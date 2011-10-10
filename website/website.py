@@ -61,8 +61,8 @@ if __name__ == "__main__":
     PORT = int(options.port)
     HOST = options.host
     
-    discov_url = 'http://localhost:22222'
-    ego_url_prefix = 'http://localhost:10007'
+    discov_url = 'http://ypod.media.mit.edu:22222'
+    ego_url_prefix = 'http://ypod.media.mit.edu:10007'
     #static_url_prefix = '/ego'
     website_url_prefix = 'http://%s:%s' % (HOST, PORT)
     
