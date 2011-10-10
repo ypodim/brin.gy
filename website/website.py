@@ -90,5 +90,6 @@ if __name__ == "__main__":
     ], **settings)
 
     http_server = tornado.httpserver.HTTPServer(application)
+    print HOST, PORT
     http_server.listen(PORT, address=HOST)
     tornado.ioloop.IOLoop.instance().start()
