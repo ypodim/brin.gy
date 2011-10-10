@@ -272,7 +272,7 @@ class Scenario(Thread):
                 o.group = g
                 
                 o.p.randomize_in_rect(o.group.p.x, o.group.p.y, o.group.w, o.group.h)
-                res = self.post('http://localhost:10002/new_agent', dict(username='agent%s'%i))
+                res = self.post('http://ypod.media.mit.edu:10007/new_agent', dict(username='agent%s'%i))
                 print 'POST', res
                 self.obj.append(o)
                 i += 1
@@ -308,7 +308,7 @@ class Scenario(Thread):
                 agents[a.name] = {'current location':dic}
             
             try:
-                res = self.post('http://localhost:10002/batch_location', dict(data=json.dumps(agents)))
+                res = self.post('http://ypod.media.mit.edu:10007/batch_location', dict(data=json.dumps(agents)))
                 print res['response_time']
             except:
                 continue
@@ -324,7 +324,7 @@ class Scenario(Thread):
                 agents[a.name] = a.profile
             
             try:
-                res = self.post('http://localhost:10002/batch_profile', dict(data=json.dumps(agents)))
+                res = self.post('http://ypod.media.mit.edu:10007/batch_profile', dict(data=json.dumps(agents)))
                 rt = res['response_time']
                 print rt
                 response_time += rt
