@@ -63,15 +63,15 @@ if __name__ == "__main__":
     
     discov_url = 'http://localhost:22222'
     ego_url_prefix = 'http://localhost:10007'
-    static_url_prefix = '/ego'
+    #static_url_prefix = '/ego'
     website_url_prefix = 'http://%s:%s' % (HOST, PORT)
     
     mode = ''
     if debug:
         mode = '(debug)'
-        static_url_prefix = ''
+        #static_url_prefix = ''
     
-    website_url_prefix += static_url_prefix
+    #website_url_prefix += static_url_prefix
     
     print 'Ego website running at %s:%s %s' % (HOST,PORT,mode)
     
@@ -80,7 +80,8 @@ if __name__ == "__main__":
         "xsrf_cookies": True,
         "debug": debug,
         "static_path": os.path.join(os.path.dirname(__file__), "static"),
-        "static_url_prefix": '%s/static/' % static_url_prefix,
+        #"static_url_prefix": '%s/static/' % static_url_prefix,
+        "static_url_prefix": '/static/'
     }
     
     application = tornado.web.Application([
