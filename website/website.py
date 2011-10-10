@@ -63,15 +63,14 @@ if __name__ == "__main__":
     
     discov_url = 'http://ypod.media.mit.edu:22222'
     ego_url_prefix = 'http://ypod.media.mit.edu:10007'
-    #static_url_prefix = '/ego'
-    website_url_prefix = 'http://%s:%s' % (HOST, PORT)
     
     mode = ''
     if debug:
         mode = '(debug)'
-        #static_url_prefix = ''
+        website_url_prefix = 'http://%s:%s' % (HOST, PORT)
+    else:
+        website_url_prefix = 'http://brin.gy'
     
-    #website_url_prefix += static_url_prefix
     
     print 'Ego website running at %s:%s %s' % (HOST,PORT,mode)
     
