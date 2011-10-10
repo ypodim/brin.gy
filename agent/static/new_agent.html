@@ -1,0 +1,81 @@
+<html>
+<head>
+<meta http-equiv="content-script-type" content="text/json">
+
+<style>
+body { color:#bbb; background:#191919; width:800px; margin:auto; }
+#header { font-size: 70px; font-variant: small-caps; padding-top:100px; }
+.text { height:50px; font-size: 35px; float:left; width:400px; }
+#form { width:800px; float:left; }
+#output { margin-top:100px; }
+button { width:250px; font-size: 35px; float:right; }
+#output { height:50px; font-size: 35px; float:left; width:800px; }
+</style>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script language="javascript" type="text/javascript">
+
+$(document).ready(function()
+{
+    $("#submit").click(create_agent);
+    $("#delete").click(delete_agent);
+})
+
+var delete_agent = function()
+{
+    $("#delete").click(function(){
+        prefix_url = "http://" + $("#agent_host").val();
+        host_url = prefix_url + "/manage_agent";
+    
+        $.ajax({
+            type: "DELETE",
+            url: host_url,
+            dataType: "json",
+            success: function(json){
+                console.log(json);
+            }
+        });
+    });
+}
+
+var create_agent = function()
+{
+    prefix_url = "http://" + $("#agent_host").val();
+    host_url = prefix_url + "/manage_agent";
+    dataString = {};
+    $.post(host_url, dataString, function(data) {
+        console.log(data);
+        if (data.error)
+            alert(data.error);
+        
+        html = "User "+data.username+" ("+data.usertype+") was added:";
+        
+        agent_url = prefix_url+"/"+data.username;
+        loc_url = prefix_url+"/static/location.html#agent_url="+data.username;
+        
+        link1 = $("<a></a>").attr("href",agent_url).html("profile").css({"margin-left":"30px", "color":"yellow"});
+        link2 = $("<a></a>").attr("href",loc_url).html("location").css({"margin-left":"30px", "color":"yellow"});
+        
+        entry = $("<div></div>").html(html).append(link1).append(link2);
+        $("#output").append(entry);
+        
+    }, "json");
+}
+</script>
+
+</head>
+<body>
+
+<div id="header">Grab an Agent <hr /> </div>
+
+<div id="form">
+    <input class="text" id="agent_host" name="agent_host" type="text" value="18.85.59.195:11111"/>
+    <button id="submit">get one</button>
+    <button id="delete">delete all</button>
+</div>
+
+<div id="output">
+</div>
+
+</body>
+</html>

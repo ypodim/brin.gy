@@ -1,0 +1,54 @@
+{% extends "website/base.html" %}
+
+{% block title %}
+Distributed Social Networking ~ Own Your Data!
+{% endblock %}
+
+{% block content %}
+<div id="slider">
+    <ul>
+        <li>
+            <!-- Main page -->
+            <table class="blocks">
+                <tr>
+                    <td class="block one">
+                        <span class="header">What is Ego?</span>
+                        <div class="text">Ego is a distributed social network that allows you to own your data and your social connections.</div>
+                        <div class="text">Your personal agent represents you to the world and acts on your behalf. Store any information you wish in your agent and form relationships with other agents to share data.</div>
+
+                        Want to learn more? Read the <a href="/ego/about">about</a> page.
+                    </td>
+                    <td class="block two">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="block three">
+                        <span class="header">Get an agent!</span>
+                        <div class="text">We can run an agent for you on our server. This means you can get up and running right away!</div>
+                        <div class="centered-text"><span id="go_forward" class="button"><img class='img_btn' src="/static/images/website/grab_agent.png" /></span></div>
+                        
+                    </td>
+                    <td class="block four">
+                        <span class="header">Who's using it?</span>
+                        
+                    </td>
+                </tr>
+            </table>
+        </li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+#slider ul, #slider li {
+    margin:0;
+    padding:0;
+    list-style:none;
+}
+</style>
+{% endblock %}

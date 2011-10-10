@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+        <title>
+        Ego ~ </title>
+        <!-- Styles -->
+        <!-- Put styles in head: http://developer.yahoo.com/performance/rules.html#css_top -->
+        <link rel="stylesheet" href="/static/css/ego_website.css" type="text/css"/> 
+<!--         {% block extra_styles %}{% endblock %} -->
+        <link rel="shortcut icon" href="/static/images/website/ego-icon.png">
+    </head>
+
+    <body>
+        <div id="menu">
+            <div class="menu-item button" id="menu-title">
+                <span id="title">Ego</span>  
+            </div>
+                <div class="menu-item">
+                    <img src="/static/images/website/index.png" />
+                    <span class="button">Home</span>
+                </div>
+                <div class="menu-item">
+                    <img src="/static/images/website/download.png" />
+                    <span class="button">Downloads</span>
+                </div>
+                <div class="menu-item">
+                    <img src="/static/images/website/guides.png" />
+                    <span class="button">Guides</span>
+                </div>
+                <div class="menu-item">
+                    <img src="/static/images/website/about.png" />
+                    <span class="button">About</span>
+                </div>
+            <br class="clear" />
+        </div>
+
+        <div id="message">
+            <!-- Block for displaying messages back to the user. -->
+            {% if message %}
+                {{message}}
+            {% else %}
+                <style>
+                    #message {
+                        display: none;
+                    }
+                </style>
+            {% endif %}
+        </div>
+
+        <div id="content">
+            <!-- Block for displaying main content. -->
+            {% block content %}{% endblock %}
+        </div>
+        
+        <div id="footer">
+            &copy; 2009 Charles Amick &amp; Pol Ypodimatopoulos, <a href="http://viral.media.mit.edu/">Viral Communications</a>, <a href="http://media.mit.edu">MIT Media Lab</a>
+        </div>
+
+        <!-- Scripts -->
+        <script language="javascript" type="text/javascript" src="/static/js/jquery.min.js"></script>
+        <script language="javascript" type="text/javascript">
+        $(document).ready(function() {
+            $("#menu-title").click(function(){window.location.href = "/";});
+        }
+        </script>
+<!--         {% block extra_scripts %}{% endblock %} -->
+    </body>
+</html>

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1214.2858"
+   height="1214.2858"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.47pre1 r21720"
+   sodipodi:docname="ego-icon.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/Users/Hgetis/projects/ego/website2/static/images/website/ego-logo256.png"
+   inkscape:export-xdpi="18.969999"
+   inkscape:export-ydpi="18.969999"
+   version="1.1">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient4757">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop4759" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop4761" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4689">
+      <stop
+         style="stop-color:#ff7f2a;stop-opacity:1;"
+         offset="0"
+         id="stop4691" />
+      <stop
+         style="stop-color:#ff7f2a;stop-opacity:0;"
+         offset="1"
+         id="stop4693" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4683">
+      <stop
+         id="stop4685"
+         offset="0"
+         style="stop-color:#ff7f2a;stop-opacity:1;" />
+      <stop
+         style="stop-color:#ff7f2a;stop-opacity:0.49803922;"
+         offset="0.26666668"
+         id="stop4695" />
+      <stop
+         id="stop4687"
+         offset="1"
+         style="stop-color:#ff7f2a;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4677">
+      <stop
+         style="stop-color:#ff7f2a;stop-opacity:1;"
+         offset="0"
+         id="stop4679" />
+      <stop
+         style="stop-color:#ff7f2a;stop-opacity:0;"
+         offset="1"
+         id="stop4681" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4671">
+      <stop
+         id="stop4673"
+         offset="0"
+         style="stop-color:#ff7f2a;stop-opacity:1;" />
+      <stop
+         id="stop4675"
+         offset="1"
+         style="stop-color:#ff7f2a;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4663">
+      <stop
+         style="stop-color:#ff7f2a;stop-opacity:1;"
+         offset="0"
+         id="stop4665" />
+      <stop
+         style="stop-color:#ff7f2a;stop-opacity:0;"
+         offset="1"
+         id="stop4667" />
+    </linearGradient>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4757"
+       id="linearGradient4763"
+       x1="831.42859"
+       y1="519.50507"
+       x2="1765.7144"
+       y2="519.50507"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="466.4286"
+     inkscape:cy="269.28186"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1115"
+     inkscape:window-height="1228"
+     inkscape:window-x="1121"
+     inkscape:window-y="189"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(1378.5714,276.4859)">
+    <g
+       id="g4765">
+      <rect
+         ry="139.5376"
+         rx="137.94106"
+         y="-276.4859"
+         x="-1378.5714"
+         height="1214.2858"
+         width="1214.2858"
+         id="rect3155"
+         style="fill:#ff7f2a;fill-opacity:0.75121951;stroke:none" />
+      <rect
+         ry="114.25667"
+         rx="112.94939"
+         y="-166.48587"
+         x="-1268.5714"
+         height="994.28571"
+         width="994.28571"
+         id="rect2383"
+         style="fill:#ff7f2a;fill-opacity:1;stroke:none" />
+    </g>
+    <g
+       id="g4717"
+       transform="matrix(1,0,0,0.78172346,-35.900645,123.71061)">
+      <g
+         id="g2840"
+         transform="translate(15.275327,9.5657664)">
+        <text
+           xml:space="preserve"
+           style="font-size:1125.64294434px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;fill:#eae9e4;fill-opacity:0.42926827;stroke:none;font-family:LMTypewriter9;-inkscape-font-specification:LMTypewriter9"
+           x="-743.7663"
+           y="687.12048"
+           id="text3165"
+           sodipodi:linespacing="100%"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Kozuka Mincho Pro B;-inkscape-font-specification:Kozuka Mincho Pro B Bold"
+             sodipodi:role="line"
+             id="tspan3167"
+             x="-743.7663"
+             y="687.12048">E</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-size:1125.64294434px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;fill:#eae9e4;fill-opacity:1;stroke:none;font-family:LMTypewriter9;-inkscape-font-specification:LMTypewriter9"
+           x="-766.86285"
+           y="662.93945"
+           id="text3157"
+           sodipodi:linespacing="100%"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Kozuka Mincho Pro B;-inkscape-font-specification:Kozuka Mincho Pro B Bold"
+             sodipodi:role="line"
+             id="tspan3159"
+             x="-766.86285"
+             y="662.93945">E</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>

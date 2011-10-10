@@ -1,0 +1,126 @@
+<html>  
+<head>
+<title>location</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+
+<script>
+var agent_url = "";
+
+var post_location = function()
+{
+    lat = $("#lat").val();
+    lon = $("#lon").val();
+    sat_url = $("#sat_host").val()+":"+$("#sat_port").val();
+    data = {"lat":lat, "lon":lon, "satellite_url":sat_url, "signature":"agent_sign"};
+    $.post(get_agent_url(), data, function(json){
+        if (json.error == "")
+        {
+            console.log(json);
+        } else {
+            console.log(json.error);
+        }
+    }, "json");
+    console.log("posted");
+}
+
+var satellite_update = function()
+{
+    sat_url = $("#sat_host").val()+":"+$("#sat_port").val();
+    sat_url = sat_url+"/location";
+    $.getJSON(sat_url, {}, function(json){
+        size = 0;
+        $("#satellite").html("");
+        for (i in json.agents) {
+            size++;
+            agent = json.agents[i];
+            
+            html = "<a href='http://"+i+"/location'>"+i+"</a> - lat:"+agent.lat+" lon:"+agent.lon+" - age:"+agent.age;
+            div = $("<div></div>").html(html);
+            $("#satellite").append(div);
+        }
+        
+        $("#population").html(size);
+    });
+}
+
+var get_agent_url = function()
+{
+    url = $("#agent_host").val()+":"+$("#agent_port").val()+$("#agent_user").val()+$("#agent_cap").val();
+    console.log(url);
+    return url;
+//     return (agent_url) ? agent_url : url;
+}
+
+$(document).ready(function() {
+    $("#save").click(post_location);
+    
+    setInterval(satellite_update, 1000);
+    /*
+    $.getJSON(get_agent_url(), function(json) {
+        for (i in json.locations) {
+            loc = json.locations[i];
+            lat = loc.lat;
+            lon = loc.lon;
+            cap_id = loc.cap_id;
+            usr_id = loc.usr_id;
+            tstamp = loc.tstamp;
+            line= "lat:"+lat+" lon:"+lon+" usr_id:"+usr_id+" cap_id:"+cap_id+" tstamp:"+tstamp+"<br>"
+            $("#locations").append(line);
+        }
+    });*/
+    
+    
+    if (/^#/.test(location.hash)) {
+        var parameters = location.hash.slice(1).split("&"),
+        started = false;
+        $.each(parameters, function() {
+            if (this != "") {
+                var parameterSplit = this.split("=");
+                switch (parameterSplit[0]) {
+                    case "agent_user":
+                        agent_user = parameterSplit[1];
+                        $("#agent_user").val("/"+agent_user);
+                        break;
+                    case "agent_url":
+                        agent_url = parameterSplit[1];
+                        $("#sat_host").val("http://"+agent_url);
+                        $("#agent_host").val("http://"+agent_url);
+                        break;
+                }
+            }
+        });
+    }
+});
+</script>
+</head>
+
+<body>
+<div>
+    satellite url
+    <input type=text id="sat_host" value="http://18.85.58.93" />
+    <input type=text id="sat_port" value="22222" />
+</div>
+
+<div>
+    agent url
+    <input type=text id="agent_host" value="http://18.85.58.93" />
+    <input type=text id="agent_port" value="10002" />
+    <input type=text id="agent_user" value="/ypod" />
+    <input type=text id="agent_cap" value="/location" />
+</div>
+
+<div>
+    new agent location:<br>
+    lat:<input type=text id="lat" value="32.5" /> <br>
+    lon:<input type=text id="lon" value="23.5" />
+</div>
+
+<button type="submit" id="save">post</button>
+<div id="population">dfs</div>
+
+<div id="locations"></div>
+
+<div id="satellite" style="background-color:gray;"></div>
+
+</body>
+</html>

@@ -1,0 +1,227 @@
+<html>
+<head>
+
+<title>GameTracker ][ MIT Media Lab</title> 
+<link rel="stylesheet" href="/static/screen.css" />
+<script src="/static/jquery.js"></script>
+
+<style>
+
+#left  { float:left;  /*width:450px;*/ padding:5px; text-align:center; }
+#right { float:right; width:180px; text-align:center; }
+
+.label { color:#FF3399; text-align:center; font-size: 40px; padding-top:20px; }
+.widget { border: 2px solid #ccc; border-radius:8px; background-color:green; }
+
+#log { padding:4px; background-color:green; color:white; }
+#chart { background-color:white;  }
+
+#container { text-align:center; font-size:40px; }
+input { width: 100px; font-size: 110%;  background-color: gray; border: 1px solid #ccc; }
+
+#stats_container { text-align: center; font-size:20px;  }
+
+
+.td { width:120px; padding: 2px; }
+
+</style>
+<script>
+
+var host = "{{prefix_url}}";
+
+var send_money = function(fromto, m)
+{
+    $.post(host, {"fromto":fromto, "amount":m}, function(json){
+        populate_table(json.players);
+        populate_log(json.log);
+        populate_stats_table(json.log, json.players);
+        make_chart(json.history);
+    }, "json");
+}
+    
+$(document).ready(function()
+{
+    $.getJSON(host + "?json=1", function(json){
+        populate_table(json.players);
+//         populate_log(json.log);
+        populate_stats_table(json.log, json.players);
+        make_chart(json.history);
+    });
+});
+
+var populate_log = function(log)
+{
+    $("#log").html("");
+    for (i in log) {
+        from = log[i][0];
+        to = log[i][1];
+        amount = log[i][2];
+        $("#log").prepend(from+" -> "+to+": "+amount+"<br>");
+    }
+}
+
+var populate_table = function(players)
+{
+    PLAYERS = players;
+    var cnt = $("#container");
+    var html;
+    
+    html = "<tr><td></td>";
+    for (var p in players) {
+        html += "<td>"+p+"</td>";
+    }
+    html += "</tr>";
+    
+    for (var p in players) {
+        html += "<tr><td>"+p+"</td>";
+        
+        for (var i in players) {
+            iid = p+" "+i;
+            tid = p+"_"+i;
+            entry = "<td><div class='td'>$<input id='"+iid+"' onchange='send_money(this.id, this.value)' type='text' value='' /></div></td>";
+            if (i == p) entry = "<td></td>";
+            html += entry;
+        }
+        html += "</tr>";
+    }
+
+    html += "<tr><td>total</td>";
+    for (var p in players) {
+        html += "<td>"+players[p]+"</td>";
+    }
+    html += "</tr>";
+    
+    cnt.html(html)
+}
+
+var populate_stats_table = function(log, players)
+{
+    var cnt = $("#stats_container");
+    var html;
+    var stats = {};
+    var from_total = {};
+    var to_total = {};
+    
+    for (i in log) {
+        from = log[i][0];
+        to = log[i][1];
+        amount = log[i][2];
+        if (stats[from] == undefined) stats[from] = {};
+        if (stats[from][to] == undefined) stats[from][to] = 0;
+        stats[from][to] += amount;
+        
+        if (from_total[from] == undefined) from_total[from] = 0;
+        from_total[from] += amount;
+        if (to_total[to] == undefined) to_total[to] = 0;
+        to_total[to] += amount;
+    }
+    
+    html = "<tr><td></td>";
+    for (var p in players) {
+        html += "<td><div class='td'>"+p+"</div></td>";
+    }
+    html += "<td>total</td></tr>";
+    
+    for (var p in players) {
+        html += "<tr><td>"+p+"</td>";
+        
+        for (var i in players) {
+            if (p == i || stats[p]==undefined || stats[p][i]==undefined) entry = "<td></td>";
+            else entry = "<td>"+stats[p][i]+"</td>";
+            
+            html += entry;
+        }
+        html += "<td>"+from_total[p]+"</td>";
+        html += "</tr>";
+    }
+
+    html += "<tr><td>total</td>";
+    for (var p in players) {
+        html += "<td>"+to_total[p]+"</td>";
+    }
+    html += "<td></td></tr>";
+    
+    cnt.html(html)
+}
+
+var make_chart = function(history)
+{
+    var limit = 6000;
+    console.log(history);
+    var chart = $("#chart");
+    url = "http://chart.apis.google.com/chart";
+    url+= "?chxr=0,0,"+limit;
+    url+= "&chxt=y";
+    url+= "&chs=440x220";
+    url+= "&cht=lxy";
+    url+= "&chco=3366CC,FF0000,00FF00,FF9900";
+    
+    data = "";
+    legend = "";
+    max = 0;
+    for (u in history) {
+        if (u == "BANK")
+            continue;
+        
+        data += "-1|";
+        legend += u+"|";
+        
+        if (max < history[u].length)
+            max = history[u].length;
+            
+        if (max < history[u].length)
+            max = history[u].length;
+        for (d in history[u])
+            data += history[u][d]+",";
+        data = data.substring(0, data.length-1);
+        data += "|";
+    }
+    legend = legend.substring(0, legend.length-1);
+    data = data.substring(0, data.length-1);
+    console.log(data);
+    url+= "&chd=t:"+data;
+    
+    url+= "&chds=0,"+100+",0,"+limit;
+    url+= "&chdl="+legend;
+    url+= "&chdlp=t";
+    url+= "&chls=3|3|3|3";
+    url+= "&chma=5,5,5,25";
+//     url+= "&chtt=Monopoly";
+    
+   
+    var img = $("<img />").attr("src", url).attr("width",500);
+    chart.html(img);
+//     console.log(img);
+}
+</script>
+
+</head>
+<body>
+
+<div id="left">
+    <div class="label">Cashier</div>
+    <div class="widget">
+        <table id="container">
+        </table>
+    </div>
+    
+    <div class="label">Wealth</div>
+    <div id="chart" class="widget"></div>
+
+    <div class="label">Statistics</div>
+    <table id="stats_container" class="widget">
+    </table>
+</div>
+
+<div id="right">
+    <div class="label">Log</div>
+    <div id="log" class="widget">jaosdi sdo;fij</div>
+</div>
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}
+manage log
+{% endblock %}
+
+{% block content %}
+<div class="section">
+<span class="header">delete entries by IP</span>
+
+    <form method="post" action="{% url ego_website.views.manage_log %}">
+        <label for="ip_entry">Select IP:</label>
+        <select name="ip_entry">
+        {% for ie in ip_entries %}
+        <option value="{{ie.ip}}">{{ie.count}} {{ie.ip}}</option>
+        {% endfor %}
+        </select>
+
+        <input type="submit" id="submit" value="delete" />
+    </form>
+
+I will delete {{ip_todelete}} count: {{ip_count}}<br><br>
+
+<span class="header">delete entries browser</span>
+    <form method="post" action="{% url ego_website.views.manage_log %}">
+        <label for="agent_entry">Select browser agent:</label>
+        <select name="agent_entry">
+        {% for ae in agent_entries %}
+        <option value="{{ae.agent}}">{{ae.count}} {{ae.agent}}</option>
+        {% endfor %}
+        </select>
+
+        <input type="submit" id="submit" value="delete" />
+    </form>
+
+I will delete {{agent_todelete}} count: {{agent_count}}<br>
+</div>
+
+{% endblock %}

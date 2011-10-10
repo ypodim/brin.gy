@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+
+{% block head %}
+<script language="javascript" type="text/javascript">
+
+
+var ego_url_prefix = "{{ego_url_prefix}}";
+var website_url_prefix = "{{website_url_prefix}}";
+
+var check_username = function()
+{
+    username = $("#username").val();
+    
+    $.getJSON(ego_url_prefix+"/"+username, function(json){
+        if (username && username != "<username>" && typeof json == "object" && json.error) {
+            $("#btn_check").hide();
+            $("#btn_clear").show();
+            $("#btn_taken").hide();
+            $("#default_msg").hide();
+        } else {
+            $("#btn_check").hide();
+            $("#btn_clear").hide();
+            $("#btn_taken").show();
+            $("#default_msg").hide();
+        }
+    });
+    return false;
+}
+
+$(document).ready(function()
+{
+    $("#username").focus().keydown(function(obj){
+        if (obj.keyCode == 13)
+            return check_username();
+        
+        $("#btn_check").show();
+        $(".indicator").hide();
+
+        if ($(this).val() == "<username>")
+            $(this).val('').css("color","black");
+
+        $("#default_msg").show();
+    });
+
+    $("form").submit(function(obj){
+        dataString = {
+            "username":$("#username").val(),
+            "usertype":$("#usertype").val(),
+        };
+        var error = "";
+        
+        $.post(ego_url_prefix+'/new_agent', dataString, function(data) {
+            console.log(data);
+            error = data.error;
+            if (data.error)
+                alert(data.error);
+            
+            html = "User "+data.username+" ("+data.usertype+") was added:";
+            link = $("<a></a>").attr("href",ego_url_prefix+"/"+data.username).html(data.username).css({"margin-left":"30px", "color":"yellow"});
+            entry = $("<div></div>").html(html).append(link);
+
+            $("#output").append(entry);
+
+            $("#btn_clear").hide().html("taken");
+            $("#btn_taken").hide().html("taken");
+            $("#default_msg").show();
+            $("#username").focus();
+
+            if (! error.length)
+                window.location.href = "{{website_url_prefix}}/manage/"+$("#username").val();
+                
+        }, "json");
+        
+        return false;
+    });
+
+    $("#btn_clear").click(function (){
+        $("form").submit();
+    });
+    
+    $("#btn_check").click(function (){
+        check_username();
+    });
+
+//     $("select").show();
+});
+</script>
+{% end %}
+
+{% block body %}
+
+<div id="left">
+    <h2>With Ego you can...</h2>
+    <p><b>create</b>, <b>store</b> and <b>analyze</b> information about you, like your location over time, your habits, the effectiveness of your medicine, etc. Then, Ego allows you to reach out to other people and <b>discover</b> information that is relevant to your own, such as people that want to buy the product that you are selling, neighbors that are already at the supermarket and can pick up milk for you, etc. <a href="/about">...more</a></p>
+</div>
+
+<div id="right">
+    <h2>Grab an Agent</h2>
+
+    <div id="form">
+        <form method="post">
+        <input class="text" id="username" name="username" type="text" value="<username>"/>
+        <select class="text" id="usertype">
+            <option class="text" value="guest">guestoid</option>
+            <option class="text" value="faculty">facultoid</option>
+            <option class="text" value="staff">staffoid</option>
+            <option class="text" value="student">studentoid</option>
+            <option class="text" value="screen">screenoid</option>
+        </select>
+        </form>
+    </div>
+
+    <div id="message" class="text css3">
+        <a id="btn_clear" class="indicator" href="#">get it!</a>
+        <a id="btn_taken" class="indicator" href="#">taken</a>
+        <a id="btn_check" href="#">check</a>
+    </div>
+    
+    <div id="test_button" class="css3">
+        
+    </div>
+
+    <div id="output" class="text"></div>
+</div>
+
+{% end %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

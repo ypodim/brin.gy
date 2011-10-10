@@ -1,0 +1,477 @@
+{% extends "base.html" %}
+
+{% block head %}
+<script language="javascript" type="text/javascript">
+
+var ego_url_prefix = "{{ego_url_prefix}}";
+
+var agent_url = ego_url_prefix+"/{{args}}";
+var capabilities = {};
+var manager = {};
+
+var valid_caps = {
+    "profile":1,
+    "friends":0,
+    "location":1,
+    "buysell":1,
+    "like":0,
+    "dating":0,
+    "charms":0,
+    "iptracker":0,
+    "miralax":0,
+    "tags":0,
+};
+    
+var invalid_profile_items = {
+    "supervisor":1,
+    "first_name":1,
+    "last_name":1,
+    "id":1,
+    "ml_title":1,
+    "user_type":1,
+    "display_web":1,
+    "employee":1,
+    "pi":1,
+    "user_name":1,
+    "outside_ra":1,
+    "status":1,
+    "mit_title":1,
+    "assistant":1,
+    "affiliation_primary":1,
+    "affiliation_secondary":1,
+    "student":1,
+    "web_code":1,
+    "agenda_title":1,
+    "bio":1,
+    "rf_id":1,
+    "office_phone":1,
+    "office_room":1,
+    "affiliation":1,
+    "picture":1,
+    "picture_url":1,
+    
+};
+
+function callfunc(func){
+    if (this[func] == undefined)
+        console.log(func);
+    this[func].apply(this, Array.prototype.slice.call(arguments, 1));
+}
+
+function insert_profile_entry(entries, username, key, val)
+{
+    new_entry = (key=="") ? "_" : "";
+    e = "<div class='entry' id='"+new_entry+"prof_entry_"+key+"_"+val+"'>";
+    e+= "<input type='text' id='"+new_entry+"prof_key_"+key+"' class='prof_entry' name='key' value='"+key+"' />";
+    e+= "<input type='text' id='"+new_entry+"prof_val_"+val+"' class='prof_entry' name='val' value='"+val+"' />";
+    e+= "</div>";
+    imgsrc = "{{ static_url('images/other/close-button-red.png') }}";
+    delbtn = $("<img src='"+imgsrc+"' class='del_button' />").click(function() {
+        console.log('deleting'+" ");
+        $.ajax({
+            type: 'DELETE',
+            url: ego_url_prefix+"/"+username+"/profile",
+            data: {"key":key,"val":val},
+            success: function(json) {
+                console.log('got back');
+                console.log(json.result);
+//                 populate_profile(entries, username);
+//                 $("#entry_").remove();
+            },
+            dataType: "json"
+        });
+    });
+    
+    entry = $(e).append(delbtn)
+    entries.append(entry);
+}
+
+function insert_buysell_entry(entries, username, action, index, itemid, price, threshold, timeout, matched, lumped)
+{
+    new_entry = (index=="") ? "_" : "";
+    sel1 = (action=="buy") ? "SELECTED" : "";
+    sel2 = (action=="sell") ? "SELECTED" : "";
+    sel3 = (index=="bestbuy") ? "SELECTED" : "";
+    sel4 = (index=="amazon") ? "SELECTED" : "";
+    sel5 = (index=="digikey") ? "SELECTED" : "";
+    sel6 = (index=="sparkfun") ? "SELECTED" : "";
+    
+    e = "<div class='entry' id='"+new_entry+"bs_entry_"+index+"_"+itemid+"'>";
+    e+= "  <select id='"+new_entry+"bs_action' name='action'>";
+    e+= "  <option "+sel1+" value='buy'>buy</option>";
+    e+= "  <option "+sel2+" value='sell'>sell</option>";
+    e+= "  </select>";
+    
+    e+= "  <select id='"+new_entry+"bs_index' name='index'>";
+    e+= "  <option "+sel3+" value='bestbuy'>BestBuy</option>";
+    e+= "  <option "+sel4+" value='amazon'>Amazon</option>";
+    e+= "  <option "+sel5+" value='digikey'>Digikey</option>";
+    e+= "  <option "+sel6+" value='sparkfun'>Sparkfun</option>";
+    e+= "  </select>";
+    
+    e+= "  <input type='text' style='width:50px' id='"+new_entry+"bs_itemid' name='itemid' value='"+itemid+"' />";
+    e+= "  $<input style='width:35px' type='text' id='"+new_entry+"bs_price' name='price' value='"+price+"' />";
+    e+= "  $<input style='width:35px' type='text' id='"+new_entry+"bs_threshold' name='threshold' value='"+threshold+"' />";
+    e+= "  <input style='width:25px' type='text' id='"+new_entry+"bs_timeout' name='timeout' value='"+timeout+"' />hrs";
+    e+= "</div>";
+    imgsrc = "{{ static_url('images/other/close-button-red.png') }}";
+    delbtn = $("<img src='"+imgsrc+"' class='del_button' />").click(function() {
+        console.log('deleting'+" ");
+        $.ajax({
+            type: 'DELETE',
+            url: ego_url_prefix+"/"+username+"/buysell",
+            data: {"index":index,"itemid":itemid},
+            success: function(json) {
+                console.log('delete got back');
+                console.log(json.result);
+                $("#bs_entry_"+index+"_"+itemid).remove();
+            },
+            dataType: "json"
+        });
+    });
+    
+    matchedtxt = "no agents matched :("
+    color = "gray";
+    if (matched.length > 0) {
+        matchedtxt = matched.length + " agents matched";
+        color = "green";
+    }
+    
+    matchedbar = $("<span></span>")
+                        .attr("id","id")
+                        .addClass("progressbar")
+                        .html(matchedtxt)
+                        .css("background-color",color);
+    
+    
+    lumpedtxt = "no agents like you"
+    color = "gray";
+    if (lumped.length > 0) {
+        lumpedtxt = lumped.length + " agents like you";
+        color = "green";
+    }
+    
+    lumpedbar = $("<span></span>")
+                        .attr("id","id")
+                        .addClass("progressbar")
+                        .html(lumpedtxt)
+                        .css("background-color",color);
+                        
+    
+    entry = $(e).append(delbtn).append(matchedbar).append(lumpedbar);
+    entries.append(entry);
+}
+
+manager.profile = function(capbox, json)
+{
+    prof_entries = $("<div></div>").attr("id","prof_entries");
+    controls = $("<div></div>").addClass("controls");
+    add_entry = $("<div></div>").attr("id","add_entry").addClass("button").html("add more");
+    add_entry.click(function() { insert_profile_entry(prof_entries, json.user, "", ""); });
+    btn = $("<button type='submit' id='save'>Save</button>");
+    btn.click(function() {
+        html = $("<div>close</div>").click(function(){
+            $("#popup").fadeOut();
+            $("#cover").hide();
+        });
+        show_popup(html);
+        
+        key = $("#_prof_key_").val();
+        val = $("#_prof_val_").val();
+        console.log("sending profile "+key+" "+val+"-");
+        
+        $.post(ego_url_prefix+"/"+json.user+"/profile", {"key":key,"val":val}, function(json){
+            console.log('got back');
+            console.log(json);
+            $("#_prof_key_").attr("id","prof_key_"+key);
+            $("#_prof_val_").attr("id","prof_val_"+val);
+        }, "json");
+    });
+    controls.append(add_entry).append(btn);
+    
+    for (k in json.data)
+        if (invalid_profile_items[k] != 1) {
+            v = json.data[k];
+            if (typeof v == "string")
+                insert_profile_entry(prof_entries, json.user, k, v, "");
+            else
+                for (i in v)
+                    insert_profile_entry(prof_entries, json.user, k, v[i], "");
+        }
+
+    capbox.append(prof_entries).append(controls);
+    
+}
+
+manager.location = function(capbox, json) 
+{
+    var gauge = $("<span style='margin-left:20px;'>50</span>");
+    var o1 = $("<input type='checkbox' />");
+    var o2 = $("<input type='range' value='50' min='20' max='500' step='1' id='location_slider' />").change(function() {
+        range = $(this).val();
+        gauge.html(range);
+        $.getJSON("http://ypod.media.mit.edu:22222/location_range", {"range":range}, function(json){
+            console.log(json);
+        });
+    });
+    
+    options = $("<div>range: </div>").append(o2).append(gauge).append("&nbsp;yards.");
+//     options.append("post location");
+//     console.log("sending location "+json.user);
+//     btn = $("<button type='submit' id='save'>Save</button>");
+//     btn.click(function() {
+//         console.log(o1.attr("checked"));
+//         $.post(ego_url_prefix+"/"+json.user+"/location", {"key":"post_to_satellite","val":o1.attr("checked")}, function(json){
+//             console.log('got back');
+//             console.log(json);
+//         });
+//     });
+    
+    controls = $("<div></div>").addClass("controls");
+    controls.append(options);
+//     contorols.append(btn);
+    capbox.append(controls);
+}
+
+manager.buysell = function(capbox, json) 
+{
+    title = "<span style='padding-left:5px;'>Action</span>";
+    title+= "<span style='padding-left:15px'>Index</span>";
+    title+= "<span style='padding-left:45px'>ItemID</span>";
+    title+= "<span style='padding-left:20px'>Price</span>";
+    title+= "<span style='padding-left:20px'>Thres</span>";
+    title+= "<span style='padding-left:10px'>Timeout</span>";
+    title = $(title);
+    capbox.append(title).addClass("wide_capability");
+    
+    entries = $("<div></div>").attr("id","entries");
+    controls = $("<div></div>").addClass("controls");
+    add_entry = $("<div></div>").attr("id","add_entry").addClass("button").html("add more");
+    add_entry.click(function() { 
+        insert_buysell_entry(entries, json.user, "", "", "", "", "", 600, 0, 0); 
+    });
+    btn = $("<button type='submit' id='save'>Save</button>");
+    btn.click(function() {
+        action = $("#_bs_action").val();
+        index = $("#_bs_index").val();
+        itemid = $("#_bs_itemid").val();
+        price = $("#_bs_price").val();
+        threshold = $("#_bs_threshold").val();
+        timeout = $("#_bs_timeout").val();
+        
+        if (action == undefined || itemid=="" || price=="" || threshold=="")
+            return;
+        
+        data = {"action":action, "index":index, "itemid":itemid, "price":price, "threshold":threshold, "timeout":timeout};
+        console.log(data);
+        
+        $.post(ego_url_prefix+"/"+json.user+"/buysell", data, function(json){
+            console.log('got back');
+            console.log(json);
+            
+            $("#_bs_action").attr("id","bs_action");
+            $("#_bs_index").attr("id","bs_index");
+            $("#_bs_itemid").attr("id","bs_itemid");
+            $("#_bs_price").attr("id","bs_price");
+            $("#_bs_threshold").attr("id","bs_threshold");
+            $("#_bs_timeout").attr("id","bs_timeout");
+            $("#_bs_entry__").attr("id","bs_entry_"+index+"_"+itemid);
+        });
+    });
+    controls.append(add_entry).append(btn);
+    
+    console.log(json.data);
+    for (k in json.data) {
+        action = json.data[k].action;
+        index = json.data[k].index;
+        itemid = json.data[k].itemid;
+        price = json.data[k].price;
+        threshold = json.data[k].threshold;
+        timeout = json.data[k].timeout;
+        matched = json.data[k].matched;
+        lumped = json.data[k].lumped;
+        tstamp = json.data[k].tstamp;
+
+        dt = (json.current_time - json.data[k].tstamp) * 1;
+        timeout = (dt < timeout) ? timeout - dt : 0;
+        
+        insert_buysell_entry(entries, json.user, action, index, itemid, price, threshold, timeout, matched, lumped);
+    }
+    capbox.append(entries).append(controls);
+}
+
+manager.friends = function(capbox, json) 
+{
+    for (i in json.data)
+        capbox.append(i+":"+json.data[i]+"<br>");
+}
+
+manager.iptracker = function(capbox, json) 
+{
+    for (i in json.data)
+        capbox.append(i+":"+json.data[i]+"<br>");
+}
+
+manager.tags = function(capbox, json) 
+{
+    for (i in json.data)
+        capbox.append(i+":"+json.data[i]+"<br>");
+}
+
+manager.like = function(capbox, json) 
+{
+    for (i in json.data)
+        capbox.append(i+":"+json.data[i]+"<br>");
+}
+
+manager.dating = function(capbox, json) 
+{
+    for (i in json.data)
+        capbox.append(i+":"+json.data[i]+"<br>");
+}
+
+manager.charms = function(capbox, json) 
+{
+    for (i in json.data)
+        capbox.append(i+":"+json.data[i]+"<br>");
+}
+
+var get_cap_data = function(capname, cap_url)
+{
+    var capbox = $("<div></div>")
+                    .addClass("capability")
+                    .attr("id","capbox_"+capname)
+                    .append("<h2>"+capname+"</h2>")
+                    .hide();
+    $.getJSON(cap_url, function(json){
+        callfunc.call(manager, capname, capbox, json);
+    });
+    
+    $("#capabilities").append(capbox);
+    
+    if (valid_caps[vcap] == 1)
+        capbox.show()
+}
+
+$(document).ready(function()
+{   
+    var capbox = $("<div></div>")
+                    .addClass("capability mgr")
+                    .append("<h2>Applications</h2>");
+    for (capab in valid_caps) {
+        cap_check = $("<div></div>");
+        checked = (valid_caps[capab] == 1) ? "checked" : "";
+        html = "<input type='checkbox' "+checked+" cap='"+capab+"' />";
+        checkbox = $(html).click(function(){
+            cap = $(this).attr("cap");
+            valid_caps[cap] = ! valid_caps[cap];
+            console.log(cap+" is now "+valid_caps[cap]);
+            $("#capbox_"+cap).toggle();
+        });
+        cap_check.append(checkbox);
+        cap_check.append(capab);
+        capbox.append(cap_check);    
+    }
+    
+    var vizbox = $("<div></div>").attr("id","vizbox").addClass("capability mgr");
+    
+    $("#capabilities").append(capbox);
+    
+    vizbox.css("height", capbox.height());
+//     $("#capabilities").append(vizbox);
+    
+    $.getJSON(agent_url, function(json){
+        for (vcap in valid_caps) {
+            for (i in json.capabilities) {
+                cap = json.capabilities[i];
+                if (cap == vcap)
+                    get_cap_data(cap, agent_url+"/"+cap);
+            }
+        }
+    });
+    
+//     draw();
+});
+
+
+var Circle = function(x, y, rad, a)
+{
+    var cir = $("<div></div>").addClass("circle");
+    cir.css({"left":x, "top":y, "width":rad, "height":rad-5, "border-radius":rad+5});
+    if (a != undefined)
+        cir.css("opacity",a);
+    
+    return cir;
+}
+
+var draw = function()
+{
+    $(".circle").remove();
+    $(".caption").remove();
+    
+    cap = $("<div></div>").addClass("caption")
+                          .addClass("large")
+                          .text("asdf")
+                          .css({"left":10, "top":10});
+    
+    vleft = $("#vizbox").offset().left - 10;
+    vtop = $("#vizbox").offset().top;
+    vwidth = $("#vizbox").width();
+    vheight = $("#vizbox").height();
+    
+    sx = vleft + $("#vizbox").width()/2;
+    sy = vtop + 10;
+    
+    cir = Circle(sx, sy, 10);
+    $("#vizbox").append(cir);
+    
+    sx = vleft + 20;
+    sy = vtop + vheight - 25;
+    cir = Circle(sx, sy, 10);
+    $("#vizbox").append(cir);
+    
+    cir.addClass("move");
+    
+//     c = $("<div></div>").addClass("caption").text("YOU").css({"left":offset, "top":offset}).show();
+//     $("#vizbox").append(c);
+    
+//     for (i=0; i<N; i++) {
+//         theta = i*2*Math.PI/N + Math.PI;
+//         x = offset + layout_rad * Math.cos(theta);
+//         y = offset + layout_rad * Math.sin(theta);
+//         
+//         cx = offset + (layout_rad/2+rad/4) * Math.cos(theta);
+//         cy = offset + (layout_rad/2+rad/4) * Math.sin(theta);
+//         caption = intersections[i];
+//         cap = $("<div></div>").addClass("caption").text(caption).css({"left":cx, "top":cy});
+//         $("#vizbox").append(cap);
+//         cir.fadeIn(delay);
+//         cap.fadeIn(delay);
+//     }
+
+}
+
+var show_popup = function(content)
+{
+    $("#cover").show();
+    pad = 10;
+    ww = $(window).width();
+    pw = $("#popup").width()+2*pad;
+    wh = $(window).height();
+    ph = $("#popup").height()+2*pad;
+//     console.log(pad);
+//     console.log(ph);
+    $("#popup").html(content).css("left",(ww-pw)/2).css("top",(wh-ph)/2).show();
+}
+
+</script>
+{% end %}
+{% block body %}
+<div id="popup">asdf</div>
+<div id="cover"></div>
+<div id="capabilities"></div>
+{% end %}
+
+
+
+

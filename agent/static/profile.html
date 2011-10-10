@@ -1,0 +1,95 @@
+<html>  
+<head>
+<title>Profile</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+<script>
+
+var url_prefix = "http://ego.media.mit.edu";
+var user = "charm-3";
+
+function insert_entry(key, val, itype)
+{   
+    e = "<div class='entry' id='entry_"+key+"_"+val+"' key='"+key+"'>";
+    e+= "<input type='text' class='"+itype+"' id='key"+key+"' name='key' value='"+key+"' />";
+    e+= "<input type='text' class='"+itype+"' id='val"+val+"' name='val' value='"+val+"' />";
+    e+= "</div>";
+    delbtn = $("<span class='button'></span>").html("delete").click(function() {
+        console.log('deleting'+key+" "+val);
+        $.ajax({
+            type: 'DELETE',
+            url: url_prefix+"/"+user+"/profile",
+            data: {"key":key,"val":val},
+            success: function(json) {
+                console.log('got back');
+                console.log(json.result);
+                populate_profile();
+            },
+            dataType: "json"
+        });
+    });
+    entry = $(e).append(delbtn)
+    $("#entries").append(entry);
+}
+
+var populate_profile = function()
+{
+    $("#entries").html("");
+    $.getJSON(url_prefix+"/"+user+"/profile", function(json){
+        console.log(json);
+        for (k in json.profile){
+            v = json.profile[k];
+            if (typeof v == "string")
+                insert_entry(k, v, "");
+            else
+                for (i in v)
+                    insert_entry(k, v[i], "");
+        }
+    });
+}
+
+$(document).ready(function() {
+    populate_profile();
+    
+    $("#add_entry").click(function() { insert_entry("", "", "temp"); });
+    
+    $("#save").click(function() {
+        key = $("#key.temp").val();
+        val = $("#val.temp").val();
+        console.log("sending "+key+" "+val+"-");
+        $.post(url_prefix+"/"+user+"/profile", {"key":key,"val":val}, function(json){
+            console.log('got back');
+            console.log(json);
+            
+            $("#val.temp").attr("class","");
+            $("#key.temp").attr("class","");
+        });
+    });
+    
+    $("#username").val(user);
+    
+    $("#fetchbtn").click(function(){
+        user = $("#username").val();
+        populate_profile();
+    });
+});
+</script>
+
+</head>
+
+<body>
+
+<input id="username" type="text" />
+<button id="fetchbtn">fetch profile</button>
+<br><br>
+<div id="profile">
+    <div id="entries">
+    </div>
+
+    <div class="controls">
+        <div id="add_entry" class="button">add more</div>
+        <button type="submit" id="save">Save</button>
+    </div>
+</div>
+
+</body>
+</html>

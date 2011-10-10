@@ -1,0 +1,1029 @@
+{% extends "base.html" %}
+
+{% block head %}
+{% autoescape None %}
+
+<script language="javascript" type="text/javascript">
+
+///////////////////////////////////
+//////        START SUGGESTION BOX
+
+suggestion_box = {};
+suggestion_box.data = {};
+
+suggestion_box.fetch_data = function(key, val, obj)
+{
+    val = val.toLowerCase();
+    
+    $.getJSON(E.satellite.url+"/profile/complete/"+key+"/"+val, function(json){
+        suggestion_box.data = {};
+        for (i in json.matches) {
+            val = json.matches[i][0];
+            card = json.matches[i][1];
+            suggestion_box.data[val] = card;
+        }
+        suggestion_box.show_suggestions(obj);
+    });
+};
+
+suggestion_box.show_suggestions = function(obj)
+{   
+    if( ! $("#dropdown").length ) {
+        offset = obj.offset();
+        _top = offset.top + obj.height() + 10;
+        _left = offset.left;
+        width = 100;
+        
+        css = {top:_top, left:_left, border:"1px solid #dddddd", backgroundColor:"white"};
+        dropdown = $("<div id='dropdown'></div>").css(css).addClass("flying medium");
+        $("body").append(dropdown);
+    }
+    
+    $("#dropdown").empty();
+    
+    for (sug in suggestion_box.data) {
+        val = $("<a></a>").html(sug).attr("sug",sug).addClass("suggestionVal");
+        val.click(function(){
+            obj.val($(this).attr("sug"));
+            obj.trigger("keydown", [{obj:{keyCode:13}}]);
+            return false;
+        });
+        card = $("<span></span>").html(suggestion_box.data[sug]).addClass("label suggestionCard");
+        entry = $("<div></div>").addClass("suggestionEntry");
+        entry.append(val).append(card);
+        $("#dropdown").append(entry);
+    }
+};
+
+suggestion_box.hide_suggestions = function(obj)
+{
+    console.log( "closing" );
+    $("#dropdown").remove();
+};
+
+
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
+
+//////        END SUGGESTION BOX
+////////////////////////////////
+
+
+attr_manager = {};
+attr_manager.udata = {};
+attr_manager.sdata = {
+    profile:{},
+    location:{
+        "current location":{},
+        "destination":{},
+    },
+    buysell:{
+        "product":{},
+    },
+};
+
+attr_manager.add_sdata = function(cap, key, cnt) {
+    if (cap==undefined || key==undefined || cnt==undefined){
+        console.log("*** add_sdata: undefined var:", cap, key, cnt);
+        return;
+    }
+    if (attr_manager.sdata[cap] == undefined)
+        attr_manager.sdata[cap] = {};
+        
+    attr_manager.sdata[cap][key] = {cnt:cnt, enabled:1};
+}
+
+attr_manager.add_udata = function(cap, key, val, cnt) {
+    if (cap==undefined || key==undefined || val==undefined || cnt==undefined){
+        console.log("*** add_udata: undefined var:", cap, key, val, cnt);
+        return;
+    }
+    if (attr_manager.udata[cap] == undefined)
+        attr_manager.udata[cap] = {};
+    if (attr_manager.udata[cap][key] == undefined)
+        attr_manager.udata[cap][key] = {};
+
+    attr_manager.udata[cap][key][val] = {cnt:cnt, enabled:1};
+}
+
+attr_manager.remove_udata = function(cap, key, val) {
+    if (cap==undefined || key==undefined || val==undefined){
+        console.log("*** remove_udata: undefined var:", cap, key, val);
+        return;
+    }
+    if (val in attr_manager.udata[cap][key])
+        delete attr_manager.udata[cap][key][val];
+    
+    if (Object.size(attr_manager.udata[cap][key]) == 0)
+        delete attr_manager.udata[cap][key];
+}
+
+attr_manager.enable_udata = function(cap, key, val) {
+    if (cap==undefined || key==undefined || val==undefined){
+        console.log("*** enable_udata: undefined var:", cap, key, val);
+        return;
+    }
+    attr_manager.udata[cap][key][val].enabled = 1;
+}
+
+attr_manager.disable_udata = function(cap, key, val) {
+    if (cap==undefined || key==undefined || val==undefined){
+        console.log("*** disable_udata: undefined var:", cap, key, val);
+        return;
+    }
+    attr_manager.udata[cap][key][val].enabled = 0;
+}
+
+// attr_manager.add_udata("profile", "one", "ena", 32);
+// console.log(attr_manager.udata.profile.one);
+// console.log(attr_manager.udata.profile.one.ena.enabled);
+// attr_manager.disable_udata("profile", "one", "ena");
+// console.log(attr_manager.udata.profile.one.ena.enabled);
+// 
+// attr_manager.remove_udata("profile", "one", "ena");
+// console.log(attr_manager.udata);
+
+
+E = {};
+E.user = {
+    toadd:{},
+    todel:{},
+};
+
+E.monitor = {
+    "user_matches":{
+        "by_keyval": {},
+        "intersection": [],
+    },
+};
+
+// E.caps = {};
+// holds the keys to appear on the left pane
+
+E.satellite = {};
+E.satellite.url = "{{discov_url}}";
+E.agent = {};
+E.agent.id = "{{args}}";
+E.agent.baseurl = "{{ego_url_prefix}}";
+E.agent.url = "{{ego_url_prefix}}/{{args}}";
+E.website_url = "{{website_url_prefix}}";
+
+E.post_keyval = null;
+// save key/val to agent. Uses E.user.toadd to store key/val to be added
+E.delete_keyval = null;
+// delete key/val to agent. Uses E.user.todel to store key/val to be deleted
+
+E.generate_entry = null;
+// generates UI profile element. 
+// Arguments: key, val (optional for new pairs)
+
+E.generate_buysell_entry = null;
+E.generate_location_entry = null;
+
+E.set_matches = null;
+// animates the counter button of intersected matches to target value
+
+E.populate_apps = null;
+// Show available applications tab on left pane
+E.populate_attrs = null;
+// Show available attributes tab on left pane. Uses values stored in E.monitor 
+
+E.add_new_value = null;
+// creates profile UI element, flies it over to the list of values,
+// then removes it and creates a value entry in scratchpad
+E.add_new_attribute = null;
+// creates attribute element to appear on left pane
+
+E.populate_aboutme = null;
+// retrieve attributes from agent and populate right pane
+E.populate_aboutothers = null;
+// IMPLEMENT
+
+E.poll_matches = null;
+E.fetch_attributes = null;
+// fetch next batch of profiles attributes. 
+// Uses E.caps to store fetched attributes.
+E.last_fetched = ""; 
+// keeps track of the last attribute fetched to continue from the next one
+
+///////////////////////////////////////////////
+
+
+E.post_keyval = function(clb) {
+    data = JSON.stringify([[E.user.toadd.key, E.user.toadd.val]]);
+    if (clb == undefined)
+        clb = function(json){
+            console.log("post", json);
+        }
+    $.post(E.agent.url+"/"+E.user.toadd.cap, {data:data}, clb, "json");
+}
+
+E.delete_keyval = function(clb) {
+    if (clb == undefined)
+        clb = function(json){
+            console.log("post", json);
+        }
+
+    data = JSON.stringify([[E.user.todel.key, E.user.todel.val]]);
+    $.ajax({
+        type: "DELETE",
+        url: E.agent.url+"/"+E.user.todel.cap,
+        data: {data:data},
+        success: clb,
+        dataType: "json",
+    });
+}
+
+E.generate_entry = function(key, val) {
+    
+    count = $("<span></span>").addClass("count attr_counters");
+    count.html("0");
+    count_container = $("<span></span>");
+    count_container.addClass("count_container").append(count);
+    
+    checkbox = $("<input type='checkbox' id='' checked='checked' />");
+    checkbox.click(function(){
+        new_state = $(this).attr("checked");
+        
+        if ( new_state ) {
+            $(this).parent().addClass("active");
+            title.addClass("enabled");
+            input.attr("disabled","");
+            attr_manager.enable_udata("profile", key, val);
+        } else {
+            $(this).parent().removeClass("active");
+            title.removeClass("enabled");
+            input.attr("disabled","true");
+            attr_manager.disable_udata("profile", key, val);
+        }
+        E.update_monitor();
+    });
+    
+    if (val.length > 0) {
+        attr_manager.add_udata("profile", key, val, 0);
+        attr = {uitype:"user_attribute", cap:"profile", key:key, val:val};
+        count.addClass("attr_counters").attr(attr);
+    }
+    
+    var title = $("<span></span>").addClass("add-on enabled").html(key);
+    var input = $("<input class='fixer' size='14' type='text' />");
+    input.val(val).keydown(function(obj){
+        
+        if (obj.keyCode == 13 || obj.keyCode == undefined) {
+            suggestion_box.hide_suggestions();
+            val = $(this).val();
+            
+            count = $(this).next().children("span");
+            
+            prev_val = count.attr("val");
+            if (prev_val != undefined) {
+//                 console.log("update entry");
+                E.user.todel = {cap:"profile", key:key, val:prev_val};
+                E.delete_keyval();
+            }
+            
+            E.user.toadd["cap"] = "profile";
+            E.user.toadd["key"] = key;
+            E.user.toadd["val"] = val;
+            clb = function(json) {
+                if (json.error == undefined || json.error != "") {
+                    console.log("*** Error: "+json.error);
+                } else {
+                }
+            }
+            E.post_keyval(clb);
+            
+            attr_manager.add_udata("profile", key, val, 0);
+            
+            attr = {uitype:"user_attribute", cap:"profile", key:key, val:val};
+            count.addClass("attr_counters").attr(attr);
+//             $(this).prev().prev().children().attr(attr);
+            
+            form = $(this).parent().parent();
+            form.attr(attr);
+            return false;
+        }
+        val = $(this).val()+String.fromCharCode(obj.keyCode);
+        suggestion_box.fetch_data(key, val, $(this));
+    }).mousedown(function(){
+        suggestion_box.fetch_data(key, val, $(this));
+    }).focusout(function(){
+        setTimeout(suggestion_box.hide_suggestions, 300);
+    });
+
+    
+    delpic = "<a class='closebtn' href='#'>&times;</a>";
+    remover = $("<span></span>").attr({cap:"profile", key:key, val:val}).addClass("remover").html(delpic).click(function(){
+        form = $(this).parent().parent();
+
+        key = form.attr("key");
+        val = form.attr("val");
+        $(this).parent().slideUp();
+        E.user.todel = {cap:"profile", key:key, val:val};
+        E.delete_keyval();
+        
+        attr_manager.remove_udata("profile", key, val);
+        
+        return false;
+    });
+    
+    check = $("<label></label>").addClass("add-on active").append(checkbox);
+    edit = $("<div></div>").addClass("input-prepend");
+    edit.append(check).append(title).append(input).append(count_container).append(remover);
+    form = $("<form></form>").append(edit).submit(function() { return false; });
+    attr = {uitype:"user_attribute", cap:"profile", key:key, val:val};
+    form.attr(attr);
+    
+    E.update_monitor();
+    
+    return form;
+}
+
+E.buysell_val_change = function() {
+    suggestion_box.hide_suggestions();
+    form = $(this).parent().parent().parent().parent();
+    pid = form.attr("pid");
+    key = $(this).attr("key");
+    val = $(this).val();
+    form.attr(key, val);
+    
+    if (form.attr("action").length == 0) {
+        form.attr("action","buy");
+    }
+    
+    action = form.attr("action");
+    product = form.attr("product");
+    price = form.attr("price");
+    
+    dic = {action:action, product:product, price:price};
+    
+    if (action && product && price) {
+
+        val = JSON.stringify(dic);
+        
+        E.user.toadd["cap"] = "buysell";
+        E.user.toadd["key"] = pid;
+        E.user.toadd["val"] = val;
+        that = this;
+        clb = function(json) {
+            if (json.result.error == undefined || json.result.error != "") {
+                console.log("*** Error: "+json.result.error);
+            } else {
+                pid = json.result.key;
+                $(that).parent().parent().parent().parent().attr("pid",pid);
+//                 console.log("in function", json.result, $(that).parent().parent().parent().parent().attr("pid"));
+            }
+        }
+        E.post_keyval(clb);
+        
+        attr_manager.add_udata("buysell", key, val, 0);
+        
+        attr = {uitype:"user_attribute", cap:"buysell", key:key, val:val};
+        count = $(this).parent().parent().parent().next();
+        count = count.children(".count_container").children(".count");
+        count.addClass("attr_counters").attr(attr);
+        
+        checkbox = $(this).parent().parent().parent().next();
+        checkbox = checkbox.children("label").children("input");
+        checkbox.attr(attr);
+    }
+}
+
+E.generate_buysell_entry = function(key, valstr) {
+    val = {};
+    if (valstr.length > 0)
+        val = JSON.parse(valstr);
+        
+    count = $("<span></span>").addClass("count");
+    count.html("0");
+    count_container = $("<span></span>").addClass("count_container").append(count);
+    
+    checkbox = $("<input type='checkbox' id='' checked='checked' />");
+    checkbox.click(function(){
+        new_state = $(this).attr("checked");
+//         console.log(key, val);
+        
+        if ( new_state ) {
+            $(this).parent().addClass("active");
+            input.attr("disabled","");
+            if (key && valstr.length)
+                attr_manager.enable_udata("buysell", key, valstr);
+        } else {
+            $(this).parent().removeClass("active");
+            input.attr("disabled","true");
+            if (key && valstr.length)
+                attr_manager.disable_udata("buysell", key, valstr);
+        }
+        E.update_monitor();
+    });
+    
+    delpic = "<a class='closebtn' href='#'>&times;</a>";
+    remover = $("<span></span>").attr({cap:"buysell", key:key, val:valstr}).addClass("remover").html(delpic).click(function(){
+        form = $(this).parent().parent();
+        key = form.attr("pid");
+        val = $(this).attr("val");
+        console.log("deleting", key, val);
+        
+        $(this).parent().parent().slideUp();
+        if (key) {
+            E.user.todel = {cap:"buysell", key:key, val:val};
+            E.delete_keyval(function(json) {
+                if (json.error.length > 0)
+                    console.log("*** Error deleting:", json.error);
+            });
+            
+            if (val.length > 0)
+                attr_manager.remove_udata("buysell", key, val);
+        }
+        return false;
+    });
+    
+    sell_selected = "";
+    if (valstr.length > 0) {
+
+        attr_manager.add_udata("buysell", key, valstr, 0);
+        attr = {uitype:"user_attribute", cap:"buysell", key:key, val:valstr};
+        count.addClass("attr_counters").attr(attr);
+        
+        if (val.action == "sell")
+            sell_selected = "selected";
+    }
+    
+    action = $("<div></div>").addClass("bsinput");
+    label = $("<label>Action</label>").addClass("span1");
+    uicontrol = $("<select></select>").addClass("mini").attr("key","action");
+    uicontrol.html("<option>buy</option><option "+sell_selected+">sell</option>");
+    uicontrol.change(E.buysell_val_change);
+    input = $("<div class='input'></div>").append(uicontrol);
+    action.append(label).append(input);
+    
+    product = $("<div></div>").addClass("bsinput");
+    label = $("<label>Product</label>").addClass("span1");
+    uicontrol = $("<input type='text' />").addClass("xlarge").attr("key","product");
+    uicontrol.val(val.product);
+    uicontrol.change(E.buysell_val_change);
+    input = $("<div class='input'></div>").append(uicontrol);
+    product.append(label).append(input);
+    
+    price = $("<div></div>").addClass("bsinput");
+    label = $("<label>Price</label>").addClass("span1");
+    uicontrol = $("<input type='text' />").addClass("mini").attr("key","price");
+    uicontrol.val(val.price);
+    uicontrol.change(E.buysell_val_change);
+    input = $("<div class='input'></div>").append(uicontrol);
+    price.append(label).append(input);
+    
+    
+    inputs = $("<div></div>").addClass("bsinputs");
+    inputs.append(action).append(product).append(price);
+    
+    check = $("<label></label>").addClass("add-on active").append(checkbox);
+    controls = $("<div></div>").addClass("input-prepend bscontrols");
+    controls.append(check).append(count_container).append(remover);
+    
+    form = $("<form></form>").addClass("buysell").attr("pid", key);
+    form.append(inputs).append(controls).submit(function() { return false; });
+    
+    
+    if (key.length > 0) {
+        form.attr({action:val.action, product:val.product, price:val.price});
+    }
+    
+    E.update_monitor();
+    
+    return form;
+}
+
+E.generate_location_entry = function(key, val) {
+    val = JSON.stringify(val);
+//     console.log("location", key, val);
+    
+    count = $("<span></span>").addClass("count");
+    count.html("0");
+    count_container = $("<span></span>").addClass("count_container").append(count);
+    
+    checkbox = $("<input type='checkbox' checked='checked' />");
+    checkbox.click(function(){
+        new_state = $(this).attr("checked");
+        
+        if ( new_state ) {
+            $(this).parent().addClass("active");
+            title.addClass("enabled");
+            input.attr("disabled","");
+            attr_manager.enable_udata("location", key, val);
+        } else {
+            $(this).parent().removeClass("active");
+            title.removeClass("enabled");
+            input.attr("disabled","true");
+            attr_manager.disable_udata("location", key, val);
+        }
+        E.update_monitor();
+    });
+    
+    attr = {uitype:"user_attribute", cap:"location", key:"current location", val:val};
+    count.addClass("attr_counters").attr(attr);
+    attr_manager.add_udata("location", key, val, 0);
+    
+    var title = $("<span></span>").addClass("add-on enabled").html(key);
+    var input = $("<input class='fixer' size='14' type='text' />");
+    
+    delpic = "<a class='closebtn' href='#'>&times;</a>";
+    remover = $("<span></span>").attr({cap:"location", key:key, val:val}).addClass("remover").html(delpic).click(function(){
+        key = $(this).attr("key");
+        val = $(this).attr("val");
+        $(this).parent().slideUp();
+        E.user.todel = {cap:"location", key:key, val:val};
+        E.delete_keyval();
+        
+        attr_manager.remove_udata("location", key, val);
+        return false;
+    });
+    
+    check = $("<label></label>").addClass("add-on active").append(checkbox);
+    edit = $("<div></div>").addClass("input-prepend").append(check).append(title).append(input).append(count_container).append(remover);
+    form = $("<form></form>").append(edit).submit(function() {
+        console.log('Handler for .submit() called.');
+        return false;
+    });
+    
+    E.update_monitor();
+    
+    return form;
+}
+
+E.set_matches = function(stop) {
+    if (stop == undefined)
+        stop = parseInt($("#matches").attr("curpos"));
+    else
+        $("#matches").attr("curpos", stop);
+    
+    $(".match_box").show();
+    start = parseInt($("#matches").html());
+    step = 1;
+    if (Math.abs(start-stop) > 10) { step = 10 }
+    if (Math.abs(start-stop) > 100) { step = 100 }
+    if (Math.abs(start-stop) > 1000) { step = 1000 }
+    if (start > stop) {
+        $("#matches").html(start-step);
+        setTimeout(E.set_matches, 20);
+    }
+    if (start < stop) {
+        $("#matches").html(start+step);
+        setTimeout(E.set_matches, 20);
+    }
+}
+E.populate_apps = function() {
+    $("#choices").empty();
+    $("#showapps").addClass("active");
+    $("#showattrs").removeClass("active");
+}
+E.populate_attrs = function() {
+    $("#choices").empty();
+    $("#showattrs").addClass("active");
+    $("#showapps").removeClass("active");
+    
+    for (capname in attr_manager.sdata) {
+        if (Object.size(attr_manager.sdata[capname]) == 0 && capname != "profile")
+            continue;
+            
+        $("#choices").append($("<div>"+capname+"</div>").addClass("choice_header"));
+        for (attr in attr_manager.sdata[capname]) {
+            
+            prop = $("<span></span>").append(attr);
+            // attr_counters class is used to group and iterate through all attribute counters
+            count = $("<span></span>").addClass("count").addClass("attr_counters");
+
+            count.html(attr_manager.sdata[capname][attr]);
+            count.attr({uitype:"sat_attribute", cap:capname, key:attr});
+            
+            prop = $("<div></div>").append(prop).append(count);
+            
+            pill_content = $("<a href='#'></a>").attr("prop",attr).attr("cap",capname).append(prop).click(function(){
+                key = $(this).attr("prop");
+                cap = $(this).attr("cap");
+                E.user.toadd["cap"] = cap;
+                offset = $(this).offset();
+                E.add_new_value(cap, key, offset);
+                return false;
+            });
+            pill = $("<li class='active'></li>").append(pill_content);
+            $("#choices").append(pill);
+        }
+        
+        // specifically for profile, add a pill for new keys
+        if (capname == 'profile') {
+            pill_content = $("<a href='#'>create new attribute...</a>").attr("cap",capname).click(E.add_new_attribute);
+            pill = $("<li class='green_pill'></li>").append(pill_content);
+            $("#choices").append(pill);
+        
+            more = $("<a href='#'>fetch more...</a>").click(function(){
+                E.fetch_attributes();
+                return false;
+            });
+            $("#choices").append(more);
+        }
+    }
+    
+    
+    $("#match_btn").click(function(){
+        console.log(E.monitor.user_matches.intersection);
+        return false;
+    });
+}
+
+//////////////////////////////////////////////////
+
+E.add_new_value = function(cap, key, offset) {
+    //hide the default help message, if shown.
+    $("#empty_scratchpad").hide();
+                
+    scratch_offset = $("#scratchpad").offset();
+    target_top = $("#scratchpad").height() + scratch_offset.top;
+    target_left= scratch_offset.left;
+    
+//     console.log("flying to", target_left);
+    
+    pill = $("<ul class='pills flying'><li class='active'><a href='#'>"+key+"</a></li></ul>");
+    pill.css({left:offset.left, top:offset.top});
+    $("body").append(pill);
+    pill.animate({top:target_top, left:target_left}, 200, function(){
+        $(this).remove();
+        if (cap == "profile") {
+            entry = E.generate_entry(key, "");
+            $("#scratchpad").append( entry );
+            entry.children().first().children().filter("input:text").focus();
+        }
+        if (cap == "location") {
+            geogy.init(E.location_clb);
+            
+            show_modal = function() {
+                modal = $("#modal-from-dom");
+                modal.modal({backdrop:"static", show:true, keyboard:true});
+                
+                $("#modal-cancel-btn").click(function(){
+                    modal.bind('hidden', function(){
+                        console.log("going to",E.website_url+"/manage/asdf");
+                        console.log("should go to", window.location);
+                        location.replace(E.website_url+"/manage/asdf");
+                    });
+                    modal.modal("hide");
+                });
+            }
+            
+            E.modal_timer = setTimeout(show_modal, 500);
+        }
+        if (cap == "buysell") {
+            entry = E.generate_buysell_entry("", "");
+            $("#scratchpad").append( entry );
+//             entry.children().first().children().filter("input:text").focus();
+        }
+    });
+}
+
+E.location_clb = function(result) {
+    modal = $("#modal-from-dom");
+    clearTimeout(E.modal_timer);
+    modal.modal("hide");
+    result.threshold = 0.0002;
+
+    E.user.toadd["key"] = "current location";
+    E.user.toadd["val"] = result;
+    E.user.toadd["cap"] = "location";
+    E.post_keyval();
+    entry = E.generate_location_entry("current location", result);
+    
+    $("#scratchpad").append( entry );
+}
+
+E.add_new_attribute = function() {
+    E.user.toadd["cap"] = $(this).attr("cap");
+    input = $("<input class='input-mini' size='10' type='text' />").keyup(function(obj){
+        if (obj.keyCode == 27) {
+            suggestion_box.hide_suggestions();
+            $(this).parent().hide();
+        }
+        if (obj.keyCode == 13) {
+            key = $(this).val();
+            offset = $(this).offset();
+            E.add_new_value("profile", key, offset);
+            
+            suggestion_box.hide_suggestions();
+            $(this).parent().hide();
+            return false;
+        }
+//         suggestion_box.fetch_data( input );
+    }).mousedown(function(){
+//         suggestion_box.fetch_data( input );
+    }).focusout(function(){
+        suggestion_box.hide_suggestions();
+        $(this).parent().hide();
+    });
+    pill_content = $("<a href='#'></a>").append(input);
+    
+    count = $("<span class='count'></span>").html("0");
+    pill_content.append(count);
+    pill = $("<li class='active'></li>").append(pill_content);
+    $(this).parent().before(pill);
+    input.focus();
+    
+    return false;
+}
+
+//////////////////////////////////////////////////
+
+E.populate_aboutme = function() {
+    $("#scratchpad").empty();
+    $("#scratchpad").append(empty_scratchpad);
+    $("#aboutme").addClass("active");
+    $("#aboutothers").removeClass("active");
+    $("#matches_caption").html("people like you");
+    
+    $.getJSON(E.agent.url, function(json){
+        
+        if (json.error.length > 0)
+            location.replace(E.website_url);
+            console.log(json.error);
+
+        counter = 0;
+        for (i in json.capabilities) {
+            counter += 1;
+            cap = json.capabilities[i];
+            
+            if (!(cap in {"profile":0, "location":0, "buysell":0}))
+                continue;
+            
+            $.getJSON(E.agent.url+"/"+cap, function(json2){
+                
+                if (json2.data == undefined)
+                    return;
+
+                if (json2.capability == "profile") {
+                    
+                    for (i in json2.data) {
+                        key = json2.data[i].key;
+                        val = json2.data[i].val;
+                        
+                        entry = E.generate_entry( key, val );
+                        $("#scratchpad").append( entry );
+                        empty_scratchpad.hide();
+                    }
+                }
+                
+                if (json2.capability == "location") {
+
+                    for (i in json2.data) {
+                        for (key in json2.data) {
+                            lat = json2.data[key].lat;
+                            lon = json2.data[key].lon;
+                            entry = E.generate_location_entry(key, {lat:lat, lon:lon});
+                            $("#scratchpad").append(entry);
+                        }
+                        empty_scratchpad.hide();
+                    }
+                }
+                
+                if (json2.capability == "buysell") {
+
+                    for (i in json2.data) {
+                        key = json2.data[i].key;
+                        val = json2.data[i].val;
+                        
+//                         console.log("got buysell entry", key, val);
+                        entry = E.generate_buysell_entry( key, val );
+                        $("#scratchpad").append( entry );
+                        empty_scratchpad.hide();
+                    }
+                }
+                
+                
+                
+                if (counter == json.capabilities.length) {
+//                     console.log("done", attr_manager.udata);
+                }
+            });
+        }
+    });
+}
+
+E.populate_aboutothers = function() {
+    $("#scratchpad").empty();
+    $("#aboutothers").addClass("active");
+    $("#aboutme").removeClass("active");
+    $("#matches_caption").html("matches found");
+}
+
+//////////////////////////////////////////////////
+
+E.poll_matches = function() {
+    
+    query = [];
+    for (cap in attr_manager.sdata)
+        for (key in attr_manager.sdata[cap])
+            query.push([cap, key, ""]);
+            
+    for (cap in attr_manager.udata)
+        for (key in attr_manager.udata[cap])
+            for (val in attr_manager.udata[cap][key]) {                
+                if (attr_manager.udata[cap][key][val].enabled == 1)
+                    query.push([cap, key, val]);
+            }
+            
+    data = JSON.stringify(query);
+//     console.log(data);
+    
+    $.getJSON(E.satellite.url+"/multimatch", {data:data}, function(json){
+        E.monitor.user_matches.by_keyval = {};
+        
+        for (i in json.matches) {
+            
+            match = json.matches[i];
+            
+            cap = match[0];
+            key = match[1];
+            val = match[2];
+            cnt = match[3];
+            matches = match[4];
+            
+            if (val.length > 0) {
+                attr_manager.add_udata(cap, key, val, cnt);
+                E.monitor.user_matches.by_keyval[key+"_"+val] = matches;
+            } else {
+                attr_manager.sdata[cap][key] = cnt;
+            }
+        }
+        
+        test_intersection = {};
+        target_count = 0
+        for (kv in E.monitor.user_matches.by_keyval) {
+//             console.log(kv);
+//             console.log(E.monitor.user_matches.by_keyval[kv]);
+            for (i in E.monitor.user_matches.by_keyval[kv]) {
+                agent = E.monitor.user_matches.by_keyval[kv][i];
+                
+//                 if (parseInt(i) >= 0)
+//                     a = 1;
+                
+                if (test_intersection[agent] == undefined)
+                    test_intersection[agent] = 0;
+                test_intersection[agent] += 1;
+                
+//                 if (test_intersection[agent] > target_count)
+//                     target_count = test_intersection[agent];
+            }
+            target_count += 1;
+        }
+        
+        
+        E.monitor.user_matches.intersection = [];
+        for (match in test_intersection)
+            if (test_intersection[match] == target_count)
+                if (match != E.agent.id)
+                    E.monitor.user_matches.intersection.push(match);
+        
+//         console.log("keyval", E.monitor.user_matches.by_keyval);
+        E.set_matches(E.monitor.user_matches.intersection.length);
+        
+        $(".attr_counters").each(function(){
+            if ($(this).attr("uitype") == "sat_attribute") {
+                cap = $(this).attr("cap");
+                key = $(this).attr("key");
+                $(this).html( attr_manager.sdata[cap][key] );
+            }
+            
+            if ($(this).attr("uitype") == "user_attribute") {
+                cap = $(this).attr("cap");
+                key = $(this).attr("key");
+                val = $(this).attr("val");
+                
+                if (attr_manager.udata[cap][key] == undefined ||
+                    attr_manager.udata[cap][key][val] == undefined) {
+                    $(this).remove();
+                    cnt = 0;
+                } else {
+                    cnt = attr_manager.udata[cap][key][val].cnt;
+                    $(this).html(cnt);
+                }
+            }
+        });
+    });
+}
+
+
+E.fetch_attributes = function() {
+    starting_from = E.last_fetched;
+    
+    if (E.last_fetched.length)
+        console.log("continuing from", E.last_fetched);
+    
+    $.getJSON(E.satellite.url+"/profile/fetch/"+starting_from, function(json){
+//         console.log("fetch", json);
+        for (i in json.matches) {
+            attribute = json.matches[i];
+            attr_manager.add_sdata("profile", attribute, 0);
+            E.last_fetched = json.matches[i];
+        }
+        
+        E.populate_attrs();
+    });
+}
+
+E.update_monitor = function() {
+    if (window.location.search == "?control") {
+        query = [];
+        for (cap in attr_manager.udata)
+            for (key in attr_manager.udata[cap])
+                for (val in attr_manager.udata[cap][key]) {                
+                    if (attr_manager.udata[cap][key][val].enabled == 1)
+                        query.push([cap, key, val]);
+                }
+        data = JSON.stringify(query);
+//         console.log(data);
+        $.post(E.agent.baseurl+"/controller", {data:data, controller:E.agent.id}, function(json){
+//             console.log("controller post:", json);
+        }, "json");
+    };
+    return false;
+}
+
+//////////////////////////////////////////////////
+////////////////     ON READY
+
+$(document).ready(function()
+{
+    $("#aboutothers").click(E.populate_aboutothers);
+    $("#aboutme").click(E.populate_aboutme);
+    
+    $("#showattrs").click(E.populate_attrs);
+    $("#showapps").click(E.populate_apps);
+    
+    E.fetch_attributes();
+    E.populate_aboutme();
+    
+    setInterval(E.poll_matches, 500); 
+    
+    E.update_monitor();
+});
+
+var empty_scratchpad = $("<span></span>");
+empty_scratchpad.attr("id","empty_scratchpad");
+empty_scratchpad.addClass("help-block");
+empty_scratchpad.html("Create an application by selecting attributes from the left panel.");
+
+
+
+</script>
+{% end %}
+{% block body %}
+
+<div class="grid">
+    <div class="row">
+        <div class="span4 columns left_column">
+            <ul class="tabs">
+                <li id="showapps"><a href="#">Apps</a></li>
+                <li id="showattrs"><a href="#">Attributes</a></li>
+            </ul>
+            <ul class="pills" id="choices">
+            </ul>
+        </div>
+        <div class="span11 columns">
+            <ul class="tabs">
+                <li id="aboutme"><a href="#">About Me</a></li>
+                <li id="aboutothers"><a href="#">About Others</a></li>
+            </ul>
+            <div id="scratchpad">
+            </div>
+            <button id="match_btn" class="btn info match_box">
+                <div id="matches" curpos="0">0</div>
+                <div id="matches_caption"></div>
+            </button>
+            <div id="others_scratchpad"></div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="modal-from-dom" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close">&times;</a>
+        <h3>Current Location</h3>
+    </div>
+    <div class="modal-body">
+        <p>To find others near you, please choose to share your location above.</p>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn danger" id="modal-cancel-btn">Cancel</a>
+    </div>
+</div>
+
+
+{% end %}
+
+
+
+

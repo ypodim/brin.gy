@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}
+Distributed Social Networking ~ Own Your Data! ~ Downloads
+{% endblock %}
+
+{% block content %}
+<div class="section">
+    <span class="header">Latest release</span>
+    {% if latest_release %}
+    <div>
+        <div>The latest release version is <span class="emphasis">{{latest_release.version}}</span>. It was released on <span class="emphasis">{{latest_release.release_date|date:"l, N dS Y"}}</span>.</div>
+
+        <div id="current-release">
+            <img src='{% url resources "images/download.png" %}'></img>
+            <a href='{% url ego_website.views.download latest_release.id %}'>Download {{latest_release.release_filename}}</a>.
+            <div id="download-size">({{latest_release.src.size}} bytes)</div>
+        </div>
+    </div>
+    {% else %}
+    There is no latest release. Check back later.
+    {% endif %}
+</div>
+
+<div class="section">
+    <span class="header">Older releases</span>
+    {% if releases %}
+        <table>
+            <tr><th>Version</th><th>Release date</th><th>Download</th><th>Release notes</th></tr>
+        {% for release in releases %}
+            <tr><td>{{release.version}}</td><td>{{release.release_date|date:"l, N dS Y"}}</td><td><a href="{% url ego_website.views.download release.id %}">{{release.release_filename}}</a></td><td>{% if release.release_notes %}<a href="{% url ego_website.views.release_notes release.id %}">Notes</a>{% else %} (none) {% endif %}</td></tr>
+        {% endfor %}
+        </table>
+    {% else %}
+    No downloads at the moment. Check back later.
+    {% endif %}
+</div>
+
+<div class="section" id="tentacle">
+    <span class="header">Sensing device (tentacle) code</span>
+    {% if tentacle_releases %}
+        <table>
+            <tr><th>Version</th><th>Release date</th><th>Download</th><th>Release notes</th></tr>
+        {% for release in tentacle_releases %}
+            <tr><td>{{release.version}}</td><td>{{release.release_date|date:"l, N dS Y"}}</td><td><a href="{% url ego_website.views.download release.id %}">{{release.release_filename}}</a></td><td>{% if release.release_notes %}<a href="{% url ego_website.views.release_notes release.id %}">Notes</a>{% else %} (none) {% endif %}</td></tr>
+        {% endfor %}
+        </table>
+    {% else %}
+    No downloads at the moment. Check back later.
+    {% endif %}
+</div>
+
+{% endblock %}

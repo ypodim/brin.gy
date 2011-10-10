@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}
+Distributed Social Networking ~ Own Your Data! ~ Guides
+{% endblock %}
+
+{% block content %}
+{% if guides %}
+<div class="section">
+    <span class="header">Guides</span>
+    Here are some links to guides to get you up and running:
+    {% for guide in guides %}
+        <div><a href="{{guide.url}}">{{guide.title}}</a></div>
+    {% endfor %}
+</div>
+
+{% else %}
+Right now there are no guides... sorry.
+{% endif %}
+{% endblock %}

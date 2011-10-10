@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block head %}
+<script src="https://github.com/fryn/html5slider/raw/master/html5slider.js" type="text/javascript">
+</script>
+
+<script language="javascript" type="text/javascript">
+
+var ego_url_prefix = "{{ego_url_prefix}}";
+var agent_url = ego_url_prefix+"/{{args}}";
+
+var Circle = function(x, y, rad, a)
+{
+    x -= rad/2;
+    y -= rad/2;
+    var cir = $("<div></div>").addClass("circle");
+    cir.css({"left":x, "top":y, "width":rad, "height":rad, "border-radius":rad});
+    if (a != undefined)
+        cir.css("opacity",a);
+    
+    return cir;
+}
+
+var captions = ["location", "buy/sell", "reputation"];
+var intersections = ["bs/rep", "rep/loc", "loc/bs"];
+
+var N = captions.length;
+var RAD = 360;
+var LAYOUT_RAD = 85;
+
+var rad = RAD;
+var layout_rad = LAYOUT_RAD;
+var offset = 100 + rad/2 + layout_rad;
+
+var draw = function(delay)
+{
+    $(".circle").remove();
+    $(".caption").remove();
+    for (i=0; i<N; i++) {
+        theta = i*2*Math.PI/N;
+        x = offset + layout_rad * Math.cos(theta);
+        y = offset + layout_rad * Math.sin(theta);
+        
+        cx = offset + (layout_rad+rad/2) * Math.cos(theta);
+        cy = offset + (layout_rad+rad/2) * Math.sin(theta);
+        caption = captions[i];
+        cap = $("<div></div>").addClass("caption").addClass("large").text(caption).css({"left":cx, "top":cy});
+        cir = Circle(x, y, rad);
+        $("#canvas").append(cir).append(cap);
+        cir.fadeIn(delay);
+        cap.fadeIn(delay);
+    }
+    
+    c = $("<div></div>").addClass("caption").text("YOU").css({"left":offset, "top":offset}).show();
+    $("#canvas").append(c);
+    
+    for (i=0; i<N; i++) {
+        theta = i*2*Math.PI/N + Math.PI;
+        x = offset + layout_rad * Math.cos(theta);
+        y = offset + layout_rad * Math.sin(theta);
+        
+        cx = offset + (layout_rad/2+rad/4) * Math.cos(theta);
+        cy = offset + (layout_rad/2+rad/4) * Math.sin(theta);
+        caption = intersections[i];
+        cap = $("<div></div>").addClass("caption").text(caption).css({"left":cx, "top":cy});
+        $("#canvas").append(cap);
+        cir.fadeIn(delay);
+        cap.fadeIn(delay);
+    }
+}
+
+$(document).ready(function()
+{
+    $("#location_slider").change(function(){
+        rad = RAD + parseInt($(this).val());
+        draw(0);
+    });
+    
+    draw(1000);
+});
+</script>
+{% end %}
+{% block body %}
+<div id="canvas"></div>
+
+<div id="sliders">
+    <div class="large">thresholds</div>
+    <p>location <input type="range" value="20" min="0" max="100" step="1" id="location_slider" /></p>
+    <p>price <input type="range" value="20" min="0" max="100" step="1" id="buysell_slider" /></p>
+    <p>reputation <input type="range" value="20" min="0" max="100" step="1" id="reputation_slider" /></p>
+    <button class="large" id="runbtn">execute</button>
+</div>
+{% end %}
+
+
+
+
+
+
+
+
+
