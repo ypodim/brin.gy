@@ -91,30 +91,23 @@ $(document).ready(function()
 {% block body %}
 
 <div id="left">
-    <h2>With Ego you can...</h2>
+    <h2>Brin.gy allows you to:</h2>
     <p><b>create</b>, <b>store</b> and <b>analyze</b> information about you, like your location over time, your habits, the effectiveness of your medicine, etc. Then, Ego allows you to reach out to other people and <b>discover</b> information that is relevant to your own, such as people that want to buy the product that you are selling, neighbors that are already at the supermarket and can pick up milk for you, etc. <a href="/about">...more</a></p>
 </div>
 
 <div id="right">
-    <h2>Grab an Agent</h2>
+    <h2>Pick a username</h2>
 
     <div id="form">
         <form method="post">
         <input class="text" id="username" name="username" type="text" value="<username>"/>
-        <select class="text" id="usertype">
-            <option class="text" value="guest">guestoid</option>
-            <option class="text" value="faculty">facultoid</option>
-            <option class="text" value="staff">staffoid</option>
-            <option class="text" value="student">studentoid</option>
-            <option class="text" value="screen">screenoid</option>
-        </select>
         </form>
     </div>
 
     <div id="message" class="text css3">
-        <a id="btn_clear" class="indicator" href="#">get it!</a>
-        <a id="btn_taken" class="indicator" href="#">taken</a>
-        <a id="btn_check" href="#">check</a>
+        <a id="btn_clear" class="btn success indicator" href="#">get it!</a>
+        <span id="btn_taken" class="label important indicator" href="#">taken</span>
+        <a id="btn_check" class="btn primary" href="#">check</a>
     </div>
     
     <div id="test_button" class="css3">

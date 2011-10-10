@@ -54,7 +54,7 @@ if __name__ == "__main__":
     
     parser = OptionParser(add_help_option=False)
     parser.add_option("-h", "--host", dest="host", default='localhost')
-    parser.add_option("-p", "--port", dest="port", default='8888')
+    parser.add_option("-p", "--port", dest="port", default='8889')
     parser.add_option("-d", "--db", dest="db", default='mysql')
     (options, args) = parser.parse_args()
     
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     HOST = options.host
     
     discov_url = 'http://localhost:22222'
-    ego_url_prefix = 'http://localhost:10002'
+    ego_url_prefix = 'http://localhost:10007'
     static_url_prefix = '/ego'
     website_url_prefix = 'http://%s:%s' % (HOST, PORT)
     

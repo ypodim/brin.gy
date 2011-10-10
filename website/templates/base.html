@@ -13,14 +13,15 @@
       less.watch();
     </script>
     
-    <link rel="shortcut icon" href='{{ static_url("images/website/ego-icon.png") }}' />
+    <link rel="shortcut icon" href='{{ static_url("images/website/bringy.favicon.16.ico") }}' />
     
     <script src='{{ static_url("js/jquery-1.5.1.min.js") }}'></script>
     <script src='{{ static_url("js/ego_website.js") }}'></script>
     <script src='{{ static_url("js/geo.js") }}'></script>
     
     <script src='{{ static_url("bootstrap/js/bootstrap-modal.js") }}'></script>
-    
+    <script src='{{ static_url("bootstrap/js/bootstrap-twipsy.js") }}'></script>
+    <script src='{{ static_url("bootstrap/js/bootstrap-popover.js") }}'></script>
     
     <script src='{{ static_url("js/jquery.flexbox.js") }}'></script>
 <!--     <link type="text/css" rel="stylesheet" href="{{ static_url("css/jquery.flexbox.css") }}"> -->
@@ -47,16 +48,16 @@
         <div class="row page-header">
             <div class="menu-item" style="width:188px;">
                 <a href="/">
-                    <img width=188 src='{{ static_url("images/website/bringy.logo2.jpg") }}' alt="" />
+                    <img width=188 src='{{ static_url("images/website/bringy.logo2.png") }}' alt="" />
                 </a>
             </div>
-            <div class="menu-item" style="float:right; padding-top:8px;">
+            <div id="delete_btn" class="menu-item" style="float:right; padding-top:8px;">
                 <a href="/UROP">
                     <img height=50 src='{{ static_url("images/website/delete.svg") }}' alt="" />delete agent
                 </a>
             </div>
             <div class="menu-item" style="float:right; padding-top:8px;">
-                <a href="/about">
+                <a href="https://github.com/ypodim/brin.gy">
                     <img height=50 src='{{ static_url("images/website/download.svg") }}' alt="" />download
                 </a>
             </div>

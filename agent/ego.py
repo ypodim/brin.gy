@@ -16,13 +16,6 @@ from urllib import urlencode
 from db import DB
 from cron import Cron
 
-capabilities_dir = 'capabilities'
-
-db = None
-
-cron = Cron()
-
-satellite_url = 'http://localhost:22222'
         
 class serve_index(tornado.web.RequestHandler):
     def options(self):
@@ -437,11 +430,17 @@ if __name__ == "__main__":
     
     parser = OptionParser(add_help_option=False)
     parser.add_option("-h", "--host", dest="host", default='')
-    parser.add_option("-p", "--port", dest="port", default='10002')
+    parser.add_option("-p", "--port", dest="port", default='10007')
     (options, args) = parser.parse_args()
     
     HOST    = options.host
     PORT    = int(options.port)
+    
+    capabilities_dir = 'capabilities'
+    
+    cron = Cron()
+
+    satellite_url = 'http://localhost:22222'
     
     mode = ''
     if settings['debug']:
@@ -465,3 +464,4 @@ if __name__ == "__main__":
         ioloop.start()
     except:
         print 'exiting'
+

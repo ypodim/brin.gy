@@ -603,14 +603,15 @@ E.populate_attrs = function() {
             
             prop = $("<div></div>").append(prop).append(count);
             
-            pill_content = $("<a href='#'></a>").attr("prop",attr).attr("cap",capname).append(prop).click(function(){
+            pill_content = $("<a href='#'></a>").attr("prop",attr).attr("cap",capname).append(prop);
+            pill_content.click(function(){
                 key = $(this).attr("prop");
                 cap = $(this).attr("cap");
                 E.user.toadd["cap"] = cap;
                 offset = $(this).offset();
                 E.add_new_value(cap, key, offset);
                 return false;
-            });
+            }).popover();
             pill = $("<li class='active'></li>").append(pill_content);
             $("#choices").append(pill);
         }
@@ -741,7 +742,9 @@ E.populate_aboutme = function() {
     $("#scratchpad").append(empty_scratchpad);
     $("#aboutme").addClass("active");
     $("#aboutothers").removeClass("active");
-    $("#matches_caption").html("people like you");
+    $("#matches_caption").html("people like you").popover({
+                  offset: 10
+                });
     
     $.getJSON(E.agent.url, function(json){
         
@@ -967,6 +970,7 @@ $(document).ready(function()
     setInterval(E.poll_matches, 500); 
     
     E.update_monitor();
+    $("#delete_btn").show();
 });
 
 var empty_scratchpad = $("<span></span>");
