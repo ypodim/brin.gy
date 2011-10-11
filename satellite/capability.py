@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 import random
 import json
@@ -116,6 +117,7 @@ class Profile:
         'profile:key:KEY' # set of agents using this key
         'profile:key:KEY:val:VAL' # set of agents using this key/val pair
         
+        #print 'key', key, 'val', val
         result = dict(error='', count=0, matches=[])
 
         #if key:

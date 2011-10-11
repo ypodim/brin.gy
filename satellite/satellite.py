@@ -152,6 +152,7 @@ class multimatch(tornado.web.RequestHandler):
         self.start_time = time.time()
         self.set_header('Access-Control-Allow-Origin', '*')
         self.set_header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
+        self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
         self.set_header('Content-Type','application/json; charset=UTF-8')
             
         if self.request.body:
@@ -163,11 +164,16 @@ class multimatch(tornado.web.RequestHandler):
                 params[k] = v[-1]
         self.params = params
         
-    def get(self):
+    def post(self):
         
         matches = []
         
-        arguments = tornado.escape.url_unescape(self.get_argument('data', ''))
+        arguments = self.get_argument('data', '')
+        #print
+        #print self.request
+        #print escaped_data
+        #arguments = tornado.escape.url_unescape(escaped_data)
+        #print arguments
         #print arguments
         arguments = json.loads(arguments)
         for capname, key, val in arguments:

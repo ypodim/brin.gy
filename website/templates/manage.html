@@ -835,11 +835,12 @@ E.poll_matches = function() {
                 if (attr_manager.udata[cap][key][val].enabled == 1)
                     query.push([cap, key, val]);
             }
-            
+    
     data = JSON.stringify(query);
+//     data = escape(data);
 //     console.log(data);
     
-    $.getJSON(E.satellite.url+"/multimatch", {data:data}, function(json){
+    $.post(E.satellite.url+"/multimatch", {data:data}, function(json){
         E.monitor.user_matches.by_keyval = {};
         
         for (i in json.matches) {
@@ -913,7 +914,7 @@ E.poll_matches = function() {
                 }
             }
         });
-    });
+    }, "json");
 }
 
 
