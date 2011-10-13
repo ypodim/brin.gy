@@ -13,6 +13,13 @@ class location():
         self.usr = usr
         self.resolution = 100000
     
+    'location:LOCTYPE:buckets' # set of buckets keyed on location types (eg "current location")
+    'location:LOCTYPE:latlon:BUCKET' # set of agents in BUCKET area for this LOCTYPE
+    
+    'USER:location:keys' # set of available location types (eg "current location") that USER participates in
+    'USER:location:LOCTYPE:lat' # lat value for USER's position and LOCTYPE
+    'USER:location:LOCTYPE:lon' # lon value for USER's position and LOCTYPE
+    
     def add_reverse(self, key, lat, lon):
         lat = float(lat)
         lon = float(lon)

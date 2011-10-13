@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 import sys
 import random
@@ -98,6 +99,7 @@ class Ball():
             if random.random() > 0.2:
                 self.profile['language'] = 'chinese'
             
+        self.buysell = {'product':'iPad 32GB', 'action':'buy', 'price':random.randint(200,400)}
         
     def update(self):
         if self.group and self.group.name != 'pucks':
@@ -234,7 +236,15 @@ class Scenario(Thread):
         self.groups = []
         
         bucket_ceiling = 0
-        i = 0
+        
+        
+        self.sound = {}
+        for i in xrange(1,9):
+            a = pygame.mixer.Sound('beep%s.aiff' % i)
+            self.sound[i] = a
+            #self.sound[i].play()
+            #time.sleep(1)
+        
         
         #fake matix setup of groups
         #self.configuration['groups'] = []
@@ -243,6 +253,7 @@ class Scenario(Thread):
                 #g = dict(name='', x=x*50+50, y=y*50+50, n=10, w=50, h=50)
                 #self.configuration['groups'].append(g)
         
+        i = 0
         for group in self.configuration['groups']:
             w = group['w']
             h = group['h']
@@ -270,10 +281,15 @@ class Scenario(Thread):
                 
                 o = Ball(i)
                 o.group = g
+                if g.name == 'Google':
+                    o.profile['company'] = 'Google'
+                    
+                if g.name == 'E14':
+                    if random.random() > 0.3:
+                        o.profile['tag'] = random.choice(['visualization', 'c++'])
                 
                 o.p.randomize_in_rect(o.group.p.x, o.group.p.y, o.group.w, o.group.h)
-                res = self.post('http://ypod.media.mit.edu:10007/new_agent', dict(username='agent%s'%i))
-                print 'POST', res
+                #res = self.post('http://ypod.media.mit.edu:10007/new_agent', dict(username='agent%s'%i))
                 self.obj.append(o)
                 i += 1
         
@@ -317,31 +333,54 @@ class Scenario(Thread):
         bucket = min(100, self.n)
         response_time = 0
         for i in xrange(0, self.n, bucket):
+            print 'profile posting', i
             agents = {}
             
             for j in xrange(bucket):
                 a = self.obj[i+j]
                 agents[a.name] = a.profile
-            
-            try:
-                res = self.post('http://ypod.media.mit.edu:10007/batch_profile', dict(data=json.dumps(agents)))
-                rt = res['response_time']
-                print rt
-                response_time += rt
-                time.sleep(0.005)
-            except:
-                continue
-            
+            #print 'posting'
+            #try:
+            res = self.post('http://ypod.media.mit.edu:10007/batch_profile', dict(data=json.dumps(agents)))
+            rt = res['response_time']
+            #print 'rt is', rt
+            response_time += rt
+            time.sleep(0.005)
+            #except:
+                #continue
+        #print 'XXXXXXXXXXX'
         print 'total time', response_time
         
     def post_buysell(self):
-        pass
+        bucket = min(100, self.n)
+        response_time = 0
+        print 'BUYSELL'
+        for i in xrange(0, self.n, bucket):
+            agents = {}
+            
+            for j in xrange(bucket):
+                a = self.obj[i+j]
+                if random.random() > 0.8:
+                    agents[a.name] = {"0":json.dumps(a.buysell)}
+            
+            #try:
+            res = self.post('http://ypod.media.mit.edu:10007/batch_buysell', dict(data=json.dumps(agents)))
+            rt = res['response_time']
+            print rt
+            response_time += rt
+            time.sleep(0.005)
+            #except:
+                #continue
+            
+        print 'total time', response_time
     
     def get_monitor_info(self):
         pass
     
     def run(self):
-        self.post_profile()
+        
+        #self.post_profile()
+        
         self.post_buysell()
         
         while self.go:
@@ -484,6 +523,7 @@ class Poller(Thread):
         self.h = httplib2.Http()
         self.r = redis.Redis(host='localhost', port=6379, db=0)
         self.monitor = 1
+        self.previous_count = 0
     def run(self):
         while self.go:
             if time.time() - self.last_post > 0.1:
@@ -582,11 +622,18 @@ class Poller(Thread):
                     self.scenario.obj[m].size = 5
                     count += 1
                 
+                diff = count - self.previous_count
+                if diff > 1:
+                    if diff > 8:
+                        diff = 8
+                    self.scenario.sound[diff].play()
+                self.previous_count = count
                 
-                print
+                
+                #print
                 #print 'controller:', aid, controller
-                print 'using:', entries
-                print 'found:', count
+                #print 'using:', entries
+                #print 'found:', count
                 #print 'poller round in', time.time()-self.last_post
             else:
                 time.sleep(0.001)
@@ -649,7 +696,7 @@ def main():
     show_waypoints = False
     while go:
         clock.tick(10)
-
+        
         for event in pygame.event.get():
             if event.type == QUIT:
                 go = 0

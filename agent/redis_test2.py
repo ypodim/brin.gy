@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import redis
 import time
 import sys
@@ -11,9 +12,9 @@ r = redis.Redis(host='localhost', port=6379, db=0)
 
 #sys.exit()
 
-if len(sys.argv) > 1:
-    r.flushall()
-    sys.exit()
+#if len(sys.argv) > 1:
+    #r.flushall()
+    #sys.exit()
 
 print 'keyvalstore entries:'
 for m in r.smembers('keyvalstore'):
@@ -21,6 +22,9 @@ for m in r.smembers('keyvalstore'):
 
 print 'users:'
 for u in r.smembers('users'):
+    if u.startswith('agent'):
+        continue
+    
     print '===\nuser', u
 
     print 'profile:'

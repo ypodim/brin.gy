@@ -176,6 +176,12 @@ class multimatch(tornado.web.RequestHandler):
         #print arguments
         #print arguments
         arguments = json.loads(arguments)
+        
+        #matchreqs = [x for x in arguments if x[2]]
+        #if matchreqs:
+            #print
+            #print matchreqs
+        
         for capname, key, val in arguments:
             #innerstart = time.time()
             try:

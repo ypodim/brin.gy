@@ -111,6 +111,19 @@ attr_manager.add_udata = function(cap, key, val, cnt) {
     attr_manager.udata[cap][key][val] = {cnt:cnt, enabled:1};
 }
 
+attr_manager.set_udata_cnt = function(cap, key, val, cnt) {
+    if (cap==undefined || key==undefined || val==undefined || cnt==undefined){
+        console.log("*** set_udata_cnt: undefined var:", cap, key, val, cnt);
+        return;
+    }
+    if (attr_manager.udata[cap] == undefined)
+        attr_manager.udata[cap] = {};
+    if (attr_manager.udata[cap][key] == undefined)
+        attr_manager.udata[cap][key] = {};
+
+    attr_manager.udata[cap][key][val]["cnt"] = cnt;
+}
+
 attr_manager.remove_udata = function(cap, key, val) {
     if (cap==undefined || key==undefined || val==undefined){
         console.log("*** remove_udata: undefined var:", cap, key, val);
@@ -249,7 +262,6 @@ E.generate_entry = function(key, val) {
     checkbox = $("<input type='checkbox' id='' checked='checked' />");
     checkbox.click(function(){
         new_state = $(this).attr("checked");
-        
         if ( new_state ) {
             $(this).parent().addClass("active");
             title.addClass("enabled");
@@ -282,7 +294,6 @@ E.generate_entry = function(key, val) {
             
             prev_val = count.attr("val");
             if (prev_val != undefined) {
-//                 console.log("update entry");
                 E.user.todel = {cap:"profile", key:key, val:prev_val};
                 E.delete_keyval();
             }
@@ -376,7 +387,6 @@ E.buysell_val_change = function() {
             } else {
                 pid = json.result.key;
                 $(that).parent().parent().parent().parent().attr("pid",pid);
-//                 console.log("in function", json.result, $(that).parent().parent().parent().parent().attr("pid"));
             }
         }
         E.post_keyval(clb);
@@ -406,7 +416,6 @@ E.generate_buysell_entry = function(key, valstr) {
     checkbox = $("<input type='checkbox' id='' checked='checked' />");
     checkbox.click(function(){
         new_state = $(this).attr("checked");
-//         console.log(key, val);
         
         if ( new_state ) {
             $(this).parent().addClass("active");
@@ -501,7 +510,6 @@ E.generate_buysell_entry = function(key, valstr) {
 
 E.generate_location_entry = function(key, val) {
     val = JSON.stringify(val);
-//     console.log("location", key, val);
     
     count = $("<span></span>").addClass("count");
     count.html("0");
@@ -838,7 +846,6 @@ E.poll_matches = function() {
     
     data = JSON.stringify(query);
 //     data = escape(data);
-//     console.log(data);
     
     $.post(E.satellite.url+"/multimatch", {data:data}, function(json){
         E.monitor.user_matches.by_keyval = {};
@@ -854,7 +861,7 @@ E.poll_matches = function() {
             matches = match[4];
             
             if (val.length > 0) {
-                attr_manager.add_udata(cap, key, val, cnt);
+                attr_manager.set_udata_cnt(cap, key, val, cnt);
                 E.monitor.user_matches.by_keyval[key+"_"+val] = matches;
             } else {
                 attr_manager.sdata[cap][key] = cnt;
@@ -889,7 +896,6 @@ E.poll_matches = function() {
                 if (match != E.agent.id)
                     E.monitor.user_matches.intersection.push(match);
         
-//         console.log("keyval", E.monitor.user_matches.by_keyval);
         E.set_matches(E.monitor.user_matches.intersection.length);
         
         $(".attr_counters").each(function(){

@@ -277,6 +277,23 @@ class api_call(tornado.web.RequestHandler):
             p.post()
         
         self.finilize_call({})
+        
+    def api_batch_buysell(self):
+        arguments = tornado.escape.json_decode(self.get_argument('data'))
+        from capabilities.buysell import buysell
+        #agents = {}
+        for agent, prof in arguments.items():
+            
+            if not db.user_exists(agent):
+                print '*** user does not exist:', agent
+                continue
+            
+            print agent, prof
+            p = buysell(agent, prof.items(), db.r, None)
+            p.clear_all()
+            #p.post()
+        
+        self.finilize_call({})
     
     def api_batch_location(self):
         arguments = tornado.escape.json_decode(self.get_argument('data'))
@@ -407,6 +424,8 @@ application = tornado.web.Application([
     (r"/test", api_call),
     (r"/batch_profile", api_call),
     (r"/batch_location", api_call),
+    (r"/batch_buysell", api_call),
+    
     (r"/controller", api_call),
     
     

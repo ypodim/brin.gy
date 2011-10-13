@@ -44,7 +44,15 @@ class buysell():
 
         error = 'Could not create new pid. Too many products already?'
         return -1, error
-        
+    
+    def clear_all(self):
+        for pid in self.get_pids():
+            action = self.db.get('%s:buysell:pid:%s:action' % (self.usr, pid))
+            product = self.db.get('%s:buysell:pid:%s:product' % (self.usr, pid))
+            self.del_reverse(product, action)
+            self.del_product(pid)
+            self.del_pid(pid)
+            
     def get_pids(self):
         return self.db.smembers('%s:buysell:pids' % self.usr)
     
