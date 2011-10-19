@@ -181,15 +181,7 @@ class api_call(tornado.web.RequestHandler):
         dic.__setitem__('error', dic.get('error',''))
         dic = tornado.escape.json_encode(dic)
         self.write(dic)
-        
-    def api_show_agents(self):
-        
-        dic = {'agents':db.get_agents()}
-        if self.callback:
-            dic = '%s(%s)' % (self.callback, tornado.escape.json_encode(dic))
-            
-        self.finilize_call(dic)
-    
+
     def clb(self, response):
         #print response.code, response.body
         pass
@@ -294,47 +286,6 @@ class api_call(tornado.web.RequestHandler):
         #print
         self.finilize_call({})
         
-    def api_test(self):
-        self.render('test.html')
-        
-    #def api_jobs(self):
-        #if 'html' in self.request.path.split('/'):
-            #self.render('jobs.html')
-        #else:
-            #jobs = cron.get_jobs()
-            #self.write(dict(jobs=jobs))
-        
-    #def api_stopjob(self):
-        #name = self.request.path.split('/', 2)[-1]
-        
-        #res = cron.stop_job(name)
-        #self.write(res)
-        
-    #def api_startjob(self):
-        #name = self.request.path.split('/', 2)[-1]
-        #ttl = self.get_argument('ttl', 5)
-        #ttl = int(ttl)
-        
-        #request_url = '%s/buysell' % satellite_url
-        
-        ##data = dict(agent=name)
-        ##if random.random() > 0.1:
-            ##data['name'] = random.choice(['gandalf','galadriel'])
-        ##if random.random() > 0.1:
-            ##data['sex'] = random.choice(['male','female'])
-        ##if random.random() > 0.1:
-            ##data['age'] = random.randint(20, 30)
-        
-        #data = dict(itemid="theproduct", price=1000, action="sell", agent="pol")
-        
-        #res = cron.start_job(name, request_url, data, ttl)
-        #self.write(res)
-        
-    #def api_polljob(self):
-        #name = self.request.path.split('/', 2)[-1]
-        #res = cron.get_responses(name)
-        #self.write(res)
-
     def api_controller(self):
         data = self.get_argument('data')
         controller = self.get_argument('controller')
@@ -352,16 +303,15 @@ settings = {
     "debug": os.environ.get("SERVER_SOFTWARE", "").startswith("Development/"),
 }
 application = tornado.web.Application([
-    (r"/show_agents", api_call),
     (r"/test", api_call),
     (r"/batch_profile", api_call),
     (r"/batch_location", api_call),
     (r"/batch_buysell", api_call),
     (r"/controller", api_call),
-    (r"/jobs.*", api_call),
-    (r"/startjob/[\/\:_a-zA-Z0-9]*", api_call),
-    (r"/stopjob/[\/\:_a-zA-Z0-9]*", api_call),
-    (r"/polljob/[\/\:_a-zA-Z0-9]*", api_call),
+    #(r"/jobs.*", api_call),
+    #(r"/startjob/[\/\:_a-zA-Z0-9]*", api_call),
+    #(r"/stopjob/[\/\:_a-zA-Z0-9]*", api_call),
+    #(r"/polljob/[\/\:_a-zA-Z0-9]*", api_call),
     
     (r"/[a-zA-Z0-9]+/?$", serve_user),
     (r"/.+", serve_capability),

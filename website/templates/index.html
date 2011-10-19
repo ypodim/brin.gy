@@ -31,12 +31,6 @@ var post_new_user = function() {
             alert(data.error);
         
         if (! error.length) {
-            other_names = $.cookie('other_names');
-            if (typeof(other_names) == "string")
-                other_names = other_names+","+valid_username;
-            else
-                other_names = valid_username;
-            $.cookie('other_names', other_names, {expires:7, path:"/"});
             window.location.href = "{{website_url_prefix}}/manage/"+valid_username;
         }
     }, "json");

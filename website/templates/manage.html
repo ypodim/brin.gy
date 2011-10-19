@@ -57,7 +57,7 @@ suggestion_box.show_suggestions = function(obj)
 
 suggestion_box.hide_suggestions = function(obj)
 {
-    console.log( "closing" );
+//     console.log( "closing" );
     $("#dropdown").remove();
 };
 
@@ -641,6 +641,7 @@ E.populate_attrs = function() {
     
     $("#match_btn").click(function(){
         console.log(E.monitor.user_matches.intersection);
+        console.log(E.match_criteria);
         return false;
     });
 }
@@ -755,7 +756,7 @@ E.populate_aboutme = function() {
                 });
     
     $.getJSON(E.agent.url, function(json){
-        console.log(json);
+        
         if (json.error.length > 0)
             location.replace(E.website_url);
             console.log(json.error);
@@ -833,6 +834,7 @@ E.populate_aboutothers = function() {
 E.poll_matches = function() {
     
     query = [];
+    E.match_criteria = [];
     for (cap in attr_manager.sdata)
         for (key in attr_manager.sdata[cap])
             query.push([cap, key, ""]);
@@ -842,6 +844,7 @@ E.poll_matches = function() {
             for (val in attr_manager.udata[cap][key]) {                
                 if (attr_manager.udata[cap][key][val].enabled == 1)
                     query.push([cap, key, val]);
+                    E.match_criteria.push([cap, key, val]);
             }
     
     data = JSON.stringify(query);
@@ -1024,6 +1027,8 @@ $(document).ready(function()
     $("#pseudonym").show();
     
     $("#delete_btn").click(show_delete_modal);
+    
+    
 });
 
 var empty_scratchpad = $("<span></span>");
