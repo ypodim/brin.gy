@@ -14,145 +14,36 @@ from threading import Thread
 from urllib import urlencode
 
 from db import DB
-from cron import Cron
+#from cron import Cron
 
-        
-class serve_index(tornado.web.RequestHandler):
-    def options(self):
-        self.write('')
-    def prepare(self):
-        self.start_time = time.time()
-        self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
-        self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
-        self.set_header('Content-Type','application/javascript; charset=UTF-8')
-    def get(self):
-        dic = dict(message='this is ego')
-        self.write(dic)
+capability_names = ['profile','location','buysell']
 
-
-#class manage_agent(tornado.web.RequestHandler):
-    #def options(self):
-        #self.write('')
-    #def prepare(self):
-        #self.start_time = time.time()
-        #self.set_header('Access-Control-Allow-Origin', '*')
-        #self.set_header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
-        #self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
-        #self.set_header('Content-Type','application/javascript; charset=UTF-8')
-    #def post(self):
-        #user_type = self.get_argument('user_type', 'bot')
-        #flag = 1
-        #while flag:
-            #user_name = ''.join(chr(random.randint(97, 122)) for x in xrange(6)) # a-z
-            
-            #sql = 'select * from ego2_user where `name`="%s"' % user_name
-            #flag = db.query(sql)
-            ##print 'tried %s and found %s' % (user_name, flag)
-            
-        #profile = dict(user_name=user_name, user_type=user_type)
-        #u, created = create_user_with_profile(profile, db)
-        ##print '****', u, created
-        
-        #res = {'error':'', 'username':user_name, 'usertype':user_type}
-        #self.write(res)
-    #def delete(self):
-        #sql = 'DELETE FROM `ego2_user`'
-        #dat = db.execute(sql)
-        #self.write({'error':'', 'res':'%s'%dat})
-        
-        
-class new_agent(tornado.web.RequestHandler):
-    def options(self):
-        self.write('')
-    def prepare(self):
-        self.start_time = time.time()
-        self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
-        self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
-        self.set_header('Content-Type','application/javascript; charset=UTF-8')
-    def post(self):
-        authorized_users = ['ypod','jon','holtzman']
-        authorized_user = ''
-
-        user = self.get_cookie("MediaLabUser")
-        if user: user = user.split('%',1)[0]
-        
-        #if user not in authorized_users:
-            #self.write({'error':'only %s are allowed to play with this' % authorized_users})
-            #return
-        
-        user_name = self.get_argument('username')
-        
-        created = db.create_user(user_name)
-        
-        res = {'error':'', 'username':user_name, 'created':created}
-        self.write(res)
-        
-        
-class serve_request(tornado.web.RequestHandler):
+class bringy_handler(tornado.web.RequestHandler):
     callback = None
     cap = ''
+    username = ''
     
     def initialize(self):
         path = tornado.escape.url_unescape(self.request.uri)
-        
         base = path.split('?')[0]
-        path = base.split('/')[1:]
+        path = base.split('/')
         
+        while path and path[0] == '':
+            path.pop(0)
+        
+        if not path:
+            return
+        
+        self.username = path[0]
         if len(path) > 1 and path[1]:
             self.cap = path[1]
         
-        self.username = path[0]
-        self.path = path[2:]
-        self.agent_url = '%s/%s' % (self.request.host, path[0])
-        
-    def die(self, error):
-        if type(error) == dict:
-            dic = error
-        if type(error) in (str, unicode):
-            dic = {'error':error}
-            print '*** %s' % dic
-            
-        self.on_response(dic)
-    
     def prepare(self):
         self.start_time = time.time()
         self.set_header('Access-Control-Allow-Origin', '*')
         self.set_header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
         self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
         self.set_header('Content-Type','application/json; charset=UTF-8')
-        
-        #print self.usr, self.request.headers.get('X-Real-Ip')
-        
-        # if user exists in ML dir
-        if not db.user_exists(self.username):
-            self.die('invalid user %s' % self.username)
-            #print '%s: %s' % (self.request.headers.get('X-Real-Ip'), self.request.uri)
-            return
-
-        capabilities = []
-        for capability_source in os.listdir(capabilities_dir):
-
-            if capability_source[-3:] == '.py' and \
-            capability_source[:2]  != '__':
-                try:
-                    capabilities.append( capability_source.split('.')[0] )
-                except:
-                    print 'Ignoring %s' % capability_source
-        
-        if not self.cap:
-            self.die({'error':'', 'capabilities':capabilities})
-            return
-            
-        if self.cap not in capabilities:
-            self.die('%s is not a valid capability' % self.cap)
-            print '%s: %s' % (self.request.headers.get('X-Real-Ip'), self.request.uri)
-            return
-            
-        authenticated_user = self.get_cookie("MediaLabUser")
-        if authenticated_user: authenticated_user = authenticated_user.split('%',1)[0]
-            
         
         self.arguments ={}
         args = self.request.arguments.get('data')
@@ -167,6 +58,71 @@ class serve_request(tornado.web.RequestHandler):
             
     def options(self):
         self.write('')
+
+    def finilize_call(self, dic):
+        now = time.time()
+        rtime = now - self.start_time
+        dic.__setitem__('capability', self.cap)
+        dic.__setitem__('current_time', now)
+        dic.__setitem__('response_time', rtime)
+        dic.__setitem__('error', dic.get('error',''))
+        dic.__setitem__('user', self.username)
+        
+        dic = tornado.escape.json_encode(dic)
+        if self.callback:
+            dic = '%s(%s)' % (self.callback, dic)
+    
+        return dic
+        
+    def on_response(self, dic={}):
+        dic = self.finilize_call(dic)
+        self.write(dic)
+        self.finish()
+
+
+class serve_index(bringy_handler):
+    def post(self):
+        user_name = self.get_argument('username')
+        created = db.create_user(user_name)
+        res = {'error':'', 'username':user_name, 'created':created}
+        self.write(res)
+    def get(self):
+        dic = dict(message='this is ego')
+        self.write(dic)
+        
+        
+class serve_user(bringy_handler):
+    def prepare(self):
+        bringy_handler.prepare(self)
+        if not db.user_exists(self.username):
+            error = 'invalid user %s' % self.username
+            self.on_response(dict(error=error))
+            #print '%s: %s' % (self.request.headers.get('X-Real-Ip'), self.request.uri)
+    def get(self):
+        dic = dict(capabilities=capability_names)
+        dic = self.finilize_call(dic)
+        self.write(dic)
+    def delete(self):
+        deleted = db.delete_user(self.username)
+        
+        for capname in capability_names:
+            exec 'from capabilities.%s import %s' % (capname, capname)
+            capability = eval(capname)(self.username, self.arguments, db.r, self.on_response)
+            capability.clear_all()
+                
+        res = {'error':'', 'username':self.username, 'deleted':deleted}
+        self.write(res)
+        
+        
+class serve_capability(bringy_handler):
+    def prepare(self):
+        bringy_handler.prepare(self)
+        
+        if self.cap not in capability_names:
+            error = '%s is not a valid capability' % self.cap
+            self.on_response(dict(error=error))
+            print '%s: %s' % (self.request.headers.get('X-Real-Ip'), self.request.uri)
+            return
         
     @tornado.web.asynchronous
     def get(self):
@@ -189,34 +145,10 @@ class serve_request(tornado.web.RequestHandler):
         
     def execute(self, arguments=None):
         exec 'from capabilities.%s import %s' % (self.cap, self.cap)
-        #print self.cap, self.username, arguments, self.arguments
         capability = eval(self.cap)(self.username, arguments or self.arguments, db.r, self.on_response)
         return eval('capability.%s' % (self.request.method.lower()) )()
     
-    def finilize_call(self, dic):
-        now = time.time()
-        rtime = now - self.start_time
-        dic.__setitem__('capability', self.cap)
-        dic.__setitem__('current_time', now)
-        dic.__setitem__('response_time', rtime)
-        dic.__setitem__('error', dic.get('error',''))
-        dic.__setitem__('user', self.username)
-        
-        alert = ''
-        if rtime > 1:
-            alert = '\n***** TOO SLOW ***'
-            print '%sresponse time: %s %s' % (alert, rtime, self.request.uri)
-        
-        dic = tornado.escape.json_encode(dic)
-        if self.callback:
-            dic = '%s(%s)' % (self.callback, dic)
-    
-        return dic
-        
-    def on_response(self, dic={}):
-        dic = self.finilize_call(dic)
-        self.write(dic)
-        self.finish()
+
         
         
 class api_call(tornado.web.RequestHandler):
@@ -365,43 +297,43 @@ class api_call(tornado.web.RequestHandler):
     def api_test(self):
         self.render('test.html')
         
-    def api_jobs(self):
-        if 'html' in self.request.path.split('/'):
-            self.render('jobs.html')
-        else:
-            jobs = cron.get_jobs()
-            self.write(dict(jobs=jobs))
+    #def api_jobs(self):
+        #if 'html' in self.request.path.split('/'):
+            #self.render('jobs.html')
+        #else:
+            #jobs = cron.get_jobs()
+            #self.write(dict(jobs=jobs))
         
-    def api_stopjob(self):
-        name = self.request.path.split('/', 2)[-1]
+    #def api_stopjob(self):
+        #name = self.request.path.split('/', 2)[-1]
         
-        res = cron.stop_job(name)
-        self.write(res)
+        #res = cron.stop_job(name)
+        #self.write(res)
         
-    def api_startjob(self):
-        name = self.request.path.split('/', 2)[-1]
-        ttl = self.get_argument('ttl', 5)
-        ttl = int(ttl)
+    #def api_startjob(self):
+        #name = self.request.path.split('/', 2)[-1]
+        #ttl = self.get_argument('ttl', 5)
+        #ttl = int(ttl)
         
-        request_url = '%s/buysell' % satellite_url
+        #request_url = '%s/buysell' % satellite_url
         
-        #data = dict(agent=name)
-        #if random.random() > 0.1:
-            #data['name'] = random.choice(['gandalf','galadriel'])
-        #if random.random() > 0.1:
-            #data['sex'] = random.choice(['male','female'])
-        #if random.random() > 0.1:
-            #data['age'] = random.randint(20, 30)
+        ##data = dict(agent=name)
+        ##if random.random() > 0.1:
+            ##data['name'] = random.choice(['gandalf','galadriel'])
+        ##if random.random() > 0.1:
+            ##data['sex'] = random.choice(['male','female'])
+        ##if random.random() > 0.1:
+            ##data['age'] = random.randint(20, 30)
         
-        data = dict(itemid="theproduct", price=1000, action="sell", agent="pol")
+        #data = dict(itemid="theproduct", price=1000, action="sell", agent="pol")
         
-        res = cron.start_job(name, request_url, data, ttl)
-        self.write(res)
+        #res = cron.start_job(name, request_url, data, ttl)
+        #self.write(res)
         
-    def api_polljob(self):
-        name = self.request.path.split('/', 2)[-1]
-        res = cron.get_responses(name)
-        self.write(res)
+    #def api_polljob(self):
+        #name = self.request.path.split('/', 2)[-1]
+        #res = cron.get_responses(name)
+        #self.write(res)
 
     def api_controller(self):
         data = self.get_argument('data')
@@ -425,19 +357,14 @@ application = tornado.web.Application([
     (r"/batch_profile", api_call),
     (r"/batch_location", api_call),
     (r"/batch_buysell", api_call),
-    
     (r"/controller", api_call),
-    
-    
     (r"/jobs.*", api_call),
     (r"/startjob/[\/\:_a-zA-Z0-9]*", api_call),
     (r"/stopjob/[\/\:_a-zA-Z0-9]*", api_call),
     (r"/polljob/[\/\:_a-zA-Z0-9]*", api_call),
     
-    #(r"/manage_agent", manage_agent),
-    (r"/new_agent", new_agent),
-    
-    (r"/.+", serve_request),
+    (r"/[a-zA-Z0-9]+/?$", serve_user),
+    (r"/.+", serve_capability),
     (r"/$", serve_index),
     
 ], **settings)    
@@ -455,9 +382,9 @@ if __name__ == "__main__":
     HOST    = options.host
     PORT    = int(options.port)
     
-    capabilities_dir = 'capabilities'
+    #capabilities_dir = 'capabilities'
     
-    cron = Cron()
+    #cron = Cron()
 
     satellite_url = 'http://localhost:22222'
     

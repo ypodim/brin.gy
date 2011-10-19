@@ -92,7 +92,7 @@ class profile():
         
     def post(self):
         res = ''
-        #print 'arguments', self.arguments
+        print 'arguments', self.arguments
         for key, val in self.arguments:
             #print 'saving', key, val
             self.set_val(key, val)

@@ -9,7 +9,10 @@ class DB:
 
     def create_user(self, username):
         return self.r.sadd('users', username)
-    
+        
+    def delete_user(self, username):
+        return self.r.srem('users', username)
+        
     def user_exists(self, username):
         return self.r.sismember('users', username)
     

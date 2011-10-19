@@ -70,7 +70,27 @@ class location():
     def del_location(self, key):
         self.db.delete('%s:location:%s:lat' % (self.usr, key))
         self.db.delete('%s:location:%s:lon' % (self.usr, key))
+      
+    def delete_entry(self, key, lat, lon):
+        #remove location from reverse entries
+        self.del_reverse(key, lat, lon)
         
+        #remove location from main store
+        self.del_location(key)
+        
+        #decrease the number of agents under this key
+        self.db.decr('location:count:%s' % key)
+        
+        #remove key from list of keys
+        # ALERT: if you're gonna uncomment the following del_key, make sure you check
+        #that the key is not being used before deleting it
+        #self.del_key(key)
+    
+    def clear_all(self):
+        for key in self.get_keys() or []:
+            dic = self.get_location(key)
+            self.delete_entry(key, dic['lat'], dic['lon'])
+            
     def get(self):
         saved_items = {}
         #print 'keys', self.get_keys()
@@ -114,19 +134,7 @@ class location():
             lat = val['lat']
             lon = val['lon']
             
-            #remove location from reverse entries
-            self.del_reverse(key, lat, lon)
-            
-            #remove location from main store
-            self.del_location(key)
-            
-            #decrease the number of agents under this key
-            self.db.decr('location:count:%s' % key)
-            
-            #remove key from list of keys
-            # ALERT: if you're gonna uncomment the following del_key, make sure you check
-            #that the key is not being used before deleting it
-            #self.del_key(key)
+            self.delete_entry(key, lat, lon)
                 
         return dict(error=error)
     

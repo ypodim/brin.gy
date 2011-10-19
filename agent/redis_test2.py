@@ -2,6 +2,9 @@
 import redis
 import time
 import sys
+import random
+import unittest
+
 
 r = redis.Redis(host='localhost', port=6379, db=0)
 

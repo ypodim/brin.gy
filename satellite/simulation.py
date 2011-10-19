@@ -236,7 +236,7 @@ class Scenario(Thread):
         self.groups = []
         
         bucket_ceiling = 0
-        
+        self.agents_url = 'http://ypod.media.mit.edu:10007'
         
         self.sound = {}
         for i in xrange(1,9):
@@ -289,7 +289,7 @@ class Scenario(Thread):
                         o.profile['tag'] = random.choice(['visualization', 'c++'])
                 
                 o.p.randomize_in_rect(o.group.p.x, o.group.p.y, o.group.w, o.group.h)
-                #res = self.post('http://ypod.media.mit.edu:10007/new_agent', dict(username='agent%s'%i))
+                #res = self.post('%s/new_agent' % self.agents_url, dict(username='agent%s'%i))
                 self.obj.append(o)
                 i += 1
         
@@ -324,7 +324,7 @@ class Scenario(Thread):
                 agents[a.name] = {'current location':dic}
             
             try:
-                res = self.post('http://ypod.media.mit.edu:10007/batch_location', dict(data=json.dumps(agents)))
+                res = self.post('%s/batch_location' % self.agents_url, dict(data=json.dumps(agents)))
                 print res['response_time']
             except:
                 continue
@@ -341,7 +341,7 @@ class Scenario(Thread):
                 agents[a.name] = a.profile
             #print 'posting'
             #try:
-            res = self.post('http://ypod.media.mit.edu:10007/batch_profile', dict(data=json.dumps(agents)))
+            res = self.post('%s/batch_profile' % self.agents_url, dict(data=json.dumps(agents)))
             rt = res['response_time']
             #print 'rt is', rt
             response_time += rt
@@ -364,7 +364,7 @@ class Scenario(Thread):
                     agents[a.name] = {"0":json.dumps(a.buysell)}
             
             #try:
-            res = self.post('http://ypod.media.mit.edu:10007/batch_buysell', dict(data=json.dumps(agents)))
+            res = self.post('%s/batch_buysell' % self.agents_url, dict(data=json.dumps(agents)))
             rt = res['response_time']
             print rt
             response_time += rt

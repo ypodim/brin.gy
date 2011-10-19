@@ -7,6 +7,7 @@
 
 var ego_url_prefix = "{{ego_url_prefix}}";
 var website_url_prefix = "{{website_url_prefix}}";
+var valid_username = undefined;
 
 var check_username = function()
 {
@@ -14,76 +15,71 @@ var check_username = function()
     
     $.getJSON(ego_url_prefix+"/"+username, function(json){
         if (username && username != "<username>" && typeof json == "object" && json.error) {
-            $("#btn_check").hide();
-            $("#btn_clear").show();
-            $("#btn_taken").hide();
-            $("#default_msg").hide();
+            $("#btn").html("get it!").removeClass("primary").addClass("success");
+            valid_username = username;
         } else {
-            $("#btn_check").hide();
-            $("#btn_clear").hide();
-            $("#btn_taken").show();
-            $("#default_msg").hide();
+            $("#btn").html("check").removeClass("primary success").addClass("danger").html("pseudonym taken!");
+            valid_username = undefined;
         }
     });
-    return false;
+}
+
+var post_new_user = function() {
+    $.post(ego_url_prefix, {username:valid_username}, function(data) {
+        error = data.error;
+        if (data.error)
+            alert(data.error);
+        
+        if (! error.length) {
+            other_names = $.cookie('other_names');
+            if (typeof(other_names) == "string")
+                other_names = other_names+","+valid_username;
+            else
+                other_names = valid_username;
+            $.cookie('other_names', other_names, {expires:7, path:"/"});
+            window.location.href = "{{website_url_prefix}}/manage/"+valid_username;
+        }
+    }, "json");
 }
 
 $(document).ready(function()
 {
-    $("#username").focus().keydown(function(obj){
-        if (obj.keyCode == 13)
-            return check_username();
+    $("#newuserform").submit(function(obj){
+        username = $("#username").val();
+        res = /\W/.test(username);
         
-        $("#btn_check").show();
-        $(".indicator").hide();
-
-        if ($(this).val() == "<username>")
-            $(this).val('').css("color","black");
-
-        $("#default_msg").show();
-    });
-
-    $("form").submit(function(obj){
-        dataString = {
-            "username":$("#username").val(),
-            "usertype":$("#usertype").val(),
-        };
-        var error = "";
-        
-        $.post(ego_url_prefix+'/new_agent', dataString, function(data) {
-            console.log(data);
-            error = data.error;
-            if (data.error)
-                alert(data.error);
-            
-            html = "User "+data.username+" ("+data.usertype+") was added:";
-            link = $("<a></a>").attr("href",ego_url_prefix+"/"+data.username).html(data.username).css({"margin-left":"30px", "color":"yellow"});
-            entry = $("<div></div>").html(html).append(link);
-
-            $("#output").append(entry);
-
-            $("#btn_clear").hide().html("taken");
-            $("#btn_taken").hide().html("taken");
-            $("#default_msg").show();
-            $("#username").focus();
-
-            if (! error.length)
-                window.location.href = "{{website_url_prefix}}/manage/"+$("#username").val();
-                
-        }, "json");
-        
+        if (res) {
+            valid_username = undefined;
+            $("#btn").removeClass("primary success").addClass("danger").html("Please use only letters and/or numbers");
+        } else {
+            if (valid_username) {
+                post_new_user();
+            } else {
+                check_username();
+            }
+        }
         return false;
     });
-
-    $("#btn_clear").click(function (){
-        $("form").submit();
+    
+    $("#btn").click(function (){
+        $("#newuserform").trigger("submit");
     });
     
-    $("#btn_check").click(function (){
-        check_username();
+    $("#username").focus();
+    
+    other_names = $.cookie('other_names');
+    if (typeof(other_names) == "string") {
+        other_names = other_names.split(",");
+        $("#previous_pseudonym").show();
+        for (i in other_names)
+            $("select").append("<option>"+other_names[i]+"</option>")
+    }
+    $("select").change(function(){
+        window.location.href = "{{website_url_prefix}}/manage/"+$(this).val();
     });
-
-//     $("select").show();
+    $("#btn2").click(function(){
+        window.location.href = "{{website_url_prefix}}/manage/"+$("select").val();
+    });
 });
 </script>
 {% end %}
@@ -91,47 +87,27 @@ $(document).ready(function()
 {% block body %}
 
 <div id="left">
-    <!--<span class="inline">What it is</span>-->
-    <h2>What this is</h2>
-    <p>Brin.gy follows a well-defined protocol that allows people to announce bits of information about themselves and participate in dynamic groups formed around that information. It implements an experimental protocol for human discovery, namely <b>Human Discovery Protocol</b>. HDP allows us to form dynamic groups such as the group of people interested in buying the same product, people with similar expertise, people in the same location, or any intersection of these examples.</p>
-    
+    <h2>What it is</h2>
+    <p>Brin.gy implements a protocol that allows people to announce bits of information about themselves and participate in dynamic groups formed around that information. It implements an experimental protocol for human discovery, namely <b>Human Discovery Protocol</b>. HDP allows us to form dynamic groups such as the group of people interested in buying the same product, people with similar expertise, people in the same location, or any intersection of these examples.</p>
     <p>When it comes to <b>"finding the right people"</b>, we need either a user account with some sort of social networking service, or a lot of patience to sift through online forums like Craigslist. When computers look for other computers though, they are consistently effective and their results are specific because they follow well-defined protocols, like DNS. Imagine how ineffective the internet would be if every DNS server was a "walled garden" requiring computers to have an account with it, or have to engage in "chatty" conversations in an online forum in order to figure out which IP address corresponds to a hostname. This is unfortunately the reality when it comes to humans discovering and communicating with each other on the internet.</p>
-    
 </div>
 
 <div id="right">
-    <h2>Pick a pseudonym</h2>
-
-    <div id="form">
-        <form method="post">
-        <input class="text" id="username" name="username" type="text" value="<username>"/>
+    <div id="new_pseudonym">
+        <h2>Pick a pseudonym</h2>
+        <form method="post" id="newuserform">
+        <input class="text" id="username" name="username" type="text" value="" />
         </form>
+        <a id="btn" class="btn primary" href="#">check</a>
     </div>
-
-    <div id="message" class="text css3">
-        <a id="btn_clear" class="btn success indicator" href="#">get it!</a>
-        <span id="btn_taken" class="label important indicator" href="#">taken</span>
-        <a id="btn_check" class="btn primary" href="#">check</a>
+    <div id="previous_pseudonym">
+        <h2>Previous pseudonyms</h2>
+        <form><select></select></form>
+        <a id="btn2" class="btn primary" href="#">choose</a>
     </div>
-    
-    <div id="output" class="text"></div>
 </div>
 
 {% end %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -80,7 +80,7 @@ attr_manager.sdata = {
     profile:{},
     location:{
         "current location":{},
-        "destination":{},
+//         "destination":{},
     },
     buysell:{
         "product":{},
@@ -755,7 +755,7 @@ E.populate_aboutme = function() {
                 });
     
     $.getJSON(E.agent.url, function(json){
-        
+        console.log(json);
         if (json.error.length > 0)
             location.replace(E.website_url);
             console.log(json.error);
@@ -960,6 +960,49 @@ E.update_monitor = function() {
     return false;
 }
 
+
+var show_delete_modal = function() {
+    modal = $("#delete-confirmation-modal");
+    modal.modal({backdrop:"static", show:true, keyboard:true});
+    
+    $("#delete-cancel-btn").click(function(){
+        modal.modal("hide");
+    });
+    $("#delete-delete-btn").click(function(){
+        modal.bind('hidden', function(){
+            console.log("deleting", E.agent.url);
+            $.ajax({
+                url: E.agent.url,
+                type: "DELETE",
+                success: function(json) {
+                    console.log("delete response", json);
+                    location.replace(E.website_url);
+                },
+                dataType: "json",
+            });
+        });
+        modal.modal("hide");
+        
+        other_names = $.cookie('other_names');
+        if (typeof(other_names) == "string") {
+            other_names = other_names.split(",");
+            idx = other_names.indexOf(E.agent.id);
+            if (idx >= 0)
+                other_names.splice(idx,1);
+//             console.log("idx was", idx);
+//             console.log("other_names", other_names);
+            if (other_names.length == 0) {
+//                 console.log("nulling cookie");
+                $.cookie('other_names', null, {path:'/'});
+//                 console.log("result:",$.cookie('other_names'));
+            } else
+                $.cookie('other_names', ""+other_names, {expires:7, path:'/'});
+//             console.log( $.cookie('other_names'));
+        }
+    });
+}
+
+
 //////////////////////////////////////////////////
 ////////////////     ON READY
 
@@ -978,12 +1021,16 @@ $(document).ready(function()
     
     E.update_monitor();
     $("#delete_btn").show();
+    $("#pseudonym").show();
+    
+    $("#delete_btn").click(show_delete_modal);
 });
 
 var empty_scratchpad = $("<span></span>");
 empty_scratchpad.attr("id","empty_scratchpad");
 empty_scratchpad.addClass("help-block");
 empty_scratchpad.html("Create an application by selecting attributes from the left panel.");
+
 
 
 
@@ -1029,6 +1076,21 @@ empty_scratchpad.html("Create an application by selecting attributes from the le
     </div>
     <div class="modal-footer">
         <a href="#" class="btn danger" id="modal-cancel-btn">Cancel</a>
+    </div>
+</div>
+
+
+<div id="delete-confirmation-modal" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close">&times;</a>
+        <h3>What?! Are you sure?</h3>
+    </div>
+    <div class="modal-body">
+        <p>You understand that this is <b>not</b> Facebook,<br> if you delete this agent all associated data will <b>actually</b> be deleted ;)</p>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn danger" id="delete-delete-btn">Trash everything</a>
+        <a href="#" class="btn primary" id="delete-cancel-btn">Cancel</a>
     </div>
 </div>
 
