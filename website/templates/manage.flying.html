@@ -622,13 +622,13 @@ E.set_matches = function(stop) {
 }
 E.populate_apps = function() {
     $("#choices").empty();
-//     $("#showapps").addClass("active");
-//     $("#showattrs").removeClass("active");
+    $("#showapps").addClass("active");
+    $("#showattrs").removeClass("active");
 }
 E.populate_attrs = function() {
     $("#choices").empty();
-//     $("#showattrs").addClass("active");
-//     $("#showapps").removeClass("active");
+    $("#showattrs").addClass("active");
+    $("#showapps").removeClass("active");
     
     for (capname in attr_manager.sdata) {
         if (Object.size(attr_manager.sdata[capname]) == 0 && capname != "profile")
@@ -638,12 +638,13 @@ E.populate_attrs = function() {
         $("#choices").append(app).addClass("");
         for (attr in attr_manager.sdata[capname]) {
             
+            prop = $("<span></span>").append(attr);
             // attr_counters class is used to group and iterate through all attribute counters
-            count = $("<span></span>").addClass("count attr_counters");
+            count = $("<span></span>").addClass("count").addClass("attr_counters");
+
             count.html(attr_manager.sdata[capname][attr]);
             count.attr({uitype:"sat_attribute", cap:capname, key:attr});
             
-            prop = $("<span></span>").append(attr);
             prop = $("<div></div>").append(prop).append(count);
             
             pill_content = $("<a href='#'></a>").attr("prop",attr).attr("cap",capname).append(prop);
@@ -656,9 +657,7 @@ E.populate_attrs = function() {
                 return false;
             }).popover();
             pill = $("<li class='active'></li>").append(pill_content);
-            
-            
-            
+//             $("#choices").append(pill);
             app.append(pill);
         }
         
@@ -675,6 +674,20 @@ E.populate_attrs = function() {
             $("#choices").append(more);
         }
     }
+    
+    
+    $("#match_btn").click(function(){
+        $("#result_list").html("");
+        for (i in E.monitor.user_matches.intersection) {
+            agent = $("<div></div>");
+            agent.html(E.monitor.user_matches.intersection[i]);
+            $("#result_list").append(agent);
+        }
+        $("#map_canvas").toggle();
+        console.log(E.monitor.user_matches.intersection);
+        console.log(E.match_criteria);
+        return false;
+    });
 }
 
 //////////////////////////////////////////////////
@@ -1028,27 +1041,14 @@ var show_delete_modal = function() {
 
 $(document).ready(function()
 {
-//     $("#aboutothers").click(E.populate_aboutothers);
-//     $("#aboutme").click(E.populate_aboutme);
+    $("#aboutothers").click(E.populate_aboutothers);
+    $("#aboutme").click(E.populate_aboutme);
     
-//     $("#showattrs").click(E.populate_attrs);
-//     $("#showapps").click(E.populate_apps);
+    $("#showattrs").click(E.populate_attrs);
+    $("#showapps").click(E.populate_apps);
     
     E.fetch_attributes();
     E.populate_aboutme();
-    
-    $("#match_btn").click(function(){
-        $("#result_list").html("");
-        for (i in E.monitor.user_matches.intersection) {
-            agent = $("<div></div>");
-            agent.html(E.monitor.user_matches.intersection[i]);
-            $("#result_list").append(agent);
-        }
-        $("#map_canvas").toggle();
-        console.log(E.monitor.user_matches.intersection);
-        console.log(E.match_criteria);
-        return false;
-    });
     
     setInterval(E.poll_matches, 500); 
     
@@ -1059,17 +1059,6 @@ $(document).ready(function()
     $("#delete_btn").click(show_delete_modal);
     
     cookies.set_cookie(E.agent.id);
-    
-    $("nav a").click(function (){
-        first_child_selected = $("nav a:first-child").hasClass("selected");
-        if (first_child_selected) {
-            $("nav a:first-child").removeClass("selected");
-            $("nav a:last-child").addClass("selected");
-        } else {
-            $("nav a:first-child").addClass("selected");
-            $("nav a:last-child").removeClass("selected");
-        }
-    });
 });
 
 var empty_scratchpad = $("<span></span>");
@@ -1086,23 +1075,19 @@ empty_scratchpad.html("Create an application by selecting attributes from the le
 
 <div class="grid">
     <div class="row">
-        <div class="span4 columns left_column">
-            <nav>
-                <a href="#">search</a>
-                <a class="selected" href="#">me</a>
-            </nav>
-<!--            <ul class="tabs">
-                <li id="showapps"><a href="#">Apps</a></li>
+        <div class="span3 columns left_column">
+            <ul class="tabs">
+<!--                 <li id="showapps"><a href="#">Apps</a></li> -->
                 <li id="showattrs"><a href="#">Attributes</a></li>
-            </ul>-->
+            </ul>
             <ul class="pills" id="choices">
             </ul>
         </div>
-        <div id="right_pane" class="span12 columns">
-<!--            <ul class="tabs">
+        <div id="right_pane" class="span13 columns">
+            <ul class="tabs">
                 <li id="aboutme"><a href="#">About Me</a></li>
-                <li id="aboutothers"><a href="#">About Others</a></li>
-            </ul>-->
+<!--                 <li id="aboutothers"><a href="#">About Others</a></li> -->
+            </ul>
             
             <div id="scratchpad">
             </div>
