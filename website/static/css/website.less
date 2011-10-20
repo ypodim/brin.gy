@@ -54,11 +54,36 @@ div.footer { text-align:center; padding-top: 10px; }
 div.choice_header { padding-bottom: 150px; clear:both;}
 div.clear {clear:both;}
 
+.map_container {
+    margin-left: 20px;
+/*     position: inline; */
+    float:left;
+}
+
 #map_canvas {
+    position: absolute;
     width: 500px;
     height: 400px;
-    float: right;
     background-color: red;
+    z-index:1000;
+}
+
+#result_list { 
+    position: absolute;
+    width: 500px;
+    height: 325px;
+    z-index: 0;
+    border: #cccccc solid 1px;
+}
+
+#match_btn {
+    position: relative;
+    left: 380px;
+    z-index:1001;
+}
+
+#matches {   
+    font-size:40px; 
 }
 
 span.enabled { color: #111 !important; border-radius: 0 0 0 0 !important; }
@@ -159,16 +184,6 @@ a.closebtn:hover {
     border-radius: 3px 0 0 3px;
 }
 
-#match_btn {
-    position: absolute;
-    left: 839px;
-    top: 160px;
-    z-index: 1000;
-/*     height: 100px; */
-}
-#matches {   
-    font-size:40px; 
-}
 
 div.left_column { border-right: 1px solid @grayLight; }
 /* div.right_column { border-left: 1px solid gray; } */

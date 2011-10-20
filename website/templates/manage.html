@@ -677,6 +677,13 @@ E.populate_attrs = function() {
     
     
     $("#match_btn").click(function(){
+        $("#result_list").html("");
+        for (i in E.monitor.user_matches.intersection) {
+            agent = $("<div></div>");
+            agent.html(E.monitor.user_matches.intersection[i]);
+            $("#result_list").append(agent);
+        }
+        $("#map_canvas").toggle();
         console.log(E.monitor.user_matches.intersection);
         console.log(E.match_criteria);
         return false;
@@ -930,11 +937,14 @@ E.poll_matches = function() {
         }
         
         
-        E.monitor.user_matches.intersection = [];
+        intersection = [];
         for (match in test_intersection)
             if (test_intersection[match] == target_count)
                 if (match != E.agent.id)
-                    E.monitor.user_matches.intersection.push(match);
+                    intersection.push(match);
+        
+        
+        E.monitor.user_matches.intersection = intersection;
         
         E.set_matches(E.monitor.user_matches.intersection.length);
         
@@ -1082,14 +1092,18 @@ empty_scratchpad.html("Create an application by selecting attributes from the le
             <div id="scratchpad">
             </div>
             
-            <button id="match_btn" class="btn info">
-                <div id="matches" curpos="0">0</div>
-                <div id="matches_caption"></div>
-            </button>
+            <div class="map_container">
+                <div id='map_canvas'></div>
+                
+                <button id="match_btn" class="btn info">
+                    <div id="matches" curpos="0">0</div>
+                    <div id="matches_caption"></div>
+                </button>
+                
+                <div id="result_list"></div>
+            </div>
             
             <div id="others_scratchpad"></div>
-            
-            <div id='map_canvas'></div>
         </div>
     </div>
 </div>
