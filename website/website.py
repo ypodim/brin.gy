@@ -39,7 +39,8 @@ class ContentHandler(tornado.web.RequestHandler):
         print 'post', self.request.arguments
         self.write('ok')
         
-        
+
+
 if __name__ == "__main__":
      
     debug = os.environ.get("SERVER_SOFTWARE", "").startswith("Development/")

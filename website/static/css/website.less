@@ -51,7 +51,16 @@ span.count {
 div.footer { text-align:center; padding-top: 10px; }
 
 .flying { position:absolute; z-index:1000; }
-div.choice_header { padding-top: 30px; clear:both; }
+div.choice_header { padding-bottom: 150px; clear:both;}
+div.clear {clear:both;}
+
+#map_canvas {
+    width: 500px;
+    height: 400px;
+    float: right;
+    background-color: red;
+}
+
 span.enabled { color: #111 !important; border-radius: 0 0 0 0 !important; }
 
 span.remover { 
@@ -150,11 +159,12 @@ a.closebtn:hover {
     border-radius: 3px 0 0 3px;
 }
 
-.match_box { 
-    float: right;
-/*     display: none; */
-    height: 100px;
-    float:right;
+#match_btn {
+    position: absolute;
+    left: 839px;
+    top: 160px;
+    z-index: 1000;
+/*     height: 100px; */
 }
 #matches {   
     font-size:40px; 

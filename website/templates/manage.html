@@ -79,7 +79,7 @@ attr_manager.udata = {};
 attr_manager.sdata = {
     profile:{},
     location:{
-        "current location":{},
+        "my location":{},
 //         "destination":{},
     },
     buysell:{
@@ -283,7 +283,7 @@ E.generate_entry = function(key, val) {
     }
     
     var title = $("<span></span>").addClass("add-on enabled").html(key);
-    var input = $("<input class='fixer' size='14' type='text' />");
+    var input = $("<input class='fixer mini' type='text' />");
     input.val(val).keydown(function(obj){
         
         if (obj.keyCode == 13 || obj.keyCode == undefined) {
@@ -533,12 +533,12 @@ E.generate_location_entry = function(key, val) {
         E.update_monitor();
     });
     
-    attr = {uitype:"user_attribute", cap:"location", key:"current location", val:val};
+    attr = {uitype:"user_attribute", cap:"location", key:"my location", val:val};
     count.addClass("attr_counters").attr(attr);
     attr_manager.add_udata("location", key, val, 0);
     
     var title = $("<span></span>").addClass("add-on enabled").html(key);
-    var input = $("<input class='fixer' size='14' type='text' />");
+    var input = $("<input class='fixer mini' type='text' />");
     
     delpic = "<a class='closebtn' href='#'>&times;</a>";
     remover = $("<span></span>").attr({cap:"location", key:key, val:val}).addClass("remover").html(delpic).click(function(){
@@ -547,6 +547,9 @@ E.generate_location_entry = function(key, val) {
         $(this).parent().slideUp();
         E.user.todel = {cap:"location", key:key, val:val};
         E.delete_keyval();
+        
+//         $("#map_canvas").fadeOut(1000, function(){$(this).remove();});
+        $("#map_canvas").html("");
         
         attr_manager.remove_udata("location", key, val);
         return false;
@@ -559,9 +562,42 @@ E.generate_location_entry = function(key, val) {
         return false;
     });
     
+//     map = $("#map_canvas").hide();
+//     $("#right_pane").append(map);
+//     map.fadeIn(1000);
+    
+    E.populate_map(JSON.parse(val));
+    
     E.update_monitor();
     
     return form;
+}
+
+E.populate_map = function(p)
+{
+    var myLatlng = new google.maps.LatLng(p.lat, p.lon);
+    var myOptions = {
+        zoom: 14,
+        center: myLatlng,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+    var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+
+    var marker = new google.maps.Marker({
+        position: myLatlng, 
+        map: map,
+        title:"You are here!",
+    });
+    
+    var infowindow = new google.maps.InfoWindow({
+        content: "",
+    });
+    
+    infowindow.setContent("tester");
+    
+    google.maps.event.addListener(marker, 'click', function() {
+        infowindow.open(map,marker);
+    });
 }
 
 E.set_matches = function(stop) {
@@ -570,7 +606,6 @@ E.set_matches = function(stop) {
     else
         $("#matches").attr("curpos", stop);
     
-    $(".match_box").show();
     start = parseInt($("#matches").html());
     step = 1;
     if (Math.abs(start-stop) > 10) { step = 10 }
@@ -598,8 +633,9 @@ E.populate_attrs = function() {
     for (capname in attr_manager.sdata) {
         if (Object.size(attr_manager.sdata[capname]) == 0 && capname != "profile")
             continue;
-            
-        $("#choices").append($("<div>"+capname+"</div>").addClass("choice_header"));
+        
+        app = $("<div>"+capname+"</div>").addClass("clear");
+        $("#choices").append(app).addClass("");
         for (attr in attr_manager.sdata[capname]) {
             
             prop = $("<span></span>").append(attr);
@@ -621,7 +657,8 @@ E.populate_attrs = function() {
                 return false;
             }).popover();
             pill = $("<li class='active'></li>").append(pill_content);
-            $("#choices").append(pill);
+//             $("#choices").append(pill);
+            app.append(pill);
         }
         
         // specifically for profile, add a pill for new keys
@@ -701,11 +738,11 @@ E.location_clb = function(result) {
     modal.modal("hide");
     result.threshold = 0.0002;
 
-    E.user.toadd["key"] = "current location";
+    E.user.toadd["key"] = "my location";
     E.user.toadd["val"] = result;
     E.user.toadd["cap"] = "location";
     E.post_keyval();
-    entry = E.generate_location_entry("current location", result);
+    entry = E.generate_location_entry("my location", result);
     
     $("#scratchpad").append( entry );
 }
@@ -940,7 +977,6 @@ E.fetch_attributes = function() {
             attr_manager.add_sdata("profile", attribute, 0);
             E.last_fetched = json.matches[i];
         }
-        
         E.populate_attrs();
     });
 }
@@ -985,23 +1021,7 @@ var show_delete_modal = function() {
             });
         });
         modal.modal("hide");
-        
-        other_names = $.cookie('other_names');
-        if (typeof(other_names) == "string") {
-            other_names = other_names.split(",");
-            idx = other_names.indexOf(E.agent.id);
-            if (idx >= 0)
-                other_names.splice(idx,1);
-//             console.log("idx was", idx);
-//             console.log("other_names", other_names);
-            if (other_names.length == 0) {
-//                 console.log("nulling cookie");
-                $.cookie('other_names', null, {path:'/'});
-//                 console.log("result:",$.cookie('other_names'));
-            } else
-                $.cookie('other_names', ""+other_names, {expires:7, path:'/'});
-//             console.log( $.cookie('other_names'));
-        }
+        cookies.del_cookie(E.agent.id);
     });
 }
 
@@ -1028,7 +1048,7 @@ $(document).ready(function()
     
     $("#delete_btn").click(show_delete_modal);
     
-    
+    cookies.set_cookie(E.agent.id);
 });
 
 var empty_scratchpad = $("<span></span>");
@@ -1045,7 +1065,7 @@ empty_scratchpad.html("Create an application by selecting attributes from the le
 
 <div class="grid">
     <div class="row">
-        <div class="span4 columns left_column">
+        <div class="span3 columns left_column">
             <ul class="tabs">
 <!--                 <li id="showapps"><a href="#">Apps</a></li> -->
                 <li id="showattrs"><a href="#">Attributes</a></li>
@@ -1053,18 +1073,23 @@ empty_scratchpad.html("Create an application by selecting attributes from the le
             <ul class="pills" id="choices">
             </ul>
         </div>
-        <div class="span11 columns">
+        <div id="right_pane" class="span13 columns">
             <ul class="tabs">
                 <li id="aboutme"><a href="#">About Me</a></li>
 <!--                 <li id="aboutothers"><a href="#">About Others</a></li> -->
             </ul>
+            
             <div id="scratchpad">
             </div>
-            <button id="match_btn" class="btn info match_box">
+            
+            <button id="match_btn" class="btn info">
                 <div id="matches" curpos="0">0</div>
                 <div id="matches_caption"></div>
             </button>
+            
             <div id="others_scratchpad"></div>
+            
+            <div id='map_canvas'></div>
         </div>
     </div>
 </div>
@@ -1074,7 +1099,7 @@ empty_scratchpad.html("Create an application by selecting attributes from the le
 <div id="modal-from-dom" class="modal hide fade">
     <div class="modal-header">
         <a href="#" class="close">&times;</a>
-        <h3>Current Location</h3>
+        <h3>Currentt Location</h3>
     </div>
     <div class="modal-body">
         <p>To find others near you, please choose to share your location above.</p>
