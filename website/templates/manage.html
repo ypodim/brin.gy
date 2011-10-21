@@ -214,7 +214,7 @@ E.add_new_attribute = null;
 
 E.populate_aboutme = null;
 // retrieve attributes from agent and populate right pane
-E.populate_aboutothers = null;
+// E.populate_aboutothers = null;
 // IMPLEMENT
 
 E.poll_matches = null;
@@ -622,13 +622,9 @@ E.set_matches = function(stop) {
 }
 E.populate_apps = function() {
     $("#choices").empty();
-//     $("#showapps").addClass("active");
-//     $("#showattrs").removeClass("active");
 }
 E.populate_attrs = function() {
     $("#choices").empty();
-//     $("#showattrs").addClass("active");
-//     $("#showapps").removeClass("active");
     
     for (capname in attr_manager.sdata) {
         if (Object.size(attr_manager.sdata[capname]) == 0 && capname != "profile")
@@ -655,25 +651,38 @@ E.populate_attrs = function() {
                 E.add_new_value(cap, key, offset);
                 return false;
             }).popover();
-            pill = $("<li class='active'></li>").append(pill_content);
+//             pill = $("<li class='active'></li>").append(pill_content);
             
-            
+            selectable = $("<span></span>").html(attr);
+            key = $("<a href='#'></a>").append(selectable).append(count);
+            key.click(function (){
+                console.log("in");
+                pressed = $(this).hasClass("pressed");
+                console.log(pressed);
+                if (pressed) {
+                    $(this).removeClass("pressed");
+                } else {
+                    $(this).addClass("pressed");
+                }
+            });
+            values = $("<values></values>").html("empty");
+            pill = $("<pill></pill>").append(key).append(values);
             
             app.append(pill);
         }
         
         // specifically for profile, add a pill for new keys
-        if (capname == 'profile') {
-            pill_content = $("<a href='#'>create new attribute...</a>").attr("cap",capname).click(E.add_new_attribute);
-            pill = $("<li class='green_pill'></li>").append(pill_content);
-            $("#choices").append(pill);
-        
-            more = $("<a href='#'>fetch more...</a>").click(function(){
-                E.fetch_attributes();
-                return false;
-            });
-            $("#choices").append(more);
-        }
+//         if (capname == 'profile') {
+//             pill_content = $("<a href='#'>create new attribute...</a>").attr("cap",capname).click(E.add_new_attribute);
+//             pill = $("<li class='green_pill'></li>").append(pill_content);
+//             $("#choices").append(pill);
+//         
+//             more = $("<a href='#'>fetch more...</a>").click(function(){
+//                 E.fetch_attributes();
+//                 return false;
+//             });
+//             $("#choices").append(more);
+//         }
     }
 }
 
@@ -681,7 +690,6 @@ E.populate_attrs = function() {
 
 E.add_new_value = function(cap, key, offset) {
     //hide the default help message, if shown.
-    $("#empty_scratchpad").hide();
                 
     scratch_offset = $("#scratchpad").offset();
     target_top = $("#scratchpad").height() + scratch_offset.top;
@@ -779,9 +787,8 @@ E.add_new_attribute = function() {
 
 E.populate_aboutme = function() {
     $("#scratchpad").empty();
-    $("#scratchpad").append(empty_scratchpad);
-    $("#aboutme").addClass("active");
-    $("#aboutothers").removeClass("active");
+//     $("#aboutme").addClass("active");
+//     $("#aboutothers").removeClass("active");
     $("#matches_caption").html("people like you").popover({
                   offset: 10
                 });
@@ -813,7 +820,6 @@ E.populate_aboutme = function() {
                         
                         entry = E.generate_entry( key, val );
                         $("#scratchpad").append( entry );
-                        empty_scratchpad.hide();
                     }
                 }
                 
@@ -826,7 +832,6 @@ E.populate_aboutme = function() {
                             entry = E.generate_location_entry(key, {lat:lat, lon:lon});
                             $("#scratchpad").append(entry);
                         }
-                        empty_scratchpad.hide();
                     }
                 }
                 
@@ -839,7 +844,6 @@ E.populate_aboutme = function() {
 //                         console.log("got buysell entry", key, val);
                         entry = E.generate_buysell_entry( key, val );
                         $("#scratchpad").append( entry );
-                        empty_scratchpad.hide();
                     }
                 }
                 
@@ -853,12 +857,12 @@ E.populate_aboutme = function() {
     });
 }
 
-E.populate_aboutothers = function() {
-    $("#scratchpad").empty();
-    $("#aboutothers").addClass("active");
-    $("#aboutme").removeClass("active");
-    $("#matches_caption").html("matches found");
-}
+// E.populate_aboutothers = function() {
+//     $("#scratchpad").empty();
+//     $("#aboutothers").addClass("active");
+//     $("#aboutme").removeClass("active");
+//     $("#matches_caption").html("matches found");
+// }
 
 //////////////////////////////////////////////////
 
@@ -1027,13 +1031,7 @@ var show_delete_modal = function() {
 ////////////////     ON READY
 
 $(document).ready(function()
-{
-//     $("#aboutothers").click(E.populate_aboutothers);
-//     $("#aboutme").click(E.populate_aboutme);
-    
-//     $("#showattrs").click(E.populate_attrs);
-//     $("#showapps").click(E.populate_apps);
-    
+{    
     E.fetch_attributes();
     E.populate_aboutme();
     
@@ -1053,10 +1051,8 @@ $(document).ready(function()
     setInterval(E.poll_matches, 500); 
     
     E.update_monitor();
-    $("#delete_btn").show();
+    $("#delete_btn").show().click(show_delete_modal);
     $("#pseudonym").show();
-    
-    $("#delete_btn").click(show_delete_modal);
     
     cookies.set_cookie(E.agent.id);
     
@@ -1072,12 +1068,6 @@ $(document).ready(function()
     });
 });
 
-var empty_scratchpad = $("<span></span>");
-empty_scratchpad.attr("id","empty_scratchpad");
-empty_scratchpad.addClass("help-block");
-empty_scratchpad.html("Create an application by selecting attributes from the left panel.");
-
-
 
 
 </script>
@@ -1086,24 +1076,16 @@ empty_scratchpad.html("Create an application by selecting attributes from the le
 
 <div class="grid">
     <div class="row">
-        <div class="span4 columns left_column">
+        <div class="span5 columns left_column">
             <nav>
-                <a href="#">search</a>
-                <a class="selected" href="#">me</a>
+                <a href="#" class="selected">search</a>
+                <a class="" href="#">me</a>
             </nav>
-<!--            <ul class="tabs">
-                <li id="showapps"><a href="#">Apps</a></li>
-                <li id="showattrs"><a href="#">Attributes</a></li>
-            </ul>-->
-            <ul class="pills" id="choices">
-            </ul>
+<!--             <ul class="pills" id="choices"> -->
+<!--             </ul> -->
+            <div id="choices"></div>
         </div>
-        <div id="right_pane" class="span12 columns">
-<!--            <ul class="tabs">
-                <li id="aboutme"><a href="#">About Me</a></li>
-                <li id="aboutothers"><a href="#">About Others</a></li>
-            </ul>-->
-            
+        <div id="right_pane" class="span11 columns">            
             <div id="scratchpad">
             </div>
             
