@@ -47,14 +47,19 @@ class Location:
         count = 0
         matches = []
         if not val:
-            count = self.r.get('location:count:%s' % key) or 0
+            for bucket in self.r.smembers('location:%s:buckets' % key):
+                for agent in self.r.smembers('location:%s:latlon:%s' % (key, bucket)):
+                    matches.append(agent)
+            #count = self.r.get('location:count:%s' % key) or 0
+            count = len(matches)
             return dict(error='', count=count, matches=matches)
         
         query = json.loads(val)
-        try:
-            lat = float(query['lat'])
-        except:
-            print query
+        
+        if not query['lat'] or not query['lon']:
+            return dict(error='', count=count, matches=matches)
+            
+        lat = float(query['lat'])
         lon = float(query['lon'])
         thres = float(query.get('threshold',0.0001))
         
@@ -92,18 +97,30 @@ class Location:
         return dict(error='', count=count, matches=matches)
             
         
-    def get(self, lat=None, lon=None, thres=None):
+    def get(self, params, arguments):
         print 'satellite location get'
-        if not lat or not lon:
-            return dict(agents=self.agents, lat=dict(self.lat.dic), lon=dict(self.lon.dic))
         
-        lat_matches = self.lat[lat-thres:lat+thres]
-        lon_matches = self.lon[lon-thres:lon+thres]
+        error = ''
+        matches = []
+        count = 0
+        lat = lon = ''
         
-        #print lat_matches
-        #print lon_matches
-        
-        return dict(agents=self.agents, lat=self.lat, lon=self.lon)
+        if len(params) >= 1:
+            if params[0] == 'fetch':
+                if len(params) > 2:
+                    aid = params[1]
+                    key = params[2]
+                    
+                    lat = self.r.get('%s:location:%s:lat' % (aid,key)) or ''
+                    lon = self.r.get('%s:location:%s:lon' % (aid,key)) or ''
+                    
+                    if lat and lon:
+                        val = json.dumps(dict(lat=lat, lon=lon))
+                        dic = self.get_count(key, val)
+                        count = dic['count']
+                        matches = dic['matches']
+            
+        return dict(matches=matches, error=error, count=count, lat=lat, lon=lon)
 
         
 class Profile:
@@ -138,7 +155,7 @@ class Profile:
     
     def get(self, params, arguments):
         #print 'satellite profile get', params, arguments
-
+        
         error = ''
         matches = []
         count = 0
@@ -181,7 +198,7 @@ class Profile:
                 matches = res
                 
             if params[0] == 'fetch':
-                bucket = 5
+                bucket = 10
                 start_from = ''
                 index = 0
                 
@@ -192,24 +209,27 @@ class Profile:
                     rank = self.r.zrevrank('profile:keyscores', start_from)
                     if rank is not None:
                         start = rank
-                    
+                
                 matches = self.r.zrevrangebyscore('profile:keyscores', '+inf', '-inf', num=bucket, start=start)
                 
+                if not arguments:
+                    arguments = {}
+                else:
+                    arguments = json.loads(arguments)
                 
-                
-                
-                #all_keys = list(self.r.smembers('profile:keys'))
-                #if len(params) >= 2 and params[1]:
-                    #start_from = params[1]
-                    
-                    #if self.r.sismember('profile:keys', start_from):
-                        #try:
-                            #index = all_keys.index(start_from) + 1
-                        #except:
-                            #pass
-                    
-                #matches = all_keys[index:index+bucket]
-                
+                if 'with_values' in arguments:
+                    dic = dict([(i[1],[]) for i in enumerate(matches)])
+                    for k in dic:
+                        zkey = 'profile:keyvalscores:%s' % k
+                        for m, score in self.r.zrevrangebyscore(zkey, '+inf', '-inf', withscores=True):
+                            userhasit = 0
+                            if 'user' in arguments:
+                                aid = arguments['user']
+                                rkey = 'profile:key:%s:val:%s' % (k, m)
+                                userhasit = int(self.r.sismember(rkey, aid))
+                            dic[k].append((m, score, userhasit))
+                    matches = dic
+                        
         return dict(matches=matches, error=error, count=count)
             
     

@@ -87,7 +87,7 @@ class profile():
         for key in self.get_keys():
             for val in self.get_vals(key):
                 saved_items.append(dict(key=key, val=val))
-        res = {'data':saved_items}
+        res = {'data':saved_items, 'user':self.usr}
         self.finish( res )
         
     def post(self):

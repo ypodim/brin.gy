@@ -187,20 +187,27 @@ class api_call(tornado.web.RequestHandler):
         pass
         
     def api_batch_profile(self):
+        res = dict(profiles={})
+        print self.request.arguments, type(self.request.arguments)
+        
         arguments = tornado.escape.json_decode(self.get_argument('data'))
         from capabilities.profile import profile
-        #agents = {}
-        for agent, prof in arguments.items():
+        for agent in arguments:
             
             if not db.user_exists(agent):
                 print '*** user does not exist:', agent
                 continue
             
-            p = profile(agent, prof.items(), db.r, None)
-            p.clear_all()
-            p.post()
+            print agent
+            def clb(dic):
+                print dic
+                res['profiles'][dic['user']] = dic
+            p = profile(agent, [], db.r, clb)
+            p.get()
+            #p.clear_all()
+            #p.post()
         
-        self.finilize_call({})
+        self.finilize_call(res)
         
     def api_batch_buysell(self):
         arguments = tornado.escape.json_decode(self.get_argument('data'))

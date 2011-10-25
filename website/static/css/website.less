@@ -54,31 +54,45 @@ div.footer { text-align:center; padding-top: 10px; }
 div.choice_header { padding-bottom: 150px; clear:both;}
 div.clear {clear:both;}
 
+
+
+.page-header {
+    margin-left:0px;
+    padding-left:0px;
+}
+
+#right_pane { 
+    border-left: #cccccc solid 1px; 
+    margin-left:5px;
+    padding-left:5px;
+}
+
 .map_container {
-    margin-left: 20px;
-/*     position: inline; */
-    float:left;
+    position: relative;
+    float:right;
+    margin: 0px;
 }
 
 #map_canvas {
-    position: absolute;
-    width: 500px;
     height: 400px;
-    background-color: red;
-    z-index:1000;
+/*     background-color: red; */
 }
 
-#result_list { 
-    position: absolute;
-    width: 500px;
-    height: 325px;
-    z-index: 0;
-    border: #cccccc solid 1px;
+#results { 
+    margin: 0px;
+    div {
+        -webkit-border-radius:@pill-radius;
+        background-color:gray;
+        padding:4px;
+        color: white;
+        margin-top: 3px;
+    }
 }
 
 #match_btn {
-    position: relative;
-    left: 380px;
+    position: absolute;
+    top:0px;
+    right:0px;
     z-index:1001;
 }
 
@@ -185,7 +199,6 @@ a.closebtn:hover {
 }
 
 
-div.left_column { border-right: 1px solid @grayLight; }
 /* div.right_column { border-left: 1px solid gray; } */
 
 .cover { 
@@ -221,29 +234,44 @@ a.suggestionVal:hover { color:white; background-color:#0050a3; text-decoration: 
 
 
 
+@pill-radius: 4px;
+
+
+.confirmation {
+    position: absolute;
+    -webkit-border-radius: @pill-radius;
+    padding: 5px;
+    text-align: center;
+    z-index: 1000;
+/*     background-color: gray; */
+    display: none;
+}
+
+
+
 pill {
     display: table;
     text-align: left;
     width: 100%;
     margin-bottom: 10px;
-    background-color: #d5d5d5;
-    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#c9c9c9), to(#8c8c8c));
-    -webkit-border-radius: 0.75em;
+/*     background-color: #d5d5d5; */
+/*     background-color: #303030; */
+/*     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#c9c9c9), to(#8c8c8c)); */
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#606060), to(#303030));
+    -webkit-border-radius: @pill-radius;
     -webkit-box-shadow: 0 0.15em 0.17em rgba(0, 0, 0, 0.5);
     position: relative;
-    a, values {
-        width: 50%;
-        text-decoration: none;
+    a, div {
         display: table-cell;
-        font-size: 0.9em;
         color: white;
-        padding: 0.65em;
         text-shadow: 0 0.08em 0.1em rgba(220, 220, 220, 0.65);
         border-left: 1px solid rgba(50, 50, 50, 0.3);
     }
     a {
-        -webkit-border-top-left-radius: 0.75em;
-        -webkit-border-bottom-left-radius: 0.75em;
+        
+        width: 100px;
+        -webkit-border-top-left-radius: @pill-radius;
+        -webkit-border-bottom-left-radius: @pill-radius;
         border-left: 0 transparent none;
         padding-left:15px;
         font-weight: bold;
@@ -261,15 +289,73 @@ pill {
             text-shadow: 0 -0.1em 0.1em rgba(25, 25, 25, 0.55);
         }
         &.pressed:hover {
-/*             text-decoration: none; */
             background: rgba(00, 80, 163, 0.85);
-/*             color: white; */
-/*             text-shadow: 0 0.08em 0.1em rgba(220, 220, 220, 0.45); */
+        }
+        
+        span.count {
+/*             position: absolute; */
+/*             right: 0px; */
         }
     }
-    values {
-        -webkit-border-top-right-radius: 0.75em;
-        -webkit-border-bottom-right-radius: 0.75em;
+    div.valpart {
+        display: table-cell;
+/*        width: 160px;*/
+        
+        a, div {
+/*             width: 100px; */
+            height: 20px;
+            display: block;
+            padding-bottom: 10px;
+            
+            &:hover {
+                -webkit-border-radius: @pill-radius;
+                text-decoration: none;
+                color: white;
+                text-shadow: 0 0.08em 0.1em rgba(220, 220, 220, 0.45);
+            }
+            &.pressed {
+                -webkit-border-radius: @pill-radius;
+                font-weight: bold;
+                background-color: #0050a3;
+                background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(25, 25, 25, 0.35)), to(rgba(25, 25, 25, 0.45)));
+                text-shadow: 0 -0.1em 0.1em rgba(25, 25, 25, 0.55);
+            }
+            &.pressed:hover {
+                background: rgba(00, 80, 163, 0.85);
+            }
+            
+            .value {
+
+            }
+            span.count {
+                margin-left: 0px;
+                margin-right: 5px;
+/*                 color:yellow; */
+            }
+        }
+        
+        div.valcontainer {
+            position: relative;
+        }
+        
+        span.add_btn {
+            -webkit-border-radius: @pill-radius;
+            text-align: center;
+            margin-top: 5px;
+            margin-right: 10px;
+            display: table-cell;
+            width: 30px;
+            display: table-cell;
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            font-weight: bold;
+            border: rgba(255,255,255,0.1) solid 1px;
+            
+            &:hover{
+                cursor: pointer;
+            }
+        }
     }
 }
 

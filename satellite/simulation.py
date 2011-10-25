@@ -236,7 +236,7 @@ class Scenario(Thread):
         self.groups = []
         
         bucket_ceiling = 0
-        self.agents_url = 'http://ypod.media.mit.edu:10007'
+        self.agents_url = 'http://localhost:10007'
         
         self.sound = {}
         for i in xrange(1,9):
