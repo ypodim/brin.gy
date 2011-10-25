@@ -107,6 +107,7 @@ class location():
     def post(self):
         #print 'location post arguments:', self.arguments
         for key, val in self.arguments:
+            print val
             lat = float(val['lat'])
             lon = float(val['lon'])
             

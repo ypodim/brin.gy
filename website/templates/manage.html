@@ -273,51 +273,18 @@ E.handle_userattr_toggle =function(){
     cap = $(this).attr("cap");
     key = $(this).attr("key");
     val = $(this).attr("val");
+    button = $(this);
     
-    E.location_clb = function(result) {
-        modal = $("#modal-from-dom");
-        clearTimeout(E.modal_timer);
-        modal.modal("hide");
-    //     result.threshold = 0.0002;
-        
-        console.log(result);
-    //     E.post_keyval("location", "my location", result);
-    //     E.populate_map(JSON.parse(val));
-    //     E.update_monitor();
-    }
-    
-    if (cap == "location" && attr_manager.sdata[cap][key].values[val].haveit == false) {
-        geogy.init(E.location_clb);
-        
-        show_modal = function() {
-            modal = $("#modal-from-dom");
-            modal.modal({backdrop:"static", show:true, keyboard:true});
-            
-            $("#modal-cancel-btn").click(function(){
-                modal.bind('hidden', function(){
-                    console.log("going to",E.website_url+"/manage/asdf");
-                    console.log("should go to", window.location);
-//                     location.replace(E.website_url+"/manage/asdf");
-                });
-                modal.modal("hide");
-            });
-        }
-        
-        E.modal_timer = setTimeout(show_modal, 500);
-    }
-    
-    that = $(this);
-    complete_toggle_handle
-    complete_toggle_handle = function(that) {
+    complete_toggle_handle = function(button) {
         haveit = !attr_manager.sdata[cap][key].values[val].haveit;
         attr_manager.sdata[cap][key].values[val].haveit = haveit;
         if (haveit) {
             E.post_keyval(cap, key, val, function(){
-                that.html("\u2713").popover("hide").css("background-color","");
+                button.html("\u2713").popover("hide").css("background-color","");
                 
                 confirmation = $(".confirmation").html("added to your profile!");
                 confirmation.addClass("success").removeClass("important").show();
-                confirmation.offset(that.offset());
+                confirmation.offset(button.offset());
                 
                 confirmation.animate({"left":"+=30px","top":"-=50px"}, "slow", function(){ 
                     $(this).animate({"left":"+=0px"}, function(){
@@ -327,17 +294,55 @@ E.handle_userattr_toggle =function(){
             });
         } else {
             E.delete_keyval(cap, key, val, function(json){
-                that.html("\u00A0").popover("hide").css("background-color","");
+                button.html("\u00A0").popover("hide").css("background-color","");
                 
                 confirmation = $(".confirmation").html("removed");
                 confirmation.addClass("important").removeClass("success").show();
-                confirmation.offset(that.offset());
+                confirmation.offset(button.offset());
                 
                 confirmation.animate({"left":"+=30px","top":"-=50px"}, "slow", function(){ 
                     $(this).hide();
                 });
             });
         }
+    }
+            
+    location_clb = function(result) {
+        modal = $("#modal-from-dom");
+        clearTimeout(E.modal_timer);
+//         complete_toggle_handle(button);
+        modal.modal("hide");
+    //     result.threshold = 0.0002;
+        
+        console.log('result', result, key, val, attr_manager.sdata.location[key].values);
+    //     E.post_keyval("location", "my location", result);
+    //     E.populate_map(JSON.parse(val));
+    //     E.update_monitor();
+    }
+    
+    haveit = attr_manager.sdata[cap][key].values[val].haveit;
+    if (cap == "location") {
+        console.log("location haveit:", haveit);
+        if (haveit == false) {
+            geogy.init(location_clb);
+            
+            show_modal = function() {
+                modal = $("#modal-from-dom");
+                modal.modal({backdrop:"static", show:true, keyboard:true});
+                
+                $("#modal-cancel-btn").click(function(){
+                    modal.bind('hidden', function(){
+                        console.log("going to",E.website_url+"/manage/asdf");
+                        console.log("should go to", window.location);
+    //                     location.replace(E.website_url+"/manage/asdf");
+                    });
+                    modal.modal("hide");
+                });
+            }
+            E.modal_timer = setTimeout(show_modal, 500);
+        }
+    } else {
+        complete_toggle_handle(button);
     }
     return false;
 }
@@ -372,7 +377,7 @@ E.handle_userattr_hover_out = function(){
 E.populate_attrs = function() {
     $("#choices").empty();
     
-    console.log(attr_manager.sdata.location);
+    console.log("location object:", attr_manager.sdata.location);
 //     if (attr_manager.sdata.location["my location"].values == undefined)
 //         attr_manager.sdata.location["my location"] = {}
     
@@ -412,11 +417,16 @@ E.populate_attrs = function() {
                     return cnt+text;
                 }, placement:"left", offset:5});
                 
-                trimmed = val;
-                if (val.length > 10)
-                    trimmed = val.substring(0,8)+"...";
+                
+                formatted = val;
+                
+                if (capname=="location" && attr=="my location")
+                    console.log(formatted);
+                
+                if (formatted.length > 10)
+                    formatted = formatted.substring(0,8)+"...";
                     
-                value = $("<span class='value'></span>").html(trimmed);
+                value = $("<span class='value'></span>").html(formatted);
                 
                 pair = {cap:capname, key:attr, val:val};
                 value_pill = $("<a href='#'></a>").attr(pair).click(E.handle_val_click);
@@ -644,23 +654,49 @@ E.fetch_keyvals = function(clb) {
             }
             E.last_fetched = attribute;
         }
-        clb();
     });
     
     key = "my location";
     $.getJSON(E.satellite.url+"/location/fetch/"+E.agent.id+"/"+key, function(json){
-        val = {lat:json.lat, lon:json.lon};
+        val = {lat:json.lat, lon:json.lon};            
+        attr_manager.add_sdata("location", key, 0);
+
+
         valstr = JSON.stringify(val);
-        
         haveit = false;
         if (json.lat.length > 0)
             haveit = true;
-            
-        attr_manager.add_sdata("location", key, 0);
         attr_manager.sdata.location[key].values[valstr] = {
             cnt:json.count, enabled:0, haveit:haveit, matches:json.matches,
         };
-
+        
+                        
+    
+        if () {
+            loc = JSON.parse(val);
+            latlng = new google.maps.LatLng(loc.lat, loc.lon);
+            geogy.geocoder.geocode({'latLng': latlng}, function(results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    formatted = results[1].formatted_address;
+                    console.log(formatted);
+                } else {
+                    alert("Geocoder failed due to: " + status);
+                }
+            });
+        }
+            
+//         if (val.lat.length == 0 && val.lon.length == 0) {
+//             valstr = "{}";
+//         } else {
+//             valstr = JSON.stringify(val);
+//             haveit = false;
+//             if (json.lat.length > 0)
+//                 haveit = true;
+//             attr_manager.sdata.location[key].values[valstr] = {
+//                 cnt:json.count, enabled:0, haveit:haveit, matches:json.matches,
+//             };
+//         }
+        
         clb();
     });
 }

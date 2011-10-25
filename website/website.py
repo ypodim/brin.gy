@@ -28,8 +28,8 @@ class ContentHandler(tornado.web.RequestHandler):
             raise tornado.web.HTTPError(404)
         self.render(function + ".html", 
                     discov_url=discov_url,
-                    ego_url_prefix=ego_url_prefix,
-                    website_url_prefix=website_url_prefix,
+                    ego_url_prefix=agents_url,
+                    website_url_prefix=website_url,
                     title='' if function=='index' else '- %s'%function,
                     args=args,
                     other_names=other_names,
@@ -48,26 +48,30 @@ if __name__ == "__main__":
     parser = OptionParser(add_help_option=False)
     parser.add_option("-h", "--host", dest="host", default='localhost')
     parser.add_option("-p", "--port", dest="port", default='8889')
-    parser.add_option("-d", "--db", dest="db", default='mysql')
+    
+    parser.add_option("-w", "--websiteurl", dest="website_url")
+    parser.add_option("-d", "--discovurl", dest="discov_url")
+    parser.add_option("-a", "--agentsurl", dest="agents_url")
     (options, args) = parser.parse_args()
     
     PORT = int(options.port)
     HOST = options.host
     
-    base_host = 'ypod.media.mit.edu'
-    base_host = 'localhost'
-    discov_url = 'http://%s:22222' % base_host
-    ego_url_prefix = 'http://%s:10007' % base_host
+    website_url = 'http://%s:%s' % (HOST, PORT)
+    discov_url = 'http://%s:22222' % HOST
+    agents_url = 'http://%s:10007' % HOST
     
-    mode = ''
-    if debug:
-        mode = '(debug)'
-        website_url_prefix = 'http://%s:%s' % (HOST, PORT)
-    else:
-        website_url_prefix = 'http://brin.gy'
+    if (options.website_url):
+        website_url = 'http://%s' % options.website_url
+    if (options.discov_url):
+        discov_url = options.discov_url
+    if (options.agents_url):
+        agents_url = options.agents_url
+        
     
-    
-    print 'Ego website running at %s:%s %s' % (HOST,PORT,mode)
+    print 'Brin.gy website running at %s' % website_url
+    print 'Discovery at: %s' % discov_url
+    print 'Agents at: %s' % agents_url
     
     settings = {
         "template_path": os.path.join(os.path.dirname(__file__), "templates"),

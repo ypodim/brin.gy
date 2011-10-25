@@ -315,10 +315,6 @@ application = tornado.web.Application([
     (r"/batch_location", api_call),
     (r"/batch_buysell", api_call),
     (r"/controller", api_call),
-    #(r"/jobs.*", api_call),
-    #(r"/startjob/[\/\:_a-zA-Z0-9]*", api_call),
-    #(r"/stopjob/[\/\:_a-zA-Z0-9]*", api_call),
-    #(r"/polljob/[\/\:_a-zA-Z0-9]*", api_call),
     
     (r"/[a-zA-Z0-9]+/?$", serve_user),
     (r"/.+", serve_capability),
