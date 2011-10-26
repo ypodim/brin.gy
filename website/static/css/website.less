@@ -54,7 +54,11 @@ div.footer { text-align:center; padding-top: 10px; }
 div.choice_header { padding-bottom: 150px; clear:both;}
 div.clear {clear:both;}
 
+#choices {
+    overflow: auto;
+    padding-right: 10px;
 
+}
 
 .page-header {
     margin-left:0px;
@@ -80,12 +84,17 @@ div.clear {clear:both;}
 
 #results { 
     margin: 0px;
-    div {
+    overflow: auto;
+    a {
+        display: block;
         -webkit-border-radius:@pill-radius;
         background-color:gray;
         padding:4px;
         color: white;
         margin-top: 3px;
+        &:hover {
+            text-decoration: none;
+        }
     }
 }
 
@@ -257,13 +266,13 @@ pill {
 /*     background-color: #d5d5d5; */
 /*     background-color: #303030; */
 /*     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#c9c9c9), to(#8c8c8c)); */
-    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#606060), to(#303030));
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#dddddd), to(#aaaaaa));
     -webkit-border-radius: @pill-radius;
     -webkit-box-shadow: 0 0.15em 0.17em rgba(0, 0, 0, 0.5);
     position: relative;
     a, div {
         display: table-cell;
-        color: white;
+        color: black;
         text-shadow: 0 0.08em 0.1em rgba(220, 220, 220, 0.65);
         border-left: 1px solid rgba(50, 50, 50, 0.3);
     }
@@ -279,12 +288,13 @@ pill {
             text-decoration: none;
             background: rgba(25, 25, 25, 0.15);
             color: #353535;
-            color: white;
+            color: black;
             text-shadow: 0 0.08em 0.1em rgba(220, 220, 220, 0.45);
         }
         &.pressed {
             font-weight: bold;
             background-color: #0050a3;
+            color:white;
             background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(25, 25, 25, 0.25)), to(rgba(25, 25, 25, 0.45)));
             text-shadow: 0 -0.1em 0.1em rgba(25, 25, 25, 0.55);
         }
@@ -310,7 +320,7 @@ pill {
             &:hover {
                 -webkit-border-radius: @pill-radius;
                 text-decoration: none;
-                color: white;
+/*                 color: white; */
                 text-shadow: 0 0.08em 0.1em rgba(220, 220, 220, 0.45);
             }
             &.pressed {

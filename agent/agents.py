@@ -188,7 +188,7 @@ class api_call(tornado.web.RequestHandler):
         
     def api_batch_profile(self):
         res = dict(profiles={})
-        print self.request.arguments, type(self.request.arguments)
+        #print self.request.arguments, type(self.request.arguments)
         
         arguments = tornado.escape.json_decode(self.get_argument('data'))
         from capabilities.profile import profile
@@ -198,9 +198,9 @@ class api_call(tornado.web.RequestHandler):
                 print '*** user does not exist:', agent
                 continue
             
-            print agent
+            #print agent
             def clb(dic):
-                print dic
+                #print dic
                 res['profiles'][dic['user']] = dic
             p = profile(agent, [], db.r, clb)
             p.get()

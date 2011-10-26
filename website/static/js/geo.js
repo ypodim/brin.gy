@@ -67,17 +67,15 @@ geogy.onload = function()
 
 
 ////////////////////// GEOCODING
-var map;
-var marker;
 geogy.geocoder = new google.maps.Geocoder();
-var latlng = new google.maps.LatLng(40.730885,-73.997383);
-geogy.geocoder.geocode({'latLng': latlng}, function(results, status) {
-    if (status == google.maps.GeocoderStatus.OK) {
-        if (results[1]) {
+// var latlng = new google.maps.LatLng(40.730885,-73.997383);
+// geogy.geocoder.geocode({'latLng': latlng}, function(results, status) {
+//     if (status == google.maps.GeocoderStatus.OK) {
+//         if (results[1]) {
 //             console.log(results);
-        }
-    } else {
-        alert("Geocoder failed due to: " + status);
-    }
-});
+//         }
+//     } else {
+//         alert("Geocoder failed due to: " + status);
+//     }
+// });
 

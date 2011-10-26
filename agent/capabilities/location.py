@@ -106,8 +106,9 @@ class location():
             
     def post(self):
         #print 'location post arguments:', self.arguments
-        for key, val in self.arguments:
-            print val
+        for key, valstr in self.arguments:
+            val = tornado.escape.json_decode(valstr)
+            #print val, type(val)
             lat = float(val['lat'])
             lon = float(val['lon'])
             

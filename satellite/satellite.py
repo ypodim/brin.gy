@@ -124,7 +124,7 @@ class serve_request(tornado.web.RequestHandler):
             if self.cap == 'buysell':
                 for key, val in params:
                     dic = tornado.escape.json_decode(val)
-                    print dic
+                    #print dic
                     res['matched'] = cap.mutate(dic['action'], dic['product'], dic['price'], agent)
 
             response['agents'][agent] = res
