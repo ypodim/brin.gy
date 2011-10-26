@@ -534,7 +534,6 @@ E.construct_result_enty = function(agent, picture, profile) {
 }
 
 E.get_multi_profile = function(agents) {
-    
     if (agents.length > 0) {
         $.getJSON(E.agent.baseurl+"/batch_profile", {data:JSON.stringify(agents)}, function(json){
             $("#results").empty();
@@ -557,8 +556,6 @@ E.get_multi_profile = function(agents) {
                 $("#results").append(entry);
             }
         });
-    } else {
-        $("#results").empty();
     }
 }
 
@@ -833,28 +830,24 @@ $(document).ready(function()
 {% end %}
 {% block body %}
 
-        <div class="span5">
-            <nav class="">
-                <a href="#" class="selected">search</a>
-                <a class="" href="#">me</a>
-            </nav>
-            <div id="choices"></div>
-        </div>
-        <div id="right_pane" class="span11 columns">            
-            <div id="scratchpad">
-            </div>
-            
-            <div id="results" class="span3"></div>
-            
-            <div class="map_container span8">
-                <div id='map_canvas'></div>
-                
-                <button id="match_btn" class="btn info">
-                    <div id="matches" curpos="0">0</div>
-                    <div id="matches_caption">people match</div>
-                </button>
-            </div>
-        </div>
+<div class="span5">
+    <!--<nav class="">
+        <a href="#" class="selected">search</a>
+        <a class="" href="#">me</a>
+    </nav>-->
+    <div id="choices"></div>
+</div>
+<div id="right_pane" class="span11 columns">            
+    <div id="scratchpad"></div>
+    <div id="results" class="span3"></div>
+    <div class="map_container span8">
+        <div id='map_canvas'></div>
+        <button id="match_btn" class="btn info">
+            <div id="matches" curpos="0">0</div>
+            <div id="matches_caption">people match</div>
+        </button>
+    </div>
+</div>
 
 
 
