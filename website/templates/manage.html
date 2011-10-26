@@ -534,6 +534,7 @@ E.construct_result_enty = function(agent, picture, profile) {
 }
 
 E.get_multi_profile = function(agents) {
+    
     if (agents.length > 0) {
         $.getJSON(E.agent.baseurl+"/batch_profile", {data:JSON.stringify(agents)}, function(json){
             $("#results").empty();
@@ -556,6 +557,8 @@ E.get_multi_profile = function(agents) {
                 $("#results").append(entry);
             }
         });
+    } else {
+        $("#results").empty();
     }
 }
 
@@ -821,7 +824,7 @@ $(document).ready(function()
     offset = $("#choices").offset();
     dheight = $(document).height();
     $("#choices").height(dheight - offset.top - 50);
-    $("#results").height(dheight - offset.top - 50);
+    $("#results").height(dheight - offset.top);
 });
 
 
