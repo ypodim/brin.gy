@@ -236,7 +236,7 @@ class Scenario(Thread):
         self.groups = []
         
         bucket_ceiling = 0
-        self.agents_url = 'http://localhost:10007'
+        self.agents_url = 'http://ypod.media.mit.edu:10007'
         
         self.sound = {}
         for i in xrange(1,9):
@@ -321,7 +321,7 @@ class Scenario(Thread):
                 lat = self.lat_start + self.lat_height * a.p.y/self.height
                 lon = self.lon_start + self.lon_width * a.p.x/self.width
                 dic = dict(agent=a.name, signature='nosign', lon=lon, lat=lat, threshold=a.threshold)
-                agents[a.name] = {'current location':dic}
+                agents[a.name] = {'my location':dic}
             
             try:
                 res = self.post('%s/batch_location' % self.agents_url, dict(data=json.dumps(agents)))
@@ -447,14 +447,14 @@ class Location_poster(Thread):
                     lat = self.scenario.lat_start + self.scenario.lat_height * a.p.y/self.scenario.height
                     lon = self.scenario.lon_start + self.scenario.lon_width * a.p.x/self.scenario.width
                     dic = dict(agent=a.name, signature='nosign', lon=lon, lat=lat, threshold=a.threshold)
-                    agents[a.name] = {'current location':dic}
+                    agents[a.name] = {'my location':dic}
                 
                 #res = self.post('http://localhost:10002/batch_location', dict(data=json.dumps(agents)))
                 
                 #print 't1', time.time()-t
                 t = time.time()
                 
-                key = 'current location'
+                key = 'my location'
                 resolution = 100000
                 pipe = self.r.pipeline()
                 
@@ -597,7 +597,7 @@ class Poller(Thread):
                     ismatch = True
                     for cap in caps:
                         for key in caps[cap]:
-                            if cap == 'location' and key == 'current location':
+                            if cap == 'location' and key == 'my location':
                                 if abs(o.p.x - self.scenario.obj[aid].p.x) > radius:
                                     ismatch = False
                                 if abs(o.p.y - self.scenario.obj[aid].p.y) > radius:

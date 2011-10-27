@@ -187,6 +187,8 @@ E.delete_keyval = function(cap, key, val, clb) {
 
 E.populate_map = function(p)
 {
+    E.monitor.user_matches.intersection;
+    
     var myLatlng = new google.maps.LatLng(p.lat, p.lon);
     var myOptions = {
         zoom: 14,
@@ -196,6 +198,7 @@ E.populate_map = function(p)
     var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 
     var marker = new google.maps.Marker({
+//         icon: "small_red.png",
         position: myLatlng, 
         map: map,
         title:"You are here!",
@@ -248,6 +251,7 @@ E.handle_key_click = function(){
             attr_manager.sdata[cap][key].values[val].enabled = false;
     }
     E.poll_matches();
+    
     return false;
 }
 
@@ -266,6 +270,7 @@ E.handle_val_click = function(){
         attr_manager.sdata[cap][key].enabled = false;
     }
     E.poll_matches();
+    
     return false;
 }
 
@@ -333,15 +338,17 @@ E.handle_userattr_toggle =function(){
                 alert("Geocoder failed due to: " + status);
             }
             
-            console.log(attr_manager.sdata.location["my location"].values[val].haveit);
+//             console.log(attr_manager.sdata.location["my location"].values[val].haveit);
             button.siblings().children("span.value").html(formatted);
             complete_toggle_handle(button);
         });
+        
+        E.populate_map(result);
     }
     
     haveit = attr_manager.sdata[cap][key].values[val].haveit;
     if (cap == "location") {
-        console.log("location haveit:", haveit);
+//         console.log("location haveit:", haveit);
         if (haveit == false) {
             geogy.init(location_clb);
             
@@ -390,7 +397,7 @@ E.handle_userattr_hover_out = function(){
     val = $(this).attr("val");
     
     text = "\u00A0";
-    console.log("hoverout:",cap,key,val,attr_manager.sdata[cap][key].values[val].haveit);
+//     console.log("hoverout:",cap,key,val,attr_manager.sdata[cap][key].values[val].haveit);
     if (attr_manager.sdata[cap][key].values[val].haveit) {
         text = "\u2713";
     }
@@ -399,8 +406,7 @@ E.handle_userattr_hover_out = function(){
 
 E.populate_attrs = function() {
     $("#choices").empty();
-    
-    console.log("location object:", attr_manager.sdata.location);
+
 //     if (attr_manager.sdata.location["my location"].values == undefined)
 //         attr_manager.sdata.location["my location"] = {}
     
@@ -523,10 +529,11 @@ E.construct_result_enty = function(agent, picture, profile) {
     username = $("<span style='margin-left:5px'></span>").html(agent);
     entry = $("<a href='#'></a>").append(pic).append(username);
     entry.click(function(){
-        $("#map_canvas").html("");
+        console.log("clearing result_details");
+        $("#result_details").html("");
         for (k in profile) {
             detail = $("<div></div>").html(k+":"+profile[k]);
-            $("#map_canvas").append(detail);
+            $("#result_details").append(detail);
         }
         return false;
     });
@@ -556,19 +563,32 @@ E.get_multi_profile = function(agents) {
                 $("#results").append(entry);
             }
         });
-    }
+    } else
+        $("#results").empty();
+}
+
+E.get_multi_location = function(agents) {
+    if (agents.length > 0) {
+        $.getJSON(E.agent.baseurl+"/batch_location", {data:JSON.stringify(agents)}, function(json){
+//             $("#results").empty();
+            console.log(json.locations);
+//             for (agent in json.profiles) {
+//                 
+//             }
+        });
+    } else
+        $("#results").empty();
 }
 
 E.poll_matches = function() {
     
     query = [];
-    E.match_criteria = [];
+    
     for (cap in attr_manager.sdata)
         for (key in attr_manager.sdata[cap]) {
             query.push([cap, key, ""]);
             for (val in attr_manager.sdata[cap][key].values) {
                 query.push([cap, key, val]);
-                E.match_criteria.push([cap, key, val]);
             }
         }
     
@@ -601,10 +621,12 @@ E.poll_matches = function() {
         test_intersection = {};
         target_count = 0
         
+        E.match_criteria = [];
         for (cap in attr_manager.sdata) {
             for (key in attr_manager.sdata[cap]) {
                 for (val in attr_manager.sdata[cap][key].values) {
                     if (attr_manager.sdata[cap][key].values[val].enabled) {
+                        E.match_criteria.push([cap, key, val]);
                         for (i in attr_manager.sdata[cap][key].values[val].matches) {
                             agent = attr_manager.sdata[cap][key].values[val].matches[i];
                             if (test_intersection[agent] == undefined)
@@ -615,6 +637,7 @@ E.poll_matches = function() {
                     }
                 }
                 if (attr_manager.sdata[cap][key].enabled) {
+                    E.match_criteria.push([cap, key, ""]);
                     for (i in attr_manager.sdata[cap][key].matches) {
                         agent = attr_manager.sdata[cap][key].matches[i];
                         if (test_intersection[agent] == undefined)
@@ -636,7 +659,11 @@ E.poll_matches = function() {
         
         
         E.get_multi_profile(intersection);
+        E.get_multi_location(intersection);
         
+//         if (cap=="profile")
+//             E.populate_map();
+            
         E.monitor.user_matches.intersection = intersection;
         
         E.set_matches(Object.size(intersection));
@@ -786,14 +813,7 @@ $(document).ready(function()
     E.fetch_keyvals(clb);
     
     $("#match_btn").click(function(){
-        $("#result_list").html("");
-        for (i in E.monitor.user_matches.intersection) {
-            agent = $("<div></div>");
-            agent.html(E.monitor.user_matches.intersection[i]);
-            $("#result_list").append(agent);
-        }
-        $("#map_canvas").toggle();
-        console.log(E.monitor.user_matches.intersection);
+        $("#result_details").toggle();
         console.log(E.match_criteria);
         return false;
     });
@@ -821,7 +841,12 @@ $(document).ready(function()
     offset = $("#choices").offset();
     dheight = $(document).height();
     $("#choices").height(dheight - offset.top - 50);
-    $("#results").height(dheight - offset.top);
+    $("#results").height(dheight - offset.top - 50);
+    $("#result_details").height(dheight - offset.top - 50);
+    $("#map_canvas").height(dheight - offset.top - 50);
+    
+    starting_point = {lat:42.360367,lon:-71.087294};
+    E.populate_map(starting_point);
 });
 
 
@@ -840,13 +865,14 @@ $(document).ready(function()
 <div id="right_panel" class="columns">            
     <div id="scratchpad"></div>
     <div id="results" class="span3"></div>
-    <div class="map_container span8">
-        <div id='map_canvas'></div>
-        <button id="match_btn" class="btn info">
-            <div id="matches" curpos="0">0</div>
-            <div id="matches_caption">people match</div>
-        </button>
+    <div id="result_details" class="span3"></div>
+    <div class="map_container">
+        <div id="map_canvas"></div>
     </div>
+    <button id="match_btn" class="btn info">
+        <div id="matches" curpos="0">0</div>
+        <div id="matches_caption">people match</div>
+    </button>
 </div>
 
 

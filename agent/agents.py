@@ -204,9 +204,24 @@ class api_call(tornado.web.RequestHandler):
                 res['profiles'][dic['user']] = dic
             p = profile(agent, [], db.r, clb)
             p.get()
-            #p.clear_all()
-            #p.post()
         
+        self.finilize_call(res)
+    
+    def api_batch_location(self):
+        res = dict(locations={})
+        arguments = tornado.escape.json_decode(self.get_argument('data'))
+        from capabilities.location import location
+        
+        key = 'my location'
+        pipe = db.r.pipeline()
+        for agent in arguments:
+            pipe.get('%s:location:%s:lat' % (agent, key))
+            pipe.get('%s:location:%s:lon' % (agent, key))
+        result = pipe.execute()
+        
+        for x in xrange(len(result)/2):
+            res['locations'][arguments[x]] = dict(lat=result[2*x], lon=result[2*x+1])
+            
         self.finilize_call(res)
         
     def api_batch_buysell(self):
@@ -225,12 +240,12 @@ class api_call(tornado.web.RequestHandler):
             #p.post()
         
         self.finilize_call({})
-    
-    def api_batch_location(self):
+        
+    def api_batch_location2(self):
         arguments = tornado.escape.json_decode(self.get_argument('data'))
         from capabilities.location import location
         
-        key = 'current location'
+        key = 'my location'
         resolution = 10000
         pipe = db.r.pipeline()
         t1 = 0
