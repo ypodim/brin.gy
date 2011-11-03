@@ -47,11 +47,14 @@ class Location:
         count = 0
         matches = []
         if not val:
-            for bucket in self.r.smembers('location:%s:buckets' % key):
-                for agent in self.r.smembers('location:%s:latlon:%s' % (key, bucket)):
-                    matches.append(agent)
-            #count = self.r.get('location:count:%s' % key) or 0
+            #for bucket in self.r.smembers('location:%s:buckets' % key):
+                #for agent in self.r.smembers('location:%s:latlon:%s' % (key, bucket)):
+                    #matches.append(agent)
+            
+            matches = self.r.smembers('location:%s:allusers' % key) or []
             count = len(matches)
+            matches = list(matches)
+            
             return dict(error='', count=count, matches=matches)
         
         query = json.loads(val)

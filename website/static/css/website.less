@@ -20,6 +20,14 @@ body { font-family:helvetica; padding-left:10px; }
 /* @bar_color: red; */
 /* @capability_color: #bbb; */
 
+.logo {
+    font-size:16px;
+    font-family:helvetica;
+    color: black;
+    &:hover {
+        text-decoration: none;
+    }
+}
 
 .columns { .border-radius(3px); }
 .pills li a:hover{
@@ -59,6 +67,22 @@ div.clear {clear:both;}
     padding-right: 10px;
 }
 
+#searchinput {
+    font-size:30px;
+    height: 30px;
+    width: 280px;
+}
+#searchbox {
+    font-size:30px;
+    margin-bottom: 40px;
+}
+
+#userinfo {
+    font-size:30px;
+    margin-bottom: 10px;
+    display: none;
+}
+
 .page-header {
     margin-left:0px;
     padding-left:0px;
@@ -78,7 +102,7 @@ div.clear {clear:both;}
     position: relative;
 }
 
-.map_container {
+/*.map_container {
     margin-left: 10px;
     width: 460px;
     
@@ -87,25 +111,31 @@ div.clear {clear:both;}
     right:0px;
     z-index:1001;
     
-/*     height: 400px; */
     background-color: rgba(11,11,11, 0.05);
     -webkit-border-radius:@pill-radius;
-}
+}*/
 
 #result_details {
     -webkit-border-radius:@pill-radius;
     margin-left: 10px;
     width: 460px;
     
+/*     float: right; */
+/*     display: inline; */
     position: absolute;
     top:0px;
     right:0px;
     z-index:1002;
     background-color: rgba(255,255,255, 1);
+    display: none;
 }
 
 #map_canvas {
-    
+    width: 460px;
+    float: right;
+    display: inline;
+    background-color: rgba(11,11,11, 0.05);
+    -webkit-border-radius:@pill-radius;
 }
 
 #results { 
@@ -121,6 +151,16 @@ div.clear {clear:both;}
         &:hover {
             text-decoration: none;
             background: rgba(11,11,11, 0.85);
+        }
+        &.pressed {
+            font-weight: bold;
+            background-color: #0050a3;
+            color:white;
+            background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(25, 25, 25, 0.25)), to(rgba(25, 25, 25, 0.45)));
+            text-shadow: 0 -0.1em 0.1em rgba(25, 25, 25, 0.55);
+        }
+        &.pressed:hover {
+            background: rgba(00, 80, 163, 0.85);
         }
     }
 }

@@ -173,16 +173,17 @@ class multimatch(tornado.web.RequestHandler):
         #print escaped_data
         #arguments = tornado.escape.url_unescape(escaped_data)
         #print arguments
-        #print arguments
+        
         arguments = json.loads(arguments)
         
         #matchreqs = [x for x in arguments if x[2]]
         #if matchreqs:
             #print
             #print matchreqs
-        
+        #print
+        #print arguments
         for capname, key, val in arguments:
-            #innerstart = time.time()
+            innerstart = time.time()
             try:
                 cap = eval('%s' % capname)
             except Exception, e:
@@ -191,6 +192,9 @@ class multimatch(tornado.web.RequestHandler):
             dic = cap.get_count(key, val)
             matches.append([capname, key, val, dic['count'], dic['matches']])
             
+            if capname == 'location':
+                print 'entry completed in ', time.time()-innerstart
+                print '-%s- -%s- %s %s' % (key, val, dic['count'], len(dic['matches']))
             
         dic = dict(matches=matches, error=self.error, count=0)
         dic.__setitem__('response_time', time.time() - self.start_time)

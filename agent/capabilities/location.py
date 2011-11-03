@@ -13,6 +13,7 @@ class location():
         self.usr = usr
         self.resolution = 100000
     
+    'location:LOCTYPE:allusers' # set of all users sharing a location
     'location:LOCTYPE:buckets' # set of buckets keyed on location types (eg "current location")
     'location:LOCTYPE:latlon:BUCKET' # set of agents in BUCKET area for this LOCTYPE
     
@@ -78,8 +79,8 @@ class location():
         #remove location from main store
         self.del_location(key)
         
-        #decrease the number of agents under this key
-        self.db.decr('location:count:%s' % key)
+        # remove agent from set of agents under this key
+        self.db.srem('location:%s:allusers' % key, self.usr)
         
         #remove key from list of keys
         # ALERT: if you're gonna uncomment the following del_key, make sure you check
@@ -119,12 +120,14 @@ class location():
             if oldlat and oldlon:
                 self.del_reverse(key, oldlat, oldlon)
             else:
-                self.db.incr('location:count:%s' % key)
+                print 'will add', self.usr
+                self.db.sadd('location:%s:allusers' % key, self.usr)
+                print self.db.scard('location:%s:allusers' % key)
                 
             self.add_reverse(key, lat, lon)
             
             self.add_key(key)
-            self.usr, self.get_location(key)
+            #self.usr, self.get_location(key)
             
         return {'result':'', 'data':self.arguments, 'error':''}
     

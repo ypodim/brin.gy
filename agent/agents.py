@@ -85,6 +85,7 @@ class serve_index(bringy_handler):
         user_name = self.get_argument('username')
         created = db.create_user(user_name)
         res = {'error':'', 'username':user_name, 'created':created}
+        #print 'CREATE USER', res
         self.write(res)
     def get(self):
         dic = dict(message='this is ego')
@@ -190,6 +191,10 @@ class api_call(tornado.web.RequestHandler):
         res = dict(profiles={})
         #print self.request.arguments, type(self.request.arguments)
         
+        def clb(dic):
+            #print dic
+            res['profiles'][dic['user']] = dic
+            
         arguments = tornado.escape.json_decode(self.get_argument('data'))
         from capabilities.profile import profile
         for agent in arguments:
@@ -198,12 +203,15 @@ class api_call(tornado.web.RequestHandler):
                 print '*** user does not exist:', agent
                 continue
             
-            #print agent
-            def clb(dic):
-                #print dic
-                res['profiles'][dic['user']] = dic
-            p = profile(agent, [], db.r, clb)
-            p.get()
+            if self.request.method == 'GET':
+                p = profile(agent, [], db.r, clb)
+                p.get()
+                
+            if self.request.method == 'POST':
+                p = profile(agent, arguments[agent].items(), db.r, clb)
+                #print 'arguments', arguments[agent].items()
+                p.post()
+                
         
         self.finilize_call(res)
     
@@ -213,6 +221,7 @@ class api_call(tornado.web.RequestHandler):
         from capabilities.location import location
         
         key = 'my location'
+        #print 'LOCATION update for', arguments
         pipe = db.r.pipeline()
         for agent in arguments:
             pipe.get('%s:location:%s:lat' % (agent, key))

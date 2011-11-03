@@ -92,7 +92,7 @@ class Ball():
         if random.random() > 0.2:
             self.profile['name'] = random.choice(['pol','grace','matt','julia','eyal','dawei','travis'])
         if random.random() > 0.2:
-            self.profile['age'] = '%s' % random.randint(23,35)
+            self.profile['age'] = '%s' % random.randint(28,34)
             
         if random.random() > 0.2:
             self.profile['language'] = 'english'
@@ -236,7 +236,8 @@ class Scenario(Thread):
         self.groups = []
         
         bucket_ceiling = 0
-        self.agents_url = 'http://ypod.media.mit.edu:10007'
+        #self.agents_url = 'http://ypod.media.mit.edu:10007'
+        self.agents_url = 'http://localhost:10007'
         
         self.sound = {}
         for i in xrange(1,9):
@@ -286,10 +287,29 @@ class Scenario(Thread):
                     
                 if g.name == 'E14':
                     if random.random() > 0.3:
-                        o.profile['tag'] = random.choice(['visualization', 'c++'])
+                        o.profile['skill'] = random.choice(['visualization', 'c++', 'arduino'])
+                    if random.random() > 0.1:
+                        o.profile['company'] = 'Media Lab'
+                    
+                if g.name == 'Google':
+                    if random.random() > 0.3:
+                        o.profile['skill'] = random.choice(['python', 'java', 'android', 'c++'])
+                
+                if random.random() > 0.9:
+                    o.profile['skill'] = 'python'
+                    
+                if random.random() > 0.5:
+                    o.profile['I like'] = random.choice(['chess', 'cooking', 
+                    'hiking'])
+                
+                if random.random() > 0.5:
+                    o.profile['I want'] = random.choice(['tablet', 'roomate', 
+                    'date'])
+                    
+                o.profile['sex'] = random.choice(['male', 'female'])
                 
                 o.p.randomize_in_rect(o.group.p.x, o.group.p.y, o.group.w, o.group.h)
-                #res = self.post('%s/new_agent' % self.agents_url, dict(username='agent%s'%i))
+                res = self.post('%s/' % self.agents_url, dict(username='agent%s'%i))
                 self.obj.append(o)
                 i += 1
         
@@ -316,12 +336,39 @@ class Scenario(Thread):
         bucket = min(100, self.n)
         for i in xrange(0, self.n, bucket):
             agents = {}
+            
+            resolution = 100000
+            
             for j in xrange(bucket):
                 a = self.obj[i+j]
                 lat = self.lat_start + self.lat_height * a.p.y/self.height
                 lon = self.lon_start + self.lon_width * a.p.x/self.width
-                dic = dict(agent=a.name, signature='nosign', lon=lon, lat=lat, threshold=a.threshold)
-                agents[a.name] = {'my location':dic}
+                aid = a.name
+                
+                # possible keys: "current location", "destination", etc
+                oldlat, oldlon = self.set_location(key, lat, lon)
+                
+                # handle reverse entries for the satellite
+                if oldlat and oldlon:
+                    
+                    latbucket = 1.0 * int(oldlat * resolution) / resolution
+                    lonbucket = 1.0 * int(oldlon * resolution) / resolution
+
+                    bucket = '%s %s' % (latbucket, lonbucket)
+                    self.db.srem('location:%s:latlon:%s' % (key, bucket), aid)
+                    if not len(self.db.smembers('location:%s:latlon:%s' % (key, bucket))):
+                        self.db.srem('location:%s:buckets' % key, lonbucket)
+                else:
+                    print 'will add', aid, key
+                    self.db.sadd('location:%s:allusers' % key, aid)
+                    print self.db.scard('location:%s:allusers' % key)
+                    
+                self.add_reverse(key, lat, lon)
+                
+                self.add_key(key)
+                
+                
+                
             
             try:
                 res = self.post('%s/batch_location' % self.agents_url, dict(data=json.dumps(agents)))
@@ -343,6 +390,7 @@ class Scenario(Thread):
             #try:
             res = self.post('%s/batch_profile' % self.agents_url, dict(data=json.dumps(agents)))
             rt = res['response_time']
+            print res
             #print 'rt is', rt
             response_time += rt
             time.sleep(0.005)
@@ -379,9 +427,9 @@ class Scenario(Thread):
     
     def run(self):
         
-        #self.post_profile()
+        self.post_profile()
         
-        self.post_buysell()
+        #self.post_buysell()
         
         while self.go:
             time.sleep(1)
@@ -389,13 +437,15 @@ class Scenario(Thread):
             
             did_nothing = True
             
-            #if time.time() - self.last_post['location'] >= 0.03:
-                ##start = time.time()
-                #self.post_location()
-                ##print 'posted location in', (time.time()-start)
-                #self.last_post['location'] = time.time()
-                #did_nothing = False
-                
+            if time.time() - self.last_post['location'] >= 0.03:
+                #start = time.time()
+                self.post_location()
+                #print 'posted location in', (time.time()-start)
+                self.last_post['location'] = time.time()
+                did_nothing = False
+            
+            
+            
             if time.time() - self.last_post['profile'] > 10:
                 start = time.time()
                 self.post_profile()
@@ -484,7 +534,8 @@ class Location_poster(Thread):
                         pipe.srem('location:%s:latlon:%s' % (key, bucket), agent)
                     else:
                         print 'errr', agent, 'didnt exist?'
-                        pipe.incr('location:count:%s' % key)
+                        #pipe.incr('location:count:%s' % key)
+                        pipe.sadd('location:%s:allusers' % key, agent)
                     
                     lat = float(agents[agent][key]['lat'])
                     lon = float(agents[agent][key]['lon'])
@@ -564,6 +615,9 @@ class Poller(Thread):
                         caps[cap][key] = []
                     caps[cap][key].append(val)
                 
+                print controller, 'query entries'
+                print entries
+                print caps
                 #dic = dict(data=json.dumps(entries))
                 #uri = 'http://localhost:22222/multimatch?%s' % urllib.urlencode(dic)
                 #res = self.post(uri, {}, method='GET')
@@ -598,16 +652,20 @@ class Poller(Thread):
                     for cap in caps:
                         for key in caps[cap]:
                             if cap == 'location' and key == 'my location':
-                                if abs(o.p.x - self.scenario.obj[aid].p.x) > radius:
-                                    ismatch = False
-                                if abs(o.p.y - self.scenario.obj[aid].p.y) > radius:
-                                    ismatch = False
+                                if caps[cap][key] == ['']:
+                                    ismatch = True
+                                else:
+                                    if abs(o.p.x - self.scenario.obj[aid].p.x) > radius:
+                                        ismatch = False
+                                    if abs(o.p.y - self.scenario.obj[aid].p.y) > radius:
+                                        ismatch = False
                             else:
                                 for val in caps[cap][key]:
                                     if key not in eval('o.%s'%cap):
                                         ismatch = False
-                                    elif val != eval('o.%s'%cap)[key]:
+                                    elif val and val != eval('o.%s'%cap)[key]:
                                         ismatch = False
+                                        
                             reset = True
                     if ismatch:
                         matches[o.id] = 1

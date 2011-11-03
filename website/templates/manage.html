@@ -73,17 +73,21 @@ Object.size = function(obj) {
 //////        END SUGGESTION BOX
 ////////////////////////////////
 
+
+
 // sdata example:
 // profile = {
 //      languages: {
-//              enabled: false,
+//              selected: false,
+//              display: true,
 //              cnt: 109,
 //              matches: {},
 //              values: {
 //                      greek: {
 //                              cnt: 9,
 //                              haveit: true,
-//                              enabled: false,
+//                              selected: false,
+//                              display: true,
 //                              matches: {},
 //                      },
 //              },
@@ -91,16 +95,16 @@ Object.size = function(obj) {
 // }
 
 attr_manager = {};
-// attr_manager.udata = {};
+attr_manager.cache = {};
 attr_manager.sdata = {
     profile:{},
     location:{
-        "my location":{cnt:0, values:{}, enabled:0, matches:{}},
+        "my location":{cnt:0, values:{}, selected:0, display:true, matches:{}},
 //         "destination":{},
     },
-    buysell:{
-        "product":{},
-    },
+//     buysell:{
+//         "product":{},
+//     },
 };
 
 attr_manager.add_sdata = function(cap, key, cnt) {
@@ -111,9 +115,30 @@ attr_manager.add_sdata = function(cap, key, cnt) {
     if (attr_manager.sdata[cap] == undefined)
         attr_manager.sdata[cap] = {};
     
-    attr_manager.sdata[cap][key] = {cnt:0, values:{}, enabled:0, matches:{}};
+    attr_manager.sdata[cap][key] = {cnt:0, values:{}, selected:0, display:true, matches:{}};
 }
 
+attr_manager.hide_keyvals = function(){
+    for (cap in this.sdata) {
+        for (key in this.sdata[cap]){
+            attr_manager.sdata[cap][key].display = false;
+            for (val in this.sdata[cap][key].values){
+                attr_manager.sdata[cap][key].values[val].display = false;
+            }
+        }
+    }
+}
+
+attr_manager.show_keyvals = function(){
+    for (cap in this.sdata) {
+        for (key in this.sdata[cap]){
+            attr_manager.sdata[cap][key].display = true;
+            for (val in this.sdata[cap][key].values){
+                attr_manager.sdata[cap][key].values[val].display = true;
+            }
+        }
+    }
+}
 
 E = {};
 E.monitor = {
@@ -123,8 +148,11 @@ E.monitor = {
     },
 };
 
-// E.caps = {};
-// holds the keys to appear on the left pane
+E.previous_intersection = {};
+// holds the first list of intersected agents among two consecutive
+// intersection polls, so that the intersection and difference between
+// the consecutive lists can be found fast and have the results list 
+// change accordingly without resetting the whole list.
 
 E.satellite = {};
 E.satellite.url = "{{discov_url}}";
@@ -185,41 +213,33 @@ E.delete_keyval = function(cap, key, val, clb) {
 }
 
 
-E.populate_map = function(p)
-{
-    E.monitor.user_matches.intersection;
+E.populate_map = function(obj) {
+//     console.log(" ");
+//     console.log("populate_map");
     
-    var myLatlng = new google.maps.LatLng(p.lat, p.lon);
-    var myOptions = {
-        zoom: 14,
-        center: myLatlng,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
+    for (agent in obj) {
+        exists = mapman.validateMarker(agent);
+        if (!exists) {
+            lat = obj[agent].lat;
+            lon = obj[agent].lon;
+            
+            var latlng = new google.maps.LatLng(lat, lon);
+            
+//             console.log("adding marker", agent);
+            mapman.addMarker(agent, latlng);
+        }
     }
-    var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-
-    var marker = new google.maps.Marker({
-//         icon: "small_red.png",
-        position: myLatlng, 
-        map: map,
-        title:"You are here!",
-    });
     
-    var infowindow = new google.maps.InfoWindow({
-        content: "",
-    });
-    
-    infowindow.setContent("tester");
-    
-    google.maps.event.addListener(marker, 'click', function() {
-        infowindow.open(map,marker);
-    });
+    mapman.hideInvalidMarkers();
 }
 
 E.set_matches = function(stop) {
     if (stop == undefined)
         stop = parseInt($("#matches").attr("curpos"));
-    else
+    else {
         $("#matches").attr("curpos", stop);
+        $("title").html("Brin.gy ("+stop+")");
+    }
     
     start = parseInt($("#matches").html());
     step = 1;
@@ -241,17 +261,16 @@ E.handle_key_click = function(){
     key = $(this).attr("key");
     
     pressed = $(this).hasClass("pressed");
-    attr_manager.sdata[cap][key].enabled = !pressed;
+    attr_manager.sdata[cap][key].selected = !pressed;
     if (pressed) {
         $(this).removeClass("pressed");
     } else {
         $(this).addClass("pressed");
         $(this).siblings("div").children().children().removeClass("pressed");
         for (val in attr_manager.sdata[cap][key].values)
-            attr_manager.sdata[cap][key].values[val].enabled = false;
+            attr_manager.sdata[cap][key].values[val].selected = false;
     }
-    E.poll_matches();
-    
+    E.poll_matches(cap);
     return false;
 }
 
@@ -261,16 +280,15 @@ E.handle_val_click = function(){
     val = $(this).attr("val");
     
     pressed = $(this).hasClass("pressed");
-    attr_manager.sdata[cap][key].values[val].enabled = !pressed;
+    attr_manager.sdata[cap][key].values[val].selected = !pressed;
     if (pressed) {
         $(this).removeClass("pressed");
     } else {
         $(this).addClass("pressed");
         $(this).parent().parent().siblings("a").removeClass("pressed");
-        attr_manager.sdata[cap][key].enabled = false;
+        attr_manager.sdata[cap][key].selected = false;
     }
-    E.poll_matches();
-    
+    E.poll_matches(cap);
     return false;
 }
 
@@ -329,7 +347,8 @@ E.handle_userattr_toggle =function(){
                 
                 attr_manager.sdata.location[key].values[val] = {
                     cnt:0, 
-                    enabled:false, 
+                    selected:false,
+                    display:true,
                     haveit:false, 
                     matches:[],
                     formatted: formatted,
@@ -407,14 +426,14 @@ E.handle_userattr_hover_out = function(){
 E.populate_attrs = function() {
     $("#choices").empty();
 
-//     if (attr_manager.sdata.location["my location"].values == undefined)
-//         attr_manager.sdata.location["my location"] = {}
-    
     for (capname in attr_manager.sdata) {
 
         app = $("<div>"+capname+"</div>").addClass("clear");
         $("#choices").append(app).addClass("");
         for (attr in attr_manager.sdata[capname]) {
+            
+            if (attr_manager.sdata[capname][attr].display == false)
+                continue;
             
             // attr_counters class is used to group and iterate through all attribute counters
             count = $("<span></span>").addClass("count attr_counters");
@@ -427,10 +446,17 @@ E.populate_attrs = function() {
             keypart.append(count).attr(pair);
             keypart.click(E.handle_key_click);
             
+            if (attr_manager.sdata[capname][attr].selected)
+                keypart.addClass("pressed");
+            
             valpart = $("<div class='valpart'></div>");
             for (val in attr_manager.sdata[capname][attr].values) {
+                
+                if (attr_manager.sdata[capname][attr].values[val].display == false)
+                    continue;
+                
                 count = $("<span></span>").addClass("count attr_counters");
-                count.html(attr_manager.sdata[capname][attr].cnt);
+                count.html(attr_manager.sdata[capname][attr].values[val].cnt);
                 count.attr({
                     uitype:"user_attribute", cap:capname, key:attr, val:val,
                 });
@@ -465,6 +491,9 @@ E.populate_attrs = function() {
                 pair = {cap:capname, key:attr, val:val};
                 value_pill = $("<a href='#'></a>").attr(pair).click(E.handle_val_click);
                 value_pill.append(count).append(value);
+                
+                if (attr_manager.sdata[capname][attr].values[val].selected)
+                    value_pill.addClass("pressed");
                 
                 // ****** add_btn ****** add_btn ****** add_btn ******
                 add_btn = $("<span class='add_btn' title='the title' data-content='the content'></span>").attr(pair);
@@ -524,64 +553,144 @@ E.populate_attrs = function() {
 
 //////////////////////////////////////////////////
 
-E.construct_result_enty = function(agent, picture, profile) {
+E.construct_result_enty = function(agent) {
+    picture = attr_manager.cache[agent].profile.picture;
+    
     pic = $("<img src='"+picture+"' width=20 style='float:left; clear:left;' />");
     username = $("<span style='margin-left:5px'></span>").html(agent);
     entry = $("<a href='#'></a>").append(pic).append(username);
+    entry.attr({agent:agent});
     entry.click(function(){
-        console.log("clearing result_details");
-        $("#result_details").html("");
-        for (k in profile) {
-            detail = $("<div></div>").html(k+":"+profile[k]);
-            $("#result_details").append(detail);
+        agent = $(this).attr("agent");
+        selected = $(this).hasClass("pressed");
+        
+        if (selected) {
+            $(this).removeClass("pressed");
+            attr_manager.show_keyvals();
+            $("#userinfo").slideUp();
+        } else {
+            $('#results a').removeClass("pressed");
+            $(this).addClass("pressed");
+            
+            $("#userinfo").html("User: "+agent).slideDown();
+            profile = attr_manager.cache[agent].profile;
+            
+            attr_manager.hide_keyvals();
+            
+            for (k in profile) {
+                if (attr_manager.sdata.profile[k])
+                    attr_manager.sdata.profile[k].display = true;
+                else
+                    continue;
+                
+                detail = $("<div></div>").html(k+":");
+                for (val in profile[k]) {
+                    attr_manager.sdata.profile[k].values[val].display = true;
+                    detail.append(", "+val);
+                }
+            }
         }
+
+        E.populate_attrs();
+        
+        if (E.location_engaged)
+            mapman.highlightMarker(agent);
+        
         return false;
     });
     return entry;
 }
 
 E.get_multi_profile = function(agents) {
-    if (agents.length > 0) {
-        $.getJSON(E.agent.baseurl+"/batch_profile", {data:JSON.stringify(agents)}, function(json){
-            $("#results").empty();
-            for (agent in json.profiles) {
-                
-                obj = {};
-                for (i in json.profiles[agent].data) {
-                    key = json.profiles[agent].data[i].key;
-                    val = json.profiles[agent].data[i].val;
-                    obj[key] = val;
-                }
-                
-                picture = "http://pldb.media.mit.edu/research/images/nophoto.gif";
-                if (obj["company"]=="Media Lab")
-                    picture = "http://pldb.media.mit.edu/face/"+agent;
-                if ("picture" in obj)
-                    picture = obj.picture;
-                
-                entry = E.construct_result_enty(agent, picture, obj);
-                $("#results").append(entry);
+    $.getJSON(E.agent.baseurl+"/batch_profile", {data:JSON.stringify(agents)}, function(json){
+        for (agent in json.profiles) {
+            
+            profile = {};
+            for (i in json.profiles[agent].data) {
+                key = json.profiles[agent].data[i].key;
+                val = json.profiles[agent].data[i].val;
+                if (profile[key] == undefined)
+                    profile[key] = {};
+                profile[key][val] = 1;
             }
-        });
-    } else
-        $("#results").empty();
+            
+            picture = "http://pldb.media.mit.edu/research/images/nophoto.gif";
+            if ("company" in profile && "Media Lab" in profile["company"])
+                picture = "http://pldb.media.mit.edu/face/"+agent;
+            if ("picture" in profile)
+                for (val in profile.picture)
+                    picture = profile.picture.val;
+            
+            if (profile.picture==undefined || profile.picture.length==0)
+                profile.picture = [picture];
+            
+            if (attr_manager.cache[agent] == undefined)
+                attr_manager.cache[agent] = {};
+            attr_manager.cache[agent].profile = profile;
+        }
+
+    
+        if (E.location_engaged) {
+            $.getJSON(E.agent.baseurl+"/batch_location", {data:JSON.stringify(agents)}, function(json){
+                
+                for (agent in json.locations) {
+                    locobj = json.locations[agent];
+                    
+                    if (attr_manager.cache[agent] == undefined)
+                        attr_manager.cache[agent] = {};
+                    attr_manager.cache[agent]["location"] = locobj;
+                }
+                E.populate_map(json.locations);
+            });
+        }
+        
+        agentsobj = {};
+        for (i in agents) {
+            agent = agents[i];
+            agentsobj[agent] = 1;
+            if (E.previous_intersection[agent]==undefined) {
+                entry = E.construct_result_enty(agent);
+                $("#results").append(entry);
+                E.previous_intersection[agent] = 1;
+            }
+        }
+        
+        for (agent in E.previous_intersection) {
+            if (agentsobj[agent]==undefined) {
+                $('a[agent="'+agent+'"]').slideUp().remove();
+                delete E.previous_intersection[agent];
+            }
+        }
+    });
 }
 
 E.get_multi_location = function(agents) {
     if (agents.length > 0) {
         $.getJSON(E.agent.baseurl+"/batch_location", {data:JSON.stringify(agents)}, function(json){
+            
 //             $("#results").empty();
-            console.log(json.locations);
+//             console.log("batch_location", json.locations);
 //             for (agent in json.profiles) {
 //                 
 //             }
+            $("#results").empty();
+            for (agent in json.locations) {
+                obj = json.locations[agent];
+                
+                picture = "http://pldb.media.mit.edu/research/images/nophoto.gif";
+                entry = E.construct_result_enty(agent, picture, obj);
+                $("#results").append(entry);
+            }
+            E.populate_map(json.locations);
         });
-    } else
+    } else {
         $("#results").empty();
+        mapman.deleteOverlays();
+    }
 }
 
-E.poll_matches = function() {
-    
+E.poll_matches = function(capname) {
+    btnclicked = 0;
     query = [];
     
     for (cap in attr_manager.sdata)
@@ -593,7 +702,6 @@ E.poll_matches = function() {
         }
     
     data = JSON.stringify(query);
-//     data = escape(data);
     
     $.getJSON(E.satellite.url+"/multimatch", {data:data}, function(json){
         E.monitor.user_matches.by_keyval = {};
@@ -611,7 +719,6 @@ E.poll_matches = function() {
             if (val.length > 0) {
                 attr_manager.sdata[cap][key].values[val].cnt = cnt;
                 attr_manager.sdata[cap][key].values[val].matches = matches;
-//                 E.monitor.user_matches.by_keyval[key+"_"+val] = matches;
             } else {
                 attr_manager.sdata[cap][key].cnt = cnt;
                 attr_manager.sdata[cap][key].matches = matches;
@@ -621,11 +728,15 @@ E.poll_matches = function() {
         test_intersection = {};
         target_count = 0
         
+        E.location_engaged = false;
+        
         E.match_criteria = [];
         for (cap in attr_manager.sdata) {
             for (key in attr_manager.sdata[cap]) {
                 for (val in attr_manager.sdata[cap][key].values) {
-                    if (attr_manager.sdata[cap][key].values[val].enabled) {
+                    if (attr_manager.sdata[cap][key].values[val].selected) {
+                        if (cap == "location")
+                            E.location_engaged = true;
                         E.match_criteria.push([cap, key, val]);
                         for (i in attr_manager.sdata[cap][key].values[val].matches) {
                             agent = attr_manager.sdata[cap][key].values[val].matches[i];
@@ -636,7 +747,9 @@ E.poll_matches = function() {
                         target_count += 1;
                     }
                 }
-                if (attr_manager.sdata[cap][key].enabled) {
+                if (attr_manager.sdata[cap][key].selected) {
+                    if (cap == "location")
+                        E.location_engaged = true;
                     E.match_criteria.push([cap, key, ""]);
                     for (i in attr_manager.sdata[cap][key].matches) {
                         agent = attr_manager.sdata[cap][key].matches[i];
@@ -648,24 +761,30 @@ E.poll_matches = function() {
                 }
             }
         }
-        
-//         console.log(test_intersection, target_count);
+
+        mapman.invalidateMarkers();
+        if (capname != undefined) {
+            E.update_monitor();
+        }
         
         intersection = [];
         for (match in test_intersection)
-            if (test_intersection[match] == target_count)
+            if (test_intersection[match] == target_count) {
                 if (match != E.agent.id)
                     intersection.push(match);
+            }
         
         
-        E.get_multi_profile(intersection);
-        E.get_multi_location(intersection);
+        if (intersection.length > 0) {
+            E.get_multi_profile(intersection);
+        } else {
+            $("#results").empty();
+            if (E.location_engaged)
+                mapman.deleteOverlays();
+        }
         
-//         if (cap=="profile")
-//             E.populate_map();
-            
+        
         E.monitor.user_matches.intersection = intersection;
-        
         E.set_matches(Object.size(intersection));
         
         $(".attr_counters").each(function(){
@@ -702,7 +821,7 @@ E.fetch_keyvals = function(clb) {
     data = JSON.stringify({with_values:1, user:E.agent.id});
     
     $.getJSON(E.satellite.url+"/profile/fetch/"+starting_from, {data:data}, function(json){
-        console.log("fetch", json);
+//         console.log("fetch", json);
         for (attribute in json.matches) {
             attr_manager.add_sdata("profile", attribute, 0);
             for (i in json.matches[attribute]) {
@@ -711,7 +830,11 @@ E.fetch_keyvals = function(clb) {
                 haveit = json.matches[attribute][i][2];
 
                 attr_manager.sdata.profile[attribute].values[val] = {
-                    cnt:cnt, enabled:0, haveit:haveit, matches:{},
+                    cnt:cnt, 
+                    selected:0,
+                    display:true,
+                    haveit:haveit, 
+                    matches:{},
                 };
             }
             E.last_fetched = attribute;
@@ -724,18 +847,24 @@ E.fetch_keyvals = function(clb) {
     $.getJSON(E.satellite.url+"/location/fetch/"+E.agent.id+"/"+key, function(json){
         val = {lat:json.lat, lon:json.lon};
         valstr = JSON.stringify(val);
+        key = "my location";
         attr_manager.add_sdata("location", key, 0);
         
         if (json.lat.length && json.lon.length) {
             latlng = new google.maps.LatLng(json.lat, json.lon);
             geogy.geocoder.geocode({'latLng': latlng}, function(results, status) {
                 if (status == google.maps.GeocoderStatus.OK) {
+                    key = "my location";
                     formatted = results[1].formatted_address;
                     console.log('formatted address:', formatted);
                     
+                    console.log('debug:', key, attr_manager.sdata.location);
+                    console.log(attr_manager.sdata.location[key]);
+                    
                     attr_manager.sdata.location[key].values[valstr] = {
                         cnt:json.count, 
-                        enabled:0, 
+                        selected:0, 
+                        display:true, 
                         haveit:true, 
                         matches:json.matches,
                         formatted: formatted,
@@ -747,7 +876,11 @@ E.fetch_keyvals = function(clb) {
             });
         } else {
             attr_manager.sdata.location[key].values[valstr] = {
-                cnt:json.count, enabled:0, haveit:false, matches:json.matches,
+                cnt:json.count, 
+                selected:0, 
+                display:true, 
+                haveit:false, 
+                matches:json.matches,
             };
             clb();
         }
@@ -755,18 +888,19 @@ E.fetch_keyvals = function(clb) {
 }
 
 E.update_monitor = function() {
+    console.log(E.match_criteria);
     if (window.location.search == "?control") {
-        query = [];
-        for (cap in attr_manager.udata)
-            for (key in attr_manager.udata[cap])
-                for (val in attr_manager.udata[cap][key]) {                
-                    if (attr_manager.udata[cap][key][val].enabled == 1)
-                        query.push([cap, key, val]);
-                }
-        data = JSON.stringify(query);
+//         query = [];
+//         for (cap in attr_manager.udata)
+//             for (key in attr_manager.udata[cap])
+//                 for (val in attr_manager.udata[cap][key]) {                
+//                     if (attr_manager.udata[cap][key][val].selected == 1)
+//                         query.push([cap, key, val]);
+//                 }
+        data = JSON.stringify(E.match_criteria);
 //         console.log(data);
         $.post(E.agent.baseurl+"/controller", {data:data, controller:E.agent.id}, function(json){
-//             console.log("controller post:", json);
+            console.log("controller post:", json);
         }, "json");
     };
     return false;
@@ -813,14 +947,13 @@ $(document).ready(function()
     E.fetch_keyvals(clb);
     
     $("#match_btn").click(function(){
-        $("#result_details").toggle();
+//         $("#result_details").toggle();
         console.log(E.match_criteria);
         return false;
     });
     
     setInterval(E.poll_matches, 2000); 
     
-    E.update_monitor();
     $("#delete_btn").show().click(show_delete_modal);
     $("#pseudonym").show();
     
@@ -842,13 +975,13 @@ $(document).ready(function()
     dheight = $(document).height();
     $("#choices").height(dheight - offset.top - 50);
     $("#results").height(dheight - offset.top - 50);
-    $("#result_details").height(dheight - offset.top - 50);
+//     $("#result_details").height(dheight - offset.top - 50);
     $("#map_canvas").height(dheight - offset.top - 50);
     
-    starting_point = {lat:42.360367,lon:-71.087294};
-    E.populate_map(starting_point);
+    mapman.initialize();
+    
+    $("#searchinput").focus();
 });
-
 
 
 </script>
@@ -860,15 +993,15 @@ $(document).ready(function()
         <a href="#" class="selected">search</a>
         <a class="" href="#">me</a>
     </nav>-->
+    <div id="searchbox"><input type="text" id="searchinput" /></div>
+    <div id="userinfo"></div>
     <div id="choices"></div>
 </div>
 <div id="right_panel" class="columns">            
     <div id="scratchpad"></div>
     <div id="results" class="span3"></div>
-    <div id="result_details" class="span3"></div>
-    <div class="map_container">
-        <div id="map_canvas"></div>
-    </div>
+<!--     <div id="result_details" class="span3"></div> -->
+    <div id="map_canvas"></div>
     <button id="match_btn" class="btn info">
         <div id="matches" curpos="0">0</div>
         <div id="matches_caption">people match</div>
