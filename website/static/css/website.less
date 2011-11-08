@@ -1,8 +1,13 @@
 @import "/static/bootstrap/lib/bootstrap.less";
 
-body { font-family:helvetica; padding-left:10px; }
+body { font-family:helvetica; font-size:12px; }
 .menu-item { width:80px; float:left; text-align:center;  }
-.menu-item a { text-decoration: none; color: black; text-align:center; }
+.menu-item a { 
+    text-decoration: none; 
+    color: black; 
+    text-align:center; 
+    font-size: 14px;
+}
 
 .inline { 
     font-weight:bold;
@@ -11,6 +16,9 @@ body { font-family:helvetica; padding-left:10px; }
 
 /* h2 { display: inline; padding:0px; margin:0px; } */
 
+.container { 
+    width:100%;
+}
 .backbtn {
     padding-bottom:10px;
 }
@@ -20,12 +28,22 @@ body { font-family:helvetica; padding-left:10px; }
 /* @bar_color: red; */
 /* @capability_color: #bbb; */
 
+.error {
+    color:white;
+    font-weight:bold;
+    background-color:red;
+    -webkit-border-radius: @pill-radius;
+    padding: 5px;
+}
+
 .logo {
-    font-size:16px;
+/*     font-size:16px; */
+    color:blue; 
+    font-weight: bold;
     font-family:helvetica;
     color: black;
     &:hover {
-        text-decoration: none;
+/*         text-decoration: none; */
     }
 }
 
@@ -56,7 +74,12 @@ span.count {
     border-radius: 3px;
 }
 
-div.footer { text-align:center; padding-top: 10px; }
+div.footer { 
+    text-align:center; 
+/*     padding-top: 10px;  */
+    bottom:0px; 
+    width:100%;
+}
 
 .flying { position:absolute; z-index:1000; }
 div.choice_header { padding-bottom: 150px; clear:both;}
@@ -64,82 +87,58 @@ div.clear {clear:both;}
 
 #choices {
     overflow: auto;
-    padding-right: 10px;
 }
 
 #searchinput {
     font-size:30px;
     height: 30px;
-    width: 280px;
 }
 #searchbox {
-    font-size:30px;
-    margin-bottom: 40px;
+/*     font-size:30px; */
+    margin-bottom: 10px;
 }
 
 #userinfo {
     font-size:30px;
     margin-bottom: 10px;
+    margin-top: 40px;
     display: none;
 }
 
 .page-header {
-    margin-left:0px;
-    padding-left:0px;
+    margin: 0 0 5px 0;
+    padding: 0px 10px 0px 10px;
 }
 
-#left_panel {
-    margin-left:20px;
-    float:left;
-    width: 300px;
-}
-#right_panel { 
-    float:left;
-    border-left: #cccccc solid 1px; 
-    margin-left:5px;
-    padding-left:5px;
-    width: 629px;
-    position: relative;
-}
-
-/*.map_container {
-    margin-left: 10px;
-    width: 460px;
-    
-    position: absolute;
-    top:0px;
-    right:0px;
-    z-index:1001;
-    
-    background-color: rgba(11,11,11, 0.05);
-    -webkit-border-radius:@pill-radius;
-}*/
-
-#result_details {
-    -webkit-border-radius:@pill-radius;
-    margin-left: 10px;
-    width: 460px;
-    
-/*     float: right; */
+#left-panel {
+    padding-left: 5px;
+/*     margin-left:20px; */
+/*     float:left; */
+/*     width: 300px; */
 /*     display: inline; */
-    position: absolute;
-    top:0px;
-    right:0px;
-    z-index:1002;
-    background-color: rgba(255,255,255, 1);
-    display: none;
+    margin: 0px;
+/*     background-color:yellow; */
+}
+#right-panel { 
+/*     float:left; */
+/*     border-left: #cccccc solid 1px;  */
+/*     margin-left:5px; */
+/*     padding-left:5px; */
+/*     width: 629px; */
+/*     position: relative; */
+/*     min-width: 300px; */
 }
 
 #map_canvas {
-    width: 460px;
-    float: right;
-    display: inline;
     background-color: rgba(11,11,11, 0.05);
     -webkit-border-radius:@pill-radius;
+    margin: 0px;
+    padding: 0px;
 }
 
 #results { 
-    margin: 0px;
+    display: inline;
+    margin: 0 6px 0 6px;
     overflow: auto;
     a {
         display: block;
@@ -147,7 +146,7 @@ div.clear {clear:both;}
         background-color:gray;
         padding:4px;
         color: white;
-        margin-top: 3px;
+        margin-bottom: 3px;
         &:hover {
             text-decoration: none;
             background: rgba(11,11,11, 0.85);
@@ -167,13 +166,13 @@ div.clear {clear:both;}
 
 #match_btn {
     position: absolute;
-    top:0px;
+    top:90px;
     right:0px;
-    z-index:1010;
+/*     z-index:1010; */
 }
 
 #matches {   
-    font-size:40px; 
+    font-size:52px; 
 }
 
 span.enabled { color: #111 !important; border-radius: 0 0 0 0 !important; }
@@ -289,8 +288,8 @@ a.closebtn:hover {
     display: none;
 }
 
-#empty_scratchpad { float:left; }
-#scratchpad { float:left; clear: left; }
+/* #empty_scratchpad { float:left; } */
+/* #scratchpad { float:left; clear: left; } */
 
 .suggestionEntry { width:100px; height:22px; }
 a.suggestionVal { float:left; width: 70px; height:22px; }
@@ -324,7 +323,6 @@ a.suggestionVal:hover { color:white; background-color:#0050a3; text-decoration: 
 }
 
 
-
 pill {
     display: table;
     text-align: left;
@@ -337,7 +335,7 @@ pill {
     -webkit-border-radius: @pill-radius;
     -webkit-box-shadow: 0 0.15em 0.17em rgba(0, 0, 0, 0.5);
     position: relative;
-    a, div {
+    a, div, form {
         display: table-cell;
         color: black;
         text-shadow: 0 0.08em 0.1em rgba(220, 220, 220, 0.65);
@@ -375,6 +373,7 @@ pill {
         }
     }
     div.valpart {
+        border-left: 0;
         display: table-cell;
 /*        width: 160px;*/
         
@@ -407,12 +406,22 @@ pill {
             span.count {
                 margin-left: 0px;
                 margin-right: 5px;
-/*                 color:yellow; */
             }
         }
         
         div.valcontainer {
             position: relative;
+        }
+        
+        form.editor {
+            padding-left:15px;
+            padding-bottom: 10px;
+            input {
+                font-size: 12px;
+                font-weight: bold;
+                height:12px;
+                color:black;
+            }
         }
         
         span.add_btn {

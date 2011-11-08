@@ -44,8 +44,9 @@ cookies.del_cookie = function(name)
 
 mapman = {};
 mapman.markers = [];
-mapman.infowindow = new google.maps.InfoWindow({content:""});
 mapman.initialize = function() {
+    mapman.infowindow = new google.maps.InfoWindow({content:""});
+    
     lat = 42.360367;
     lon = -71.087294;
     latlng = new google.maps.LatLng(lat, lon);

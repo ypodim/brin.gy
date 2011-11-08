@@ -231,6 +231,17 @@ E.populate_map = function(obj) {
     }
     
     mapman.hideInvalidMarkers();
+    
+    if (E.reset_map_bounds) {
+        //  Create a new viewpoint bound
+        var bounds = new google.maps.LatLngBounds();
+        //  Go through each...
+        for (aid in mapman.markers)
+            bounds.extend(mapman.markers[aid].position);
+        //  Fit these bounds to the map
+        mapman.map.fitBounds(bounds);
+        E.reset_map_bounds = false;
+    }
 }
 
 E.set_matches = function(stop) {
@@ -271,6 +282,7 @@ E.handle_key_click = function(){
             attr_manager.sdata[cap][key].values[val].selected = false;
     }
     E.poll_matches(cap);
+    E.reset_map_bounds = true;
     return false;
 }
 
@@ -289,6 +301,7 @@ E.handle_val_click = function(){
         attr_manager.sdata[cap][key].selected = false;
     }
     E.poll_matches(cap);
+    E.reset_map_bounds = true;
     return false;
 }
 
@@ -301,7 +314,7 @@ E.handle_userattr_toggle =function(){
     complete_toggle_handle = function(button) {
         
         haveit = !attr_manager.sdata[cap][key].values[val].haveit;
-        console.log(cap,key,val,haveit);
+//         console.log(cap,key,val,haveit);
         attr_manager.sdata[cap][key].values[val].haveit = haveit;
         if (haveit) {
             E.post_keyval(cap, key, val, function(){
@@ -357,7 +370,7 @@ E.handle_userattr_toggle =function(){
                 alert("Geocoder failed due to: " + status);
             }
             
-//             console.log(attr_manager.sdata.location["my location"].values[val].haveit);
+            console.log(attr_manager.sdata.location["my location"].values[val].haveit);
             button.siblings().children("span.value").html(formatted);
             complete_toggle_handle(button);
         });
@@ -367,7 +380,6 @@ E.handle_userattr_toggle =function(){
     
     haveit = attr_manager.sdata[cap][key].values[val].haveit;
     if (cap == "location") {
-//         console.log("location haveit:", haveit);
         if (haveit == false) {
             geogy.init(location_clb);
             
@@ -423,12 +435,92 @@ E.handle_userattr_hover_out = function(){
     $(this).html(text).css("background-color","");
 }
 
-E.populate_attrs = function() {
+
+E.generate_val_entry = function(capname, attr, val) {
+    
+    count = $("<span></span>").addClass("count attr_counters");
+    count.html(attr_manager.sdata[capname][attr].values[val].cnt);
+    count.attr({
+        uitype:"user_attribute", cap:capname, key:attr, val:val,
+    });
+    count.addClass("attr_counters").attr(attr);
+    count.twipsy({title:function(){
+        cap = $(this).attr("cap");
+        key = $(this).attr("key");
+        val = $(this).attr("val");
+        cnt = attr_manager.sdata[cap][key].values[val].cnt;
+        text = " people";
+        if (cnt == 1)
+            text = " person";
+        return cnt+text;
+    }, placement:"left", offset:5});
+    
+    
+    formatted = val;
+    
+    if (capname=="location" && attr=="my location") {
+        address = attr_manager.sdata[capname][attr].values[val].formatted;
+        if (address == undefined)
+            formatted = "";
+        else
+            formatted = address;
+    }
+    
+    if (formatted.length > 10)
+        formatted = formatted.substring(0,8)+"...";
+        
+    value = $("<span class='value'></span>").html(formatted);
+    
+    pair = {cap:capname, key:attr, val:val};
+    value_pill = $("<a href='#'></a>").attr(pair).click(E.handle_val_click);
+    value_pill.append(count).append(value);
+    
+    if (attr_manager.sdata[capname][attr].values[val].selected)
+        value_pill.addClass("pressed");
+    
+    // ****** add_btn ****** add_btn ****** add_btn ******
+    add_btn = $("<span class='add_btn' title='the title' data-content='the content'></span>").attr(pair);
+    
+    add_btn.click(E.handle_userattr_toggle);
+    
+    // ****** HOVER ****** HOVER ****** HOVER ******
+    add_btn.hover(E.handle_userattr_hover_in, E.handle_userattr_hover_out);
+    
+    text = "\u00A0";
+    if (attr_manager.sdata[capname][attr].values[val].haveit) {
+        text = "\u2713";
+    }
+    
+    // ****** POPOVER ****** POPOVER ****** POPOVER ******
+    add_btn.html(text).popover({title:function(){
+        return $(this).attr("key")+": "+$(this).attr("val");
+    }, content:function(){
+        cap = $(this).attr("cap");
+        key = $(this).attr("key");
+        val = $(this).attr("val");
+        
+        if (attr_manager.sdata[cap][key].values[val].haveit)
+            return "Remove this from your profile.";
+        else
+            return "Add this to your "+cap;
+    }, offset:15});
+    
+    value_container = $("<div class='valcontainer'></div>");
+    value_container.append(value_pill).append(add_btn);
+    return value_container;
+}
+
+
+E.populate_attrs = function(useEditor) {
+    console.log(useEditor);
+    if (useEditor == undefined)
+        useEditor = true;
+        
     $("#choices").empty();
 
     for (capname in attr_manager.sdata) {
 
-        app = $("<div>"+capname+"</div>").addClass("clear");
+        app = $("<div></div>").addClass("clear");
         $("#choices").append(app).addClass("");
         for (attr in attr_manager.sdata[capname]) {
             
@@ -450,83 +542,77 @@ E.populate_attrs = function() {
                 keypart.addClass("pressed");
             
             valpart = $("<div class='valpart'></div>");
+            
             for (val in attr_manager.sdata[capname][attr].values) {
-                
                 if (attr_manager.sdata[capname][attr].values[val].display == false)
                     continue;
-                
-                count = $("<span></span>").addClass("count attr_counters");
-                count.html(attr_manager.sdata[capname][attr].values[val].cnt);
-                count.attr({
-                    uitype:"user_attribute", cap:capname, key:attr, val:val,
-                });
-                count.addClass("attr_counters").attr(attr);
-                count.twipsy({title:function(){
-                    cap = $(this).attr("cap");
-                    key = $(this).attr("key");
-                    val = $(this).attr("val");
-                    cnt = attr_manager.sdata[cap][key].values[val].cnt;
-                    text = " people";
-                    if (cnt == 1)
-                        text = " person";
-                    return cnt+text;
-                }, placement:"left", offset:5});
-                
-                
-                formatted = val;
-                
-                if (capname=="location" && attr=="my location") {
-                    address = attr_manager.sdata[capname][attr].values[val].formatted;
-                    if (address == undefined)
-                        formatted = "";
-                    else
-                        formatted = address;
-                }
-                
-                if (formatted.length > 10)
-                    formatted = formatted.substring(0,8)+"...";
-                    
-                value = $("<span class='value'></span>").html(formatted);
-                
-                pair = {cap:capname, key:attr, val:val};
-                value_pill = $("<a href='#'></a>").attr(pair).click(E.handle_val_click);
-                value_pill.append(count).append(value);
-                
-                if (attr_manager.sdata[capname][attr].values[val].selected)
-                    value_pill.addClass("pressed");
-                
-                // ****** add_btn ****** add_btn ****** add_btn ******
-                add_btn = $("<span class='add_btn' title='the title' data-content='the content'></span>").attr(pair);
-                
-                add_btn.click(E.handle_userattr_toggle);
-                
-                // ****** HOVER ****** HOVER ****** HOVER ******
-                add_btn.hover(E.handle_userattr_hover_in, E.handle_userattr_hover_out);
-                
-                text = "\u00A0";
-                if (attr_manager.sdata[capname][attr].values[val].haveit) {
-                    text = "\u2713";
-                }
-                
-                // ****** POPOVER ****** POPOVER ****** POPOVER ******
-                add_btn.html(text).popover({title:function(){
-                    return $(this).attr("key")+": "+$(this).attr("val");
-                }, content:function(){
-                    cap = $(this).attr("cap");
-                    key = $(this).attr("key");
-                    val = $(this).attr("val");
-                    
-                    if (attr_manager.sdata[cap][key].values[val].haveit)
-                        return "Remove this from your profile.";
-                    else
-                        return "Add this to your "+cap;
-                }, offset:15});
-                
-                
-                value_container = $("<div class='valcontainer'></div>");
-                value_container.append(value_pill).append(add_btn);
+                value_container = E.generate_val_entry(capname, attr, val);
                 valpart.append(value_container);
             }
+            
+            if (capname=="profile" && useEditor==true) {
+                editor = $("<form class='editor' title='new value' data-content='the content'></form>");
+                editbox = $("<input type='text' class='span2' class='editbox' />");
+                editor.attr("key",attr);
+                editbox.attr("key",attr);
+                editbox.popover({title:function(){
+                    return $(this).attr("key");
+                }, content:function(){
+                    key = $(this).attr("key");
+                    val = $(this).attr("val");
+                    if (val) {
+                        test = (val in attr_manager.sdata.profile[key].values);
+                        html = $("<div>"+val+":"+test+"</div>");
+                        if (test)
+                            html.html(val+": already exists").addClass("error");
+                        else
+                            html.html('press enter to save "<b>'+val+'</b>"');
+                        return html;
+                    }
+                    return 'Enter new value for "'+$(this).attr("key")+'"';
+                }, offset:15, html:true, animate:false, trigger:"focus"});
+                editbox.keydown(function(obj){
+                    if (obj.keyCode == 8)
+                        val = $(this).val().substr(0,$(this).val().length-1);
+                    else if (obj.keyCode != 13)
+                        val = $(this).val()+String.fromCharCode(obj.keyCode);
+                    else
+                        val = "";
+                    val = val.toLowerCase();
+                    $(this).attr("val",val);
+                    $(this).popover('show');
+                });
+                editor.submit(function(){
+                    cap = "profile";
+                    key = $(this).attr("key");
+                    val = $(this).children("input").val();
+                    console.log("submitting", cap, key, val);
+                    test = (val in attr_manager.sdata.profile[key].values);
+                    if (!test) {
+                        attr_manager.sdata[cap][key].values[val] = {
+                            cnt:0, 
+                            selected:0,
+                            display:true,
+                            haveit:true, 
+                            matches:{},
+                        };
+                        
+                        console.log(attr_manager.sdata.profile.name);
+                        
+                        value_container = E.generate_val_entry("profile", key, val);
+                        $(this).before(value_container);
+                        that = this;
+                        E.post_keyval(cap, key, val, function(){
+                            console.log("added", key, val);
+                            $(that).children("input").val("");
+                        });
+                    }
+                    return false;
+                });
+                editor.html(editbox);
+                valpart.append(editor);
+            }
+            
             pill = $("<pill></pill>").append(keypart).append(valpart);
             
             app.append(pill);
@@ -568,11 +654,19 @@ E.construct_result_enty = function(agent) {
             $(this).removeClass("pressed");
             attr_manager.show_keyvals();
             $("#userinfo").slideUp();
+            
+            _h = $("#choices").height();
+            $("#choices").height(_h+80);
+            useEditor = true;
         } else {
             $('#results a').removeClass("pressed");
             $(this).addClass("pressed");
             
             $("#userinfo").html("User: "+agent).slideDown();
+            
+            _h = $("#choices").height();
+            $("#choices").height(_h-80);
+            
             profile = attr_manager.cache[agent].profile;
             
             attr_manager.hide_keyvals();
@@ -589,9 +683,10 @@ E.construct_result_enty = function(agent) {
                     detail.append(", "+val);
                 }
             }
+            useEditor = false;
         }
 
-        E.populate_attrs();
+        E.populate_attrs(useEditor);
         
         if (E.location_engaged)
             mapman.highlightMarker(agent);
@@ -630,7 +725,7 @@ E.get_multi_profile = function(agents) {
         }
 
     
-        if (E.location_engaged) {
+//         if (E.location_engaged) {
             $.getJSON(E.agent.baseurl+"/batch_location", {data:JSON.stringify(agents)}, function(json){
                 
                 for (agent in json.locations) {
@@ -642,7 +737,7 @@ E.get_multi_profile = function(agents) {
                 }
                 E.populate_map(json.locations);
             });
-        }
+//         }
         
         agentsobj = {};
         for (i in agents) {
@@ -667,12 +762,6 @@ E.get_multi_profile = function(agents) {
 E.get_multi_location = function(agents) {
     if (agents.length > 0) {
         $.getJSON(E.agent.baseurl+"/batch_location", {data:JSON.stringify(agents)}, function(json){
-            
-//             $("#results").empty();
-//             console.log("batch_location", json.locations);
-//             for (agent in json.profiles) {
-//                 
-//             }
             $("#results").empty();
             for (agent in json.locations) {
                 obj = json.locations[agent];
@@ -779,7 +868,7 @@ E.poll_matches = function(capname) {
             E.get_multi_profile(intersection);
         } else {
             $("#results").empty();
-            if (E.location_engaged)
+//             if (E.location_engaged)
                 mapman.deleteOverlays();
         }
         
@@ -791,7 +880,7 @@ E.poll_matches = function(capname) {
             if ($(this).attr("uitype") == "sat_attribute") {
                 cap = $(this).attr("cap");
                 key = $(this).attr("key");
-                $(this).html( attr_manager.sdata[cap][key].cnt );
+                $(this).html(attr_manager.sdata[cap][key].cnt);
             }
             
             if ($(this).attr("uitype") == "user_attribute") {
@@ -852,7 +941,11 @@ E.fetch_keyvals = function(clb) {
         
         if (json.lat.length && json.lon.length) {
             latlng = new google.maps.LatLng(json.lat, json.lon);
-            geogy.geocoder.geocode({'latLng': latlng}, function(results, status) {
+            console.log("CREATE GEOCODER");
+            geocoder = new google.maps.Geocoder();
+            console.log("CALLING GEOCODER", latlng);
+            geocoder.geocode({'latLng': latlng}, function(results, status) {
+                console.log("IN GEOCODER");
                 if (status == google.maps.GeocoderStatus.OK) {
                     key = "my location";
                     formatted = results[1].formatted_address;
@@ -888,7 +981,7 @@ E.fetch_keyvals = function(clb) {
 }
 
 E.update_monitor = function() {
-    console.log(E.match_criteria);
+//     console.log(E.match_criteria);
     if (window.location.search == "?control") {
 //         query = [];
 //         for (cap in attr_manager.udata)
@@ -932,7 +1025,13 @@ var show_delete_modal = function() {
     });
 }
 
-
+E.resize_overflow_divs = function(){
+    offset = $("#choices").offset();
+    dheight = $(document).height();
+    $("#choices").height(dheight - offset.top - 40);
+    $("#results").height(dheight - offset.top + 10);
+    $("#map_canvas").height(dheight - offset.top + 10);
+}
 //////////////////////////////////////////////////
 ////////////////     ON READY
 
@@ -947,7 +1046,6 @@ $(document).ready(function()
     E.fetch_keyvals(clb);
     
     $("#match_btn").click(function(){
-//         $("#result_details").toggle();
         console.log(E.match_criteria);
         return false;
     });
@@ -971,16 +1069,42 @@ $(document).ready(function()
         return false;
     });
     
-    offset = $("#choices").offset();
-    dheight = $(document).height();
-    $("#choices").height(dheight - offset.top - 50);
-    $("#results").height(dheight - offset.top - 50);
-//     $("#result_details").height(dheight - offset.top - 50);
-    $("#map_canvas").height(dheight - offset.top - 50);
+    E.resize_overflow_divs();
     
     mapman.initialize();
     
-    $("#searchinput").focus();
+    $("#searchinput").focus().keydown(function(obj) {
+        if (obj.keyCode == 13 || obj.keyCode == undefined) {
+            text = $(this).val()+String.fromCharCode(obj.keyCode);
+            console.log("entered", text);
+        }
+        else if (obj.keyCode == 8)
+            text = $(this).val().substr(0, $(this).val().length-1);
+        else if (obj.keyCode==32 || (obj.keyCode>64 && obj.keyCode<91))
+            text = $(this).val()+String.fromCharCode(obj.keyCode);
+        else
+            return false;
+        
+//         console.log("looking for", text);
+        re = new RegExp(text, 'i');
+        no_match_found = true;
+        for (cap in attr_manager.sdata)
+            for (key in attr_manager.sdata[cap]) {
+                if (key.match(re)) {
+                    no_match_found = false;
+                    attr_manager.sdata[cap][key].display = true;
+                } else {
+                    attr_manager.sdata[cap][key].display = false;
+                }
+                
+                E.populate_attrs();
+            }
+        if (no_match_found) {
+            console.log("adding "+text);
+        }
+    });
+    
+//     $(window).resize(E.resize_overflow_divs);
 });
 
 
@@ -988,20 +1112,18 @@ $(document).ready(function()
 {% end %}
 {% block body %}
 
-<div id="left_panel" class="">
+<div id="left-panel" class="span5">
     <!--<nav class="">
         <a href="#" class="selected">search</a>
         <a class="" href="#">me</a>
     </nav>-->
-    <div id="searchbox"><input type="text" id="searchinput" /></div>
+    <div id="searchbox"><input type="text" id="searchinput" class="span5" /></div>
     <div id="userinfo"></div>
     <div id="choices"></div>
 </div>
-<div id="right_panel" class="columns">            
-    <div id="scratchpad"></div>
+<div id="right-panel" class="">            
     <div id="results" class="span3"></div>
-<!--     <div id="result_details" class="span3"></div> -->
-    <div id="map_canvas"></div>
+    <div id="map_canvas" class=""></div>
     <button id="match_btn" class="btn info">
         <div id="matches" curpos="0">0</div>
         <div id="matches_caption">people match</div>

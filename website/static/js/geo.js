@@ -10,7 +10,7 @@
  */
 
 var geogy = {};
-
+geogy.geocoder = new google.maps.Geocoder();
 geogy.init = function(clb){
     geogy.clb = clb;
     geogy.result = {error:""};
@@ -67,7 +67,7 @@ geogy.onload = function()
 
 
 ////////////////////// GEOCODING
-geogy.geocoder = new google.maps.Geocoder();
+
 // var latlng = new google.maps.LatLng(40.730885,-73.997383);
 // geogy.geocoder.geocode({'latLng': latlng}, function(results, status) {
 //     if (status == google.maps.GeocoderStatus.OK) {
