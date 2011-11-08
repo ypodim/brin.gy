@@ -140,6 +140,17 @@ attr_manager.show_keyvals = function(){
     }
 }
 
+attr_manager.deselect_keyvals = function(){
+    for (cap in this.sdata) {
+        for (key in this.sdata[cap]){
+            attr_manager.sdata[cap][key].selected = false;
+            for (val in this.sdata[cap][key].values){
+                attr_manager.sdata[cap][key].values[val].selected = false;
+            }
+        }
+    }
+}
+
 E = {};
 E.monitor = {
     "user_matches":{
@@ -167,7 +178,7 @@ E.post_keyval = null;
 E.delete_keyval = null;
 // delete key/val to agent
 
-E.generate_entry = null;
+// E.generate_entry = null;
 // generates UI profile element. 
 // Arguments: key, val (optional for new pairs)
 
@@ -435,6 +446,23 @@ E.handle_userattr_hover_out = function(){
     $(this).html(text).css("background-color","");
 }
 
+E.generate_key_entry = function(capname, attr) {
+    // attr_counters class is used to group and iterate through all attribute counters
+    count = $("<span></span>").addClass("count attr_counters");
+    count.html(attr_manager.sdata[capname][attr].cnt);
+    count.attr({uitype:"sat_attribute", cap:capname, key:attr});
+    
+    attribute = $("<span></span>").html(attr);
+    pair = {cap:capname, key:attr};
+    var keypart = $("<a href='#'></a>").append(attribute);
+    keypart.append(count).attr(pair);
+    keypart.click(E.handle_key_click);
+    
+    if (attr_manager.sdata[capname][attr].selected)
+        keypart.addClass("pressed");
+        
+    return keypart;
+}
 
 E.generate_val_entry = function(capname, attr, val) {
     
@@ -510,9 +538,71 @@ E.generate_val_entry = function(capname, attr, val) {
     return value_container;
 }
 
+E.generate_val_entry_editor = function(attr) {
+    editor = $("<form class='editor' title='new value' data-content='the content'></form>");
+    editbox = $("<input type='text' class='span2' class='editbox' />");
+    editor.attr("key",attr);
+    editbox.attr("key",attr);
+    editbox.popover({title:function(){
+        return $(this).attr("key");
+    }, content:function(){
+        key = $(this).attr("key");
+        val = $(this).attr("val");
+        if (val) {
+            test = (val in attr_manager.sdata.profile[key].values);
+            html = $("<div>"+val+":"+test+"</div>");
+            if (test)
+                html.html(val+": already exists").addClass("error");
+            else
+                html.html('press enter to save "<b>'+val+'</b>"');
+            return html;
+        }
+        return 'Type new "'+$(this).attr("key")+'" entry';
+    }, offset:15, html:true, animate:false, trigger:"focus"});
+    editbox.keydown(function(obj){
+        if (obj.keyCode == 8)
+            val = $(this).val().substr(0,$(this).val().length-1);
+        else if (obj.keyCode != 13)
+            val = $(this).val()+String.fromCharCode(obj.keyCode);
+        else
+            val = "";
+        val = val.toLowerCase();
+        $(this).attr("val",val);
+        $(this).popover('show');
+    });
+    editor.submit(function(){
+        cap = "profile";
+        key = $(this).attr("key");
+        val = $(this).children("input").val();
+        console.log("submitting", cap, key, val);
+        test = (val in attr_manager.sdata.profile[key].values);
+        if (!test) {
+            attr_manager.sdata[cap][key].values[val] = {
+                cnt:0, 
+                selected:0,
+                display:true,
+                haveit:true, 
+                matches:{},
+            };
+            
+            console.log(attr_manager.sdata.profile.name);
+            
+            value_container = E.generate_val_entry("profile", key, val);
+            $(this).before(value_container);
+            that = this;
+            E.post_keyval(cap, key, val, function(){
+                console.log("added", key, val);
+                $(that).children("input").val("");
+            });
+        }
+        return false;
+    });
+    editor.html(editbox);
+    return editor;
+}
 
 E.populate_attrs = function(useEditor) {
-    console.log(useEditor);
+    
     if (useEditor == undefined)
         useEditor = true;
         
@@ -527,20 +617,7 @@ E.populate_attrs = function(useEditor) {
             if (attr_manager.sdata[capname][attr].display == false)
                 continue;
             
-            // attr_counters class is used to group and iterate through all attribute counters
-            count = $("<span></span>").addClass("count attr_counters");
-            count.html(attr_manager.sdata[capname][attr].cnt);
-            count.attr({uitype:"sat_attribute", cap:capname, key:attr});
-            
-            attribute = $("<span></span>").html(attr);
-            pair = {cap:capname, key:attr};
-            keypart = $("<a href='#'></a>").append(attribute);
-            keypart.append(count).attr(pair);
-            keypart.click(E.handle_key_click);
-            
-            if (attr_manager.sdata[capname][attr].selected)
-                keypart.addClass("pressed");
-            
+            keypart = E.generate_key_entry(capname, attr);
             valpart = $("<div class='valpart'></div>");
             
             for (val in attr_manager.sdata[capname][attr].values) {
@@ -551,65 +628,7 @@ E.populate_attrs = function(useEditor) {
             }
             
             if (capname=="profile" && useEditor==true) {
-                editor = $("<form class='editor' title='new value' data-content='the content'></form>");
-                editbox = $("<input type='text' class='span2' class='editbox' />");
-                editor.attr("key",attr);
-                editbox.attr("key",attr);
-                editbox.popover({title:function(){
-                    return $(this).attr("key");
-                }, content:function(){
-                    key = $(this).attr("key");
-                    val = $(this).attr("val");
-                    if (val) {
-                        test = (val in attr_manager.sdata.profile[key].values);
-                        html = $("<div>"+val+":"+test+"</div>");
-                        if (test)
-                            html.html(val+": already exists").addClass("error");
-                        else
-                            html.html('press enter to save "<b>'+val+'</b>"');
-                        return html;
-                    }
-                    return 'Enter new value for "'+$(this).attr("key")+'"';
-                }, offset:15, html:true, animate:false, trigger:"focus"});
-                editbox.keydown(function(obj){
-                    if (obj.keyCode == 8)
-                        val = $(this).val().substr(0,$(this).val().length-1);
-                    else if (obj.keyCode != 13)
-                        val = $(this).val()+String.fromCharCode(obj.keyCode);
-                    else
-                        val = "";
-                    val = val.toLowerCase();
-                    $(this).attr("val",val);
-                    $(this).popover('show');
-                });
-                editor.submit(function(){
-                    cap = "profile";
-                    key = $(this).attr("key");
-                    val = $(this).children("input").val();
-                    console.log("submitting", cap, key, val);
-                    test = (val in attr_manager.sdata.profile[key].values);
-                    if (!test) {
-                        attr_manager.sdata[cap][key].values[val] = {
-                            cnt:0, 
-                            selected:0,
-                            display:true,
-                            haveit:true, 
-                            matches:{},
-                        };
-                        
-                        console.log(attr_manager.sdata.profile.name);
-                        
-                        value_container = E.generate_val_entry("profile", key, val);
-                        $(this).before(value_container);
-                        that = this;
-                        E.post_keyval(cap, key, val, function(){
-                            console.log("added", key, val);
-                            $(that).children("input").val("");
-                        });
-                    }
-                    return false;
-                });
-                editor.html(editbox);
+                editor = E.generate_val_entry_editor(attr);
                 valpart.append(editor);
             }
             
@@ -655,8 +674,8 @@ E.construct_result_enty = function(agent) {
             attr_manager.show_keyvals();
             $("#userinfo").slideUp();
             
-            _h = $("#choices").height();
-            $("#choices").height(_h+80);
+//             _h = $("#choices").height();
+//             $("#choices").height(_h+80);
             useEditor = true;
         } else {
             $('#results a').removeClass("pressed");
@@ -664,8 +683,8 @@ E.construct_result_enty = function(agent) {
             
             $("#userinfo").html("User: "+agent).slideDown();
             
-            _h = $("#choices").height();
-            $("#choices").height(_h-80);
+//             _h = $("#choices").height();
+//             $("#choices").height(_h-80);
             
             profile = attr_manager.cache[agent].profile;
             
@@ -1074,10 +1093,10 @@ $(document).ready(function()
     mapman.initialize();
     
     $("#searchinput").focus().keydown(function(obj) {
-        if (obj.keyCode == 13 || obj.keyCode == undefined) {
-            text = $(this).val()+String.fromCharCode(obj.keyCode);
-            console.log("entered", text);
-        }
+        attr_manager.deselect_keyvals();
+        
+        if (obj.keyCode == 13)
+            text = $(this).val();
         else if (obj.keyCode == 8)
             text = $(this).val().substr(0, $(this).val().length-1);
         else if (obj.keyCode==32 || (obj.keyCode>64 && obj.keyCode<91))
@@ -1085,7 +1104,9 @@ $(document).ready(function()
         else
             return false;
         
-//         console.log("looking for", text);
+        $(this).attr("key",text.toLowerCase());
+        $(this).popover("show");
+        
         re = new RegExp(text, 'i');
         no_match_found = true;
         for (cap in attr_manager.sdata)
@@ -1095,13 +1116,47 @@ $(document).ready(function()
                     attr_manager.sdata[cap][key].display = true;
                 } else {
                     attr_manager.sdata[cap][key].display = false;
-                }
-                
+                }   
                 E.populate_attrs();
             }
-        if (no_match_found) {
-            console.log("adding "+text);
+        
+    }).popover({content:function(){
+        key = $("#searchinput").attr("key");
+        html = $("<div></div>");
+        
+        if (key == undefined || key.length == 0)
+            return "Search or enter new attribute";
+            
+        if (key in attr_manager.sdata.profile) {
+            html.html(key+": already exists").addClass("error");
+        } else
+            html.html('press enter to add "<b>'+key+'</b>"');
+            
+        return html;
+    }, offset:15, html:true, animate:false, trigger:"focus"});
+    
+    $("#searchbox").submit(function(){
+        searchinput = $(this).children("input");
+        newkey = searchinput.val();
+        if (newkey in attr_manager.sdata.profile)
+            console.log("already exists", newkey );
+        else {
+            searchinput.popover("hide").val("");
+            attr_manager.show_keyvals();
+            E.populate_attrs(true);
+            
+            cap = "profile";
+            attr_manager.add_sdata(cap, newkey, 0);
+            
+            keypart = E.generate_key_entry(cap, newkey);
+            editor = E.generate_val_entry_editor(newkey);
+            valpart = $("<div class='valpart'></div>").append(editor);
+            
+            pill = $("<pill></pill>").append(keypart).append(valpart);
+            $("#choices").children("div:first-child").prepend(pill);
+            editor.children("input").focus();
         }
+        return false;
     });
     
 //     $(window).resize(E.resize_overflow_divs);
@@ -1117,7 +1172,10 @@ $(document).ready(function()
         <a href="#" class="selected">search</a>
         <a class="" href="#">me</a>
     </nav>-->
-    <div id="searchbox"><input type="text" id="searchinput" class="span5" /></div>
+    <form id="searchbox">
+        <div class="help-block">search or add new attribute</div>
+        <input type="text" id="searchinput" class="span5" title='add new attribute' data-content='press enter to add this attribute' />
+    </form>
     <div id="userinfo"></div>
     <div id="choices"></div>
 </div>
