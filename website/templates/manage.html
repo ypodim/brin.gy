@@ -1141,7 +1141,7 @@ $(document).ready(function()
         if (newkey in attr_manager.sdata.profile)
             console.log("already exists", newkey );
         else {
-            searchinput.popover("hide").val("");
+            searchinput.popover("hide").val("").attr("key","");
             attr_manager.show_keyvals();
             E.populate_attrs(true);
             
