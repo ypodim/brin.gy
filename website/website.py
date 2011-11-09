@@ -64,9 +64,9 @@ if __name__ == "__main__":
     if (options.website_url):
         website_url = 'http://%s' % options.website_url
     if (options.discov_url):
-        discov_url = options.discov_url
+        discov_url = 'http://%s' % options.discov_url
     if (options.agents_url):
-        agents_url = options.agents_url
+        agents_url = 'http://%s' % options.agents_url
         
     
     print 'Brin.gy website running at %s' % website_url
