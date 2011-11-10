@@ -576,6 +576,10 @@ E.generate_val_entry_editor = function(attr) {
             val = $(this).val()+String.fromCharCode(obj.keyCode);
         else
             val = "";
+            
+        if (obj.metaKey || obj.altKey || obj.ctrlKey)
+            val = "";
+            
         val = val.toLowerCase();
         $(this).attr("val",val);
         $(this).popover('show');
