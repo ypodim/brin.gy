@@ -1114,6 +1114,9 @@ $(document).ready(function()
         else
             return false;
         
+        if (obj.metaKey || obj.altKey || obj.ctrlKey)
+            return false;
+        
         $(this).attr("key",text.toLowerCase());
         $(this).popover("show");
         
