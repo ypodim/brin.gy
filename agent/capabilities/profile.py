@@ -61,12 +61,12 @@ class profile():
         return self.db.srem(u'%s:profile:keys' % self.usr, key)
     
     def get_vals(self, key):
+        print key
         return self.db.smembers(u'%s:profile:key:%s' % (self.usr, key))
     
     def set_val(self, key, val):
         self.set_key(key)
         self.add_reverse(key, val)
-        print key
         return self.db.sadd(u'%s:profile:key:%s' % (self.usr, key), val)
     
     def del_val(self, key, val):
