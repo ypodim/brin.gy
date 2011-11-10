@@ -61,7 +61,7 @@ class profile():
         return self.db.srem(u'%s:profile:keys' % self.usr, key)
     
     def get_vals(self, key):
-        #key = unicode(key, errors='replace')
+        key = unicode(key, errors='replace')
         return self.db.smembers(u'%s:profile:key:%s' % (self.usr, key))
     
     def set_val(self, key, val):
