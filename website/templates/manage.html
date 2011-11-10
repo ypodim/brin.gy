@@ -2,6 +2,7 @@
 
 {% block head %}
 {% autoescape None %}
+<script src='{{ static_url("js/tour.js") }}'></script>
 
 <script language="javascript" type="text/javascript">
 
@@ -69,6 +70,12 @@ Object.size = function(obj) {
     }
     return size;
 };
+
+if (typeof String.prototype.startsWith != 'function') {
+  String.prototype.startsWith = function (str){
+    return this.indexOf(str) == 0;
+  };
+}
 
 //////        END SUGGESTION BOX
 ////////////////////////////////
@@ -251,6 +258,9 @@ E.populate_map = function(obj) {
             bounds.extend(mapman.markers[aid].position);
         //  Fit these bounds to the map
         mapman.map.fitBounds(bounds);
+        zoom = mapman.map.getZoom();
+        if (mapman.map.getZoom() > 16)
+            mapman.map.setZoom(16);
         E.reset_map_bounds = false;
     }
 }
@@ -1160,6 +1170,39 @@ $(document).ready(function()
     });
     
 //     $(window).resize(E.resize_overflow_divs);
+
+    
+    if (window.location.hash.startsWith("#tour")) {
+        Tour.do_tour(0);
+    } else {
+        console.log("hash is", window.location.hash);
+    }
+    
+    $("#tourBtn").click(function(){
+        Tour.do_tour(0);
+    });
+    
+    $(document).bind('keydown', function(event){
+        if (event.keyCode == 27 && E.inTour == true)
+            E.close_tour();
+    });
+    
+    $("#coverclosebtn").click(Tour.close_tour);
+    $("#covernextbtn").click(function(){
+        index = parseInt($(this).attr("index"));
+        if (index == Tour.tourSlides.length-1) {
+            Tour.close_tour();
+        } else {
+            Tour.do_tour(index+1);
+        }
+        return false;
+    });
+    $("#coverbackbtn").click(function(){
+        index = parseInt($(this).attr("index"));
+        if (index > 0)
+            Tour.do_tour(index-1);
+        return false;
+    });
 });
 
 
@@ -1219,6 +1262,20 @@ $(document).ready(function()
 </div>
 
 
+
+<div id="coverbanner" class="cover">
+    <div id="covertext" class="cover">asdf</div>
+    <a href="#" id="covernextbtn" class="btn success">Next</a>
+    <a href="#" id="coverbackbtn" class="">Back</a>
+    <a href="#" id="coverclosebtn" class="">x close</a>
+</div>
+
+
+<div id="covertop" class="cover"></div>
+<div id="coverleft" class="cover"></div>
+<div id="coverright" class="cover"></div>
+<div id="coverbottom" class="cover"></div>
+<div id="popup"></div>
 
 <div class='confirmation label'></div>
 

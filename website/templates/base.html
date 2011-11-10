@@ -74,6 +74,11 @@
                     <img height=50 src='{{ static_url("images/website/about.svg") }}' alt="" />about
                 </a>
             </div>
+            <div class="menu-item" style="float:right; padding-top:8px;">
+                <a id="tourBtn" href="#tour">
+                    <img height=50 src='{{ static_url("images/website/tour.svg") }}' alt="" />take the tour
+                </a>
+            </div>
             <div id="pseudonym" style="float:right; padding: 8px 50px 0 0;">
                 pseudonym: <span class="label success">{{args}}</span>
             </div>
@@ -81,11 +86,7 @@
         <div class=""> 
             {% block body %}{% end %}
         </div>
-        
     </div>
-    
-    <div class="cover"></div>
-    <div id="popup"></div>
 </div>
 <div class="footer"> 
     <a class="logo" target="_blank" href="http://brin.gy">Brin.gy</a>

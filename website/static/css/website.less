@@ -1,6 +1,14 @@
 @import "/static/bootstrap/lib/bootstrap.less";
 
-body { font-family:helvetica; font-size:12px; }
+body { 
+    font-family:helvetica; 
+    font-size:12px;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
 .menu-item { width:80px; float:left; text-align:center;  }
 .menu-item a { 
     text-decoration: none; 
@@ -27,6 +35,7 @@ body { font-family:helvetica; font-size:12px; }
 /* @gridColumnWidth:   20px; */
 /* @bar_color: red; */
 /* @capability_color: #bbb; */
+
 
 .error {
     color:white;
@@ -261,7 +270,7 @@ a.closebtn:hover {
     opacity: 0.9;
 }
 
-.fixer {
+/*.fixer {
     float: left;
     display: block;
     width: auto;
@@ -277,25 +286,105 @@ a.closebtn:hover {
     -webkit-border-radius: 3px 0 0 3px;
     -moz-border-radius: 3px 0 0 3px;
     border-radius: 3px 0 0 3px;
-}
+}*/
 
 
 /* div.right_column { border-left: 1px solid gray; } */
 
 .cover { 
     position:absolute;
+    height:100%;
+    background-color: black;
+    opacity: 0.75;
+    z-index:1000;
+    display: none;
+    text-shadow: 0 -0.1em 0.1em rgba(25, 25, 25, 0.55);
+}
+
+#coverbanner {
+    top:10px;
+    right:0px;
+    width:50%;
+    height:200px;
+    background-color:black;
+    opacity:0.7;
+    z-index:1010;
+    padding-top:125px;
+}
+#covertext {
+    padding:20px;
+    font-size:36px;
+    line-height:38px;
+/*     background-color:red; */
+    color:white;
+    height:100px;
+    top:0px;
+    opacity:1;
+    font-weight: bold;
+}
+#covernextbtn {
+    position:absolute;
+    left: 20px;
+    bottom:20px;
+    font-size:30px;
+    z-index:1020;
+    opacity:1;
+}
+#coverbackbtn {
+    position:absolute;
+    left: 140px;
+    bottom:20px;
+    font-size:30px;
+    z-index:1020;
+    opacity:1;
+    padding:15px;
+    color:white;
+    font-size:16px;
+    
+    -webkit-border-radius: @pill-radius;
+    text-decoration:none;
+    &:hover {
+        background-color:#468847;
+    }
+}
+
+#coverclosebtn {
+    position:absolute;
+    right: 20px;
+    bottom:20px;
+    font-size:30px;
+    z-index:1020;
+    opacity:1;
+    padding:15px;
+    color:white;
+    font-size:16px;
+    
+    -webkit-border-radius: @pill-radius;
+    text-decoration:none;
+    &:hover {
+        background-color:red;
+    }
+}
+
+#covertop {
     left:0;
     top:0;
     width:100%;
-    height:100%;
-    background-color: gray;
-    opacity: 0.5;
-    z-index:1000;
-    display: none;
+}
+#coverleft {
+    left:0;
+}
+#coverright {
+    
+}
+#coverbottom {
+    left:0px;
+    bottom:0px;
+    width:100%;
 }
 
-/* #empty_scratchpad { float:left; } */
-/* #scratchpad { float:left; clear: left; } */
+
+
 
 .suggestionEntry { width:100px; height:22px; }
 a.suggestionVal { float:left; width: 70px; height:22px; }
