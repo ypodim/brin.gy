@@ -23,6 +23,7 @@ class profile():
     
     
     def add_reverse(self, key, val):
+        key = unicode(key, errors='replace')
         added = self.db.sadd(u'profile:keys', key)
         self.db.sadd(u'profile:key:%s' % key, self.usr)
         keyvaladded = self.db.sadd(u'profile:key:%s:val:%s' % (key, val), self.usr)
@@ -39,6 +40,7 @@ class profile():
             self.db.zincrby(u'profile:keyvalscores:%s' % key, val, 1)
         
     def del_reverse(self, key, val):
+        key = unicode(key, errors='replace')
         self.db.srem(u'profile:key:%s:val:%s' % (key, val), self.usr)
         self.db.srem(u'profile:key:%s' % key, self.usr)
         
@@ -55,15 +57,15 @@ class profile():
         return self.db.smembers(u'%s:profile:keys' % self.usr)
     
     def set_key(self, key):
+        key = unicode(key, errors='replace')
         return self.db.sadd(u'%s:profile:keys' % self.usr, key)
         
     def del_key(self, key):
+        key = unicode(key, errors='replace')
         return self.db.srem(u'%s:profile:keys' % self.usr, key)
     
     def get_vals(self, key):
-        #rkey = 
         key = unicode(key, errors='replace')
-        #print key
         return self.db.smembers(u'%s:profile:key:%s' % (self.usr, key))
     
     def set_val(self, key, val):
@@ -72,6 +74,7 @@ class profile():
         return self.db.sadd(u'%s:profile:key:%s' % (self.usr, key), val)
     
     def del_val(self, key, val):
+        key = unicode(key, errors='replace')
         self.del_reverse(key, val)
         res = self.db.srem(u'%s:profile:key:%s' % (self.usr, key), val)
         if res:
@@ -82,12 +85,14 @@ class profile():
     
     def clear_all(self):
         for key in self.get_keys():
+            key = unicode(key, errors='replace')
             for val in self.get_vals(key):
                 self.del_val(key, val)
         
     def get(self):
         saved_items = []
         for key in self.get_keys():
+            key = unicode(key, errors='replace')
             for val in self.get_vals(key):
                 saved_items.append(dict(key=key, val=val))
         res = {'data':saved_items, 'user':self.usr}
@@ -97,6 +102,7 @@ class profile():
         res = ''
         #print 'arguments', self.arguments
         for key, val in self.arguments:
+            key = unicode(key, errors='replace')
             #print 'saving', key, val
             self.set_val(key, val)
         
@@ -105,6 +111,7 @@ class profile():
     def delete(self):
         error = ''
         for key, val in self.arguments:
+            key = unicode(key, errors='replace')
             print 'deleting', key, val
             if key and val:
                 res = '%s' % self.del_val(key, val)
