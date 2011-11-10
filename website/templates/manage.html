@@ -578,7 +578,7 @@ E.generate_val_entry_editor = function(attr) {
             val = "";
             
         if (obj.metaKey || obj.altKey || obj.ctrlKey)
-            val = "";
+            return false;
             
         val = val.toLowerCase();
         $(this).attr("val",val);
