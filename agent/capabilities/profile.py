@@ -103,7 +103,8 @@ class profile():
     def delete(self):
         error = ''
         for key, val in self.arguments:
-            print 'deleting', key, val
+            #key = unicode(key, errors='replace')
+            #print 'deleting', key, val
             if key and val:
                 res = '%s' % self.del_val(key, val)
             else:
