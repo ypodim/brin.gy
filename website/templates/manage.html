@@ -552,7 +552,8 @@ E.generate_val_entry_editor = function(attr) {
     editor = $("<form class='editor' title='new value' data-content='the content'></form>");
     editbox = $("<input type='text' class='span2' class='editbox' />");
     editor.attr("key",attr);
-    editbox.attr("key",attr);
+    editbox.attr("key",attr).attr("tabindex", E.tabindex);
+    E.tabindex++;
     editbox.popover({title:function(){
         return $(this).attr("key");
     }, content:function(){
@@ -1106,7 +1107,8 @@ $(document).ready(function()
     
     mapman.initialize();
     
-    $("#searchinput").focus().keydown(function(obj) {
+    E.tabindex = 2;
+    $("#searchinput").attr("tabindex", 1).focus().keydown(function(obj) {
         attr_manager.deselect_keyvals();
         
         if (obj.keyCode == 9)
