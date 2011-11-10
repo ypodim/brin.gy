@@ -62,6 +62,7 @@ class profile():
     
     def get_vals(self, key):
         print key
+        key = unicode(key)
         return self.db.smembers(u'%s:profile:key:%s' % (self.usr, key))
     
     def set_val(self, key, val):
