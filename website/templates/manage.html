@@ -1109,6 +1109,9 @@ $(document).ready(function()
     $("#searchinput").focus().keydown(function(obj) {
         attr_manager.deselect_keyvals();
         
+        if (obj.keyCode == 9)
+            return true;
+            
         if (obj.keyCode == 13)
             text = $(this).val();
         else if (obj.keyCode == 8)
@@ -1125,11 +1128,9 @@ $(document).ready(function()
         $(this).popover("show");
         
         re = new RegExp(text, 'i');
-        no_match_found = true;
         for (cap in attr_manager.sdata)
             for (key in attr_manager.sdata[cap]) {
                 if (key.match(re)) {
-                    no_match_found = false;
                     attr_manager.sdata[cap][key].display = true;
                 } else {
                     attr_manager.sdata[cap][key].display = false;
@@ -1155,9 +1156,12 @@ $(document).ready(function()
     $("#searchbox").submit(function(){
         searchinput = $(this).children("input");
         newkey = searchinput.val();
-        if (newkey in attr_manager.sdata.profile)
+        if (newkey in attr_manager.sdata.profile) {
             console.log("already exists", newkey );
-        else {
+            console.log($(".editor").children());
+            $("#searchinput").popover("hide");
+            $(".editor").children().focus();
+        } else {
             searchinput.popover("hide").val("").attr("key","");
             attr_manager.show_keyvals();
             E.populate_attrs(true);
