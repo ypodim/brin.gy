@@ -676,7 +676,7 @@ E.populate_attrs = function(useEditor) {
 E.construct_result_enty = function(agent) {
     picture = attr_manager.cache[agent].profile.picture;
     
-    pic = $("<img src='"+picture+"' width=20 style='float:left; clear:left;' />");
+    pic = $("<img width=20 style='float:left; clear:left;' />").attr("src",picture);
     username = $("<span style='margin-left:5px'></span>").html(agent);
     entry = $("<a href='#'></a>").append(pic).append(username);
     entry.attr({agent:agent});

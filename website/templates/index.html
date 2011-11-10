@@ -59,20 +59,24 @@ $(document).ready(function()
         $("#newuserform").trigger("submit");
     });
     
-    $("#username").focus();
+    $("#username").focus().keydown(function(obj){
+        if (obj.metaKey || obj.altKey || obj.ctrlKey)
+            return false;
+    }).keyup(function(obj) {
+//         console.log(obj.keyCode);
+//         text = $(this).val();
+//         console.log("checking", text);
+        if ($(this).val().length)
+            check_username();
+        else
+            $("#btn").html("check").removeClass("danger success").addClass("primary").html("check");
+        return true;
+    });
     
-//     other_names = $.cookie('other_names');
-//     if (typeof(other_names) == "string") {
-//         other_names = other_names.split(",");
-//         $("#previous_pseudonym").show();
-//         for (i in other_names)
-//             $("select").append("<option>"+other_names[i]+"</option>")
-//     }
     for (name in cookies.get_cookie()) {
         $("select").append("<option>"+name+"</option>")
         $("#previous_pseudonym").show();
     }
-    
     
     $("select").change(function(){
         window.location.href = "{{website_url_prefix}}/manage/"+$(this).val();
@@ -95,14 +99,16 @@ $(document).ready(function()
     <div id="new_pseudonym">
         <h2>Pick a pseudonym</h2>
         <form method="post" id="newuserform">
-        <input class="text" id="username" name="username" type="text" value="" />
+            <input class="span2" id="username" name="username" type="text" value="" />
+            <a id="btn" class="btn primary" href="#">check</a>
         </form>
-        <a id="btn" class="btn primary" href="#">check</a>
     </div>
     <div id="previous_pseudonym">
         <h2>Previous pseudonyms</h2>
-        <form><select></select></form>
-        <a id="btn2" class="btn primary" href="#">choose</a>
+        <form>
+            <select class="span2"></select>
+            <a id="btn2" class="btn primary" href="#">choose</a>
+        </form>
     </div>
 </div>
 
