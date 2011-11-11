@@ -327,6 +327,9 @@ class api_call(tornado.web.RequestHandler):
         res = dict(data=data, controller=controller)
         self.write(res)
         
+    def api_ustats(self):
+        dic = dict(users=list(db.get_agents()))
+        self.write(dic)
 #########################################
 
 settings = {
@@ -334,7 +337,7 @@ settings = {
     "debug": os.environ.get("SERVER_SOFTWARE", "").startswith("Development/"),
 }
 application = tornado.web.Application([
-    #(r"/test", api_call),
+    (r"/ustats", api_call),
     (r"/batch_profile", api_call),
     (r"/batch_location", api_call),
     (r"/batch_buysell", api_call),
