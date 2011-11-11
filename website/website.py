@@ -18,7 +18,7 @@ class ContentHandler(tornado.web.RequestHandler):
         if len(path) > 1:
             args = path[1]
             
-        paths = ('index', 'UROP', 'manage', 'manageold', 'responses', 'about')
+        paths = ('API', 'index', 'UROP', 'manage', 'manageold', 'responses', 'about')
         if not function: function = "index"
         
         other_names = self.get_cookie('other_names')
