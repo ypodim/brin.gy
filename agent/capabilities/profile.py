@@ -23,58 +23,58 @@ class profile():
     
     
     def add_reverse(self, key, val):
-        added = self.db.sadd(u'profile:keys', key)
-        self.db.sadd(u'profile:key:%s' % key, self.usr)
-        keyvaladded = self.db.sadd(u'profile:key:%s:val:%s' % (key, val), self.usr)
+        added = self.db.sadd('profile:keys', key)
+        self.db.sadd('profile:key:%s' % key, self.usr)
+        keyvaladded = self.db.sadd('profile:key:%s:val:%s' % (key, val), self.usr)
         
         if added:
-            self.db.zadd(u'profile:keyscores', key, 1)
+            self.db.zadd('profile:keyscores', key, 1)
         else:
-            self.db.zincrby(u'profile:keyscores', key, 1)
+            self.db.zincrby('profile:keyscores', key, 1)
         
         #if self.db.zscore('profile:keyvalscores:%s' % key, val) == None:
             #self.db.zadd('profile:keyvalscores:%s' % key, val, 1)
         #else:
         if keyvaladded:
-            self.db.zincrby(u'profile:keyvalscores:%s' % key, val, 1)
+            self.db.zincrby('profile:keyvalscores:%s' % key, val, 1)
         
     def del_reverse(self, key, val):
-        self.db.srem(u'profile:key:%s:val:%s' % (key, val), self.usr)
-        self.db.srem(u'profile:key:%s' % key, self.usr)
+        self.db.srem('profile:key:%s:val:%s' % (key, val), self.usr)
+        self.db.srem('profile:key:%s' % key, self.usr)
         
-        newscore = self.db.zincrby(u'profile:keyscores', key, -1)
+        newscore = self.db.zincrby('profile:keyscores', key, -1)
         if newscore == 0:
-            self.db.srem(u'profile:keys', key)
-            self.db.zrem(u'profile:keyscores', key)
+            self.db.srem('profile:keys', key)
+            self.db.zrem('profile:keyscores', key)
         
-        newscore = self.db.zincrby(u'profile:keyvalscores:%s' % key, val, -1)
+        newscore = self.db.zincrby('profile:keyvalscores:%s' % key, val, -1)
         if newscore == 0:
-            self.db.zrem(u'profile:keyvalscores:%s' % key, val)
+            self.db.zrem('profile:keyvalscores:%s' % key, val)
         
     def get_keys(self):
-        return self.db.smembers(u'%s:profile:keys' % self.usr)
+        return self.db.smembers('%s:profile:keys' % self.usr)
     
     def set_key(self, key):
-        return self.db.sadd(u'%s:profile:keys' % self.usr, key)
+        return self.db.sadd('%s:profile:keys' % self.usr, key)
         
     def del_key(self, key):
-        return self.db.srem(u'%s:profile:keys' % self.usr, key)
+        return self.db.srem('%s:profile:keys' % self.usr, key)
     
     def get_vals(self, key):
-        #key = unicode(key, errors='replace')
-        return self.db.smembers(u'%s:profile:key:%s' % (self.usr, key))
+        key = unicode(key, errors='replace')
+        return self.db.smembers('%s:profile:key:%s' % (self.usr, key))
     
     def set_val(self, key, val):
         self.set_key(key)
         self.add_reverse(key, val)
-        return self.db.sadd(u'%s:profile:key:%s' % (self.usr, key), val)
+        return self.db.sadd('%s:profile:key:%s' % (self.usr, key), val)
     
     def del_val(self, key, val):
         self.del_reverse(key, val)
-        res = self.db.srem(u'%s:profile:key:%s' % (self.usr, key), val)
+        res = self.db.srem('%s:profile:key:%s' % (self.usr, key), val)
         if res:
             if not self.get_vals(key):
-                self.db.delete(u'%s:profile:key:%s' % (self.usr, key))
+                self.db.delete('%s:profile:key:%s' % (self.usr, key))
                 self.del_key(key)
         return res
     
