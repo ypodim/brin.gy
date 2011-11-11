@@ -386,7 +386,9 @@ E.handle_userattr_toggle =function(){
                     formatted: formatted,
                 };
                 
-                $("span.attr_counters[uitype=\"user_attribute\"][cap=\"location\"][key=\"my location\"]").attr("val",val);
+                counter = $("span.attr_counters[uitype=\"user_attribute\"][cap=\"location\"][key=\"my location\"]");
+                counter.attr("val",val);
+                counter.parent().attr("val",val);
             } else {
                 alert("Geocoder failed due to: " + status);
             }
