@@ -230,19 +230,15 @@ E.delete_keyval = function(cap, key, val, clb) {
 
 
 E.populate_map = function(obj) {
-//     console.log(" ");
-//     console.log("populate_map");
-    
     for (agent in obj) {
         exists = mapman.validateMarker(agent);
         if (!exists) {
             lat = obj[agent].lat;
             lon = obj[agent].lon;
-            
-            var latlng = new google.maps.LatLng(lat, lon);
-            
-//             console.log("adding marker", agent);
-            mapman.addMarker(agent, latlng);
+            if (lat && lon) {
+                var latlng = new google.maps.LatLng(lat, lon);
+                mapman.addMarker(agent, latlng);
+            }
         }
     }
     
@@ -252,27 +248,35 @@ E.populate_map = function(obj) {
         //  Create a new viewpoint bound
         var bounds = new google.maps.LatLngBounds();
         //  Go through each...
-        for (aid in mapman.markers)
+        for (aid in mapman.markers) {
             bounds.extend(mapman.markers[aid].position);
-        //  Fit these bounds to the map
-        mapman.map.fitBounds(bounds);
-        zoom = mapman.map.getZoom();
-        if (mapman.map.getZoom() > 16)
-            mapman.map.setZoom(16);
+        }
+        
+        if (mapman.markers.length) {
+            //  Fit these bounds to the map
+            mapman.map.fitBounds(bounds);
+            zoom = mapman.map.getZoom();
+            if (mapman.map.getZoom() > 16)
+                mapman.map.setZoom(16);
+        } else {
+            latlng = new google.maps.LatLng(42.360367, -71.087294);
+            mapman.map.setCenter(latlng);
+        }
         E.reset_map_bounds = false;
     }
 }
 
-E.set_matches = function(stop) {
-    if (stop == undefined)
+E.set_matches = function(stop, nonce) {
+    if (nonce == undefined) {  
         stop = parseInt($("#matches").attr("curpos"));
-    else {
+    } else {
         $("#matches").attr("curpos", stop);
         $("title").html("Brin.gy ("+stop+")");
     }
     
     start = parseInt($("#matches").html());
     step = 1;
+    
     if (Math.abs(start-stop) > 10) { step = 10 }
     if (Math.abs(start-stop) > 100) { step = 100 }
     if (Math.abs(start-stop) > 1000) { step = 1000 }
@@ -664,24 +668,8 @@ E.populate_attrs = function(useEditor) {
             
             app.append(pill);
         }
-        
-        // specifically for profile, add a pill for new keys
-//         if (capname == 'profile') {
-//             pill_content = $("<a href='#'>create new attribute...</a>").attr("cap",capname).click(E.add_new_attribute);
-//             pill = $("<li class='green_pill'></li>").append(pill_content);
-//             $("#choices").append(pill);
-//         
-//             more = $("<a href='#'>fetch more...</a>").click(function(){
-//                 E.fetch_keyvals();
-//                 return false;
-//             });
-//             $("#choices").append(more);
-//         }
     }
 }
-
-//////////////////////////////////////////////////
-
 
 
 //////////////////////////////////////////////////
@@ -702,17 +690,12 @@ E.construct_result_enty = function(agent) {
             attr_manager.show_keyvals();
             $("#userinfo").slideUp();
             
-//             _h = $("#choices").height();
-//             $("#choices").height(_h+80);
             useEditor = true;
         } else {
             $('#results a').removeClass("pressed");
             $(this).addClass("pressed");
             
             $("#userinfo").html("User: "+agent).slideDown();
-            
-//             _h = $("#choices").height();
-//             $("#choices").height(_h-80);
             
             profile = attr_manager.cache[agent].profile;
             
@@ -772,19 +755,17 @@ E.get_multi_profile = function(agents) {
         }
 
     
-//         if (E.location_engaged) {
-            $.getJSON(E.agent.baseurl+"/batch_location", {data:JSON.stringify(agents)}, function(json){
+        $.getJSON(E.agent.baseurl+"/batch_location", {data:JSON.stringify(agents)}, function(json){
+            
+            for (agent in json.locations) {
+                locobj = json.locations[agent];
                 
-                for (agent in json.locations) {
-                    locobj = json.locations[agent];
-                    
-                    if (attr_manager.cache[agent] == undefined)
-                        attr_manager.cache[agent] = {};
-                    attr_manager.cache[agent]["location"] = locobj;
-                }
-                E.populate_map(json.locations);
-            });
-//         }
+                if (attr_manager.cache[agent] == undefined)
+                    attr_manager.cache[agent] = {};
+                attr_manager.cache[agent]["location"] = locobj;
+            }
+            E.populate_map(json.locations);
+        });
         
         agentsobj = {};
         for (i in agents) {
@@ -806,24 +787,7 @@ E.get_multi_profile = function(agents) {
     });
 }
 
-// E.get_multi_location = function(agents) {
-//     if (agents.length > 0) {
-//         $.getJSON(E.agent.baseurl+"/batch_location", {data:JSON.stringify(agents)}, function(json){
-//             $("#results").empty();
-//             for (agent in json.locations) {
-//                 obj = json.locations[agent];
-//                 
-//                 picture = "http://pldb.media.mit.edu/research/images/nophoto.gif";
-//                 entry = E.construct_result_enty(agent, picture, obj);
-//                 $("#results").append(entry);
-//             }
-//             E.populate_map(json.locations);
-//         });
-//     } else {
-//         $("#results").empty();
-//         mapman.deleteOverlays();
-//     }
-// }
+
 
 E.poll_matches = function(capname) {
     btnclicked = 0;
@@ -915,14 +879,13 @@ E.poll_matches = function(capname) {
             E.get_multi_profile(intersection);
         } else {
             $("#results").empty();
-//             if (E.location_engaged)
             mapman.deleteOverlays();
             E.previous_intersection = {};
         }
         
         
         E.monitor.user_matches.intersection = intersection;
-        E.set_matches(Object.size(intersection));
+        E.set_matches(Object.size(intersection), "external");
         
         $(".attr_counters").each(function(){
             if ($(this).attr("uitype") == "sat_attribute") {
