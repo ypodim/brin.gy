@@ -1188,10 +1188,11 @@ $(document).ready(function()
         console.log("hash is", window.location.hash);
     }
     
-    $("#tourBtn").click(function(){
+    $("#tourBtn").show().click(function(){
         attr_manager.deselect_keyvals();
         E.populate_attrs();
         Tour.do_tour(0);
+        return false;
     });
     
     $(document).bind('keydown', function(event){
