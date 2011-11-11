@@ -791,24 +791,24 @@ E.get_multi_profile = function(agents) {
     });
 }
 
-E.get_multi_location = function(agents) {
-    if (agents.length > 0) {
-        $.getJSON(E.agent.baseurl+"/batch_location", {data:JSON.stringify(agents)}, function(json){
-            $("#results").empty();
-            for (agent in json.locations) {
-                obj = json.locations[agent];
-                
-                picture = "http://pldb.media.mit.edu/research/images/nophoto.gif";
-                entry = E.construct_result_enty(agent, picture, obj);
-                $("#results").append(entry);
-            }
-            E.populate_map(json.locations);
-        });
-    } else {
-        $("#results").empty();
-        mapman.deleteOverlays();
-    }
-}
+// E.get_multi_location = function(agents) {
+//     if (agents.length > 0) {
+//         $.getJSON(E.agent.baseurl+"/batch_location", {data:JSON.stringify(agents)}, function(json){
+//             $("#results").empty();
+//             for (agent in json.locations) {
+//                 obj = json.locations[agent];
+//                 
+//                 picture = "http://pldb.media.mit.edu/research/images/nophoto.gif";
+//                 entry = E.construct_result_enty(agent, picture, obj);
+//                 $("#results").append(entry);
+//             }
+//             E.populate_map(json.locations);
+//         });
+//     } else {
+//         $("#results").empty();
+//         mapman.deleteOverlays();
+//     }
+// }
 
 E.poll_matches = function(capname) {
     btnclicked = 0;
@@ -901,7 +901,8 @@ E.poll_matches = function(capname) {
         } else {
             $("#results").empty();
 //             if (E.location_engaged)
-                mapman.deleteOverlays();
+            mapman.deleteOverlays();
+            E.previous_intersection = {};
         }
         
         
@@ -1106,23 +1107,17 @@ $(document).ready(function()
     mapman.initialize();
     
     E.tabindex = 2;
-    $("#searchinput").attr("tabindex", 1).focus().keydown(function(obj) {
+    $("#searchinput").attr("tabindex", 1).focus().keydown(function(obj){
+        if (obj.metaKey || obj.altKey || obj.ctrlKey)
+            return false;
+    }).keyup(function(obj) {
         attr_manager.deselect_keyvals();
+        
+        text = $(this).val();
+        console.log(text);
         
         if (obj.keyCode == 9)
             return true;
-            
-        if (obj.keyCode == 13)
-            text = $(this).val();
-        else if (obj.keyCode == 8)
-            text = $(this).val().substr(0, $(this).val().length-1);
-        else if (obj.keyCode==32 || (obj.keyCode>64 && obj.keyCode<91))
-            text = $(this).val()+String.fromCharCode(obj.keyCode);
-        else
-            return false;
-        
-        if (obj.metaKey || obj.altKey || obj.ctrlKey)
-            return false;
         
         $(this).attr("key",text.toLowerCase());
         $(this).popover("show");
