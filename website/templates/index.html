@@ -31,7 +31,7 @@ var post_new_user = function() {
             alert(data.error);
         
         if (! error.length) {
-            window.location.href = "{{website_url_prefix}}/manage/"+valid_username;
+            window.location.href = "{{website_url_prefix}}/manage/"+valid_username+"#tour";
         }
     }, "json");
 }
@@ -82,7 +82,7 @@ $(document).ready(function()
         window.location.href = "{{website_url_prefix}}/manage/"+$(this).val();
     });
     $("#btn2").click(function(){
-        window.location.href = "{{website_url_prefix}}/manage/"+$("select").val();
+        window.location.href = "{{website_url_prefix}}/manage/"+$("select").val()+"#tour";
     });
 });
 </script>

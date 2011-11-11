@@ -334,7 +334,7 @@ settings = {
     "debug": os.environ.get("SERVER_SOFTWARE", "").startswith("Development/"),
 }
 application = tornado.web.Application([
-    (r"/test", api_call),
+    #(r"/test", api_call),
     (r"/batch_profile", api_call),
     (r"/batch_location", api_call),
     (r"/batch_buysell", api_call),
