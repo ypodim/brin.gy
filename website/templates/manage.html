@@ -331,9 +331,7 @@ E.handle_userattr_toggle =function(){
     button = $(this);
     
     complete_toggle_handle = function(button) {
-        
         haveit = !attr_manager.sdata[cap][key].values[val].haveit;
-//         console.log(cap,key,val,haveit);
         attr_manager.sdata[cap][key].values[val].haveit = haveit;
         if (haveit) {
             E.post_keyval(cap, key, val, function(){
@@ -369,9 +367,11 @@ E.handle_userattr_toggle =function(){
         clearTimeout(E.modal_timer);
         modal.modal("hide");
         val = JSON.stringify({lat:""+result.lat,lon:""+result.lon});
+        attr_manager.sdata.location[key].values = {};
         
         latlng = new google.maps.LatLng(result.lat, result.lon);
         geogy.geocoder.geocode({'latLng': latlng}, function(results, status) {
+            
             if (status == google.maps.GeocoderStatus.OK) {
                 key = "my location";
                 formatted = results[1].formatted_address;
@@ -385,11 +385,13 @@ E.handle_userattr_toggle =function(){
                     matches:[],
                     formatted: formatted,
                 };
+                
+                $("span.attr_counters[uitype=\"user_attribute\"][cap=\"location\"][key=\"my location\"]").attr("val",val);
             } else {
                 alert("Geocoder failed due to: " + status);
             }
-            
-            console.log(attr_manager.sdata.location["my location"].values[val].haveit);
+            if (formatted.length > 10)
+                formatted = formatted.substring(0,8)+"...";
             button.siblings().children("span.value").html(formatted);
             complete_toggle_handle(button);
         });
@@ -521,12 +523,6 @@ E.generate_val_entry = function(capname, attr, val) {
                 return val;
         return "";
     }});
-/*    value_pill.mouseover(function(){
-        val = $(this).attr("val");
-        if (val.length > 10)
-            $(this).twipsy("show");
-    }).mouseout;*/
-    
     
     if (attr_manager.sdata[capname][attr].values[val].selected)
         value_pill.addClass("pressed");
@@ -991,14 +987,12 @@ E.fetch_keyvals = function(clb) {
         
         if (json.lat.length && json.lon.length) {
             latlng = new google.maps.LatLng(json.lat, json.lon);
-            console.log("CREATE GEOCODER");
             geocoder = new google.maps.Geocoder();
-            console.log("CALLING GEOCODER", latlng);
             geocoder.geocode({'latLng': latlng}, function(results, status) {
-                console.log("IN GEOCODER");
                 if (status == google.maps.GeocoderStatus.OK) {
                     key = "my location";
                     formatted = results[1].formatted_address;
+//                     console.log("");
                     console.log('formatted address:', formatted);
                     
                     console.log('debug:', key, attr_manager.sdata.location);
@@ -1012,6 +1006,7 @@ E.fetch_keyvals = function(clb) {
                         matches:json.matches,
                         formatted: formatted,
                     };
+                    console.log(attr_manager.sdata.location[key]);
                 } else {
                     alert("Geocoder failed due to: " + status);
                 }
@@ -1170,8 +1165,6 @@ $(document).ready(function()
         searchinput = $(this).children("input");
         newkey = searchinput.val();
         if (newkey in attr_manager.sdata.profile) {
-            console.log("already exists", newkey );
-            console.log($(".editor").children());
             $("#searchinput").popover("hide");
             $(".editor").children().focus();
         } else {
