@@ -480,16 +480,16 @@ E.generate_val_entry = function(capname, attr, val) {
         uitype:"user_attribute", cap:capname, key:attr, val:val,
     });
     count.addClass("attr_counters").attr(attr);
-    count.twipsy({title:function(){
-        cap = $(this).attr("cap");
-        key = $(this).attr("key");
-        val = $(this).attr("val");
-        cnt = attr_manager.sdata[cap][key].values[val].cnt;
-        text = " people";
-        if (cnt == 1)
-            text = " person";
-        return cnt+text;
-    }, placement:"left", offset:5});
+//     count.twipsy({title:function(){
+//         cap = $(this).attr("cap");
+//         key = $(this).attr("key");
+//         val = $(this).attr("val");
+//         cnt = attr_manager.sdata[cap][key].values[val].cnt;
+//         text = " people";
+//         if (cnt == 1)
+//             text = " person";
+//         return cnt+text;
+//     }, placement:"left", offset:5});
     
     
     formatted = val;
@@ -507,9 +507,26 @@ E.generate_val_entry = function(capname, attr, val) {
         
     value = $("<span class='value'></span>").html(formatted);
     
-    pair = {cap:capname, key:attr, val:val};
+    pair = {cap:capname, key:attr, val:val, address:address};
     value_pill = $("<a href='#'></a>").attr(pair).click(E.handle_val_click);
-    value_pill.append(count).append(value);
+    value_pill.append(count).append(value)
+    value_pill.twipsy({placement:"below", offset:5, title:function(){
+        cap = $(this).attr("cap");
+        val = $(this).attr("val");
+        address = $(this).attr("address");
+        if (val.length > 10)
+            if (cap == "location")
+                return address
+            else
+                return val;
+        return "";
+    }});
+/*    value_pill.mouseover(function(){
+        val = $(this).attr("val");
+        if (val.length > 10)
+            $(this).twipsy("show");
+    }).mouseout;*/
+    
     
     if (attr_manager.sdata[capname][attr].values[val].selected)
         value_pill.addClass("pressed");
@@ -1108,16 +1125,17 @@ $(document).ready(function()
     
     E.tabindex = 2;
     $("#searchinput").attr("tabindex", 1).focus().keydown(function(obj){
-        if (obj.metaKey || obj.altKey || obj.ctrlKey)
-            return false;
+        if (obj.metaKey || obj.altKey || obj.ctrlKey) {
+            console.log(obj.keyCode);
+//             return false;
+        }
     }).keyup(function(obj) {
         attr_manager.deselect_keyvals();
         
         text = $(this).val();
-        console.log(text);
         
-        if (obj.keyCode == 9)
-            return true;
+//         if (obj.keyCode == 9)
+//             return true;
         
         $(this).attr("key",text.toLowerCase());
         $(this).popover("show");
