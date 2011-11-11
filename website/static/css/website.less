@@ -46,7 +46,7 @@ body {
     color:white;
     font-weight:bold;
     background-color:red;
-    -webkit-border-radius: @pill-radius;
+    border-radius: @pill-radius;
     padding: 5px;
 }
 
@@ -88,7 +88,7 @@ span.count {
     padding: 1px 5px;
     text-shadow: 0 0px 1px #fff;
     line-height: 30px;
-    -webkit-border-radius: 15px;
+    border-radius: 15px;
     -moz-border-radius: 15px;
     border-radius: 3px;
 }
@@ -151,7 +151,7 @@ div.clear {clear:both;}
 
 #map_canvas {
     background-color: rgba(11,11,11, 0.05);
-    -webkit-border-radius:@pill-radius;
+    border-radius:@pill-radius;
     margin: 0px;
     padding: 0px;
 }
@@ -162,7 +162,7 @@ div.clear {clear:both;}
     overflow: auto;
     a {
         display: block;
-        -webkit-border-radius:@pill-radius;
+        border-radius:@pill-radius;
         background-color:gray;
         padding:4px;
         color: white;
@@ -175,6 +175,7 @@ div.clear {clear:both;}
             font-weight: bold;
             background-color: #0050a3;
             color:white;
+            background-image: -moz-linear-gradient(90deg, rgba(25, 25, 25, 0.25), rgba(25, 25, 25, 0.45));
             background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(25, 25, 25, 0.25)), to(rgba(25, 25, 25, 0.45)));
             text-shadow: 0 -0.1em 0.1em rgba(25, 25, 25, 0.55);
         }
@@ -210,7 +211,7 @@ span.remover {
     text-shadow: 0 1px 0 #fff;
     border: 1px solid #ccc;
     border-left-width: 0;
-    -webkit-border-radius: 0 3px 3px 0;
+    border-radius: 0 3px 3px 0;
     -moz-border-radius: 0 3px 3px 0;
     border-radius: 0 3px 3px 0;
 }
@@ -234,7 +235,7 @@ form.buysell {
     padding: 5px 5px 5px 0;
     text-shadow: 0 1px 0 #fff;
     border: 1px solid #ccc;
-    -webkit-border-radius: 3px;
+    border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
 }
@@ -288,7 +289,7 @@ a.closebtn:hover {
     text-shadow: 0 1px 0 #fff;
     border: 1px solid #ccc;
     border-right-width: 0;
-    -webkit-border-radius: 3px 0 0 3px;
+    border-radius: 3px 0 0 3px;
     -moz-border-radius: 3px 0 0 3px;
     border-radius: 3px 0 0 3px;
 }*/
@@ -346,7 +347,7 @@ a.closebtn:hover {
     color:white;
     font-size:16px;
     
-    -webkit-border-radius: @pill-radius;
+    border-radius: @pill-radius;
     text-decoration:none;
     &:hover {
         background-color:#468847;
@@ -364,7 +365,7 @@ a.closebtn:hover {
     color:white;
     font-size:16px;
     
-    -webkit-border-radius: @pill-radius;
+    border-radius: @pill-radius;
     text-decoration:none;
     &:hover {
         background-color:red;
@@ -415,7 +416,7 @@ a.suggestionVal:hover { color:white; background-color:#0050a3; text-decoration: 
 
 .confirmation {
     position: absolute;
-    -webkit-border-radius: @pill-radius;
+    border-radius: @pill-radius;
     padding: 5px;
     text-align: center;
     z-index: 1000;
@@ -429,12 +430,10 @@ pill {
     text-align: left;
     width: 100%;
     margin-bottom: 10px;
-/*     background-color: #d5d5d5; */
-/*     background-color: #303030; */
-/*     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#c9c9c9), to(#8c8c8c)); */
+    background-image: -moz-linear-gradient(90deg, #dddddd, #aaaaaa);
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#dddddd), to(#aaaaaa));
-    -webkit-border-radius: @pill-radius;
-    -webkit-box-shadow: 0 0.15em 0.17em rgba(0, 0, 0, 0.5);
+    border-radius: @pill-radius;
+    box-shadow: 0 0.15em 0.17em rgba(0, 0, 0, 0.5);
     position: relative;
     a, div, form {
         display: table-cell;
@@ -461,6 +460,7 @@ pill {
             font-weight: bold;
             background-color: #0050a3;
             color:white;
+            background-image: -moz-linear-gradient(90deg, rgba(25, 25, 25, 0.25), rgba(25, 25, 25, 0.45));
             background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(25, 25, 25, 0.25)), to(rgba(25, 25, 25, 0.45)));
             text-shadow: 0 -0.1em 0.1em rgba(25, 25, 25, 0.55);
         }
@@ -485,15 +485,16 @@ pill {
             padding-bottom: 10px;
             
             &:hover {
-                -webkit-border-radius: @pill-radius;
+                border-radius: @pill-radius;
                 text-decoration: none;
 /*                 color: white; */
                 text-shadow: 0 0.08em 0.1em rgba(220, 220, 220, 0.45);
             }
             &.pressed {
-                -webkit-border-radius: @pill-radius;
+                border-radius: @pill-radius;
                 font-weight: bold;
                 background-color: #0050a3;
+                background-image: -moz-linear-gradient(90deg, rgba(25, 25, 25, 0.35), rgba(25, 25, 25, 0.45));
                 background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(25, 25, 25, 0.35)), to(rgba(25, 25, 25, 0.45)));
                 text-shadow: 0 -0.1em 0.1em rgba(25, 25, 25, 0.55);
             }
@@ -526,7 +527,7 @@ pill {
         }
         
         span.add_btn {
-            -webkit-border-radius: @pill-radius;
+            border-radius: @pill-radius;
             text-align: center;
             margin-top: 5px;
             margin-right: 10px;
@@ -560,9 +561,10 @@ nav {
 /*     width: 100%; */
     margin-bottom: 50px;
     background-color: #d5d5d5;
+    background-image: -moz-linear-gradient(90deg, #c9c9c9, #8c8c8c);
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#c9c9c9), to(#8c8c8c));
-    -webkit-border-radius: 0.75em;
-    -webkit-box-shadow: 0 0.15em 0.17em rgba(0, 0, 0, 0.5);
+    border-radius: 0.75em;
+    box-shadow: 0 0.15em 0.17em rgba(0, 0, 0, 0.5);
     text-align: center;
     position: relative;
 }
@@ -598,8 +600,8 @@ nav a:hover, nav a:active {
     background: rgba(25, 25, 25, 0.15);
     color: #353535;
     text-shadow: 0 0.08em 0.1em rgba(220, 220, 220, 0.45);
-    /*  -webkit-border-radius: 0.75em;
-    -webkit-box-shadow: 0 -0.1em 0.1em rgba(25, 25, 25, 0.35);*/
+    /*  border-radius: 0.75em;
+    box-shadow: 0 -0.1em 0.1em rgba(25, 25, 25, 0.35);*/
 }
 
 nav a.selected {
@@ -607,10 +609,11 @@ nav a.selected {
     color: white;
     background-color: #303030;
     background: rgba(25, 25, 25, 0.35);
+    background-image: -moz-linear-gradient(90deg, rgba(25, 25, 25, 0.25), rgba(25, 25, 25, 0.45));
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(25, 25, 25, 0.25)), to(rgba(25, 25, 25, 0.45)));
     text-shadow: 0 -0.1em 0.1em rgba(25, 25, 25, 0.55);
-/*  -webkit-border-radius: 0.75em;*/
-/*  -webkit-box-shadow: 0 -0.1em 0.1em rgba(25, 25, 25, 0.55);*/
+/*  border-radius: 0.75em;*/
+/*  box-shadow: 0 -0.1em 0.1em rgba(25, 25, 25, 0.55);*/
 }
 /*********** nav stuff *******/
 
