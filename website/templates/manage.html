@@ -2,8 +2,6 @@
 
 {% block head %}
 {% autoescape None %}
-<script src='{{ static_url("js/tour.js") }}'></script>
-
 <script language="javascript" type="text/javascript">
 
 ///////////////////////////////////
@@ -158,7 +156,6 @@ attr_manager.deselect_keyvals = function(){
     }
 }
 
-E = {};
 E.monitor = {
     "user_matches":{
         "by_keyval": {},
@@ -647,7 +644,7 @@ E.populate_attrs = function(useEditor) {
                 valpart.append(editor);
             }
             
-            pill = $("<pill></pill>").append(keypart).append(valpart);
+            pill = $("<pill></pill>").append(keypart).append(valpart).attr("key",attr);
             
             app.append(pill);
         }
@@ -1182,22 +1179,24 @@ $(document).ready(function()
         return false;
     });
     
-//     $(window).resize(E.resize_overflow_divs);
-
     
     if (window.location.hash.startsWith("#tour")) {
+        attr_manager.deselect_keyvals();
+        E.populate_attrs();
         Tour.do_tour(0);
     } else {
         console.log("hash is", window.location.hash);
     }
     
     $("#tourBtn").click(function(){
+        attr_manager.deselect_keyvals();
+        E.populate_attrs();
         Tour.do_tour(0);
     });
     
     $(document).bind('keydown', function(event){
-        if (event.keyCode == 27 && E.inTour == true)
-            E.close_tour();
+        if (event.keyCode == 27 && Tour.inTour == true)
+            Tour.close_tour();
     });
     
     $("#coverclosebtn").click(Tour.close_tour);
