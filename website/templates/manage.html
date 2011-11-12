@@ -334,6 +334,8 @@ E.handle_userattr_toggle =function(){
     var val = $(this).attr("val");
     button = $(this);
     
+//     $.post()
+    
     complete_toggle_handle = function(button) {
         haveit = !attr_manager.sdata[cap][key].values[val].haveit;
         attr_manager.sdata[cap][key].values[val].haveit = haveit;
