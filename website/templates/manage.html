@@ -252,15 +252,15 @@ E.populate_map = function(obj) {
             bounds.extend(mapman.markers[aid].position);
         }
         
-        if (mapman.markers.length) {
+        if (Object.size(mapman.markers)) {
             //  Fit these bounds to the map
             mapman.map.fitBounds(bounds);
             zoom = mapman.map.getZoom();
             if (mapman.map.getZoom() > 16)
                 mapman.map.setZoom(16);
         } else {
-            latlng = new google.maps.LatLng(42.360367, -71.087294);
-            mapman.map.setCenter(latlng);
+//             latlng = new google.maps.LatLng(42.360367, -71.087294);
+//             mapman.map.setCenter(latlng);
         }
         E.reset_map_bounds = false;
     }
@@ -746,10 +746,9 @@ E.get_multi_profile = function(agents) {
                 picture = "http://pldb.media.mit.edu/face/"+agent;
             if ("picture" in profile)
                 for (val in profile.picture)
-                    picture = profile.picture.val;
-            
-            if (profile.picture==undefined || profile.picture.length==0)
-                profile.picture = [picture];
+                    picture = val;
+
+            profile.picture = [picture];
             
             if (attr_manager.cache[agent] == undefined)
                 attr_manager.cache[agent] = {};
