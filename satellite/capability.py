@@ -353,7 +353,7 @@ class Buysell:
                 matches = res
                 
             if params[0] == 'fetch':
-                bucket = 10
+                bucket = 100
                 start_from = ''
                 if len(params) >= 2 and params[1]:
                     start_from = params[1]
