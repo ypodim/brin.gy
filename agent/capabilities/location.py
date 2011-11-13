@@ -34,6 +34,7 @@ class location():
         
     
     def del_reverse(self, key, lat, lon):
+        print "del_reverse", key, lat, lon
         lat = float(lat)
         lon = float(lon)
         

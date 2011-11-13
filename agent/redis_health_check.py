@@ -40,9 +40,30 @@ class TestSequenceFunctions(unittest.TestCase):
 
 if __name__ == '__main__':
     #unittest.main()
-    users = r.smembers('users')
     
-    for u in users:
+    resolution = 100000
+    key = 'my location'
+    for b in r.smembers('location:%s:buckets' % (key)):
+        lat, lon = b.split()
+        for aid in r.smembers('location:%s:latlon:%s' % (key, b)):
+            lat = float(lat)
+            lon = float(lon)
+            
+            lattest = r.get('%s:location:%s:lat' % (aid, key))
+            lontest = r.get('%s:location:%s:lon' % (aid, key))
+            if lattest and lontest:
+                lattest = float(lattest)
+                lontest = float(lontest)
+                lattest = 1.0*int(lattest * resolution)/resolution
+                lontest = 1.0*int(lontest * resolution)/resolution
+            
+            if not (lat==lattest and lon==lontest):
+                print aid, lat, lon
+                print 'removed', r.srem('location:%s:latlon:%s' % (key, b), aid)
+            
+    sys.exit()
+    users = r.smembers('users') 
+    for u in users:   
         for k in r.smembers('%s:profile:keys' % (u)):
             l = len(r.smembers('%s:profile:key:%s' % (u,k)))
             if (l == 0):
