@@ -969,8 +969,12 @@ E.fetch_keyvals = function(clb) {
                 cap = "location";
                 key = "my location";
                 oldval = JSON.stringify({lat:""+json.lat,lon:""+json.lon});
-                E.delete_keyval(cap, key, oldval, function(){console.log("deleted old")});
-                E.post_keyval(cap, key, val, function(){console.log("saved new")});
+                E.delete_keyval(cap, key, oldval, function(){
+                    console.log("deleted old");
+                    E.post_keyval(cap, key, val, function(){
+                        console.log("saved new")
+                    });
+                });
                 clb();
             }
             
