@@ -202,7 +202,7 @@ class Profile:
                 matches = res
                 
             if params[0] == 'fetch':
-                bucket = 10
+                bucket = 100
                 start_from = ''
                 index = 0
                 
