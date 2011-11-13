@@ -328,6 +328,66 @@ E.handle_val_click = function(){
     return false;
 }
 
+
+E.get_geolocation = function(clb) {
+    
+    location_clb = function(result) {
+        key = "my location";
+        modal = $("#modal-from-dom");
+        clearTimeout(E.modal_timer);
+        modal.modal("hide");
+        val = JSON.stringify({lat:""+result.lat,lon:""+result.lon});
+        attr_manager.sdata.location[key].values = {};
+        
+        latlng = new google.maps.LatLng(result.lat, result.lon);
+        geogy.geocoder.geocode({'latLng': latlng}, function(results, status) {
+            
+            if (status == google.maps.GeocoderStatus.OK) {
+                key = "my location";
+                formatted = results[1].formatted_address;
+                console.log('formatted address:', formatted, key);
+                
+                attr_manager.sdata.location[key].values[val] = {
+                    cnt:0, 
+                    selected:false,
+                    display:true,
+                    haveit:true, 
+                    matches:[],
+                    formatted: formatted,
+                };
+                
+                counter = $("span.attr_counters[uitype=\"user_attribute\"][cap=\"location\"][key=\"my location\"]");
+                counter.attr("val",val);
+                counter.parent().attr("val",val);
+            } else {
+                alert("Geocoder failed due to: " + status);
+            }
+            if (formatted.length > 10)
+                formatted = formatted.substring(0,8)+"...";
+                
+            clb(val, results, formatted);
+        });
+        
+        E.populate_map(result);
+    }
+    
+    geogy.init(location_clb);
+    show_modal = function() {
+        modal = $("#modal-from-dom");
+        modal.modal({backdrop:"static", show:true, keyboard:true});
+        
+        $("#modal-cancel-btn").click(function(){
+            modal.bind('hidden', function(){
+                console.log("going to",E.website_url+"/manage/asdf");
+                console.log("should go to", window.location);
+//                     location.replace(E.website_url+"/manage/asdf");
+            });
+            modal.modal("hide");
+        });
+    }
+    E.modal_timer = setTimeout(show_modal, 500);
+}
+
 E.handle_userattr_toggle =function(){
     var cap = $(this).attr("cap");
     var key = $(this).attr("key");
@@ -336,9 +396,9 @@ E.handle_userattr_toggle =function(){
     
 //     $.post()
     
-    complete_toggle_handle = function(button) {
-        haveit = !attr_manager.sdata[cap][key].values[val].haveit;
-        attr_manager.sdata[cap][key].values[val].haveit = haveit;
+    complete_toggle_handle = function(cap, key, val, button) {
+        haveit = attr_manager.sdata[cap][key].values[val].haveit;
+//         attr_manager.sdata[cap][key].values[val].haveit = haveit;
         if (haveit) {
             E.post_keyval(cap, key, val, function(){
                 button.html("\u2713").popover("hide").css("background-color","");
@@ -367,71 +427,23 @@ E.handle_userattr_toggle =function(){
             });
         }
     }
-            
-    location_clb = function(result) {
-        modal = $("#modal-from-dom");
-        clearTimeout(E.modal_timer);
-        modal.modal("hide");
-        val = JSON.stringify({lat:""+result.lat,lon:""+result.lon});
-        attr_manager.sdata.location[key].values = {};
-        
-        latlng = new google.maps.LatLng(result.lat, result.lon);
-        geogy.geocoder.geocode({'latLng': latlng}, function(results, status) {
-            
-            if (status == google.maps.GeocoderStatus.OK) {
-                key = "my location";
-                formatted = results[1].formatted_address;
-                console.log('formatted address:', formatted, key);
-                
-                attr_manager.sdata.location[key].values[val] = {
-                    cnt:0, 
-                    selected:false,
-                    display:true,
-                    haveit:false, 
-                    matches:[],
-                    formatted: formatted,
-                };
-                
-                counter = $("span.attr_counters[uitype=\"user_attribute\"][cap=\"location\"][key=\"my location\"]");
-                counter.attr("val",val);
-                counter.parent().attr("val",val);
-            } else {
-                alert("Geocoder failed due to: " + status);
-            }
-            if (formatted.length > 10)
-                formatted = formatted.substring(0,8)+"...";
-            button.siblings().children("span.value").html(formatted);
-            complete_toggle_handle(button);
-        });
-        
-        E.populate_map(result);
-    }
     
     haveit = attr_manager.sdata[cap][key].values[val].haveit;
+    attr_manager.sdata[cap][key].values[val].haveit = !haveit;
     if (cap == "location") {
         if (haveit == false) {
-            geogy.init(location_clb);
-            
-            show_modal = function() {
-                modal = $("#modal-from-dom");
-                modal.modal({backdrop:"static", show:true, keyboard:true});
-                
-                $("#modal-cancel-btn").click(function(){
-                    modal.bind('hidden', function(){
-                        console.log("going to",E.website_url+"/manage/asdf");
-                        console.log("should go to", window.location);
-    //                     location.replace(E.website_url+"/manage/asdf");
-                    });
-                    modal.modal("hide");
-                });
-            }
-            E.modal_timer = setTimeout(show_modal, 500);
+            clb = function(val, results, formatted) {
+                button.attr("val", val);
+                button.siblings().children("span.value").html(formatted);
+                complete_toggle_handle(cap, key, val, button);
+            };
+            E.get_geolocation(clb);
         } else {
             button.siblings().children("span.value").html("");
-            complete_toggle_handle(button);
+            complete_toggle_handle(cap, key, val, button);
         }
     } else {
-        complete_toggle_handle(button);
+        complete_toggle_handle(cap, key, val, button);
     }
     return false;
 }
@@ -504,6 +516,7 @@ E.generate_val_entry = function(capname, attr, val) {
     
     formatted = val;
     
+    address = "";
     if (capname=="location" && attr=="my location") {
         address = attr_manager.sdata[capname][attr].values[val].formatted;
         if (address == undefined)
@@ -952,32 +965,18 @@ E.fetch_keyvals = function(clb) {
         attr_manager.add_sdata("location", key, 0);
         
         if (json.lat.length && json.lon.length) {
-            latlng = new google.maps.LatLng(json.lat, json.lon);
-            geocoder = new google.maps.Geocoder();
-            geocoder.geocode({'latLng': latlng}, function(results, status) {
-                if (status == google.maps.GeocoderStatus.OK) {
-                    key = "my location";
-                    formatted = results[1].formatted_address;
-//                     console.log("");
-                    console.log('formatted address:', formatted);
-                    
-                    console.log('debug:', key, attr_manager.sdata.location);
-                    console.log(attr_manager.sdata.location[key]);
-                    
-                    attr_manager.sdata.location[key].values[valstr] = {
-                        cnt:json.count, 
-                        selected:0, 
-                        display:true, 
-                        haveit:true, 
-                        matches:json.matches,
-                        formatted: formatted,
-                    };
-                    console.log(attr_manager.sdata.location[key]);
-                } else {
-                    alert("Geocoder failed due to: " + status);
-                }
+            geoclb = function(val, results, formatted) {
+                cap = "location";
+                key = "my location";
+                oldval = JSON.stringify({lat:""+json.lat,lon:""+json.lon});
+                E.delete_keyval(cap, key, oldval, function(){console.log("deleted old")});
+                E.post_keyval(cap, key, val, function(){console.log("saved new")});
                 clb();
-            });
+            }
+            
+            E.get_geolocation(geoclb);
+            
+
         } else {
             attr_manager.sdata.location[key].values[valstr] = {
                 cnt:json.count, 

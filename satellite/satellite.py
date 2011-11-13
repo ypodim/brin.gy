@@ -192,9 +192,9 @@ class multimatch(tornado.web.RequestHandler):
             dic = cap.get_count(key, val)
             matches.append([capname, key, val, dic['count'], dic['matches']])
             
-            if capname == 'location':
-                print 'entry completed in ', time.time()-innerstart
-                print '-%s- -%s- %s %s' % (key, val, dic['count'], len(dic['matches']))
+            #if capname == 'location':
+                #print 'entry completed in ', time.time()-innerstart
+                #print '-%s- -%s- %s %s' % (key, val, dic['count'], len(dic['matches']))
             
         dic = dict(matches=matches, error=self.error, count=0)
         dic.__setitem__('response_time', time.time() - self.start_time)

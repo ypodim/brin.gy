@@ -44,6 +44,7 @@ class Location:
         return matches
 
     def get_count(self, key='', val=''):
+        #print 'location get_count', key, val
         count = 0
         matches = []
         if not val:
@@ -101,7 +102,7 @@ class Location:
             
         
     def get(self, params, arguments):
-        print 'satellite location get'
+        #print 'satellite location get'
         
         error = ''
         matches = []
