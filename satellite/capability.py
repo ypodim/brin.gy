@@ -58,8 +58,6 @@ class Location:
             
             return dict(error='', count=count, matches=matches)
         
-        print 
-        print '*********** loading json', val, key
         query = json.loads(val)
         
         if not query['lat'] or not query['lon']:
