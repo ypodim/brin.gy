@@ -833,8 +833,8 @@ E.poll_matches = function(capname) {
         }
     
     data = JSON.stringify(query);
-    console.log(data);
-    console.log(attr_manager.sdata);
+//     console.log(data);
+//     console.log(attr_manager.sdata);
     
     $.getJSON(E.satellite.url+"/multimatch", {data:data}, function(json){
         E.monitor.user_matches.by_keyval = {};
