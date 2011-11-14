@@ -18,31 +18,12 @@ def post(dic, path='', method='POST', url='http://localhost:10007'):
     return json.loads(content)
 
 
-r = redis.Redis(host='localhost', port=6379, db=0)
-#r.flushall()
-
-class TestSequenceFunctions(unittest.TestCase):
-
-    def setUp(self):
-        self.seq = range(10)
-        self.u = 'tester'
-        self.p = dict(key='name', val='pol')
-        
-    def test_health(self):
-        users = r.smembers('users')
-        self.assertTrue(type(users)==set)
-        
-        for u in users:
-            for k in r.smembers('%s:profile:keys' % (u)):
-                l = len(r.smembers('%s:profile:key:%s' % (u,k)))
-                self.assertTrue(l>0)
-                
-
 if __name__ == '__main__':
-    #unittest.main()
+    r = redis.Redis(host='localhost', port=6379, db=0)
     
     resolution = 100000
     key = 'my location'
+    print 'checking redundant location bucket entries'
     for b in r.smembers('location:%s:buckets' % (key)):
         lat, lon = b.split()
         for aid in r.smembers('location:%s:latlon:%s' % (key, b)):
@@ -58,22 +39,56 @@ if __name__ == '__main__':
                 lontest = 1.0*int(lontest * resolution)/resolution
             
             if not (lat==lattest and lon==lontest):
+                print '*** redundant location bucket entry: bucket: %s  aid: %s' % (b, aid)
                 print aid, lat, lon
-                print 'removed', r.srem('location:%s:latlon:%s' % (key, b), aid)
-            
-    sys.exit()
+                #print 'removed', r.srem('location:%s:latlon:%s' % (key, b), aid)
+    print 'done.'
+    print
+    
+    print 'checking for orphaned profile key entries'
     users = r.smembers('users') 
-    for u in users:   
+    for u in users:
         for k in r.smembers('%s:profile:keys' % (u)):
             l = len(r.smembers('%s:profile:key:%s' % (u,k)))
             if (l == 0):
-                print 
-                print 'problem with', u, k
-                print r.smembers('profile:key:%s' % k)
-                s = r.zrangebyscore('profile:keyscores', '-inf','+inf')
-                print (k in s)
-                s = r.zrangebyscore('profile:keyscores:%s' % k, '-inf','+inf')
-                print (k in s)
-                
+                print '*** problem with user:%s no values for key:%s' % (u, k)
                 r.srem('%s:profile:keys' % u, k)
+                print 'deleted.'
                 
+                print 'user:%s in reverse for key:%s: %s' % (u, k, (u in r.smembers('profile:key:%s' % k)))
+                
+                s = r.zrangebyscore('profile:keyscores', '-inf','+inf')
+                print 'key in keyscores:%s' % (k in s)
+                s = r.zrangebyscore('profile:keyvalscores:%s' % k, '-inf','+inf')
+                print 'key in keyvalscores:%s' % (k in s)
+                
+                
+    print 'done.'
+    print
+    
+    
+    for u in users:
+        for key in r.smembers('%s:location:keys' % u):
+            if key == 'my location':
+                continue
+            print 'trying invalid keys in location'
+            for aid in r.smembers('location:%s:allusers' % key):
+                print aid
+                print 'deleted lat entry', r.delete('%s:location:%s:lat' % (aid, key))
+                print 'deleted lon entry', r.delete('%s:location:%s:lon' % (aid, key))
+            for b in r.smembers('location:%s:buckets' % key):
+                print 'deleting invalid bucket entry:%s' % b, r.srem('location:%s:buckets' % key, b)
+            for u in r.smembers('location:%s:allusers' % key):
+                print 'deleting invalid allusers entry:%s' % b, r.srem('location:%s:allusers' % key, u)
+        
+    print 'done.'
+    print
+    
+    
+    
+    
+    
+    
+    
+    
+    

@@ -15,6 +15,7 @@ class profile():
     'profile:keys' # set of all keys in use
     'profile:key:KEY' # set of agents using this key
     'profile:key:KEY:val:VAL' # set of agents using this key/val pair
+    
     'profile:keyscores' # set of keys, scored on the number of agents that have it
     'profile:keyvalscores:KEY' # set of vals corresponding to this key, scored on the number of agents that have it
     
@@ -28,6 +29,7 @@ class profile():
         keyvaladded = self.db.sadd('profile:key:%s:val:%s' % (key, val), self.usr)
         
         if added:
+            print 'add keyscore for', key
             self.db.zadd('profile:keyscores', key, 1)
         else:
             self.db.zincrby('profile:keyscores', key, 1)
