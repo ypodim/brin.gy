@@ -850,9 +850,13 @@ E.poll_matches = function(capname) {
             matches = match[4];
             
             if (val.length > 0) {
+                if (attr_manager.sdata[cap][key].values[val]==undefined)
+                    console.log("***", cap, key, val, attr_manager.sdata);
                 attr_manager.sdata[cap][key].values[val].cnt = cnt;
                 attr_manager.sdata[cap][key].values[val].matches = matches;
             } else {
+                if (attr_manager.sdata[cap][key].cnt==undefined)
+                    console.log("***", cap, key, attr_manager.sdata);
                 attr_manager.sdata[cap][key].cnt = cnt;
                 attr_manager.sdata[cap][key].matches = matches;
             }
@@ -991,11 +995,15 @@ E.fetch_keyvals = function(clb) {
                 key = "my location";
                 oldval = {lat:""+json.lat,lon:""+json.lon};
                 oldval = JSON.stringify(oldval);
-                E.delete_keyval(cap, key, oldval, function(){
-                    console.log("deleted old");
-                    E.post_keyval(cap, key, val, function(){
-                        console.log("saved new")
-                    });
+//                 E.delete_keyval(cap, key, oldval, function(){
+//                     console.log("deleted old");
+//                     E.post_keyval(cap, key, val, function(){
+//                         console.log("saved new")
+//                     });
+//                 });
+                
+                E.post_keyval(cap, key, val, function(){
+                    console.log("saved new")
                 });
                 clb();
             }
