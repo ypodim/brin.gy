@@ -157,6 +157,13 @@ attr_manager.deselect_keyvals = function(){
     }
 }
 
+attr_manager.get_location = function() {
+    for (val in attr_manager.sdata.location["my location"].values)
+        if (attr_manager.sdata.location["my location"].values[val].haveit)
+            return val;
+    return null;
+}
+
 E.monitor = {
     "user_matches":{
         "by_keyval": {},
@@ -390,45 +397,42 @@ E.get_geolocation = function(clb) {
     E.modal_timer = setTimeout(show_modal, 500);
 }
 
+E.complete_toggle_handle = function(cap, key, val, button) {
+    haveit = attr_manager.sdata[cap][key].values[val].haveit;
+    if (haveit) {
+        E.post_keyval(cap, key, val, function(){
+            button.html("\u2713").popover("hide").css("background-color","");
+            
+            confirmation = $(".confirmation").html("added to your profile!");
+            confirmation.addClass("success").removeClass("important").show();
+            confirmation.offset(button.offset());
+            
+            confirmation.animate({"left":"+=30px","top":"-=50px"}, "slow", function(){ 
+                $(this).animate({"left":"+=0px"}, function(){
+                    $(this).hide();
+                });
+            });
+        });
+    } else {
+        E.delete_keyval(cap, key, val, function(json){
+            button.html("\u00A0").popover("hide").css("background-color","");
+            
+            confirmation = $(".confirmation").html("removed");
+            confirmation.addClass("important").removeClass("success").show();
+            confirmation.offset(button.offset());
+            
+            confirmation.animate({"left":"+=30px","top":"-=50px"}, "slow", function(){ 
+                $(this).hide();
+            });
+        });
+    }
+}
+
 E.handle_userattr_toggle =function(){
     var cap = $(this).attr("cap");
     var key = $(this).attr("key");
     var val = $(this).attr("val");
     button = $(this);
-    
-//     $.post()
-    
-    complete_toggle_handle = function(cap, key, val, button) {
-        haveit = attr_manager.sdata[cap][key].values[val].haveit;
-//         attr_manager.sdata[cap][key].values[val].haveit = haveit;
-        if (haveit) {
-            E.post_keyval(cap, key, val, function(){
-                button.html("\u2713").popover("hide").css("background-color","");
-                
-                confirmation = $(".confirmation").html("added to your profile!");
-                confirmation.addClass("success").removeClass("important").show();
-                confirmation.offset(button.offset());
-                
-                confirmation.animate({"left":"+=30px","top":"-=50px"}, "slow", function(){ 
-                    $(this).animate({"left":"+=0px"}, function(){
-                        $(this).hide();
-                    });
-                });
-            });
-        } else {
-            E.delete_keyval(cap, key, val, function(json){
-                button.html("\u00A0").popover("hide").css("background-color","");
-                
-                confirmation = $(".confirmation").html("removed");
-                confirmation.addClass("important").removeClass("success").show();
-                confirmation.offset(button.offset());
-                
-                confirmation.animate({"left":"+=30px","top":"-=50px"}, "slow", function(){ 
-                    $(this).hide();
-                });
-            });
-        }
-    }
     
     haveit = attr_manager.sdata[cap][key].values[val].haveit;
     attr_manager.sdata[cap][key].values[val].haveit = !haveit;
@@ -437,15 +441,15 @@ E.handle_userattr_toggle =function(){
             clb = function(val, results, formatted) {
                 button.attr("val", val);
                 button.siblings().children("span.value").html(formatted);
-                complete_toggle_handle(cap, key, val, button);
+                E.complete_toggle_handle(cap, key, val, button);
             };
             E.get_geolocation(clb);
         } else {
             button.siblings().children("span.value").html("");
-            complete_toggle_handle(cap, key, val, button);
+            E.complete_toggle_handle(cap, key, val, button);
         }
     } else {
-        complete_toggle_handle(cap, key, val, button);
+        E.complete_toggle_handle(cap, key, val, button);
     }
     return false;
 }
@@ -973,22 +977,13 @@ E.fetch_keyvals = function(clb) {
                 key = "my location";
                 oldval = {lat:""+json.lat,lon:""+json.lon};
                 oldval = JSON.stringify(oldval);
-//                 E.delete_keyval(cap, key, oldval, function(){
-//                     console.log("deleted old");
-//                     E.post_keyval(cap, key, val, function(){
-//                         console.log("saved new")
-//                     });
-//                 });
                 
                 E.post_keyval(cap, key, val, function(){
                     console.log("saved new")
                 });
                 clb();
             }
-            
             E.get_geolocation(geoclb);
-            
-
         } else {
             attr_manager.sdata.location[key].values[valstr] = {
                 cnt:json.count, 
@@ -1044,6 +1039,29 @@ var show_delete_modal = function() {
         });
         modal.modal("hide");
         cookies.del_cookie(E.agent.id);
+    });
+}
+
+var show_getlocation_modal = function() {
+    modal = $("#get-location-modal");
+    modal.modal({backdrop:"static", show:true, keyboard:true});
+    
+    $("#location-cancel-btn").click(function(){
+        modal.modal("hide");
+    });
+    $("#location-ok-btn").click(function(){
+        geoclb = function(val, results, formatted) {
+            console.log("geoclb:", val, results, formatted);
+            cap = "location";
+            key = "my location";
+            button = $("span.add_btn[cap='"+cap+"'][key='"+key+"']");
+            button.attr("val", val);
+            button.siblings().children("span.value").html(formatted);
+            E.complete_toggle_handle(cap, key, val, button);
+        }
+        
+        E.get_geolocation(geoclb);
+        modal.modal("hide");
     });
 }
 
@@ -1190,6 +1208,9 @@ $(document).ready(function()
         index = parseInt($(this).attr("index"));
         if (index == Tour.tourSlides.length-1) {
             Tour.close_tour();
+            have_location = attr_manager.get_location();
+            if (have_location == null)
+                show_getlocation_modal();
         } else {
             Tour.do_tour(index+1);
         }
@@ -1234,7 +1255,7 @@ $(document).ready(function()
 <div id="modal-from-dom" class="modal hide fade">
     <div class="modal-header">
         <a href="#" class="close">&times;</a>
-        <h3>Currentt Location</h3>
+        <h3>Current Location</h3>
     </div>
     <div class="modal-body">
         <p>To find others near you, please choose to share your location above.</p>
@@ -1256,6 +1277,22 @@ $(document).ready(function()
     <div class="modal-footer">
         <a href="#" class="btn danger" id="delete-delete-btn">Trash everything</a>
         <a href="#" class="btn primary" id="delete-cancel-btn">Cancel</a>
+    </div>
+</div>
+
+
+
+<div id="get-location-modal" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close">&times;</a>
+        <h3>Location</h3>
+    </div>
+    <div class="modal-body">
+        <p>Would you like to use your location to get more relevant results?</p>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn danger" id="location-cancel-btn">No</a>
+        <a href="#" class="btn success" id="location-ok-btn">Yes</a>
     </div>
 </div>
 

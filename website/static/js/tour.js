@@ -101,7 +101,7 @@ Tour.select_key = function(key){
 
 Tour.select_val = function(key, val){
     selector = "div.valcontainer a[key='"+key+"'][val='"+val+"']";
-    console.log($(selector));
+//     console.log($(selector));
     offset = $(selector).offset();
     if (offset != undefined) {
         $('#choices').animate({scrollTop: offset.top-wh/2},'slow');
@@ -134,8 +134,8 @@ Tour.do_tour = function(index){
     $("#coverright").show().css({left:slide.left+slide.width, top:slide.top, width:ww-slide.left-slide.width, height:slide.height});
     $("#coverbottom").show().css({height:wh-slide.top-slide.height});
     
-    console.log("select_key", slide.select_key);
-    console.log("select_val", slide.select_val);
+//     console.log("select_key", slide.select_key);
+//     console.log("select_val", slide.select_val);
     if (slide.select_key) {
         if (slide.select_val == undefined) {
             count = Tour.select_key(slide.select_key);
