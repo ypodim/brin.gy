@@ -141,7 +141,7 @@ class serve_request(tornado.web.RequestHandler):
         self.write(dic)
         
         
-class churn(tornado.web.RequestHandler):
+class stats(tornado.web.RequestHandler):
     def options(self):
         self.write({})
     def prepare(self):
@@ -152,6 +152,17 @@ class churn(tornado.web.RequestHandler):
         self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
         self.set_header('Content-Type','application/json; charset=UTF-8')
     def get(self):
+        keys = r.smembers('profile:keys')
+        vals = 0
+        for k in keys:
+            vals += r.scard('profile:key:%s' % k)
+        
+        dic = dict(churn=self.churn(), 
+                   users=r.scard('users'),
+                   keys=len(keys),
+                   values=vals)
+        self.write(dic)
+    def churn(self):
         dic = {}
         for cap in ['profile','location']:
             if cap not in dic: dic[cap] = {}
@@ -161,8 +172,9 @@ class churn(tornado.web.RequestHandler):
                     add = r.get('churn:%s:%s:%s:add' % (cap, key, val))
                     rem = r.get('churn:%s:%s:%s:rem' % (cap, key, val))
                     dic[cap][key][val] = dict(add=add, rem=rem)
-        self.write(dic)
-    
+        return dic
+
+
 class multimatch(tornado.web.RequestHandler):
     error = ''
     def options(self):
@@ -257,7 +269,7 @@ settings = {
 }
 application = tornado.web.Application([
     (r"/multimatch", multimatch),
-    (r"/churn", churn),
+    (r"/stats", stats),
     (r"/.+", serve_request),
 ], **settings)    
 

@@ -7,6 +7,7 @@
 
 var ego_url_prefix = "{{ego_url_prefix}}";
 var website_url_prefix = "{{website_url_prefix}}";
+var discov_url = "{{discov_url}}";
 var valid_username = undefined;
 
 var check_username = function()
@@ -60,8 +61,8 @@ $(document).ready(function()
     });
     
     $("#username").focus().keydown(function(obj){
-        if (obj.metaKey || obj.altKey || obj.ctrlKey)
-            return false;
+//         if (obj.metaKey || obj.altKey || obj.ctrlKey)
+//             return false;
     }).keyup(function(obj) {
 //         console.log(obj.keyCode);
 //         text = $(this).val();
@@ -84,6 +85,11 @@ $(document).ready(function()
     $("#btn2").click(function(){
         window.location.href = "{{website_url_prefix}}/manage/"+$("select").val()+"#tour";
     });
+    
+    $.getJSON(discov_url+"/stats", function(json){
+        $("#users").html(json.users);
+        $("#values").html(json.values);
+    });
 });
 </script>
 {% end %}
@@ -93,6 +99,39 @@ $(document).ready(function()
 <div id="left">
     <h2>What it is</h2>
     <p>Brin.gy allows people to announce bits of information about themselves and find others based on that information. It implements an experimental protocol for human discovery, namely <b>Human Discovery Protocol</b>. HDP allows us to form dynamic groups such as the group of people interested in buying the same product, people with similar expertise, people in the same location, or any intersection of these examples.</p>
+    
+    <h2>Statistics</h2>
+    <p>Users to engage with: <stat id="users" class="stat-entry"></stat></p>
+    <p>Attributes to choose from: <stat id="values" class="stat-entry"></stat><p>
+    <p>
+    Get more statistics by doing an HTTP GET request to <code>http://satellite.brin.gy/stats</code>. The result is in JSON format and looks like this:
+    <pre>
+{
+    "users": 80,    # number of users in the system
+    "keys": 33,     # number of attributes
+    "values": 189,  # total number of values assigned to attributes
+    "churn": {
+        "python": {
+            "add": 7, # people that added "python" to their profile
+            "rem": 3  # people that removed "python" from their profile
+        }
+    }
+}</pre>
+    </p>
+<!--    <div class="stat-entry">
+        <stat class="alert-message success left">users</stat>
+        <stat id="users" class="alert-message success right"></stat>
+        <span>in this system.</span>
+    </div>
+    <div class="stat-entry">
+        <stat class="alert-message left success">attributes</stat>
+        <stat id="keys" class="alert-message success right"></stat>
+    </div>
+    <div class="stat-entry">
+        <stat class="alert-message left success">values</stat>
+        <stat id="values" class="alert-message success right"></stat>
+        to choose from.
+    </div>-->
 </div>
 
 <div id="right">
