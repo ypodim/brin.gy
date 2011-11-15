@@ -12,8 +12,8 @@ class profile():
         self.cap = __name__.split('.')[-1]
         self.usr = usr
     
-    'churn:keys' # set of recorded keys in churn
-    'churn:KEY:vals' # set of recorded vals for each key in churn
+    'churn:CAP:keys' # set of recorded keys in churn
+    'churn:CAP:KEY:vals' # set of recorded vals for each key in churn
     'churn:CAP:KEY:VAL:add' # counter of adds a key/val has received
     'churn:CAP:KEY:VAL:rem' # counter of rems a key/val has received
     
@@ -100,12 +100,6 @@ class profile():
         self.finish( res )
         
     def post(self):
-        'churn:keys' # set of recorded keys in churn
-        'churn:KEY:vals' # set of recorded vals for each key in churn
-        'churn:CAP:KEY:VAL:add' # counter of adds a key/val has received
-        'churn:CAP:KEY:VAL:rem' # counter of rems a key/val has received
-        
-        
         res = ''
         #print 'arguments', self.arguments
         for key, val in self.arguments:

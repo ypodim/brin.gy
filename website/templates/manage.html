@@ -813,7 +813,7 @@ E.poll_matches = function(capname) {
     
     data = JSON.stringify(query);
     
-    $.getJSON(E.satellite.url+"/multimatch", {data:data}, function(json){
+    $.post(E.satellite.url+"/multimatch", {data:data}, function(json){
         E.monitor.user_matches.by_keyval = {};
         
         for (i in json.matches) {
@@ -923,7 +923,7 @@ E.poll_matches = function(capname) {
                 }
             }
         });
-    });
+    }, "json");
 }
 
 E.fetch_keyvals = function(clb) {
