@@ -214,26 +214,29 @@ class Profile:
                     if rank is not None:
                         start = rank
                 
-                matches = self.r.zrevrangebyscore('profile:keyscores', '+inf', '-inf', num=bucket, start=start)
-                
                 if not arguments:
                     arguments = {}
                 else:
                     arguments = json.loads(arguments)
                 
-                if 'with_values' in arguments:
-                    dic = dict([(i[1],[]) for i in enumerate(matches)])
-                    for k in dic:
-                        zkey = 'profile:keyvalscores:%s' % k
-                        for m, score in self.r.zrevrangebyscore(zkey, '+inf', '-inf', withscores=True):
+                keyscores = self.r.zrevrangebyscore('profile:keyscores', '+inf', '-inf', withscores=True, num=bucket, start=start)
+                matches = []
+                for key, score in keyscores:
+                    dic = dict(key=key, score=score)
+                    if 'with_values' in arguments:
+                        dic['values'] = []
+                        zkey = 'profile:keyvalscores:%s' % key
+                        for v, score in self.r.zrevrangebyscore(zkey, '+inf', '-inf', withscores=True):
                             userhasit = 0
                             if 'user' in arguments:
                                 aid = arguments['user']
-                                rkey = 'profile:key:%s:val:%s' % (k, m)
+                                rkey = 'profile:key:%s:val:%s' % (key, v)
                                 userhasit = int(self.r.sismember(rkey, aid))
-                            dic[k].append((m, score, userhasit))
-                    matches = dic
+                            dic['values'].append(dict(val=v, score=score, userhasit=userhasit))
                         
+
+                    matches.append(dic)
+                    
         return dict(matches=matches, error=error, count=count)
             
     

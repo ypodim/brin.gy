@@ -693,11 +693,10 @@ E.populate_attrs = function(useEditor) {
 
 E.construct_result_enty = function(agent) {
     picture = "http://pldb.media.mit.edu/research/images/nophoto.gif";
-    if (picture in attr_manager.cache[agent].profile)
+    if ("picture" in attr_manager.cache[agent].profile)
         for (p in attr_manager.cache[agent].profile.picture)
             picture = p;
-    console.log(agent, picture);
-    
+            
     pic = $("<img width=20 style='float:left; clear:left;' />").attr("src",picture);
     username = $("<span style='margin-left:5px'></span>").html(agent);
     entry = $("<a href='#'></a>").append(pic).append(username);
@@ -730,13 +729,6 @@ E.construct_result_enty = function(agent) {
                 
                 detail = $("<div></div>").html(k+":");
                 for (val in profile[k]) {
-                    
-//                     if (attr_manager.sdata.profile[k].values[val] == undefined) {
-//                         console.log("profile", profile);
-//                         console.log("val", val);
-//                         console.log("agent", agent, attr_manager.cache);
-//                         console.log("key", k, attr_manager.sdata.profile[k].values);
-//                     }
                     attr_manager.sdata.profile[k].values[val].display = true;
                     detail.append(", "+val);
                 }
@@ -766,19 +758,6 @@ E.get_multi_profile = function(agents) {
                     profile[key] = {};
                 profile[key][val] = 1;
             }
-            
-//             picture = "http://pldb.media.mit.edu/research/images/nophoto.gif";
-//             if ("company" in profile && "Media Lab" in profile["company"])
-//                 picture = "http://pldb.media.mit.edu/face/"+agent;
-            
-//             if ("picture" in profile)
-//                 for (val in profile.picture)
-//                     picture = val;
-//                     
-//             console.log("picture is now", picture);
-//             if (profile.picture == undefined)
-//                 profile.picture = {};
-//             profile.picture[picture] = 1;
             
             if (attr_manager.cache[agent] == undefined)
                 attr_manager.cache[agent] = {};
@@ -833,8 +812,6 @@ E.poll_matches = function(capname) {
         }
     
     data = JSON.stringify(query);
-//     console.log(data);
-//     console.log(attr_manager.sdata);
     
     $.getJSON(E.satellite.url+"/multimatch", {data:data}, function(json){
         E.monitor.user_matches.by_keyval = {};
@@ -959,12 +936,13 @@ E.fetch_keyvals = function(clb) {
     
     $.getJSON(E.satellite.url+"/profile/fetch/"+starting_from, {data:data}, function(json){
 //         console.log("fetch", json);
-        for (attribute in json.matches) {
+        for (i in json.matches) {
+            attribute = json.matches[i].key;
             attr_manager.add_sdata("profile", attribute, 0);
-            for (i in json.matches[attribute]) {
-                val = json.matches[attribute][i][0];
-                cnt = json.matches[attribute][i][1];
-                haveit = json.matches[attribute][i][2];
+            for (j in json.matches[i].values) {
+                val = json.matches[i].values[j].val;
+                cnt = json.matches[i].values[j].score;
+                haveit = json.matches[i].values[j].userhasit;
 
                 attr_manager.sdata.profile[attribute].values[val] = {
                     cnt:cnt, 
