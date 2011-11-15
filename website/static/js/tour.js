@@ -93,7 +93,7 @@ Tour.select_key = function(key){
     
     offset = $(selector).offset();
     if (offset != undefined) {
-        $('#choices').animate({scrollTop: offset.top},'slow');
+        $('#choices').animate({scrollTop: offset.top-wh/2},'slow');
         $(selector).children("a").click();
         return $(selector).children("a").children("span.attr_counters").html();
     }
@@ -104,7 +104,7 @@ Tour.select_val = function(key, val){
     console.log($(selector));
     offset = $(selector).offset();
     if (offset != undefined) {
-        $('#choices').animate({scrollTop: offset.top},'slow');
+        $('#choices').animate({scrollTop: offset.top-wh/2},'slow');
         $(selector).click();
         return $(selector).children("span.attr_counters").html();
     }

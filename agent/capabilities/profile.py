@@ -12,6 +12,11 @@ class profile():
         self.cap = __name__.split('.')[-1]
         self.usr = usr
     
+    'churn:keys' # set of recorded keys in churn
+    'churn:KEY:vals' # set of recorded vals for each key in churn
+    'churn:CAP:KEY:VAL:add' # counter of adds a key/val has received
+    'churn:CAP:KEY:VAL:rem' # counter of rems a key/val has received
+    
     'profile:keys' # set of all keys in use
     'profile:key:KEY' # set of agents using this key
     'profile:key:KEY:val:VAL' # set of agents using this key/val pair
@@ -95,10 +100,21 @@ class profile():
         self.finish( res )
         
     def post(self):
+        'churn:keys' # set of recorded keys in churn
+        'churn:KEY:vals' # set of recorded vals for each key in churn
+        'churn:CAP:KEY:VAL:add' # counter of adds a key/val has received
+        'churn:CAP:KEY:VAL:rem' # counter of rems a key/val has received
+        
+        
         res = ''
         #print 'arguments', self.arguments
         for key, val in self.arguments:
             #print 'saving', key, val
+            
+            self.db.sadd('churn:%s:keys' % self.cap, key)
+            self.db.sadd('churn:%s:%s:vals' % (self.cap, key), val)
+            self.db.incr('churn:%s:%s:%s:add' % (self.cap, key, val))
+            
             self.set_val(key, val)
         
         return {'result':res, 'data':self.arguments, 'error':''}
@@ -108,6 +124,11 @@ class profile():
         for key, val in self.arguments:
             #key = unicode(key, errors='replace')
             #print 'deleting', key, val
+            
+            self.db.sadd('churn:%s:keys' % self.cap, key)
+            self.db.sadd('churn:%s:%s:vals' % (self.cap, key), val)
+            self.db.incr('churn:%s:%s:%s:rem' % (self.cap, key, val))
+            
             if key and val:
                 res = '%s' % self.del_val(key, val)
             else:

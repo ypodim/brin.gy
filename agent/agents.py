@@ -362,10 +362,6 @@ if __name__ == "__main__":
     HOST    = options.host
     PORT    = int(options.port)
     
-    #capabilities_dir = 'capabilities'
-    
-    #cron = Cron()
-
     satellite_url = 'http://localhost:22222'
     
     mode = ''
@@ -379,12 +375,6 @@ if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(PORT, address=HOST)
     ioloop = tornado.ioloop.IOLoop.instance()
-    
-    #poster = Poster()
-    
-    #caller = tornado.ioloop.PeriodicCallback(poster.execute, 1000, ioloop)
-    #caller.start()
-    
     
     try:
         ioloop.start()

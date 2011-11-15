@@ -112,6 +112,10 @@ class location():
             if key != 'my location':
                 continue
             
+            self.db.sadd('churn:%s:keys' % self.cap, key)
+            self.db.sadd('churn:%s:%s:vals' % (self.cap, key), valstr)
+            self.db.incr('churn:%s:%s:%s:add' % (self.cap, key, valstr))
+            
             val = tornado.escape.json_decode(valstr)
             #print val, type(val)
             lat = float(val['lat'])
@@ -138,6 +142,11 @@ class location():
     def delete(self):
         error = ''
         for key, valstr in self.arguments:
+            
+            self.db.sadd('churn:%s:keys' % self.cap, key)
+            self.db.sadd('churn:%s:%s:vals' % (self.cap, key), valstr)
+            self.db.incr('churn:%s:%s:%s:rem' % (self.cap, key, valstr))
+            
             val = tornado.escape.json_decode(valstr)
             #print 'deleting location', key, val, type(val)
             lat = val['lat']
