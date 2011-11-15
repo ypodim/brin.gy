@@ -1105,7 +1105,8 @@ $(document).ready(function()
         attr_manager.deselect_keyvals();
         
         text = $(this).val();
-        
+        if (text.length == 1)
+            return true;
 //         if (obj.keyCode == 9)
 //             return true;
         
@@ -1169,7 +1170,7 @@ $(document).ready(function()
         E.populate_attrs();
         Tour.do_tour(0);
     } else {
-        console.log("hash is", window.location.hash);
+//         console.log("hash is", window.location.hash);
     }
     
     $("#tourBtn").show().click(function(){
