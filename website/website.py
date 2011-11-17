@@ -2,48 +2,108 @@
 # -*- coding: utf-8 -*-
 
 import tornado.httpserver
+import tornado.httpclient
 import tornado.ioloop
 import tornado.web
 
 import os
 import os.path
+import time
 from optparse import OptionParser
 import json
 
-class ContentHandler(tornado.web.RequestHandler):
-    def get(self, path):
-        path = path.split('/')
-        function = path[0]
-        args = ''
-        if len(path) > 1:
-            args = path[1]
+class Config:
+    discov_url = ''
+    ego_url_prefix = ''
+    website_url_prefix = ''
+    agentid = ''
+    
+    
+class website_call(tornado.web.RequestHandler):
+    def get(self):
+        self.start_time = time.time()
+        self.callback = self.get_argument("callback", None)
+        self.render("%s.html" % self.path, config=config)
+        
+    def prepare(self):
+        path = self.request.path.split('/')
+        self.path = path[1] or 'index'
+        
+        
+class serve_user(tornado.web.RequestHandler):
+    def clb(self, response):
+        try:
+            dic = json.loads(response.body)
+        except:
+            print '*** serve_user clb: error parsing json: %s' % response.body
+            self.redirect('/')
+            return 
             
-        paths = ('api', 'index', 'UROP', 'manage', 'manageold', 'responses', 'about')
-        if not function: function = "index"
+        if not dic.get('error'):
+            #secret = cookie_dic.get('secret')
+            #if secret == 
+            self.render("manage.html", config=config)
+        else:
+            self.redirect('/')
+    @tornado.web.asynchronous
+    def get(self, agentid):
+        config.agentid = agentid
         
-        other_names = self.get_cookie('other_names')
-        print 'cookie', other_names
+        #cookie = self.get_cookie('bringy')
+        #if cookie == None:
+            #cookie = '{}'
+            #self.set_cookie('bringy', cookie)
         
-        if function not in paths:
-            raise tornado.web.HTTPError(404)
-        self.render(function + ".html", 
-                    discov_url=discov_url,
-                    ego_url_prefix=agents_url,
-                    website_url_prefix=website_url,
-                    title='' if function=='index' else '- %s'%function,
-                    args=args,
-                    other_names=other_names,
-                    path=json.dumps(path))
+        #try:
+            #cookie_dic = json.loads(tornado.escape.url_unescape(cookie))
+        #except:
+            #print '*** serve_user get: error parsing cookie: %s' % cookie
+            #self.redirect('/')
+            #return
+        
+        #if agentid in cookie_dic.get('pseudonyms',{}):
+            #secret = cookie_dic['pseudonyms'][agentid]
+            #print 'secret in cookie', secret
+        #else:
+            #print '*** serve_user get: Illegal attempt to access %s' % agentid
+            #self.redirect('/')
+            #return
+            
+        http_client = tornado.httpclient.AsyncHTTPClient()
+        http_client.fetch("%s/%s" % (config.ego_url_prefix, config.agentid), self.clb)
+        
 
-    def post(self):
-        print 'post', self.request.arguments
-        self.write('ok')
-        
+debug = os.environ.get("SERVER_SOFTWARE", "").startswith("Development/")
 
+settings = {
+    "template_path": os.path.join(os.path.dirname(__file__), "templates"),
+    #"xsrf_cookies": True,
+    "debug": debug,
+    "static_path": os.path.join(os.path.dirname(__file__), "static"),
+    #"static_url_prefix": '%s/static/' % static_url_prefix,
+    "static_url_prefix": '/static/'
+}
+
+application = tornado.web.Application([
+    (r"/", website_call),
+    (r"/api", website_call),
+    (r"/about", website_call),
+    (r"/UROP", website_call),
+    (r"/about", website_call),
+    
+    (r"/([a-zA-Z0-9]+/?)$", serve_user),
+    #(r"/.+", serve_capability),
+    #(r"/$", serve_index),
+    
+    #(r"/([a-zA-Z0-9/]*)", ContentHandler),
+    #(r"/([a-zA-Z0-9./]*)", ContentHandler),
+    #(r"%s/static/.*" % prefix, tornado.web.RedirectHandler,
+    #dict(url="http://github.com/downloads/facebook/tornado/tornado-0.1.tar.gz")),
+], **settings)
 
 if __name__ == "__main__":
-     
-    debug = os.environ.get("SERVER_SOFTWARE", "").startswith("Development/")
+    
+    config = Config()
     
     parser = OptionParser(add_help_option=False)
     parser.add_option("-h", "--host", dest="host", default='localhost')
@@ -68,26 +128,15 @@ if __name__ == "__main__":
     if (options.agents_url):
         agents_url = 'http://%s' % options.agents_url
         
+    config.website_url_prefix = website_url
+    config.discov_url = discov_url
+    config.ego_url_prefix = agents_url
     
     print 'Brin.gy website running at %s' % website_url
     print 'Discovery at: %s' % discov_url
     print 'Agents at: %s' % agents_url
     
-    settings = {
-        "template_path": os.path.join(os.path.dirname(__file__), "templates"),
-        #"xsrf_cookies": True,
-        "debug": debug,
-        "static_path": os.path.join(os.path.dirname(__file__), "static"),
-        #"static_url_prefix": '%s/static/' % static_url_prefix,
-        "static_url_prefix": '/static/'
-    }
-    
-    application = tornado.web.Application([
-        (r"/([a-zA-Z0-9/]*)", ContentHandler),
-        #(r"/([a-zA-Z0-9./]*)", ContentHandler),
-        #(r"%s/static/.*" % prefix, tornado.web.RedirectHandler,
-        #dict(url="http://github.com/downloads/facebook/tornado/tornado-0.1.tar.gz")),
-    ], **settings)
+
 
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(PORT, address=HOST)

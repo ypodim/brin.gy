@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
-    <title>Brin.gy {{title}}</title>
+    <title>Brin.gy</title>
     
     <link type="text/css" rel="stylesheet" href="{{ static_url("bootstrap/bootstrap.css") }}">
     <link rel="stylesheet/less" type="text/css" href='{{ static_url("css/website.less") }}'>
@@ -63,7 +63,6 @@
                     <img height=50 src='{{ static_url("images/website/delete.svg") }}' alt="" />delete agent
                 </a>
             </div>
-            
             <div class="menu-item" style="float:right; padding-top:8px;">
                 <a href="https://github.com/ypodim/brin.gy" target="_blank">
                     <img height=50 src='{{ static_url("images/website/download.svg") }}' alt="" />download
@@ -74,18 +73,23 @@
                     <img height=50 src='{{ static_url("images/website/about.svg") }}' alt="" />about
                 </a>
             </div>
-            <div class="menu-item" style="float:right; padding-top:8px;">
-                <a id="tourBtn" href="/manage/ypodim#tour">
+            <div id="tourBtn" class="menu-item" style="float:right; padding-top:8px;">
+                <a href="/ypodim#tour">
                     <img height=50 src='{{ static_url("images/website/tour.svg") }}' alt="" />take the tour
                 </a>
             </div>
+<!--            <div id="cart-btn" class="menu-item" style="float:right; padding-top:8px;">
+                <a href="#">
+                    <img height=50 src='{{ static_url("images/website/cart.svg") }}' alt="" />add to cart
+                </a>
+            </div>-->
 <!--            <div class="menu-item" style="float:right; padding-top:8px;">
                 <a href="/api">
                     <img height=50 src='{{ static_url("images/website/gears.svg") }}' alt="" /><br>API
                 </a>
             </div>-->
-            <div id="pseudonym" style="float:right; padding: 8px 50px 0 0;">
-                pseudonym: <span class="label success">{{args}}</span>
+            <div id="pseudonym">
+                pseudonym: <span class="label success">{{config.agentid}}</span>
             </div>
         </div>
         <div class=""> 

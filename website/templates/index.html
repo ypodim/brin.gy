@@ -5,10 +5,16 @@
 <script language="javascript" type="text/javascript">
 
 
-var ego_url_prefix = "{{ego_url_prefix}}";
-var website_url_prefix = "{{website_url_prefix}}";
-var discov_url = "{{discov_url}}";
+var ego_url_prefix = "{{config.ego_url_prefix}}";
+var website_url_prefix = "{{config.website_url_prefix}}";
+var discov_url = "{{config.discov_url}}";
 var valid_username = undefined;
+
+console.log(ego_url_prefix, website_url_prefix, discov_url);
+
+var redirect = function(username) {
+    window.location.href = "{{config.website_url_prefix}}/"+username+"#tour";
+}
 
 var check_username = function()
 {
@@ -30,9 +36,10 @@ var post_new_user = function() {
         error = data.error;
         if (data.error)
             alert(data.error);
-        
+        console.log(data);
         if (! error.length) {
-            window.location.href = "{{website_url_prefix}}/manage/"+valid_username+"#tour";
+            cookies.set_cookie(data.username, data.secret);
+            redirect(data.username);
         }
     }, "json");
 }
@@ -64,9 +71,6 @@ $(document).ready(function()
 //         if (obj.metaKey || obj.altKey || obj.ctrlKey)
 //             return false;
     }).keyup(function(obj) {
-//         console.log(obj.keyCode);
-//         text = $(this).val();
-//         console.log("checking", text);
         if ($(this).val().length)
             check_username();
         else
@@ -74,16 +78,16 @@ $(document).ready(function()
         return true;
     });
     
-    for (name in cookies.get_cookie()) {
+    for (name in cookies.get_cookie().pseudonyms) {
         $("select").append("<option>"+name+"</option>")
         $("#previous_pseudonym").show();
     }
     
     $("select").change(function(){
-        window.location.href = "{{website_url_prefix}}/manage/"+$(this).val();
+        redirect($(this).val());
     });
     $("#btn2").click(function(){
-        window.location.href = "{{website_url_prefix}}/manage/"+$("select").val()+"#tour";
+        redirect($("select").val());
     });
     
     $.getJSON(discov_url+"/stats", function(json){

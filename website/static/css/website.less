@@ -156,10 +156,23 @@ div.clear {clear:both;}
     padding: 0px;
 }
 
-#results { 
+
+#results-container { 
     display: inline;
     margin: 0 6px 0 6px;
+}
+#cart-btn div img {
+    padding: 5px 0 0 0;
+}
+#cart-btn .description {
+    width:50px;
+    float:right;
+}
+
+#results { 
     overflow: auto;
+    margin-bottom: 5px;
+
     a {
         display: block;
         border-radius:@pill-radius;
@@ -379,7 +392,12 @@ a.suggestionVal:hover { color:white; background-color:#0050a3; text-decoration: 
 
 .indicator {display:none;}
 
-#delete_btn, #tourBtn, #pseudonym {display:none;}
+#delete_btn, #tourBtn, #cart-btn, #pseudonym {display:none;}
+
+#pseudonym { 
+    float:left; 
+    padding: 8px 50px 0 30px;
+}
 #left {float:left; width:50%; padding-right:50px;margin-left: 50px;}
 .left {margin-left: 50px;}
 #right {float: left;}
@@ -531,12 +549,9 @@ pill {
 
 
 .stat-entry {
-/*     width:200px; */
     font-size: 14px;
-/*     display:block; */
-/*     float:left; */
     font-weight:bold;
-    background-color:gr
+/*     background-color:gr */
 }
 /*stat.left {
     margin:0;

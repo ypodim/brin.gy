@@ -178,12 +178,12 @@ E.previous_intersection = {};
 // change accordingly without resetting the whole list.
 
 E.satellite = {};
-E.satellite.url = "{{discov_url}}";
+E.satellite.url = "{{config.discov_url}}";
 E.agent = {};
-E.agent.id = "{{args}}";
-E.agent.baseurl = "{{ego_url_prefix}}";
-E.agent.url = "{{ego_url_prefix}}/{{args}}";
-E.website_url = "{{website_url_prefix}}";
+E.agent.id = "{{config.agentid}}";
+E.agent.baseurl = "{{config.ego_url_prefix}}";
+E.agent.url = "{{config.ego_url_prefix}}/{{config.agentid}}";
+E.website_url = "{{config.website_url_prefix}}";
 
 E.post_keyval = null;
 // save key/val to agent.
@@ -216,7 +216,9 @@ E.post_keyval = function(cap, key, val, clb) {
         clb = function(json){
             console.log("post", json);
         }
-    $.post(E.agent.url+"/"+cap, {data:data}, clb, "json");
+    
+    secret = cookies.get_cookie().pseudonyms[E.agent.id];
+    $.post(E.agent.url+"/"+cap, {data:data, secret:secret}, clb, "json");
 }
 
 E.delete_keyval = function(cap, key, val, clb) {
@@ -224,12 +226,13 @@ E.delete_keyval = function(cap, key, val, clb) {
         clb = function(json){
             console.log("post", json);
         }
-
+    
+    secret = cookies.get_cookie().pseudonyms[E.agent.id];
     data = JSON.stringify([[key, val]]);
     $.ajax({
         type: "DELETE",
         url: E.agent.url+"/"+cap,
-        data: {data:data},
+        data: {data:data, secret:secret},
         success: clb,
         dataType: "json",
     });
@@ -335,6 +338,39 @@ E.handle_val_click = function(){
     return false;
 }
 
+E.get_geocode = function(latlng, clb) {
+    geogy.geocoder.geocode({'latLng': latlng}, function(results, status) {
+        lat = results[0].geometry.location.lat();
+        lon = results[0].geometry.location.lng();
+        val = JSON.stringify({lat:""+lat,lon:""+lon});
+        
+        if (status == google.maps.GeocoderStatus.OK) {
+            key = "my location";
+            formatted = results[0].formatted_address;
+            console.log('formatted address:', formatted, key);
+            
+            attr_manager.sdata.location[key].values[val] = {
+                cnt:0, 
+                selected:false,
+                display:true,
+                haveit:true, 
+                matches:[],
+                formatted: formatted,
+            };
+            
+            counter = $("span.attr_counters[uitype=\"user_attribute\"][cap=\"location\"][key=\"my location\"]");
+            counter.attr("val",val);
+            counter.parent().attr("val",val);
+        } else {
+            alert("Geocoder failed due to: " + status);
+        }
+        if (formatted.length > 10)
+            formatted = formatted.substring(0,8)+"...";
+            
+        if (clb != undefined)
+            clb(val, results, formatted);
+    });
+}
 
 E.get_geolocation = function(clb) {
     
@@ -346,37 +382,7 @@ E.get_geolocation = function(clb) {
         attr_manager.sdata.location[key].values = {};
         
         latlng = new google.maps.LatLng(result.lat, result.lon);
-        geogy.geocoder.geocode({'latLng': latlng}, function(results, status) {
-            lat = results[0].geometry.location.lat();
-            lon = results[0].geometry.location.lng();
-            val = JSON.stringify({lat:""+lat,lon:""+lon});
-            
-            if (status == google.maps.GeocoderStatus.OK) {
-                key = "my location";
-                formatted = results[0].formatted_address;
-                console.log('formatted address:', formatted, key);
-                
-                attr_manager.sdata.location[key].values[val] = {
-                    cnt:0, 
-                    selected:false,
-                    display:true,
-                    haveit:true, 
-                    matches:[],
-                    formatted: formatted,
-                };
-                
-                counter = $("span.attr_counters[uitype=\"user_attribute\"][cap=\"location\"][key=\"my location\"]");
-                counter.attr("val",val);
-                counter.parent().attr("val",val);
-            } else {
-                alert("Geocoder failed due to: " + status);
-            }
-            if (formatted.length > 10)
-                formatted = formatted.substring(0,8)+"...";
-                
-            clb(val, results, formatted);
-        });
-        
+        E.get_geocode(latlng, clb);
         E.populate_map(result);
     }
     
@@ -400,7 +406,12 @@ E.get_geolocation = function(clb) {
 E.complete_toggle_handle = function(cap, key, val, button) {
     haveit = attr_manager.sdata[cap][key].values[val].haveit;
     if (haveit) {
-        E.post_keyval(cap, key, val, function(){
+        E.post_keyval(cap, key, val, function(json){
+            if (json.error) {
+                alert(json.error);
+                attr_manager.sdata[cap][key].values[val].haveit = !haveit;
+                return false;
+            }
             button.html("\u2713").popover("hide").css("background-color","");
             
             confirmation = $(".confirmation").html("added to your profile!");
@@ -415,6 +426,12 @@ E.complete_toggle_handle = function(cap, key, val, button) {
         });
     } else {
         E.delete_keyval(cap, key, val, function(json){
+            if (json.error) {
+                alert(json.error);
+                attr_manager.sdata[cap][key].values[val].haveit = !haveit;
+                return false;
+            }
+            
             button.html("\u00A0").popover("hide").css("background-color","");
             
             confirmation = $(".confirmation").html("removed");
@@ -660,7 +677,6 @@ E.populate_attrs = function(useEditor) {
         useEditor = true;
         
     $("#choices").empty();
-
     for (capname in attr_manager.sdata) {
 
         app = $("<div></div>").addClass("clear");
@@ -798,6 +814,7 @@ E.get_multi_profile = function(agents) {
                 delete E.previous_intersection[agent];
             }
         }
+//         $("#cart-btn").show();
     });
 }
 
@@ -896,6 +913,7 @@ E.poll_matches = function(capname) {
         if (intersection.length > 0) {
             E.get_multi_profile(intersection);
         } else {
+            $("#cart-btn").hide();
             $("#results").empty();
             mapman.deleteOverlays();
             E.previous_intersection = {};
@@ -969,7 +987,9 @@ E.fetch_keyvals = function(clb) {
         key = "my location";
         attr_manager.add_sdata("location", key, 0);
         
+        console.log("checking", E.agent.id, cookies.get_cookie().pseudonyms, json.lat, json.lon);
         if (json.lat.length && json.lon.length) {
+            
             geoclb = function(val, results, formatted) {
                 console.log("geoclb:", val, results, formatted);
                 
@@ -978,12 +998,20 @@ E.fetch_keyvals = function(clb) {
                 oldval = {lat:""+json.lat,lon:""+json.lon};
                 oldval = JSON.stringify(oldval);
                 
-                E.post_keyval(cap, key, val, function(){
-                    console.log("saved new")
+                
+                E.post_keyval(cap, key, val, function(json){
+                    console.log("saving new location:", json.error);
                 });
                 clb();
             }
-            E.get_geolocation(geoclb);
+            
+            if (E.agent.id in cookies.get_cookie().pseudonyms) {
+                E.get_geolocation(geoclb);
+            } else {
+                latlng = new google.maps.LatLng(json.lat, json.lon);
+                E.get_geocode(latlng);
+                clb();
+            }
         } else {
             attr_manager.sdata.location[key].values[valstr] = {
                 cnt:json.count, 
@@ -1069,19 +1097,14 @@ E.resize_overflow_divs = function(){
     offset = $("#choices").offset();
     dheight = $(document).height();
     $("#choices").height(dheight - offset.top - 40);
-    $("#results").height(dheight - offset.top + 10);
-    $("#map_canvas").height(dheight - offset.top + 10);
+    $("#results").height(dheight - offset.top + 20);// - 70);
+    $("#map_canvas").height(dheight - offset.top + 20);
 }
 //////////////////////////////////////////////////
 ////////////////     ON READY
 
 $(document).ready(function()
 {
-    $.getJSON(E.agent.url, function(json){
-        if (json.error == "invalid user "+E.agent.id)
-            location.replace(E.website_url);
-    });
-    
     clb = E.populate_attrs;
     E.fetch_keyvals(clb);
     
@@ -1094,8 +1117,6 @@ $(document).ready(function()
     
     $("#delete_btn").show().click(show_delete_modal);
     $("#pseudonym").show();
-    
-    cookies.set_cookie(E.agent.id);
     
     $("nav a").click(function (){
         first_child_selected = $("nav a:first-child").hasClass("selected");
@@ -1191,6 +1212,10 @@ $(document).ready(function()
 //         console.log("hash is", window.location.hash);
     }
     
+    $("#cart-btn a").click(function(){
+        console.log(E.previous_intersection);
+        return false;
+    });
     $("#tourBtn").show().click(function(){
         attr_manager.deselect_keyvals();
         E.populate_attrs();
@@ -1242,14 +1267,19 @@ $(document).ready(function()
     <div id="choices"></div>
 </div>
 <div id="right-panel" class="">            
-    <div id="results" class="span3"></div>
+    <div id="results-container" class="span3">
+        <div id="results" ></div>
+        <div id="cart-btn" class="btn success">
+            <img height=50 src='{{ static_url("images/website/cart.svg") }}' alt="" />
+            <span class="description">add people to cart</span>
+        </div>
+    </div>
     <div id="map_canvas" class=""></div>
     <button id="match_btn" class="btn info">
         <div id="matches" curpos="0">0</div>
         <div id="matches_caption">people match</div>
     </button>
 </div>
-
 
 
 <div id="modal-from-dom" class="modal hide fade">
@@ -1281,7 +1311,6 @@ $(document).ready(function()
 </div>
 
 
-
 <div id="get-location-modal" class="modal hide fade">
     <div class="modal-header">
         <a href="#" class="close">&times;</a>
@@ -1295,7 +1324,6 @@ $(document).ready(function()
         <a href="#" class="btn success" id="location-ok-btn">Yes</a>
     </div>
 </div>
-
 
 
 <div id="coverbanner" class="cover">
@@ -1313,7 +1341,6 @@ $(document).ready(function()
 <div id="popup"></div>
 
 <div class='confirmation label'></div>
-
 
 {% end %}
 

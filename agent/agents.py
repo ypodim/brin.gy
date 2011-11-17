@@ -7,7 +7,7 @@ import tornado.web
 import tornado.escape
 import tornado.httpclient
 
-import sys, os, time, random
+import sys, os, time
 from datetime import datetime
 from optparse import OptionParser
 from threading import Thread
@@ -83,8 +83,9 @@ class bringy_handler(tornado.web.RequestHandler):
 class serve_index(bringy_handler):
     def post(self):
         user_name = self.get_argument('username')
-        created = db.create_user(user_name)
-        res = {'error':'', 'username':user_name, 'created':created}
+        created, secret = db.create_user(user_name)
+        res = dict(error='', username=user_name, created=created, secret=secret)
+        
         #print 'CREATE USER', res
         self.write(res)
     def get(self):
@@ -131,18 +132,28 @@ class serve_capability(bringy_handler):
         self.execute()
         
     def post(self):
-        res = self.execute()
-        if res: self.write(res)
-        
+        secret = self.get_argument('secret', None)
+        if db.authenticate_user(self.username, secret):
+            res = self.execute()
+            if res: self.write(res)
+        else:
+            res = dict(error='authentication failed for user:%s secret:%s' % (self.username, secret))
+            self.write(res)
+            
     def delete(self):
         dic = tornado.escape.url_unescape(self.request.body)
         args = [x.split('=', 1) for x in self.request.body.split('&')]
         params = dict(args)
         arguments = tornado.escape.url_unescape(params['data'])
         arguments = tornado.escape.json_decode(arguments)
-        print 'delete:', arguments, type(arguments)
-        res = self.execute(arguments)
-        if res: self.write(res)
+        #print 'delete:', arguments, type(arguments)
+        secret = params.get('secret')
+        if db.authenticate_user(self.username, secret):
+            res = self.execute(arguments)
+            if res: self.write(res)
+        else:
+            res = dict(error='authentication failed for user:%s secret:%s' % (self.username, secret))
+            self.write(res)
         
     def execute(self, arguments=None):
         exec 'from capabilities.%s import %s' % (self.cap, self.cap)
@@ -330,6 +341,13 @@ class api_call(tornado.web.RequestHandler):
     def api_ustats(self):
         dic = dict(users=list(db.get_agents()))
         self.write(dic)
+        
+    def api_authenticate_user(self):
+        user = self.get_argument('user')
+        secret = self.get_argument('secret')
+        res = (db.r.hget('options:%s' % user, 'secret') == secret)
+        self.write(dict(result=res))
+        
 #########################################
 
 settings = {
@@ -342,6 +360,7 @@ application = tornado.web.Application([
     (r"/batch_location", api_call),
     (r"/batch_buysell", api_call),
     (r"/controller", api_call),
+    (r"/authenticate_user", api_call),
     
     (r"/[a-zA-Z0-9]+/?$", serve_user),
     (r"/.+", serve_capability),
