@@ -91,7 +91,8 @@ class location():
     def clear_all(self):
         for key in self.get_keys() or []:
             dic = self.get_location(key)
-            self.delete_entry(key, dic['lat'], dic['lon'])
+            if dic:
+                self.delete_entry(key, dic['lat'], dic['lon'])
             
     def get(self):
         saved_items = {}

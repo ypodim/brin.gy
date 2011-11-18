@@ -1122,6 +1122,8 @@ E.resize_overflow_divs = function(){
 
 $(document).ready(function()
 {
+    cookies.upgrade_cookie();
+    
     clb = E.populate_attrs;
     E.fetch_keyvals(clb);
     

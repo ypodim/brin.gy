@@ -46,6 +46,13 @@ cookies.del_cookie = function(name)
     $.cookie('bringy', cookie_str, {expires:7, path:"/"});
 }
 
+cookies.upgrade_cookie = function()
+{
+    cookie_str = $.cookie('other_names', {path:"/"});
+    if (typeof(cookie_str) == "string"){
+        cookie = JSON.parse(cookie_str);
+    console.log("other_names", cookie);
+}
 
 
 
