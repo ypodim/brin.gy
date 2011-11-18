@@ -133,8 +133,11 @@ class serve_capability(bringy_handler):
         
     def post(self):
         secret = self.get_argument('secret', None)
-        if db.authenticate_user(self.username, secret):
+        passed = db.authenticate_user(self.username, secret)
+        if passed:
             res = self.execute()
+            if type(passed) == str:
+                res['secret'] = passed
             if res: self.write(res)
         else:
             res = dict(error='authentication failed for user:%s secret:%s' % (self.username, secret))
@@ -148,8 +151,11 @@ class serve_capability(bringy_handler):
         arguments = tornado.escape.json_decode(arguments)
         #print 'delete:', arguments, type(arguments)
         secret = params.get('secret')
-        if db.authenticate_user(self.username, secret):
+        passed = db.authenticate_user(self.username, secret)
+        if passed:
             res = self.execute(arguments)
+            if type(passed) == str:
+                res['secret'] = passed
             if res: self.write(res)
         else:
             res = dict(error='authentication failed for user:%s secret:%s' % (self.username, secret))

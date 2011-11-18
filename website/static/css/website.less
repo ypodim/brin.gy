@@ -87,7 +87,6 @@ span.count {
     margin-left: 10px;
     padding: 1px 5px;
     text-shadow: 0 0px 1px #fff;
-    line-height: 30px;
     border-radius: 15px;
     -moz-border-radius: 15px;
     border-radius: 3px;
@@ -95,7 +94,6 @@ span.count {
 
 div.footer { 
     text-align:center; 
-/*     padding-top: 10px;  */
     bottom:0px; 
     width:100%;
 }
@@ -105,7 +103,7 @@ div.choice_header { padding-bottom: 150px; clear:both;}
 div.clear {clear:both;}
 
 #choices {
-    overflow: auto;
+    overflow: auto !important;
 }
 
 #searchinput {
@@ -132,12 +130,7 @@ div.clear {clear:both;}
 
 #left-panel {
     padding-left: 5px;
-/*     margin-left:20px; */
-/*     float:left; */
-/*     width: 300px; */
-/*     display: inline; */
     margin: 0px;
-/*     background-color:yellow; */
 }
 #right-panel { 
 /*     float:left; */
@@ -409,7 +402,7 @@ a.suggestionVal:hover { color:white; background-color:#0050a3; text-decoration: 
 
 
 
-@pill-radius: 4px;
+@pill-radius: 3px;
 
 
 .confirmation {
@@ -427,7 +420,7 @@ pill {
     display: table;
     text-align: left;
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     background-image: -moz-linear-gradient(90deg, #dddddd, #aaaaaa);
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#dddddd), to(#aaaaaa));
     border-radius: @pill-radius;
@@ -440,12 +433,11 @@ pill {
         border-left: 1px solid rgba(50, 50, 50, 0.3);
     }
     a {
-        
         width: 100px;
         -webkit-border-top-left-radius: @pill-radius;
         -webkit-border-bottom-left-radius: @pill-radius;
         border-left: 0 transparent none;
-        padding-left:15px;
+        padding-left:5px;
         font-weight: bold;
         &:hover {
             text-decoration: none;
@@ -474,18 +466,17 @@ pill {
     div.valpart {
         border-left: 0;
         display: table-cell;
-/*        width: 160px;*/
-        
-        a, div {
-/*             width: 100px; */
-            height: 20px;
+
+        div {
+            height: 25px;
             display: block;
-            padding-bottom: 10px;
-            
+        }
+        a {
+            width:170px;
+            padding: 3px 0 3px 5px;
             &:hover {
                 border-radius: @pill-radius;
                 text-decoration: none;
-/*                 color: white; */
                 text-shadow: 0 0.08em 0.1em rgba(220, 220, 220, 0.45);
             }
             &.pressed {
@@ -500,12 +491,14 @@ pill {
                 background: rgba(00, 80, 163, 0.85);
             }
             
-            .value {
-
-            }
             span.count {
                 margin-left: 0px;
                 margin-right: 5px;
+                width: 15px;
+            }
+            span.value {
+/*                 line-height:15px; */
+/*                 padding:0px; */
             }
         }
         
@@ -515,7 +508,8 @@ pill {
         
         form.editor {
             padding-left:15px;
-            padding-bottom: 10px;
+            padding-bottom: 5px;
+            padding-top: 0px;
             input {
                 font-size: 12px;
                 font-weight: bold;
@@ -527,8 +521,7 @@ pill {
         span.add_btn {
             border-radius: @pill-radius;
             text-align: center;
-            margin-top: 5px;
-            margin-right: 10px;
+            margin: 2px 8px 0 0;
             display: table-cell;
             width: 30px;
             display: table-cell;

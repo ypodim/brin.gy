@@ -207,6 +207,8 @@ E.fetch_keyvals = null;
 E.last_fetched = ""; 
 // keeps track of the last attribute fetched to continue from the next one
 
+E.formatted_length = 24;
+
 ///////////////////////////////////////////////
 
 
@@ -218,7 +220,17 @@ E.post_keyval = function(cap, key, val, clb) {
         }
     
     secret = cookies.get_cookie().pseudonyms[E.agent.id];
-    $.post(E.agent.url+"/"+cap, {data:data, secret:secret}, clb, "json");
+    if (secret == undefined) {
+        clb({error:"Not allowed to change "+E.agent.id+"'s profile."});
+        return false;
+    }
+    $.post(E.agent.url+"/"+cap, {data:data, secret:secret}, function(json){
+        if (json.secret != undefined)
+            console.log("GOT SECRET BACK", json.secret, "my secret was", secret);
+        else
+            console.log("my secret was", secret);
+        clb(json);
+    }, "json");
 }
 
 E.delete_keyval = function(cap, key, val, clb) {
@@ -228,6 +240,10 @@ E.delete_keyval = function(cap, key, val, clb) {
         }
     
     secret = cookies.get_cookie().pseudonyms[E.agent.id];
+    if (secret == undefined) {
+        clb({error:"Not allowed to change "+E.agent.id+"'s profile."});
+        return false;
+    }
     data = JSON.stringify([[key, val]]);
     $.ajax({
         type: "DELETE",
@@ -364,8 +380,8 @@ E.get_geocode = function(latlng, clb) {
         } else {
             alert("Geocoder failed due to: " + status);
         }
-        if (formatted.length > 10)
-            formatted = formatted.substring(0,8)+"...";
+        if (formatted.length > E.formatted_length)
+            formatted = formatted.substring(0,E.formatted_length-3)+"...";
             
         if (clb != undefined)
             clb(val, results, formatted);
@@ -548,8 +564,8 @@ E.generate_val_entry = function(capname, attr, val) {
             formatted = address;
     }
     
-    if (formatted.length > 10)
-        formatted = formatted.substring(0,8)+"...";
+    if (formatted.length > E.formatted_length)
+        formatted = formatted.substring(0,E.formatted_length-3)+"...";
         
     value = $("<span class='value'></span>").html(formatted);
     
@@ -1009,8 +1025,9 @@ E.fetch_keyvals = function(clb) {
                 E.get_geolocation(geoclb);
             } else {
                 latlng = new google.maps.LatLng(json.lat, json.lon);
-                E.get_geocode(latlng);
-                clb();
+                E.get_geocode(latlng, function(){
+                    clb();
+                });
             }
         } else {
             attr_manager.sdata.location[key].values[valstr] = {
@@ -1254,7 +1271,7 @@ $(document).ready(function()
 {% end %}
 {% block body %}
 
-<div id="left-panel" class="span5">
+<div id="left-panel" class="span6">
 <!--    <nav class="">
         <a href="#" class="selected">search</a>
         <a class="" href="#">me</a>
