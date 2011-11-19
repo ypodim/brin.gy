@@ -46,6 +46,9 @@ var post_new_user = function() {
 
 $(document).ready(function()
 {
+    cookies.upgrade_cookie();
+    
+    
     $("#newuserform").submit(function(obj){
         username = $("#username").val();
         res = /\W/.test(username);

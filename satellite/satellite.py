@@ -196,7 +196,9 @@ class multimatch(tornado.web.RequestHandler):
             for k,v in self.request.arguments.items():
                 params[k] = v[-1]
         self.params = params
-        
+    
+    def get(self):
+        self.post()
     def post(self):
         matches = []
         

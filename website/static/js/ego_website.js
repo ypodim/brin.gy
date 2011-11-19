@@ -2,6 +2,7 @@
 // cookie management
 
 cookies = {};
+E = {};
 
 cookies.get_cookie = function()
 {
@@ -19,7 +20,7 @@ cookies.set_cookie = function(name, secret)
     if (secret == undefined)
         secret = 0
     cookie_str = $.cookie('bringy', {path:"/"});
-//     console.log("set_cookie other_names1", cookie_str, name);
+    console.log("set_cookie other_names1", cookie_str, name);
     if (typeof(cookie_str) != "string") 
         cookie_str = "{}";
     
@@ -28,7 +29,7 @@ cookies.set_cookie = function(name, secret)
         cookie.pseudonyms = {};
     cookie.pseudonyms[name] = secret;    
     cookie_str = JSON.stringify(cookie);
-//     console.log("set_cookie other_names2", cookie_str, secret);
+    console.log("set_cookie other_names2", cookie_str, secret);
     $.cookie('bringy', cookie_str, {expires:7, path:"/"});
 }
 
@@ -48,10 +49,23 @@ cookies.del_cookie = function(name)
 
 cookies.upgrade_cookie = function()
 {
+    agent_url = "http://localhost:10007/retrieve_secret";
+    
     cookie_str = $.cookie('other_names', {path:"/"});
-    if (typeof(cookie_str) == "string"){
+    if (cookie_str && typeof(cookie_str) == "string"){
+        
+        console.log("bringy cookie before:", cookies.get_cookie());
+        cookie_str = $.cookie('other_names', {path:"/"});
+        
         cookie = JSON.parse(cookie_str);
-        console.log("other_names", cookie);
+        console.log("other_names", cookie, cookie_str);
+        for (user in cookie) {
+            $.getJSON(agent_url, {user:user}, function(json){
+                console.log("got back from retrieve_secret:", json.user, json.stored_secret);
+                cookies.set_cookie(json.user, json.stored_secret);
+                console.log("bringy cookie after:", cookies.get_cookie());
+            });
+        }
     } else
         console.log("other_names not found in cookie, good.");
 }

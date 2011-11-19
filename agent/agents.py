@@ -354,6 +354,15 @@ class api_call(tornado.web.RequestHandler):
         res = (db.r.hget('options:%s' % user, 'secret') == secret)
         self.write(dict(result=res))
         
+    def api_retrieve_secret(self):
+        user = self.get_argument('user')
+        stored_secret = db.r.hget('options:%s' % user, 'secret')
+        created = False
+        if not stored_secret:
+            stored_secret = db.generate_secret(user)
+            created = True
+        self.write(dict(stored_secret=stored_secret, created=created, user=user))
+        
 #########################################
 
 settings = {
@@ -367,6 +376,7 @@ application = tornado.web.Application([
     (r"/batch_buysell", api_call),
     (r"/controller", api_call),
     (r"/authenticate_user", api_call),
+    (r"/retrieve_secret", api_call),
     
     (r"/[a-zA-Z0-9]+/?$", serve_user),
     (r"/.+", serve_capability),
