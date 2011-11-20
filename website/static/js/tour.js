@@ -34,13 +34,13 @@ Tour.tourSlides.push({
 });
 Tour.tourSlides.push({
     left:290, top:155, 
-    width:40, height:wh-155, 
-    text:'You can use these boxes to add or remove values to your profile.',
+    width:50, height:wh-155, 
+    text:'You can use these boxes to add or remove values to your profile.<br><br>Click on a box to add a piece of information about you, go on :)',
     btnText: "Next",
     backbtnText: "Back",
 });
 
-
+// PYTHON SKILL APP
 Tour.tourSlides.push({
     left:130, top:155, 
     width:0, height:wh-155, 
@@ -74,8 +74,44 @@ Tour.tourSlides.push({
     backbtnText: "Back",
 });
 Tour.tourSlides.push({
-    left:5, top:90, 
+    left:510, top:90, 
     width:ww-355, height:wh-110, 
+    text:'... and these are the results on the map.',
+    btnText: "Next",
+    backbtnText: "Back",
+});
+
+
+// DATING APP
+Tour.tourSlides.push({
+    left:130, top:155, 
+    width:0, height:wh-155, 
+    text:'Now, let\'s look for a date instead ;)<BR><BR>Against all odds, you\'re a girl looking for a boy!',
+    btnText: "Next",
+    backbtnText: "Back",
+    startFresh: true,
+});
+Tour.tourSlides.push({
+    left:110, top:155, 
+    width:170, height:wh-155,
+    text:'First, let\'s look for males.',
+    btnText: "Next",
+    backbtnText: "Back",
+    select_key: "sex",
+    select_val: "male",
+});
+Tour.tourSlides.push({
+    left:5, top:155, 
+    width:105, height:wh-155,  
+    text:'Intersect that with people who reported location by clicking on "my location" attribute.',
+    btnText: "Next",
+    backbtnText: "Back",
+    select_key: "my location",
+});
+
+Tour.tourSlides.push({
+    left:350, top:90, 
+    width:ww-350, height:wh-110, 
     text:'... and these are the results on the map. Happy hunting!',
     btnText: "Finish",
     backbtnText: "Back",
@@ -134,9 +170,17 @@ Tour.do_tour = function(index){
     $("#coverright").show().css({left:slide.left+slide.width, top:slide.top, width:ww-slide.left-slide.width, height:slide.height});
     $("#coverbottom").show().css({height:wh-slide.top-slide.height});
     
-//     console.log("select_key", slide.select_key);
-//     console.log("select_val", slide.select_val);
-    if (slide.select_key) {
+    
+    if (slide.startFresh) {
+        $("pill a").each(function(){
+            if ($(this).hasClass("pressed")) {
+                console.log("clicked", this);
+                $(this).click();
+            }
+        });
+    }
+        
+    if (slide.select_key) {            
         if (slide.select_val == undefined) {
             count = Tour.select_key(slide.select_key);
         } else {
