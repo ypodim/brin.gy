@@ -105,14 +105,21 @@ class serve_user(bringy_handler):
         dic = self.finilize_call(dic)
         self.write(dic)
     def delete(self):
-        deleted = db.delete_user(self.username)
+        deleted = ''
+        error = ''
+        secret = self.get_argument('secret', '')
+        passed = db.authenticate_user(self.username, secret)
         
-        for capname in capability_names:
-            exec 'from capabilities.%s import %s' % (capname, capname)
-            capability = eval(capname)(self.username, self.arguments, db.r, self.on_response)
-            capability.clear_all()
-                
-        res = {'error':'', 'username':self.username, 'deleted':deleted}
+        if passed:
+            deleted = db.delete_user(self.username)
+            for capname in capability_names:
+                exec 'from capabilities.%s import %s' % (capname, capname)
+                capability = eval(capname)(self.username, self.arguments, db.r, self.on_response)
+                capability.clear_all()
+        else:
+            error='authentication failed for user:%s secret:%s' % (self.username, secret)
+            
+        res = {'error':error, 'username':self.username, 'deleted':deleted}
         self.write(res)
         
         

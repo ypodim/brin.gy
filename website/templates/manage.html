@@ -1077,8 +1077,10 @@ var show_delete_modal = function() {
             $.ajax({
                 url: E.agent.url,
                 type: "DELETE",
+                data: {secret:cookies.get_cookie().pseudonyms[E.agent.id]},
                 success: function(json) {
-                    console.log("delete response", json);
+//                     if (json.error.length)
+//                         alert(json.error);
                     location.replace(E.website_url);
                 },
                 dataType: "json",
@@ -1233,7 +1235,7 @@ $(document).ready(function()
     });
     $("#tourBtn").show().click(function(){
         attr_manager.deselect_keyvals();
-        E.populate_attrs();
+//         E.populate_attrs();
         Tour.do_tour(0);
         return false;
     });

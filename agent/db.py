@@ -32,8 +32,9 @@ class DB:
         if not stored_secret:
             stored_secret = self.generate_secret(user)
             return True
-        if secret == '1':
-            return secret
+        #if secret == '1':
+            #return secret
+        print 'returning', secret, stored_secret, (stored_secret == secret), (secret and stored_secret == secret)
         return (secret and stored_secret == secret)
         
     def delete_user(self, username):
