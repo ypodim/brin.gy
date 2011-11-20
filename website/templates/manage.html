@@ -965,15 +965,20 @@ E.poll_matches = function(capname) {
 }
 
 E.fetch_keyvals = function(clb) {
-    starting_from = E.last_fetched;
+    targetcount = 2;
+    count = 0;
+    finished = function() {
+        count++;
+        if (count==targetcount)
+            clb();
+    }
     
     if (E.last_fetched.length)
         console.log("continuing from", E.last_fetched);
     
     data = JSON.stringify({with_values:1, user:E.agent.id});
     
-    $.getJSON(E.satellite.url+"/profile/fetch/"+starting_from, {data:data}, function(json){
-//         console.log("fetch", json);
+    $.getJSON(E.satellite.url+"/profile/fetch/"+E.last_fetched, {data:data}, function(json){
         for (i in json.matches) {
             attribute = json.matches[i].key;
             attr_manager.add_sdata("profile", attribute, 0);
@@ -992,6 +997,8 @@ E.fetch_keyvals = function(clb) {
             }
             E.last_fetched = attribute;
         }
+        finished();
+        console.log("finish  profile");
     });
     
     // I should get all possible keys from the satellite,
@@ -1018,7 +1025,8 @@ E.fetch_keyvals = function(clb) {
                 E.post_keyval(cap, key, val, function(json){
                     console.log("saving new location:", json.error);
                 });
-                clb();
+                finished();
+                console.log("finish  location");
             }
             
             if (E.agent.id in cookies.get_cookie().pseudonyms) {
@@ -1026,7 +1034,8 @@ E.fetch_keyvals = function(clb) {
             } else {
                 latlng = new google.maps.LatLng(json.lat, json.lon);
                 E.get_geocode(latlng, function(){
-                    clb();
+                    finished();
+                    console.log("finish  location");
                 });
             }
         } else {
@@ -1037,7 +1046,8 @@ E.fetch_keyvals = function(clb) {
                 haveit:false, 
                 matches:json.matches,
             };
-            clb();
+            finished();
+            console.log("finish  location");
         }
     });
 }
@@ -1045,15 +1055,7 @@ E.fetch_keyvals = function(clb) {
 E.update_monitor = function() {
 //     console.log(E.match_criteria);
     if (window.location.search == "?control") {
-//         query = [];
-//         for (cap in attr_manager.udata)
-//             for (key in attr_manager.udata[cap])
-//                 for (val in attr_manager.udata[cap][key]) {                
-//                     if (attr_manager.udata[cap][key][val].selected == 1)
-//                         query.push([cap, key, val]);
-//                 }
         data = JSON.stringify(E.match_criteria);
-//         console.log(data);
         $.post(E.agent.baseurl+"/controller", {data:data, controller:E.agent.id}, function(json){
             console.log("controller post:", json);
         }, "json");
@@ -1222,11 +1224,7 @@ $(document).ready(function()
     
     
     if (window.location.hash.startsWith("#tour")) {
-        attr_manager.deselect_keyvals();
-        E.populate_attrs();
         Tour.do_tour(0);
-    } else {
-//         console.log("hash is", window.location.hash);
     }
     
     $("#cart-btn a").click(function(){
@@ -1278,7 +1276,7 @@ $(document).ready(function()
     </nav>-->
     <form id="searchbox">
         <div class="help-block">search or add new attribute</div>
-        <input type="text" id="searchinput" class="span5" title='add new attribute' data-content='press enter to add this attribute' />
+        <input type="text" id="searchinput" class="span6" title='add new attribute' data-content='press enter to add this attribute' />
     </form>
     <div id="userinfo"></div>
     <div id="choices"></div>

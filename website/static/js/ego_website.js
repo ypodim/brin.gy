@@ -49,7 +49,7 @@ cookies.del_cookie = function(name)
 
 cookies.upgrade_cookie = function()
 {
-    agent_url = "http://localhost:10007/retrieve_secret";
+    agent_url = "http://agents.brin.gy/retrieve_secret";
     
     cookie_str = $.cookie('other_names', {path:"/"});
     if (cookie_str && typeof(cookie_str) == "string"){

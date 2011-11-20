@@ -5,35 +5,35 @@ Tour = {};
 Tour.inTour = false;
 Tour.tourSlides = [];
 Tour.tourSlides.push({
-    left:10, top:155, 
+    left:55, top:155, 
     width:0, height:wh-155, 
     text:"So, you want to find some people. Awesome! <br>This tour will show you how Brin.gy works.",
     btnText: "Start",
     backbtnText: "",
 });
 Tour.tourSlides.push({
-    left:10, top:155, 
-    width:110, height:wh-155, 
+    left:5, top:155, 
+    width:105, height:wh-155, 
     text:'This is a list of attributes, like "name", "age", "skills" and "location".',
     btnText: "Next",
     backbtnText: "Back",
 });
 Tour.tourSlides.push({
-    left:120, top:155, 
-    width:120, height:wh-155, 
+    left:110, top:155, 
+    width:170, height:wh-155, 
     text:'This is a list of values for each attribute, like "pol" for "name and "chinese" for "language".',
     btnText: "Next",
     backbtnText: "Back",
 });
 Tour.tourSlides.push({
-    left:125, top:155, 
-    width:40, height:wh-155, 
+    left:110, top:155, 
+    width:30, height:wh-155, 
     text:'The red boxes show the number of people that have added the attribute next to them.',
     btnText: "Next",
     backbtnText: "Back",
 });
 Tour.tourSlides.push({
-    left:240, top:155, 
+    left:290, top:155, 
     width:40, height:wh-155, 
     text:'You can use these boxes to add or remove values to your profile.',
     btnText: "Next",
@@ -49,8 +49,8 @@ Tour.tourSlides.push({
     backbtnText: "Back",
 });
 Tour.tourSlides.push({
-    left:120, top:155, 
-    width:120, height:wh-155,
+    left:110, top:155, 
+    width:170, height:wh-155,
     text:'First, look for people with the "python" skill by clicking on "python".',
     btnText: "Next",
     backbtnText: "Back",
@@ -58,8 +58,8 @@ Tour.tourSlides.push({
     select_val: "python",
 });
 Tour.tourSlides.push({
-    left:10, top:155, 
-    width:110, height:wh-155,  
+    left:5, top:155, 
+    width:105, height:wh-155,  
     text:'Intersect that with people who reported location by clicking on "my location" attribute.',
     btnText: "Next",
     backbtnText: "Back",
@@ -67,14 +67,14 @@ Tour.tourSlides.push({
 });
 
 Tour.tourSlides.push({
-    left:290, top:90, 
+    left:350, top:90, 
     width:165, height:wh-110, 
     text:'This is a list of results in the intersection.',
     btnText: "Next",
     backbtnText: "Back",
 });
 Tour.tourSlides.push({
-    left:455, top:90, 
+    left:5, top:90, 
     width:ww-355, height:wh-110, 
     text:'... and these are the results on the map. Happy hunting!',
     btnText: "Finish",
