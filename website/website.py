@@ -48,7 +48,7 @@ class serve_user(tornado.web.RequestHandler):
     @tornado.web.asynchronous
     def get(self, agentid):
         config.agentid = agentid
-        
+                
         #cookie = self.get_cookie('bringy')
         #if cookie == None:
             #cookie = '{}'

@@ -22,6 +22,7 @@ class DB:
         
     def create_user(self, username):
         created = self.r.sadd('users', username)
+        secret = ''
         if created:
             secret = self.generate_secret(username)
             
@@ -34,8 +35,9 @@ class DB:
             return True
         #if secret == '1':
             #return secret
-        print 'returning', secret, stored_secret, (stored_secret == secret), (secret and stored_secret == secret)
-        return (secret and stored_secret == secret)
+        res = (len(secret)>0 and stored_secret == secret)
+        print 'returning', secret, stored_secret, res
+        return res
         
     def delete_user(self, username):
         return self.r.srem('users', username)

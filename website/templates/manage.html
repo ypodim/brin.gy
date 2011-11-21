@@ -1010,7 +1010,7 @@ E.fetch_keyvals = function(clb) {
         key = "my location";
         attr_manager.add_sdata("location", key, 0);
         
-        console.log("checking", E.agent.id, cookies.get_cookie().pseudonyms, json.lat, json.lon);
+//         console.log("checking", E.agent.id, cookies.get_cookie().pseudonyms, json.lat, json.lon);
         if (json.lat.length && json.lon.length) {
             
             geoclb = function(val, results, formatted) {
@@ -1072,22 +1072,24 @@ var show_delete_modal = function() {
         modal.modal("hide");
     });
     $("#delete-delete-btn").click(function(){
-        modal.bind('hidden', function(){
-            console.log("deleting", E.agent.url);
-            $.ajax({
-                url: E.agent.url,
-                type: "DELETE",
-                data: {secret:cookies.get_cookie().pseudonyms[E.agent.id]},
-                success: function(json) {
-//                     if (json.error.length)
-//                         alert(json.error);
+        that = this;
+        secret = cookies.get_cookie().pseudonyms[E.agent.id];
+        console.log("deleting", E.agent.url, secret);
+        $.ajax({
+            url: E.agent.url,
+            type: "DELETE",
+            data: {secret:secret},
+            success: function(json) {
+                if (json.error.length) {
+                    $(that).parent().parent().modal("hide");
+                    alert(json.error);
+                } else {
+                    cookies.del_cookie(E.agent.id);
                     location.replace(E.website_url);
-                },
-                dataType: "json",
-            });
+                }
+            },
+            dataType: "json",
         });
-        modal.modal("hide");
-        cookies.del_cookie(E.agent.id);
     });
 }
 

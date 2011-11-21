@@ -81,7 +81,7 @@ class bringy_handler(tornado.web.RequestHandler):
 
 
 class serve_index(bringy_handler):
-    def post(self):
+    def post(self):            
         user_name = self.get_argument('username')
         created, secret = db.create_user(user_name)
         res = dict(error='', username=user_name, created=created, secret=secret)
@@ -107,9 +107,10 @@ class serve_user(bringy_handler):
     def delete(self):
         deleted = ''
         error = ''
-        secret = self.get_argument('secret', '')
+        secret = ''
+        if self.request.body:
+            secret = self.request.body.split('=')[1]
         passed = db.authenticate_user(self.username, secret)
-        
         if passed:
             deleted = db.delete_user(self.username)
             for capname in capability_names:

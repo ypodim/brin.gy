@@ -10,7 +10,7 @@ cookies.get_cookie = function()
     cookie_str = $.cookie('bringy', {path:"/"});
     if (typeof(cookie_str) == "string"){
         cookie = JSON.parse(cookie_str);
-//         console.log(cookie_str);
+        console.log("get_cookie:",cookie_str);
     }
     return cookie;
 }
