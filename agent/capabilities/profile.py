@@ -5,12 +5,13 @@ import tornado.httpclient
 from urllib import urlencode
 
 class profile():
-    def __init__(self, usr, arguments, db, finish):
+    def __init__(self, usr, arguments, path, db, finish):
         self.db = db
         self.finish = finish
         self.arguments = arguments
         self.cap = __name__.split('.')[-1]
         self.usr = usr
+        self.path = path
     
     'churn:CAP:keys' # set of recorded keys in churn
     'churn:CAP:KEY:vals' # set of recorded vals for each key in churn
@@ -23,6 +24,9 @@ class profile():
     
     'profile:keyscores' # set of keys, scored on the number of agents that have it
     'profile:keyvalscores:KEY' # set of vals corresponding to this key, scored on the number of agents that have it
+    
+    'USER:profile:visited:keys' # set keys that USER has already seen
+    'USER:profile:visited:key:KEY' # set of vals for the given KEY that USER has already seen
     
     'USER:profile:keys' # set of keys
     'USER:profile:key:KEY' # val
@@ -92,6 +96,17 @@ class profile():
                 self.del_val(key, val)
         
     def get(self):
+        if self.path[-1] == 'visited':
+            visited_items = {}
+            for key in self.db.smembers('%s:profile:visited:keys' % self.usr):
+                vals = self.db.smembers('%s:profile:visited:key:%s' % (self.usr, key))
+                visited_items[key] = {}
+                for val in vals:
+                    visited_items[key][val] = 1
+            res = {'data':visited_items, 'user':self.usr}
+            self.finish( res )
+            return
+            
         saved_items = []
         for key in self.get_keys():
             for val in self.get_vals(key):
@@ -100,6 +115,16 @@ class profile():
         self.finish( res )
         
     def post(self):
+        if self.path[-1] == 'visited':
+            res = 0
+            for key in self.arguments:
+                lst = self.arguments[key]
+                self.db.sadd('%s:profile:visited:keys' % self.usr, key)
+                self.db.sadd('%s:profile:visited:key:%s' % (self.usr, key), *lst)
+                res += len(lst)
+            res = {'result':res, 'error':''}
+            return res
+            
         res = ''
         #print 'arguments', self.arguments
         for key, val in self.arguments:

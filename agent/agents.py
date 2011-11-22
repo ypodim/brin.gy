@@ -34,6 +34,7 @@ class bringy_handler(tornado.web.RequestHandler):
         if not path:
             return
         
+        self.path = path
         self.username = path[0]
         if len(path) > 1 and path[1]:
             self.cap = path[1]
@@ -171,7 +172,12 @@ class serve_capability(bringy_handler):
         
     def execute(self, arguments=None):
         exec 'from capabilities.%s import %s' % (self.cap, self.cap)
-        capability = eval(self.cap)(self.username, arguments or self.arguments, db.r, self.on_response)
+        capability = eval(self.cap)(
+            self.username, 
+            arguments or self.arguments, 
+            self.path, 
+            db.r, 
+            self.on_response)
         return eval('capability.%s' % (self.request.method.lower()) )()
     
 
@@ -229,7 +235,7 @@ class api_call(tornado.web.RequestHandler):
                 continue
             
             if self.request.method == 'GET':
-                p = profile(agent, [], db.r, clb)
+                p = profile(agent, [], self.request.path.split('/'), db.r, clb)
                 p.get()
                 
             if self.request.method == 'POST':
@@ -371,6 +377,14 @@ class api_call(tornado.web.RequestHandler):
             created = True
         self.write(dict(stored_secret=stored_secret, created=created, user=user))
         
+    def api_cleanup(self):
+        for user in db.r.smembers('users'):
+            for key in db.r.smembers('%s:profile:visited:keys' % user):
+                print db.r.delete('%s:profile:visited:key:%s' % (user, key))
+            print db.r.delete('%s:profile:visited:keys' % user)
+        self.write("ok")
+        
+        
 #########################################
 
 settings = {
@@ -385,6 +399,7 @@ application = tornado.web.Application([
     (r"/controller", api_call),
     (r"/authenticate_user", api_call),
     (r"/retrieve_secret", api_call),
+    (r"/cleanup", api_call),
     
     (r"/[a-zA-Z0-9]+/?$", serve_user),
     (r"/.+", serve_capability),

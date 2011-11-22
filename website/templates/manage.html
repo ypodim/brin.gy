@@ -212,6 +212,26 @@ E.formatted_length = 24;
 ///////////////////////////////////////////////
 
 
+E.post_visited_keyval = function() {
+    data = {};
+    for (key in attr_manager.sdata.profile) {
+        data[key] = [];
+        for (val in attr_manager.sdata.profile[key].values)
+            data[key].push(val);
+    }
+    
+    secret = cookies.get_cookie().pseudonyms[E.agent.id];
+    if (secret == undefined) {
+        return {error:"Not allowed to change "+E.agent.id+"'s profile."};
+    }
+    params = {data:JSON.stringify(data), secret:secret};
+    console.log(params);
+    
+    $.post(E.agent.url+"/"+cap+"/visited", params, function(json){
+        return json;
+    }, "json");
+}
+
 E.post_keyval = function(cap, key, val, clb) {
     data = JSON.stringify([[key, val]]);
     if (clb == undefined)
@@ -225,10 +245,6 @@ E.post_keyval = function(cap, key, val, clb) {
         return false;
     }
     $.post(E.agent.url+"/"+cap, {data:data, secret:secret}, function(json){
-        if (json.secret != undefined)
-            console.log("GOT SECRET BACK", json.secret, "my secret was", secret);
-        else
-            console.log("my secret was", secret);
         clb(json);
     }, "json");
 }
@@ -541,17 +557,6 @@ E.generate_val_entry = function(capname, attr, val) {
         uitype:"user_attribute", cap:capname, key:attr, val:val,
     });
     count.addClass("attr_counters").attr(attr);
-//     count.twipsy({title:function(){
-//         cap = $(this).attr("cap");
-//         key = $(this).attr("key");
-//         val = $(this).attr("val");
-//         cnt = attr_manager.sdata[cap][key].values[val].cnt;
-//         text = " people";
-//         if (cnt == 1)
-//             text = " person";
-//         return cnt+text;
-//     }, placement:"left", offset:5});
-    
     
     formatted = val;
     
@@ -669,9 +674,10 @@ E.generate_val_entry_editor = function(attr) {
                 display:true,
                 haveit:true, 
                 matches:{},
+                new:false;
             };
             
-            console.log(attr_manager.sdata.profile.name);
+//             console.log(attr_manager.sdata.profile.name);
             
             value_container = E.generate_val_entry("profile", key, val);
             $(this).before(value_container);
@@ -964,15 +970,27 @@ E.poll_matches = function(capname) {
     }, "json");
 }
 
-E.fetch_keyvals = function(clb) {
+
+
+
+E.fetch_initial_info = function(clb) {
     targetcount = 2;
     count = 0;
     finished = function() {
         count++;
-        if (count==targetcount)
+        if (count==targetcount) {
             clb();
+        }
     }
     
+    $.getJSON(E.agent.url+"/profile/visited", function(json){
+        E.fetch_profile(json.data, finished);
+        E.fetch_location(finished);
+    });
+}
+
+E.fetch_profile = function(visited, clb) {
+    console.log("visited", visited);
     if (E.last_fetched.length)
         console.log("continuing from", E.last_fetched);
     
@@ -986,21 +1004,30 @@ E.fetch_keyvals = function(clb) {
                 val = json.matches[i].values[j].val;
                 cnt = json.matches[i].values[j].score;
                 haveit = json.matches[i].values[j].userhasit;
-
+                
+                newval = true
+                if (attribute in visited && val in visited[attribute])
+                    newval = false
+                if (newval)
+                    console.log("new val:", attribute, val);
+                    
                 attr_manager.sdata.profile[attribute].values[val] = {
                     cnt:cnt, 
                     selected:0,
                     display:true,
                     haveit:haveit, 
                     matches:{},
+                    new:newval,
                 };
             }
             E.last_fetched = attribute;
         }
-        finished();
+        clb();
         console.log("finish  profile");
     });
-    
+}
+
+E.fetch_location = function(clb) {
     // I should get all possible keys from the satellite,
     // let's fix it to "my location" for now.
     key = "my location";
@@ -1025,7 +1052,7 @@ E.fetch_keyvals = function(clb) {
                 E.post_keyval(cap, key, val, function(json){
                     console.log("saving new location:", json.error);
                 });
-                finished();
+                clb();
                 console.log("finish  location");
             }
             
@@ -1034,7 +1061,7 @@ E.fetch_keyvals = function(clb) {
             } else {
                 latlng = new google.maps.LatLng(json.lat, json.lon);
                 E.get_geocode(latlng, function(){
-                    finished();
+                    clb();
                     console.log("finish  location");
                 });
             }
@@ -1046,7 +1073,7 @@ E.fetch_keyvals = function(clb) {
                 haveit:false, 
                 matches:json.matches,
             };
-            finished();
+            clb();
             console.log("finish  location");
         }
     });
@@ -1123,16 +1150,27 @@ E.resize_overflow_divs = function(){
     $("#results").height(dheight - offset.top + 20);// - 70);
     $("#map_canvas").height(dheight - offset.top + 20);
 }
+
+E.nav_search = function(){
+    
+}
+E.nav_new = function(){
+    E.post_visited_keyval();
+}
+E.nav_me = function(){
+    
+}
+
 //////////////////////////////////////////////////
 ////////////////     ON READY
 
 $(document).ready(function()
 {
     clb = E.populate_attrs;
-    E.fetch_keyvals(clb);
+    E.fetch_initial_info(clb);
+    
     
     $("#match_btn").click(function(){
-        console.log(E.match_criteria);
         return false;
     });
     
@@ -1142,14 +1180,11 @@ $(document).ready(function()
     $("#pseudonym").show();
     
     $("nav a").click(function (){
-        first_child_selected = $("nav a:first-child").hasClass("selected");
-        if (first_child_selected) {
-            $("nav a:first-child").removeClass("selected");
-            $("nav a:last-child").addClass("selected");
-        } else {
-            $("nav a:first-child").addClass("selected");
-            $("nav a:last-child").removeClass("selected");
-        }
+        $("nav a").removeClass("selected");
+        $(this).addClass("selected");
+        if ($(this).html() == "search") E.nav_search();
+        if ($(this).html() == "new") E.nav_new();
+        if ($(this).html() == "me") E.nav_me();
         return false;
     });
     
@@ -1274,10 +1309,11 @@ $(document).ready(function()
 {% block body %}
 
 <div id="left-panel" class="span6">
-<!--    <nav class="">
+    <nav class="">
         <a href="#" class="selected">search</a>
+        <a class="" href="#">new</a>
         <a class="" href="#">me</a>
-    </nav>-->
+    </nav>
     <form id="searchbox">
         <div class="help-block">search or add new attribute</div>
         <input type="text" id="searchinput" class="span6" title='add new attribute' data-content='press enter to add this attribute' />

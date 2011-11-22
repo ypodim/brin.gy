@@ -5,7 +5,7 @@ import tornado.httpclient
 from urllib import urlencode
 
 class buysell():
-    def __init__(self, usr, arguments, db, finish):
+    def __init__(self, usr, arguments, path, db, finish):
         self.db = db
         self.finish = finish
         self.arguments = arguments

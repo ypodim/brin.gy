@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from urllib import urlencode
 
 class location():
-    def __init__(self, usr, arguments, db, finish):
+    def __init__(self, usr, arguments, path, db, finish):
         self.db = db
         self.finish = finish
         self.arguments = arguments
