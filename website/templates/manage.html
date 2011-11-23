@@ -94,6 +94,7 @@ if (typeof String.prototype.startsWith != 'function') {
 //                              selected: false,
 //                              display: true,
 //                              matches: {},
+//                              visited: false,
 //                      },
 //              },
 //      },
@@ -621,14 +622,17 @@ E.generate_val_entry = function(capname, attr, val) {
     
     value_container = $("<div class='valcontainer'></div>");
     value_container.append(value_pill).append(add_btn);
+    pair["new"] = attr_manager.sdata[capname][attr].values[val].new;
+    pair["me"] = attr_manager.sdata[capname][attr].values[val].haveit;
+    value_container.attr(pair);
     return value_container;
 }
 
 E.generate_val_entry_editor = function(attr) {
     editor = $("<form class='editor' title='new value' data-content='the content'></form>");
     editbox = $("<input type='text' class='span2' class='editbox' />");
-    editor.attr("key",attr);
-    editbox.attr("key",attr).attr("tabindex", E.tabindex);
+    editor.attr({key:attr});
+    editbox.attr({key:attr, cap:"profile"}).attr("tabindex", E.tabindex);
     E.tabindex++;
     editbox.popover({title:function(){
         return $(this).attr("key");
@@ -674,7 +678,7 @@ E.generate_val_entry_editor = function(attr) {
                 display:true,
                 haveit:true, 
                 matches:{},
-                new:false;
+                new:false,
             };
             
 //             console.log(attr_manager.sdata.profile.name);
@@ -724,6 +728,15 @@ E.populate_attrs = function(useEditor) {
             }
             
             pill = $("<pill></pill>").append(keypart).append(valpart).attr("key",attr);
+            
+            pair = {new:false, me:false};
+            for (val in attr_manager.sdata[capname][attr].values) {
+                if (attr_manager.sdata[capname][attr].values[val].new == true)
+                    pair.new = true;
+                if (attr_manager.sdata[capname][attr].values[val].haveit)
+                    pair.me = true;
+            }
+            pill.attr(pair);
             
             app.append(pill);
         }
@@ -1003,9 +1016,9 @@ E.fetch_profile = function(visited, clb) {
             for (j in json.matches[i].values) {
                 val = json.matches[i].values[j].val;
                 cnt = json.matches[i].values[j].score;
-                haveit = json.matches[i].values[j].userhasit;
+                haveit = (json.matches[i].values[j].userhasit==1);
                 
-                newval = true
+                newval = true;
                 if (attribute in visited && val in visited[attribute])
                     newval = false
                 if (newval)
@@ -1152,13 +1165,31 @@ E.resize_overflow_divs = function(){
 }
 
 E.nav_search = function(){
-    
+    $("div.valcontainer").show();
+    $("pill").show();
+    $("#choices div.help-block").remove();
+    $("input[cap=\"profile\"]").show();
 }
 E.nav_new = function(){
-    E.post_visited_keyval();
+    $("div.valcontainer").show();
+    $("pill").show();
+    $("div.valcontainer[new!=\"true\"]").hide();
+    $("pill[new!=\"true\"]").hide();
+    $("#choices div.help-block").remove();
+    $("input[cap=\"profile\"]").hide();
+//     E.post_visited_keyval();
 }
 E.nav_me = function(){
+    $("#choices div.help-block").remove();
+    $("div.valcontainer").show();
+    $("pill").show();
+    $("div.valcontainer[me!=\"true\"]").hide();
+    $("pill[me!=\"true\"]").hide();
+    console.log($("pill:visible").length);
+    if ($("pill:visible").length == 0)
+        $("#choices").append("<div class=\"help-block\">your profile is empty</div>")
     
+    $("input[cap=\"profile\"]").hide();
 }
 
 //////////////////////////////////////////////////
@@ -1315,7 +1346,7 @@ $(document).ready(function()
         <a class="" href="#">me</a>
     </nav>
     <form id="searchbox">
-        <div class="help-block">search or add new attribute</div>
+        <div class="help-block">search for attribute</div>
         <input type="text" id="searchinput" class="span6" title='add new attribute' data-content='press enter to add this attribute' />
     </form>
     <div id="userinfo"></div>
