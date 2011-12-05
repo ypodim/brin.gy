@@ -23,13 +23,7 @@
     <script src='{{ static_url("js/geo.js") }}'></script>
     <script src='{{ static_url("js/tour.js") }}'></script>
     <script src='{{ static_url("js/ego_website.js") }}'></script>
-    
-    
-
-    
-<!--     <script src='https://raw.github.com/carhartl/jquery-cookie/master/jquery.cookie.js'></script> -->
     <script src='{{ static_url("js/jquery.cookie.js") }}'></script>
-    
     
     <script type="text/javascript">
         var _gaq = _gaq || [];
@@ -45,6 +39,16 @@
     
     <script>
     E = {};
+    $(document).ready(function(){
+        $(".urllabel").click(function(){
+            console.log("ok");
+            this.select();
+        }).keydown(function(obj){
+            if (obj.metaKey || obj.altKey || obj.ctrlKey)
+                return true;
+            return false;
+        })
+    })
     </script>
     
     
@@ -91,7 +95,15 @@
                 </a>
             </div>-->
             <div id="pseudonym">
-                pseudonym: <span class="label success">{{config.agentid}}</span>
+                <span class="title header-title">pseudonym:</span>
+                <span class="label success">{{config.agentid}}</span>
+                <br>
+                <span class="title header-title">admin URL:</span>
+                <input class="urllabel" value="{{config.agent_url_private}}" />
+                <br>
+                <span class="title header-title">read-only URL:</span>
+                <input class="urllabel" value="{{config.agent_url}}" />
+                <br>
             </div>
         </div>
         <div class=""> 

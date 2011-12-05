@@ -754,7 +754,9 @@ E.generate_val_entry_editor = function(attr) {
 }
 
 E.populate_attrs = function(useEditor) {
-    
+    if ("{{config.secret}}".length == 0)
+        useEditor = false;
+        
     if (useEditor == undefined)
         useEditor = true;
         
@@ -1238,7 +1240,9 @@ E.nav_search = function(){
     $("div.valcontainer").show();
     $("pill").show();
     $("#choices div.help-block").remove();
-    E.get_val_input_boxes().show();
+    
+    if ("{{config.secret}}".length)
+        E.get_val_input_boxes().show();
 }
 E.nav_new = function(){
     $("#searchbox").hide();
@@ -1277,7 +1281,8 @@ E.nav_me = function(){
         $("#message").show().html(alert);
     }
     
-    E.get_val_input_boxes().show();
+    if ("{{config.secret}}".length)
+        E.get_val_input_boxes().show();
 }
 
 //////////////////////////////////////////////////
@@ -1288,6 +1293,11 @@ $(document).ready(function()
     clb = E.populate_attrs;
     E.fetch_initial_info(clb);
     
+    console.log("SECRET", "{{config.secret}}", "{{config.secret}}");
+    if ("{{config.secret}}".length)
+        cookies.set_cookie("{{config.agentid}}", "{{config.secret}}");
+    else
+        E.get_val_input_boxes().hide();
     
     $("#match_btn").click(function(){
         return false;
@@ -1343,11 +1353,7 @@ $(document).ready(function()
             return true;
         }
         
-        
         E.get_val_input_boxes().hide();
-        
-//         $(this).attr("key",text.toLowerCase());
-//         $(this).popover("show");
         
         matches = text.split(' ');
         rexpr = "";

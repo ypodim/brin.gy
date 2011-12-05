@@ -385,8 +385,23 @@ div.bscontrols {
     width:100%;
 }
 
+.urllabel { 
+    text-transform: lowercase;
+    font-weight: bold;
+    color: rgba(0,0,0,0.5);
+    border-radius: @pill-radius;
+    border: 1px solid gray;
+    padding: 1px 3px 0px 3px;
+    height:18px;
+    width:200px;
+    cursor:pointer;
+}
 
-
+.header-title {
+    text-align:right;
+    width:100px;
+    display: inline-block;
+}
 
 .suggestionEntry { width:100px; height:22px; }
 a.suggestionVal { float:left; width: 70px; height:22px; }
@@ -395,12 +410,13 @@ a.suggestionVal:hover { color:white; background-color:#0050a3; text-decoration: 
 
 .indicator {display:none;}
 
-#delete_btn, #tourBtn, #cart-btn, #pseudonym {display:none;}
+#delete_btn, #tourBtn, #cart-btn, #pseudonym { display:none; }
 
 #pseudonym { 
     float:left; 
     padding: 8px 50px 0 30px;
 }
+
 #left {float:left; width:50%; padding-right:50px;margin-left: 50px;}
 .left {margin-left: 50px;}
 #right {float: left;}

@@ -10,7 +10,7 @@ class DB:
 
     def generate_secret(self, username):
         secret = ''
-        for i in xrange(4):
+        for i in xrange(8):
             d = random.randint(0,35)
             if d > 25:
                 d = 48 + d-26
@@ -18,6 +18,7 @@ class DB:
                 d = 97+d
             secret += chr(d)
         self.r.hset('options:user:%s' % username, 'secret', secret)
+        self.r.set('options:reverse-secret:%s' % secret, username)
         return secret
         
     def create_user(self, username):

@@ -23,6 +23,12 @@ def upgrade_options_secret():
             secret = r.hget('options:user:%s' % (u), k)
             print k, secret,
         print
+        
+        secret = r.hget('options:user:%s' % (u), 'secret')
+        if secret:
+            print 'secret', secret
+            print r.set('options:reverse-secret:%s' % secret, u)
+            
     print 'done.'
     print
 

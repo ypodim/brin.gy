@@ -62,18 +62,6 @@ $(document).ready(function()
 {
     cookies.upgrade_cookie();
     
-    if (window.location.hash.substr(0,3) == "#c=") {
-        hash = window.location.hash;
-        user = hash.substr(3,hash.length);
-        $.getJSON(ego_url_prefix+"/retrieve_secret?user="+user, function(json){
-            console.log(json);
-            cookies.set_cookie(json.user, json.stored_secret);
-            
-            cookie = cookies.get_cookie();
-            console.log("verifying", cookie);
-        });
-    }
-    
     $("#newuserform").submit(function(obj){
         username = $("#username").val();
         res = /\W/.test(username);

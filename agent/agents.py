@@ -24,7 +24,14 @@ class bringy_handler(tornado.web.RequestHandler):
     username = ''
     error = ''
     
-    def initialize(self):
+    #def initialize(self):
+    def prepare(self):
+        self.start_time = time.time()
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
+        self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
+        self.set_header('Content-Type','application/json; charset=UTF-8')
+        
         path = tornado.escape.url_unescape(self.request.uri)
         base = path.split('?')[0]
         path = base.split('/')
@@ -36,28 +43,26 @@ class bringy_handler(tornado.web.RequestHandler):
             return
         
         if path[0] == 'a':
-            user = db.r.get('options:reverse-secret:%s' % secret)
-            if user:
-                self.username = user
-                self.path = path[1:]
-                if len(self.path) > 1 and self.path[1]:
-                    self.cap = self.path[1]
+            if len(path) > 1 and path[1]:
+                secret = path[1]
+                user = db.r.get('options:reverse-secret:%s' % secret)
+                if user:
+                    self.username = user
+                    self.path = path[1:]
+                    if len(self.path) > 1 and self.path[1]:
+                        self.cap = self.path[1]
+                else:
+                    self.send_error(404)
             else:
-                self.error = 'invalid secret'
+                self.send_error(404)
         else:
             self.path = path
             self.username = path[0]
             if len(path) > 1 and path[1]:
                 self.cap = path[1]
         
-    def prepare(self):
-        self.start_time = time.time()
-        self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
-        self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
-        self.set_header('Content-Type','application/json; charset=UTF-8')
-        
-        self.arguments ={}
+
+        self.arguments = {}
         args = self.request.arguments.get('data')
         if type(args) == list:
             self.arguments = tornado.escape.json_decode(args[0])
@@ -77,7 +82,7 @@ class bringy_handler(tornado.web.RequestHandler):
         dic.__setitem__('capability', self.cap)
         dic.__setitem__('current_time', now)
         dic.__setitem__('response_time', rtime)
-        dic.__setitem__('error', dic.get('error',error))
+        dic.__setitem__('error', dic.get('error', self.error))
         dic.__setitem__('user', self.username)
         
         dic = tornado.escape.json_encode(dic)
@@ -87,6 +92,8 @@ class bringy_handler(tornado.web.RequestHandler):
         return dic
         
     def on_response(self, dic={}):
+        if self._finished:
+            return
         dic = self.finilize_call(dic)
         self.write(dic)
         self.finish()
@@ -111,7 +118,6 @@ class serve_user(bringy_handler):
         if not db.user_exists(self.username):
             error = 'invalid user %s' % self.username
             self.on_response(dict(error=error))
-            #print '%s: %s' % (self.request.headers.get('X-Real-Ip'), self.request.uri)
     def get(self):
         dic = dict(capabilities=capability_names)
         dic = self.finilize_call(dic)
@@ -378,15 +384,14 @@ class api_call(tornado.web.RequestHandler):
         secret = self.get_argument('secret')
         res = (db.r.hget('options:user:%s' % user, 'secret') == secret)
         self.write(dict(result=res))
-        
-    def api_retrieve_secret(self):
-        user = self.get_argument('user')
-        stored_secret = db.r.hget('options:user:%s' % user, 'secret')
-        created = False
-        if not stored_secret:
-            stored_secret = db.generate_secret(user)
-            created = True
-        self.write(dict(stored_secret=stored_secret, created=created, user=user))
+    
+    def api_authenticate_admin_secret(self):
+        error = ''
+        secret = self.get_argument('secret')
+        user = db.r.get('options:reverse-secret:%s' % secret)
+        if not user:
+            error = 'user not found'
+        self.write(dict(secret=secret, user=user, error=error))
         
     def api_cleanup(self):
         for user in db.r.smembers('users'):
@@ -409,7 +414,7 @@ application = tornado.web.Application([
     (r"/batch_buysell", api_call),
     (r"/controller", api_call),
     (r"/authenticate_user", api_call),
-    (r"/retrieve_secret", api_call),
+    (r"/authenticate_admin_secret", api_call),
     (r"/cleanup", api_call),
     
     (r"/a/[a-zA-Z0-9]+/?$", serve_user),

@@ -17,7 +17,8 @@ class Config:
     ego_url_prefix = ''
     website_url_prefix = ''
     agentid = ''
-    
+    agent_url_private = ''
+    agent_url = ''
     
 class website_call(tornado.web.RequestHandler):
     def get(self):
@@ -31,46 +32,77 @@ class website_call(tornado.web.RequestHandler):
         
         
 class serve_user(tornado.web.RequestHandler):
-    def clb(self, response):
+    @tornado.web.asynchronous
+    def get(self):
+        path = self.request.uri.split('/')[1:]
+        if path[0] == 'a':
+            self.secret = path[1]
+            http_client = tornado.httpclient.AsyncHTTPClient()
+            http_client.fetch("%s/authenticate_admin_secret?secret=%s" % (config.ego_url_prefix, self.secret), self.evaluate_agentid_clb)
+        else:
+            self.agentid = path[0]
+            self.examine_cookie()
+        
+    def examine_cookie(self):
+        cookie = self.get_cookie('bringy')
+        try:
+            cookie_dic = json.loads(tornado.escape.url_unescape(cookie))
+        except:
+            cookie_dic = {}
+            print '*** serve_user get: error parsing cookie: %s' % cookie
+        
+        if self.agentid in cookie_dic.get('pseudonyms',{}):
+            self.secret = cookie_dic['pseudonyms'][self.agentid]
+            print 'secret in cookie', self.secret
+        else:
+            self.secret = ''
+            print '*** serve_user get: Illegal attempt to access %s' % self.agentid
+        
+        http_client = tornado.httpclient.AsyncHTTPClient()
+        http_client.fetch("%s/%s" % (config.ego_url_prefix, self.agentid), self.evaluate_secret_clb)
+    
+    def evaluate_secret_clb(self, response):
         try:
             dic = json.loads(response.body)
         except:
-            print '*** serve_user clb: error parsing json: %s' % response.body
+            error = '*** serve_user clb: error parsing json: %s' % response.body
+            dic = dict(error=error)
+        
+        if dic.get('error'):
+            print dic['error']
             self.redirect('/')
-            return 
+            return
+        self.finish_call()
             
-        if not dic.get('error'):
-            #secret = cookie_dic.get('secret')
-            #if secret == 
-            self.render("manage.html", config=config)
+    def evaluate_agentid_clb(self, response):
+        try:
+            dic = json.loads(response.body)
+        except:
+            error = '*** serve_user clb: error parsing json: %s' % response.body
+            dic = dict(error=error)
+        
+        if dic.get('error') and not dic.get('user'):
+            print dic['error']
+            self.redirect('/')
+            return
+        self.agentid = dic['user']
+        
+        self.finish_call()
+        
+    def finish_call(self):
+        config.agentid = self.agentid
+        config.agent_url = '%s/%s' % (config.website_url_prefix, self.agentid)
+        config.agent_url_private = '%s/%s' % (config.website_url_prefix, self.agentid)
+        config.secret = self.secret
+        
+        if self.secret:
+            config.agent_url_private = '%s/a/%s' % (config.website_url_prefix, self.secret)
         else:
-            self.redirect('/')
-    @tornado.web.asynchronous
-    def get(self, agentid):
-        config.agentid = agentid
-                
-        #cookie = self.get_cookie('bringy')
-        #if cookie == None:
-            #cookie = '{}'
-            #self.set_cookie('bringy', cookie)
+            config.agent_url_private = "<not available>"
         
-        #try:
-            #cookie_dic = json.loads(tornado.escape.url_unescape(cookie))
-        #except:
-            #print '*** serve_user get: error parsing cookie: %s' % cookie
-            #self.redirect('/')
-            #return
+        self.render("manage.html", config=config)
         
-        #if agentid in cookie_dic.get('pseudonyms',{}):
-            #secret = cookie_dic['pseudonyms'][agentid]
-            #print 'secret in cookie', secret
-        #else:
-            #print '*** serve_user get: Illegal attempt to access %s' % agentid
-            #self.redirect('/')
-            #return
-            
-        http_client = tornado.httpclient.AsyncHTTPClient()
-        http_client.fetch("%s/%s" % (config.ego_url_prefix, config.agentid), self.clb)
+    
         
 
 debug = os.environ.get("SERVER_SOFTWARE", "").startswith("Development/")
@@ -91,13 +123,8 @@ application = tornado.web.Application([
     (r"/UROP", website_call),
     (r"/about", website_call),
     
-    (r"/([a-zA-Z0-9]+/?)$", serve_user),
-    #(r"/.+", serve_capability),
-    #(r"/$", serve_index),
-    
-    #(r"/([a-zA-Z0-9/]*)", ContentHandler),
-    #(r"/([a-zA-Z0-9./]*)", ContentHandler),
-    #(r"%s/static/.*" % prefix, tornado.web.RedirectHandler,
+    (r"/a/[a-zA-Z0-9]+/?$", serve_user),
+    (r"/[a-zA-Z0-9]+/?$", serve_user),
     #dict(url="http://github.com/downloads/facebook/tornado/tornado-0.1.tar.gz")),
 ], **settings)
 
