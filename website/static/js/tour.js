@@ -4,37 +4,38 @@ wh = $(window).height();
 Tour = {};
 Tour.inTour = false;
 Tour.tourSlides = [];
+Tour.top = 215;
 Tour.tourSlides.push({
-    left:55, top:155, 
-    width:0, height:wh-155, 
+    left:55, top:Tour.top, 
+    width:0, height:wh-Tour.top, 
     text:"So, you want to find some people. Awesome! <br>This tour will show you how Brin.gy works.",
     btnText: "Start",
     backbtnText: "",
 });
 Tour.tourSlides.push({
-    left:5, top:155, 
-    width:105, height:wh-155, 
+    left:5, top:Tour.top, 
+    width:105, height:wh-Tour.top, 
     text:'This is a list of attributes, like "name", "age", "skills" and "location".',
     btnText: "Next",
     backbtnText: "Back",
 });
 Tour.tourSlides.push({
-    left:110, top:155, 
-    width:170, height:wh-155, 
+    left:110, top:Tour.top, 
+    width:170, height:wh-Tour.top, 
     text:'This is a list of values for each attribute, like "pol" for "name and "chinese" for "language".',
     btnText: "Next",
     backbtnText: "Back",
 });
 Tour.tourSlides.push({
-    left:110, top:155, 
-    width:30, height:wh-155, 
+    left:110, top:Tour.top, 
+    width:30, height:wh-Tour.top, 
     text:'The red boxes show the number of people that have added the attribute next to them.',
     btnText: "Next",
     backbtnText: "Back",
 });
 Tour.tourSlides.push({
-    left:290, top:155, 
-    width:50, height:wh-155, 
+    left:290, top:Tour.top, 
+    width:50, height:wh-Tour.top, 
     text:'You can use these boxes to add or remove values to your profile.<br><br>Click on a box to add a piece of information about you, go on :)',
     btnText: "Next",
     backbtnText: "Back",
@@ -42,15 +43,15 @@ Tour.tourSlides.push({
 
 // PYTHON SKILL APP
 Tour.tourSlides.push({
-    left:130, top:155, 
-    width:0, height:wh-155, 
+    left:130, top:Tour.top, 
+    width:0, height:wh-Tour.top, 
     text:'Let\'s look for people who know python and their respective location.',
     btnText: "Next",
     backbtnText: "Back",
 });
 Tour.tourSlides.push({
-    left:110, top:155, 
-    width:170, height:wh-155,
+    left:110, top:Tour.top, 
+    width:170, height:wh-Tour.top,
     text:'First, look for people with the "python" skill by clicking on "python".',
     btnText: "Next",
     backbtnText: "Back",
@@ -58,8 +59,8 @@ Tour.tourSlides.push({
     select_val: "python",
 });
 Tour.tourSlides.push({
-    left:5, top:155, 
-    width:105, height:wh-155,  
+    left:5, top:Tour.top, 
+    width:105, height:wh-Tour.top,  
     text:'Intersect that with people who reported location by clicking on "my location" attribute.',
     btnText: "Next",
     backbtnText: "Back",
@@ -84,16 +85,16 @@ Tour.tourSlides.push({
 
 // DATING APP
 Tour.tourSlides.push({
-    left:130, top:155, 
-    width:0, height:wh-155, 
+    left:130, top:Tour.top, 
+    width:0, height:wh-Tour.top, 
     text:'Now, let\'s look for a date instead ;)<BR><BR>Against all odds, you\'re a girl looking for a boy!',
     btnText: "Next",
     backbtnText: "Back",
     startFresh: true,
 });
 Tour.tourSlides.push({
-    left:110, top:155, 
-    width:170, height:wh-155,
+    left:110, top:Tour.top, 
+    width:170, height:wh-Tour.top,
     text:'First, let\'s look for males.',
     btnText: "Next",
     backbtnText: "Back",
@@ -101,8 +102,8 @@ Tour.tourSlides.push({
     select_val: "male",
 });
 Tour.tourSlides.push({
-    left:5, top:155, 
-    width:105, height:wh-155,  
+    left:5, top:Tour.top, 
+    width:105, height:wh-Tour.top,  
     text:'Intersect that with people who reported location by clicking on "my location" attribute.',
     btnText: "Next",
     backbtnText: "Back",

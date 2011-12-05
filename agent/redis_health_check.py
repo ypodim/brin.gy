@@ -3,24 +3,30 @@ import redis
 import time
 import sys
 import random
-import unittest
-import httplib2
-import urllib
 import json
 
-h = httplib2.Http()
+def upgrade_options_secret():
+    users = r.smembers('users')
+    print 'options:'
+    for u in users:
+        print 'user', u,
+        for k in r.hgetall('options:%s' % (u)):
+            secret = r.hget('options:%s' % (u), k)
+            if not secret:
+                continue
+            print 'deprecated entry', k,
+            print secret,
+            print 'deleting...', r.hdel('options:%s' % (u), k),
+            print 'upgrading...', r.hset('options:user:%s' % (u), k, secret),
+            print
+            print 'verifying...',
+            secret = r.hget('options:user:%s' % (u), k)
+            print k, secret,
+        print
+    print 'done.'
+    print
 
-def post(dic, path='', method='POST', url='http://localhost:10007'):
-    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-    body = urllib.urlencode(dic)
-    uri = '%s%s'%(url,path)
-    resp, content = h.request(uri, method, headers=headers, body=body)
-    return json.loads(content)
-
-
-if __name__ == '__main__':
-    r = redis.Redis(host='localhost', port=6379, db=0)
-    
+def check_redundant_bucket_entries():
     resolution = 100000
     key = 'my location'
     print 'checking redundant location bucket entries'
@@ -44,7 +50,9 @@ if __name__ == '__main__':
                 #print 'removed', r.srem('location:%s:latlon:%s' % (key, b), aid)
     print 'done.'
     print
-    
+
+
+def check_orphaned_profile_keys():
     print 'checking for orphaned profile key entries'
     users = r.smembers('users') 
     for u in users:
@@ -60,13 +68,14 @@ if __name__ == '__main__':
                 s = r.zrangebyscore('profile:keyscores', '-inf','+inf')
                 print 'key in keyscores:%s' % (k in s)
                 s = r.zrangebyscore('profile:keyvalscores:%s' % k, '-inf','+inf')
-                print 'key in keyvalscores:%s' % (k in s)
-                
-                
+                print 'key in keyvalscores:%s' % (k in s)       
     print 'done.'
     print
-    
-    
+
+
+
+def fix_orphaned_profile_keys():
+    users = r.smembers('users')
     for u in users:
         for key in r.smembers('%s:location:keys' % u):
             if key == 'my location':
@@ -83,12 +92,14 @@ if __name__ == '__main__':
         
     print 'done.'
     print
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+fix = False
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+upgrade_options_secret()
+
+
+

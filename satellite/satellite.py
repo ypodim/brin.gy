@@ -6,9 +6,8 @@ import tornado.ioloop
 import tornado.web
 import tornado.escape
 
-import sys, os, time
+import sys, os, time, random
 from optparse import OptionParser
-#from Queue import Queue
 
 from capability import *
 #from simulation import Simulation#, Sender
@@ -238,7 +237,29 @@ class multimatch(tornado.web.RequestHandler):
         self.write(dic)
 
 
-
+class randomstat(tornado.web.RequestHandler):
+    def options(self):
+        self.write({})
+    def prepare(self):
+        statistics.hit()
+        self.start_time = time.time()
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
+        self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
+        self.set_header('Content-Type','application/json; charset=UTF-8')    
+    def get(self):
+        kvlist = []
+        while not kvlist:
+            keys = r.zrevrangebyscore('profile:keyscores', '+inf', 2, withscores=True) or []
+            key, score = random.choice(keys)
+            
+            zkey = 'profile:keyvalscores:%s' % key
+            kvlist = r.zrevrangebyscore(zkey, '+inf', 2, withscores=True) or []
+        val, score = random.choice(kvlist)
+        
+        res = dict(key=key, val=val, score=score)
+        self.write(res)
+        
 
 class GarbageC():
     def __init__(self):
@@ -272,6 +293,7 @@ settings = {
 application = tornado.web.Application([
     (r"/multimatch", multimatch),
     (r"/stats", stats),
+    (r"/randomstat", randomstat),
     (r"/.+", serve_request),
 ], **settings)    
 
@@ -286,7 +308,7 @@ if __name__ == "__main__":
     location = Location(r)
     buysell = Buysell(r)
     
-    gc = GarbageC()
+    #gc = GarbageC()
     
     parser = OptionParser(add_help_option=False)
     parser.add_option("-h", "--host", dest="host", default='')
@@ -306,8 +328,8 @@ if __name__ == "__main__":
     http_server.listen(PORT, address=HOST)
     ioloop = tornado.ioloop.IOLoop.instance()
     
-    gccaller = tornado.ioloop.PeriodicCallback(gc.execute, 1000, ioloop)
-    gccaller.start()
+    #gccaller = tornado.ioloop.PeriodicCallback(gc.execute, 1000, ioloop)
+    #gccaller.start()
     
     try:
         ioloop.start()

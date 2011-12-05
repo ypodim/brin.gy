@@ -223,12 +223,13 @@ E.post_visited_keyval = function() {
     
     secret = cookies.get_cookie().pseudonyms[E.agent.id];
     if (secret == undefined) {
+        console.log("Not allowed to change "+E.agent.id+"'s profile.");
         return {error:"Not allowed to change "+E.agent.id+"'s profile."};
     }
     params = {data:JSON.stringify(data), secret:secret};
     console.log(params);
     
-    $.post(E.agent.url+"/"+cap+"/visited", params, function(json){
+    $.post(E.agent.url+"/profile/visited", params, function(json){
         return json;
     }, "json");
 }
@@ -333,6 +334,48 @@ E.set_matches = function(stop, nonce) {
     }
 }
 
+E.toggle_filter = function(action, cap, key, val){
+    attr = {cap:cap,key:key,val:val,type:"valfilter"};
+    if (action == "remove") {
+        query = ".filter[cap='"+cap+"'][key='"+key+"']";
+        if (val != undefined)
+            query += "[val='"+val+"']";
+        else 
+            query += "[type='keyfilter']";
+            
+        $(query).remove();
+        if ("removed", $(".filter").length == 0)
+            $("#clear-filters-btn").hide();
+        return true;
+    }
+    
+    $("#clear-filters-btn").show();
+    
+    valstr = "<span class='highlight'>"+val+"</span>";
+    if (val == undefined) {
+        attr['type'] = "keyfilter";
+        valstr = "anything";
+    }
+    
+    closebtn = $("<a href='#'>×</a>").addClass("closebtn").attr(attr);
+    closebtn.click(function(){
+        cap = $(this).attr("cap");
+        key = $(this).attr("key");
+        val = $(this).attr("val");
+        query = "[cap='"+cap+"'][key='"+key+"']";
+        if (val == undefined)
+            query += "[type='keypart']";
+        else
+            query += "[val='"+val+"'][type='valpart']";
+        $(query).click();
+        return false;
+    });
+    title = "<span class='highlight'>"+key+"</span> is "+valstr;
+    filter = $("<p></p>").append(title).append(closebtn).addClass("filter");
+    filter.attr(attr);
+    $("#filters").append(filter);
+}
+
 E.handle_key_click = function(){
     cap = $(this).attr("cap");
     key = $(this).attr("key");
@@ -341,11 +384,15 @@ E.handle_key_click = function(){
     attr_manager.sdata[cap][key].selected = !pressed;
     if (pressed) {
         $(this).removeClass("pressed");
+        E.toggle_filter("remove", cap, key);
     } else {
         $(this).addClass("pressed");
         $(this).siblings("div").children().children().removeClass("pressed");
-        for (val in attr_manager.sdata[cap][key].values)
+        for (val in attr_manager.sdata[cap][key].values) {
             attr_manager.sdata[cap][key].values[val].selected = false;
+            E.toggle_filter("remove", cap, key, val);
+        }
+        E.toggle_filter("add", cap, key);
     }
     E.poll_matches(cap);
     E.reset_map_bounds = true;
@@ -361,10 +408,13 @@ E.handle_val_click = function(){
     attr_manager.sdata[cap][key].values[val].selected = !pressed;
     if (pressed) {
         $(this).removeClass("pressed");
+        E.toggle_filter("remove", cap, key, val);
     } else {
         $(this).addClass("pressed");
         $(this).parent().parent().siblings("a").removeClass("pressed");
         attr_manager.sdata[cap][key].selected = false;
+        E.toggle_filter("remove", cap, key);
+        E.toggle_filter("add", cap, key, val);
     }
     E.poll_matches(cap);
     E.reset_map_bounds = true;
@@ -447,6 +497,9 @@ E.complete_toggle_handle = function(cap, key, val, button) {
             }
             button.html("\u2713").popover("hide").css("background-color","");
             
+            $("pill[key=\""+key+"\"]").attr("me","true");
+            $("div.valcontainer[cap=\""+cap+"\"][key=\""+key+"\"][val=\""+val+"\"]").attr("me","true");
+            
             confirmation = $(".confirmation").html("added to your profile!");
             confirmation.addClass("success").removeClass("important").show();
             confirmation.offset(button.offset());
@@ -464,8 +517,10 @@ E.complete_toggle_handle = function(cap, key, val, button) {
                 attr_manager.sdata[cap][key].values[val].haveit = !haveit;
                 return false;
             }
-            
             button.html("\u00A0").popover("hide").css("background-color","");
+            
+            $("pill[key=\""+key+"\"]").attr("me","");
+            $("div.valcontainer[cap=\""+cap+"\"][key=\""+key+"\"][val=\""+val+"\"]").attr("me","");
             
             confirmation = $(".confirmation").html("removed");
             confirmation.addClass("important").removeClass("success").show();
@@ -539,7 +594,7 @@ E.generate_key_entry = function(capname, attr) {
     count.attr({uitype:"sat_attribute", cap:capname, key:attr});
     
     attribute = $("<span></span>").html(attr);
-    pair = {cap:capname, key:attr};
+    pair = {cap:capname, key:attr, type:"keypart"};
     var keypart = $("<a href='#'></a>").append(attribute);
     keypart.append(count).attr(pair);
     keypart.click(E.handle_key_click);
@@ -577,6 +632,7 @@ E.generate_val_entry = function(capname, attr, val) {
     
     pair = {cap:capname, key:attr, val:val, address:address};
     value_pill = $("<a href='#'></a>").attr(pair).click(E.handle_val_click);
+    value_pill.attr("type","valpart");
     value_pill.append(count).append(value)
     value_pill.twipsy({placement:"below", offset:5, title:function(){
         cap = $(this).attr("cap");
@@ -728,6 +784,11 @@ E.populate_attrs = function(useEditor) {
             }
             
             pill = $("<pill></pill>").append(keypart).append(valpart).attr("key",attr);
+            
+            if (capname == "location") {
+                pill.addClass("location");
+                valpart.children("div").css("height",50);
+            }
             
             pair = {new:false, me:false};
             for (val in attr_manager.sdata[capname][attr].values) {
@@ -1021,8 +1082,8 @@ E.fetch_profile = function(visited, clb) {
                 newval = true;
                 if (attribute in visited && val in visited[attribute])
                     newval = false
-                if (newval)
-                    console.log("new val:", attribute, val);
+//                 if (newval)
+//                     console.log("new val:", attribute, val);
                     
                 attr_manager.sdata.profile[attribute].values[val] = {
                     cnt:cnt, 
@@ -1164,32 +1225,59 @@ E.resize_overflow_divs = function(){
     $("#map_canvas").height(dheight - offset.top + 20);
 }
 
+E.get_val_input_boxes = function() {
+    return $("input[cap=\"profile\"]");
+}
+
 E.nav_search = function(){
+    $("#searchbox").show();
+    $("#add-key-div").hide();
+    $("#searchinput").focus();
+    
+    $("#message").hide();
     $("div.valcontainer").show();
     $("pill").show();
     $("#choices div.help-block").remove();
-    $("input[cap=\"profile\"]").show();
+    E.get_val_input_boxes().show();
 }
 E.nav_new = function(){
+    $("#searchbox").hide();
+    $("#add-key-div").hide();
+    
     $("div.valcontainer").show();
     $("pill").show();
     $("div.valcontainer[new!=\"true\"]").hide();
     $("pill[new!=\"true\"]").hide();
-    $("#choices div.help-block").remove();
-    $("input[cap=\"profile\"]").hide();
-//     E.post_visited_keyval();
+    
+    $("#message").hide();
+    if ($("pill[new=\"true\"]").length == 0) {
+        alert = $("<div class='alert-message warning fade in' data-alert='alert'><a class='close' href='#'>&times;</a><p>Nothing new yet.<br>Why not add something new about you?</p></div>")
+        alert.alert();
+        $("#message").show().html(alert);
+    }
+    
+    E.get_val_input_boxes().hide();
+    E.post_visited_keyval();
 }
 E.nav_me = function(){
+    $("#searchbox").hide();
+    $("#add-key-div").show();
+    $("#new-key-input").focus();
+    
     $("#choices div.help-block").remove();
     $("div.valcontainer").show();
     $("pill").show();
     $("div.valcontainer[me!=\"true\"]").hide();
     $("pill[me!=\"true\"]").hide();
-    console.log($("pill:visible").length);
-    if ($("pill:visible").length == 0)
-        $("#choices").append("<div class=\"help-block\">your profile is empty</div>")
     
-    $("input[cap=\"profile\"]").hide();
+    $("#message").hide();
+    if ($("pill:visible").length == 0) {
+        alert = $("<div class='alert-message warning fade in' data-alert='alert'><a class='close' href='#'>&times;</a><p>Your profile is empty.<br>Try typing an attribute below, or go to the \"search\" tab to add from existing ones.</p></div>")
+        alert.alert();
+        $("#message").show().html(alert);
+    }
+    
+    E.get_val_input_boxes().show();
 }
 
 //////////////////////////////////////////////////
@@ -1204,6 +1292,18 @@ $(document).ready(function()
     $("#match_btn").click(function(){
         return false;
     });
+    
+    $("#clear-filters-btn").click(function(){
+        $(".filter").each(function(){
+            $(this).children("a.closebtn").click();
+        });
+        return false;
+    });
+    $("#search-clear-btn").click(function(){
+        $("#searchinput").val("").keyup().focus();
+        return false;
+    });
+    
     
     setInterval(E.poll_matches, 2000); 
     
@@ -1230,34 +1330,109 @@ $(document).ready(function()
 //             return false;
         }
     }).keyup(function(obj) {
-        attr_manager.deselect_keyvals();
+//         attr_manager.deselect_keyvals();
         
         text = $(this).val();
-        if (text.length == 1)
+        attr_manager.show_keyvals();
+        if (text.length == 0)
+            $("#search-clear-btn").hide();
+        else
+            $("#search-clear-btn").show();
+            
+        if (text.length == 1) {
             return true;
-//         if (obj.keyCode == 9)
-//             return true;
+        }
         
-        $(this).attr("key",text.toLowerCase());
-        $(this).popover("show");
         
-        re = new RegExp(text, 'i');
+        E.get_val_input_boxes().hide();
+        
+//         $(this).attr("key",text.toLowerCase());
+//         $(this).popover("show");
+        
+        matches = text.split(' ');
+        rexpr = "";
+        for (i in matches) {
+            if (matches[i].length == 0)
+                continue;
+            if (i>0)
+                rexpr += "|";
+            rexpr += matches[i];
+        }
+        re = new RegExp(rexpr, 'i');
+        
         for (cap in attr_manager.sdata)
             for (key in attr_manager.sdata[cap]) {
                 if (key.match(re)) {
                     attr_manager.sdata[cap][key].display = true;
+                    
                 } else {
-                    attr_manager.sdata[cap][key].display = false;
-                }   
+                    no_match = true;
+                
+                    for (val in attr_manager.sdata[cap][key].values) {
+                        if (val.match(re)) {
+                            attr_manager.sdata[cap][key].values[val].display = true;
+                            no_match = false;
+                        } else {
+                            attr_manager.sdata[cap][key].values[val].display = false;
+                        } 
+                    }
+                    
+                    if (no_match)
+                        attr_manager.sdata[cap][key].display = false;
+                }
             }
         E.populate_attrs();
+    });
+    
+    $("#new-key-input").attr("tabindex", 1).keyup(function(obj) {
+        text = $(this).val();
+        attr_manager.show_keyvals();
+            
+        if (text.length == 1) {
+            return true;
+        }
+        $(this).attr("key",text.toLowerCase());
+        $(this).popover("show");
         
+        matches = text.split(' ');
+        rexpr = "";
+        for (i in matches) {
+            if (matches[i].length == 0)
+                continue;
+            if (i>0)
+                rexpr += "|";
+            rexpr += matches[i];
+        }
+        re = new RegExp(rexpr, 'i');
+        
+        for (cap in attr_manager.sdata)
+            for (key in attr_manager.sdata[cap]) {
+                if (key.match(re)) {
+                    attr_manager.sdata[cap][key].display = true;
+                    
+                } else {
+                    no_match = true;
+                
+                    for (val in attr_manager.sdata[cap][key].values) {
+                        if (val.match(re)) {
+                            attr_manager.sdata[cap][key].values[val].display = true;
+                            no_match = false;
+                        } else {
+                            attr_manager.sdata[cap][key].values[val].display = false;
+                        } 
+                    }
+                    
+                    if (no_match)
+                        attr_manager.sdata[cap][key].display = false;
+                }
+            }
+        E.populate_attrs();
     }).popover({content:function(){
         key = $("#searchinput").attr("key");
         html = $("<div></div>");
         
         if (key == undefined || key.length == 0)
-            return "Search or enter new attribute";
+            return "Type to add new attribute";
             
         if (key in attr_manager.sdata.profile) {
             html.html(key+": already exists").addClass("error");
@@ -1267,7 +1442,36 @@ $(document).ready(function()
         return html;
     }, offset:15, html:true, animate:false, trigger:"focus"});
     
+    $("#add-key-div").submit(function(){
+        searchinput = $(this).children("input");
+        newkey = searchinput.val();
+        if (newkey in attr_manager.sdata.profile) {
+            searchinput.popover("hide");
+            $(".editor").children().focus();
+        } else {
+            searchinput.popover("hide").val("").attr("key","");
+            attr_manager.show_keyvals();
+            E.populate_attrs(true);
+            
+            cap = "profile";
+            attr_manager.add_sdata(cap, newkey, 0);
+            
+            keypart = E.generate_key_entry(cap, newkey);
+            editor = E.generate_val_entry_editor(newkey);
+            valpart = $("<div class='valpart'></div>").append(editor);
+            
+            pill = $("<pill></pill>").append(keypart).append(valpart);
+            $("#choices").children("div:nth-child(2)").prepend(pill);
+            editor.children("input").focus();
+        }
+        return false;
+    });
+    
+    
+    
     $("#searchbox").submit(function(){
+        return false;
+        
         searchinput = $(this).children("input");
         newkey = searchinput.val();
         if (newkey in attr_manager.sdata.profile) {
@@ -1296,6 +1500,15 @@ $(document).ready(function()
     if (window.location.hash.startsWith("#tour")) {
         Tour.do_tour(0);
     }
+//     if (window.location.hash.startsWith("#search")) {
+//         $("nav a:nth-child(1)").click();
+//     }
+//     if (window.location.hash.startsWith("#new")) {
+//         $("nav a:nth-child(2)").click();
+//     }
+//     if (window.location.hash.startsWith("#me")) {
+//         $("nav a:nth-child(3)").click();
+//     }
     
     $("#cart-btn a").click(function(){
         console.log(E.previous_intersection);
@@ -1342,19 +1555,29 @@ $(document).ready(function()
 <div id="left-panel" class="span6">
     <nav class="">
         <a href="#" class="selected">search</a>
-        <a class="" href="#">new</a>
-        <a class="" href="#">me</a>
+        <a href="#" class="">new</a>
+        <a href="#" class="">me</a>
     </nav>
     <form id="searchbox">
         <div class="help-block">search for attribute</div>
-        <input type="text" id="searchinput" class="span6" title='add new attribute' data-content='press enter to add this attribute' />
+        <input type="text" id="searchinput" class="" />
+        <a href='#' class="closebtn" id="search-clear-btn">×</a>
     </form>
+    <div id="message"></div>
+    <form id="add-key-div">
+        <div class="help-block">type to add new attribute</div>
+        <input type="text" id="new-key-input" title='add new attribute' data-content='press enter to add this attribute' />
+    </form>
+    
     <div id="userinfo"></div>
     <div id="choices"></div>
 </div>
 <div id="right-panel" class="">            
     <div id="results-container" class="span3">
-        <div id="results" ></div>
+        <div id="filters">
+            <div id="clear-filters-btn" class="btn" style="width">clear filters</div>
+        </div>
+        <div id="results"></div>
         <div id="cart-btn" class="btn success">
             <img height=50 src='{{ static_url("images/website/cart.svg") }}' alt="" />
             <span class="description">add people to cart</span>

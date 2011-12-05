@@ -17,7 +17,7 @@ class DB:
             else:
                 d = 97+d
             secret += chr(d)
-        self.r.hset('options:%s' % username, 'secret', secret)
+        self.r.hset('options:user:%s' % username, 'secret', secret)
         return secret
         
     def create_user(self, username):
@@ -29,7 +29,7 @@ class DB:
         return created, secret
     
     def authenticate_user(self, user, secret):
-        stored_secret = self.r.hget('options:%s' % user, 'secret')
+        stored_secret = self.r.hget('options:user:%s' % user, 'secret')
         if not stored_secret:
             stored_secret = self.generate_secret(user)
             return True

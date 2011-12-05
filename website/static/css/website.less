@@ -87,9 +87,11 @@ span.count {
     margin-left: 10px;
     padding: 1px 5px;
     text-shadow: 0 0px 1px #fff;
-    border-radius: 15px;
-    -moz-border-radius: 15px;
+/*     border-radius: 15px; */
+/*     -moz-border-radius: 15px; */
     border-radius: 3px;
+/*     border-color:white; */
+/*     border: 3px solid rgba(255,255,255,1); */
 }
 
 div.footer { 
@@ -109,12 +111,40 @@ div.clear {clear:both;}
 #searchinput {
     font-size:30px;
     height: 30px;
+    padding-right:30px;
+    width:305px;
 }
 
 #searchbox {
-/*     font-size:30px; */
     margin-bottom: 10px;
+    position:relative;
 }
+#search-clear-btn{
+    right:5px;
+    top:25px;
+    display:none;
+    padding:5px 5px 7px 5px;
+    &:hover {
+        background-color:gray;
+        color:white;
+        border-radius: 14px;
+    }
+}
+
+
+
+#add-key-div {
+    padding: 0;
+    display:none;
+    margin-bottom:10px;
+}
+#new-key-input {
+    font-size:30px;
+    height: 30px;
+    width:330px;
+    background-color: #FEE9CC;
+}
+
 
 #userinfo {
     font-size:30px;
@@ -158,6 +188,8 @@ div.clear {clear:both;}
     width:50px;
     float:right;
 }
+
+
 
 #results { 
     overflow: auto;
@@ -258,25 +290,6 @@ div.bsinputs {
 div.bscontrols {
     float:right;
     margin-left: 15px;
-}
-a.closebtn {
-    color: #000000;
-    font-size: 16px;
-    font-weight: bold;
-    text-shadow: 0 1px 0 #ffffff;
-    filter: alpha(opacity=20);
-    -khtml-opacity: 0.2;
-    -moz-opacity: 0.2;
-    opacity: 0.2;
-}
-
-a.closebtn:hover { 
-    color: #ff1111;
-    text-decoration: none;
-    filter: alpha(opacity=40);
-    -khtml-opacity: 0.4;
-    -moz-opacity: 0.4;
-    opacity: 0.9;
 }
 
 
@@ -396,10 +409,62 @@ a.suggestionVal:hover { color:white; background-color:#0050a3; text-decoration: 
 
 
 
-
+.ticker-label {
+    display:inline;
+    font-weight: bold;
+    padding: 5px 10px 5px 10px;
+    text-shadow: 0;
+    background-color: #FEE9CC;
+}
 
 
 @pill-radius: 3px;
+
+#filters {
+    margin-bottom: 10px;
+}
+#filters div {
+    margin-bottom:5px;
+    width:130px;
+    text-align: center;
+    display:none;
+}
+.filter {
+    border: 1px solid rgba(200,200,200,0.5);
+    background-color: rgba(255,255,0,0.25);
+    border-radius: @pill-radius;
+    padding: 5px;
+    position:relative;
+    margin-bottom:2px;
+}
+.highlight {
+    color:white;
+    font-weight:bold;
+    background-color:gray;
+    padding: 0 3px 0 3px;
+}
+a.closebtn {
+    position:absolute;
+    top:0px;
+    right:5px;
+    color: #000000;
+    font-size: 16px;
+    font-weight: bold;
+    text-shadow: 0 1px 0 #ffffff;
+    filter: alpha(opacity=20);
+    -khtml-opacity: 0.2;
+    -moz-opacity: 0.2;
+    opacity: 0.2;
+    &:hover {
+        cursor:pointer;
+        color: gray;
+        text-decoration: none;
+        filter: alpha(opacity=40);
+        -khtml-opacity: 0.4;
+        -moz-opacity: 0.4;
+        opacity: 0.9; 
+    }
+}
 
 
 .confirmation {
@@ -412,14 +477,23 @@ a.suggestionVal:hover { color:white; background-color:#0050a3; text-decoration: 
     display: none;
 }
 
+@pill-color-start: #dddddd;
+@pill-color-end: #aaaaaa;
+
+@pill-loc-color-start: rgba(102, 204, 153, 1);
+@pill-loc-color-end: rgba(102, 204, 153, 0.7);
+pill.location {
+    background-image: -moz-linear-gradient(90deg, @pill-loc-color-start, @pill-loc-color-end);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(@pill-loc-color-start), to(@pill-loc-color-end));
+}
 
 pill {
     display: table;
     text-align: left;
     width: 100%;
     margin-bottom: 5px;
-    background-image: -moz-linear-gradient(90deg, #dddddd, #aaaaaa);
-    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#dddddd), to(#aaaaaa));
+    background-image: -moz-linear-gradient(90deg, @pill-color-start, @pill-color-end);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(@pill-color-start), to(@pill-color-end));
     border-radius: @pill-radius;
     box-shadow: 0 0.15em 0.17em rgba(0, 0, 0, 0.5);
     position: relative;
@@ -479,9 +553,9 @@ pill {
             &.pressed {
                 border-radius: @pill-radius;
                 font-weight: bold;
-                background-color: #0050a3;
-                background-image: -moz-linear-gradient(90deg, rgba(25, 25, 25, 0.35), rgba(25, 25, 25, 0.45));
-                background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(25, 25, 25, 0.35)), to(rgba(25, 25, 25, 0.45)));
+/*                 background-color: #0050a3; */
+/*                 background-image: -moz-linear-gradient(90deg, rgba(25, 25, 25, 0.35), rgba(25, 25, 25, 0.45)); */
+/*                 background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(25, 25, 25, 0.35)), to(rgba(25, 25, 25, 0.45))); */
                 text-shadow: 0 -0.1em 0.1em rgba(25, 25, 25, 0.55);
             }
             &.pressed:hover {
