@@ -442,7 +442,7 @@ E.get_geocode = function(latlng, clb) {
         
         if (status == google.maps.GeocoderStatus.OK) {
             key = "my location";
-            formatted = results[0].formatted_address;
+            formatted = results[1].formatted_address;
             console.log('formatted address:', formatted, key);
             
             attr_manager.sdata.location[key].values[val] = {
@@ -1180,6 +1180,34 @@ E.update_monitor = function() {
     return false;
 }
 
+var show_admin_url_modal = function() {
+    modal = $("#admin-url-modal");
+    modal.modal({backdrop:"static", show:true, keyboard:true});
+    
+    $("#admin-url-cancel-btn").click(function(){
+        modal.modal("hide");
+    });
+    $("#delete-delete-btn").click(function(){
+        that = this;
+        secret = cookies.get_cookie().pseudonyms[E.agent.id];
+        console.log("deleting", E.agent.url, secret);
+        $.ajax({
+            url: E.agent.url,
+            type: "GET",
+            data: {secret:secret},
+            success: function(json) {
+                if (json.error.length) {
+                    $(that).parent().parent().modal("hide");
+                    alert(json.error);
+                } else {
+                    cookies.del_cookie(E.agent.id);
+                    location.replace(E.website_url);
+                }
+            },
+            dataType: "json",
+        });
+    });
+}
 
 var show_delete_modal = function() {
     modal = $("#delete-confirmation-modal");
@@ -1332,6 +1360,8 @@ $(document).ready(function()
     setInterval(E.poll_matches, 2000); 
     
     $("#delete_btn").show().click(show_delete_modal);
+//     $("#event-btn").show().click(show_admin_url_modal);
+    $("#whatisthis").show().click(show_admin_url_modal);
     $("#pseudonym").show();
     
     $("nav a").click(function (){
@@ -1520,15 +1550,6 @@ $(document).ready(function()
     if (window.location.hash.startsWith("#tour")) {
         Tour.do_tour(0);
     }
-//     if (window.location.hash.startsWith("#search")) {
-//         $("nav a:nth-child(1)").click();
-//     }
-//     if (window.location.hash.startsWith("#new")) {
-//         $("nav a:nth-child(2)").click();
-//     }
-//     if (window.location.hash.startsWith("#me")) {
-//         $("nav a:nth-child(3)").click();
-//     }
     
     $("#cart-btn a").click(function(){
         console.log(E.previous_intersection);
@@ -1651,6 +1672,25 @@ $(document).ready(function()
     <div class="modal-footer">
         <a href="#" class="btn danger" id="location-cancel-btn">No</a>
         <a href="#" class="btn success" id="location-ok-btn">Yes</a>
+    </div>
+</div>
+
+
+<div id="admin-url-modal" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close">&times;</a>
+        <h3>Admin URL</h3>
+    </div>
+    <div class="modal-body">
+        <p>Your admin URL allows you to edit your profile. You may want to bookmark this URL.</p>
+        <p>
+            Email it to me: 
+            <input class="span4" />
+            <a href="#" class="btn success" id="admin-url-send-btn">Send</a>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn primary" id="admin-url-cancel-btn">Close</a>
     </div>
 </div>
 

@@ -68,11 +68,11 @@ class location():
         oldlon = self.db.getset('%s:location:%s:lon' % (self.usr, key), lon)
         
         return oldlat, oldlon
-        
+    
     def del_location(self, key):
         self.db.delete('%s:location:%s:lat' % (self.usr, key))
         self.db.delete('%s:location:%s:lon' % (self.usr, key))
-      
+    
     def delete_entry(self, key, lat, lon):
         #remove location from reverse entries
         self.del_reverse(key, lat, lon)
@@ -93,7 +93,7 @@ class location():
             dic = self.get_location(key)
             if dic:
                 self.delete_entry(key, dic['lat'], dic['lon'])
-            
+    
     def get(self):
         saved_items = {}
         #print 'keys', self.get_keys()
@@ -106,7 +106,7 @@ class location():
             
         res = {'data':saved_items}
         self.finish(res)
-            
+    
     def post(self):
         #print 'location post arguments:', self.arguments
         for key, valstr in self.arguments:
