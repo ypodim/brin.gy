@@ -47,7 +47,11 @@
             if (obj.metaKey || obj.altKey || obj.ctrlKey)
                 return true;
             return false;
-        })
+        });
+        
+        $("#whatisthis").click(function(){
+            return false;
+        });
     })
     </script>
     
@@ -99,7 +103,7 @@
                 <span class="label success">{{config.agentid}}</span>
                 <br>
                 <span class="title header-title">admin URL:</span>
-                <input class="urllabel" value="{{config.agent_url_private}}" />
+                <input class="urllabel" value="{{config.agent_url_private}}" /> <a id="whatisthis" href="#">what is this?</a>
                 <br>
                 <span class="title header-title">read-only URL:</span>
                 <input class="urllabel" value="{{config.agent_url}}" />

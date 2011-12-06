@@ -100,12 +100,36 @@ def fix_orphaned_profile_keys():
     print
 
 
-
+def validate_reverse_profile(fix=False):
+    keys = r.smembers('profile:keys')
+    for k in keys:
+        for a in r.smembers('profile:key:%s' % k):
+            if not r.sismember('users', a):
+                print '*** key group %s %s' % (k, a)
+                if fix:
+                    r.srem('profile:key:%s' % k, a)
+    
+    keyscores = r.zrevrangebyscore('profile:keyscores', '+inf', '-inf', withscores=True)
+    for key, score in keyscores:
+        for a in r.smembers('profile:key:%s' % key):
+            if not r.sismember('users', a):
+                print '*** key score group %s %s %s' % (key, a, score)
+                if fix:
+                    r.srem('profile:key:%s' % key, a)
+                    
+        zkey = 'profile:keyvalscores:%s' % key
+        for v, score in r.zrevrangebyscore(zkey, '+inf', '-inf', withscores=True):
+            for a in r.smembers('profile:key:%s:val:%s' % (key,v)):
+                if not r.sismember('users', a):
+                    print '*** val group %s %s %s %s' % (key, v, a, score)
+                    if fix:
+                        r.srem('profile:key:%s:val:%s' % (key,v), a)
+    
 
 fix = False
 r = redis.Redis(host='localhost', port=6379, db=0)
 
-upgrade_options_secret()
-
+#upgrade_options_secret()
+validate_reverse_profile(True)
 
 

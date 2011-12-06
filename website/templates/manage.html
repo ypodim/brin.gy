@@ -342,7 +342,7 @@ E.toggle_filter = function(action, cap, key, val){
             query += "[val='"+val+"']";
         else 
             query += "[type='keyfilter']";
-            
+        
         $(query).remove();
         if ("removed", $(".filter").length == 0)
             $("#clear-filters-btn").hide();
@@ -363,11 +363,23 @@ E.toggle_filter = function(action, cap, key, val){
         key = $(this).attr("key");
         val = $(this).attr("val");
         query = "[cap='"+cap+"'][key='"+key+"']";
-        if (val == undefined)
+        if (val == undefined) {
             query += "[type='keypart']";
-        else
+            attr_manager.sdata[cap][key].selected = false;
+        } else {
             query += "[val='"+val+"'][type='valpart']";
-        $(query).click();
+            attr_manager.sdata[cap][key].values[val].selected = false;
+        }
+        
+        if ($(query).length == 0) {
+            E.toggle_filter("remove", cap, key, val);
+//             if (val == undefined) {
+//                 E.toggle_filter("remove", cap, key);
+//             } else {
+                
+//             }
+        } else
+            $(query).click();
         return false;
     });
     title = "<span class='highlight'>"+key+"</span> is "+valstr;
@@ -416,6 +428,7 @@ E.handle_val_click = function(){
         E.toggle_filter("remove", cap, key);
         E.toggle_filter("add", cap, key, val);
     }
+    
     E.poll_matches(cap);
     E.reset_map_bounds = true;
     return false;
@@ -811,9 +824,11 @@ E.populate_attrs = function(useEditor) {
 
 E.construct_result_enty = function(agent) {
     picture = "http://pldb.media.mit.edu/research/images/nophoto.gif";
-    if ("picture" in attr_manager.cache[agent].profile)
-        for (p in attr_manager.cache[agent].profile.picture)
-            picture = p;
+    if (attr_manager.cache[agent])
+        if (attr_manager.cache[agent].profile)
+            if ("picture" in attr_manager.cache[agent].profile)
+                for (p in attr_manager.cache[agent].profile.picture)
+                    picture = p;
             
     pic = $("<img width=20 style='float:left; clear:left;' />").attr("src",picture);
     username = $("<span style='margin-left:5px'></span>").html(agent);
@@ -867,7 +882,6 @@ E.construct_result_enty = function(agent) {
 E.get_multi_profile = function(agents) {
     $.getJSON(E.agent.baseurl+"/batch_profile", {data:JSON.stringify(agents)}, function(json){
         for (agent in json.profiles) {
-            
             profile = {};
             for (i in json.profiles[agent].data) {
                 key = json.profiles[agent].data[i].key;
@@ -880,8 +894,8 @@ E.get_multi_profile = function(agents) {
             if (attr_manager.cache[agent] == undefined)
                 attr_manager.cache[agent] = {};
             attr_manager.cache[agent].profile = profile;
+            
         }
-
     
         $.getJSON(E.agent.baseurl+"/batch_location", {data:JSON.stringify(agents)}, function(json){
             
@@ -994,7 +1008,7 @@ E.poll_matches = function(capname) {
                 }
             }
         }
-
+        
         mapman.invalidateMarkers();
         if (capname != undefined) {
             E.update_monitor();
