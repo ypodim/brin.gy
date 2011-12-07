@@ -227,10 +227,10 @@ E.post_visited_keyval = function() {
         return {error:"Not allowed to change "+E.agent.id+"'s profile."};
     }
     params = {data:JSON.stringify(data), secret:secret};
-    console.log(params);
+    console.log("setting visited", params);
     
     $.post(E.agent.url+"/profile/visited", params, function(json){
-        return json;
+        console.log("visited", json);
     }, "json");
 }
 
