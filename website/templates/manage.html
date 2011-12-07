@@ -1181,31 +1181,40 @@ E.update_monitor = function() {
 }
 
 var show_admin_url_modal = function() {
+    $("#spinning-icon").hide();
     modal = $("#admin-url-modal");
     modal.modal({backdrop:"static", show:true, keyboard:true});
+    modal.bind('shown', function(){
+        $("#admin-url-email").focus();
+    });
     
+    $("#admin-url-email").keyup(function(obj){
+        value = $(this).val();
+        var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        if (filter.test(value))
+            $("#admin-url-send-btn").removeClass("disabled");
+        else
+            $("#admin-url-send-btn").addClass("disabled");
+            
+        if (obj.keyCode == 13 && filter.test(value))
+            $("#admin-url-send-btn").click();
+    });
     $("#admin-url-cancel-btn").click(function(){
         modal.modal("hide");
     });
-    $("#delete-delete-btn").click(function(){
+    $("#admin-url-send-btn").click(function(){
         that = this;
         secret = cookies.get_cookie().pseudonyms[E.agent.id];
-        console.log("deleting", E.agent.url, secret);
-        $.ajax({
-            url: E.agent.url,
-            type: "GET",
-            data: {secret:secret},
-            success: function(json) {
-                if (json.error.length) {
-                    $(that).parent().parent().modal("hide");
-                    alert(json.error);
-                } else {
-                    cookies.del_cookie(E.agent.id);
-                    location.replace(E.website_url);
-                }
-            },
-            dataType: "json",
-        });
+        email = $("#admin-url-email").val();
+        data = {secret:secret, to:email, user:E.agent.id};
+        var r = document.cookie.match("\\b_xsrf=([^;]*)\\b");
+        data._xsrf = r ? r[1] : undefined;
+        $.post("/message", data, function(json){
+            if (json.error)
+                console.log("message got back", json);
+            modal.modal("hide");
+        }, "json");
+        $("#spinning-icon").show();
     });
 }
 
@@ -1685,8 +1694,9 @@ $(document).ready(function()
         <p>Your admin URL allows you to edit your profile. You may want to bookmark this URL.</p>
         <p>
             Email it to me: 
-            <input class="span4" />
-            <a href="#" class="btn success" id="admin-url-send-btn">Send</a>
+            <input id="admin-url-email" class="span4" />
+            <a href="#" class="btn success disabled" id="admin-url-send-btn">Send</a>
+            <img id="spinning-icon" src="{{ static_url("images/website/spinning.gif") }}" />
         </p>
     </div>
     <div class="modal-footer">

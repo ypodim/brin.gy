@@ -11,6 +11,10 @@ import os.path
 import time
 from optparse import OptionParser
 import json
+import smtplib
+from email.mime.text import MIMEText
+
+
 
 class Config:
     discov_url = ''
@@ -101,18 +105,57 @@ class serve_user(tornado.web.RequestHandler):
             config.agent_url_private = "<not available>"
         
         self.render("manage.html", config=config)
+
+
+class message(tornado.web.RequestHandler):
+    def post(self):
+        you = self.get_argument('to')
+        secret = self.get_argument('secret')
+        user = self.get_argument('user')
+        ip = self.request.headers.get('X-Real-Ip')
         
-    
+        import redis
+        r = redis.Redis(host='localhost', port=6379, db=0)
+        r.sadd('adminemails', '%s:%s' % (user,you))
+        
+        message = 'Hello,\n\n'
+        message+= 'You received this message because someone (probably you) emailed to you the "admin URL" for user "%s" on Brin.gy:\n\n' % user
+        message+= 'http://brin.gy/a/%s\n\n' % secret
+        message+= 'You can use the above URL to manage your pseudonym.\n\n'
+        message+= 'Cheers\nBrin.gy\n\nPS: IP address that was used: %s' % ip
+        
+        me = 'info@brin.gy'
+        msg = MIMEText(message)
+        msg['Subject'] = 'Brin.gy: your "%s" pseudonym' % user
+        msg['From'] = me
+        msg['To'] = you
+
+        LOGIN = 'info@brin.gy'
+        PASSWD = open('email.pwd').read()
+        
+        error = ''
+        s = smtplib.SMTP('smtp.gmail.com', 587)
+        s.ehlo()
+        s.starttls()
+        try:
+            s.login(LOGIN, PASSWD)
+            s.sendmail(me, [you], msg.as_string())
+            s.quit()
+        except Exception,e:
+            error = '%s'%e
+        self.write(dict(error=error, to=you))
+        if not self._finished:
+            self.finish()
         
 
 debug = os.environ.get("SERVER_SOFTWARE", "").startswith("Development/")
 
 settings = {
     "template_path": os.path.join(os.path.dirname(__file__), "templates"),
-    #"xsrf_cookies": True,
+    "cookie_secret": "61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
+    "xsrf_cookies": True,
     "debug": debug,
     "static_path": os.path.join(os.path.dirname(__file__), "static"),
-    #"static_url_prefix": '%s/static/' % static_url_prefix,
     "static_url_prefix": '/static/'
 }
 
@@ -121,11 +164,10 @@ application = tornado.web.Application([
     (r"/api", website_call),
     (r"/about", website_call),
     (r"/UROP", website_call),
-    (r"/about", website_call),
+    (r"/message", message),
     
     (r"/a/[a-zA-Z0-9]+/?$", serve_user),
     (r"/[a-zA-Z0-9]+/?$", serve_user),
-    #dict(url="http://github.com/downloads/facebook/tornado/tornado-0.1.tar.gz")),
 ], **settings)
 
 if __name__ == "__main__":
