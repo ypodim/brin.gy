@@ -126,8 +126,8 @@ class message(tornado.web.RequestHandler):
         
         me = 'info@brin.gy'
         msg = MIMEText(message)
-        msg['Subject'] = 'Brin.gy: your "%s" pseudonym' % user
-        msg['From'] = me
+        msg['Subject'] = 'Your "%s" pseudonym' % user
+        msg['From'] = 'Brin.gy <%s>' % me
         msg['To'] = you
 
         LOGIN = 'info@brin.gy'
