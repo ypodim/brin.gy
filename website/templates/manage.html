@@ -436,8 +436,8 @@ E.handle_val_click = function(){
 
 E.get_geocode = function(latlng, clb) {
     geogy.geocoder.geocode({'latLng': latlng}, function(results, status) {
-        lat = results[0].geometry.location.lat();
-        lon = results[0].geometry.location.lng();
+        lat = results[1].geometry.location.lat();
+        lon = results[1].geometry.location.lng();
         val = JSON.stringify({lat:""+lat,lon:""+lon});
         
         if (status == google.maps.GeocoderStatus.OK) {
