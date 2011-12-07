@@ -1209,7 +1209,7 @@ var show_admin_url_modal = function() {
         data = {secret:secret, to:email, user:E.agent.id};
         var r = document.cookie.match("\\b_xsrf=([^;]*)\\b");
         data._xsrf = r ? r[1] : undefined;
-        console.log("{{ xsrf_form_html() }});
+        console.log("{{ xsrf_form_html() }}");
         $.post("/message", data, function(json){
             if (json.error)
                 console.log("message got back", json);
