@@ -140,6 +140,6 @@ fix = False
 r = redis.Redis(host='localhost', port=6379, db=0)
 
 #upgrade_options_secret()
-validate_reverse_profile(True)
-
+#validate_reverse_profile(True)
+migrate_reverse_profile_to_context()
 
