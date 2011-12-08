@@ -19,13 +19,14 @@ var redirect = function(username) {
 var check_username = function()
 {
     username = $("#username").val();
-    
+    console.log("chekcing", username);
     $.getJSON(ego_url_prefix+"/"+username, function(json){
+        console.log("chekcing result", json);
         if (username && username != "<username>" && typeof json == "object" && json.error) {
-            $("#btn").html("get it!").removeClass("primary").addClass("success");
+            $("#btn1").html("get it!").removeClass("primary").addClass("success");
             valid_username = username;
         } else {
-            $("#btn").html("check").removeClass("primary success").addClass("danger").html("pseudonym taken!");
+            $("#btn1").html("check").removeClass("primary success").addClass("danger").html("pseudonym taken!");
             valid_username = undefined;
         }
     });
@@ -67,7 +68,7 @@ $(document).ready(function()
         
         if (res) {
             valid_username = undefined;
-            $("#btn").removeClass("primary success").addClass("danger").html("Please use only letters and/or numbers");
+            $("#btn1").removeClass("primary success").addClass("danger").html("Please use only letters and/or numbers");
         } else {
             if (valid_username) {
                 post_new_user();
@@ -89,7 +90,7 @@ $(document).ready(function()
         if ($(this).val().length)
             check_username();
         else
-            $("#btn").html("check").removeClass("danger success").addClass("primary").html("check");
+            $("#btn1").html("check").removeClass("danger success").addClass("primary").html("check");
         return true;
     });
     
