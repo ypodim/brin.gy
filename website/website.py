@@ -116,7 +116,7 @@ class message(tornado.web.RequestHandler):
         
         import redis
         r = redis.Redis(host='localhost', port=6379, db=0)
-        r.sadd('adminemails', '%s:%s' % (user,you))
+        r.sadd('adminemails', '%s:%s:%s' % (user,you,ip))
         
         message = 'Hello,\n\n'
         message+= 'You received this message because someone (probably you) emailed to you the "admin URL" for user "%s" on Brin.gy:\n\n' % user
@@ -126,7 +126,7 @@ class message(tornado.web.RequestHandler):
         
         me = 'info@brin.gy'
         msg = MIMEText(message)
-        msg['Subject'] = 'Your "%s" pseudonym' % user
+        msg['Subject'] = 'Your "%s" pse%sudonym' % user
         msg['From'] = 'Brin.gy <%s>' % me
         msg['To'] = you
 

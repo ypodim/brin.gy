@@ -133,7 +133,7 @@ class serve_user(bringy_handler):
             deleted = db.delete_user(self.username)
             for capname in capability_names:
                 exec 'from capabilities.%s import %s' % (capname, capname)
-                capability = eval(capname)(self.username, self.arguments, db.r, self.on_response)
+                capability = eval(capname)(self.username, self.arguments, self.path, db.r, self.on_response)
                 capability.clear_all()
         else:
             error='authentication failed for user:%s secret:%s' % (self.username, secret)

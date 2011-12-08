@@ -126,6 +126,16 @@ def validate_reverse_profile(fix=False):
                         r.srem('profile:key:%s:val:%s' % (key,v), a)
     
 
+def migrate_reverse_profile_to_context():
+    for k in r.smembers('profile:keys'):
+        for k in r.smembers('profile:key:%s' % k):
+            
+        for a in r.smembers('profile:key:%s' % k):
+            if not r.sismember('users', a):
+                print '*** key group %s %s' % (k, a)
+                if fix:
+                    r.srem('profile:key:%s' % k, a)
+    
 fix = False
 r = redis.Redis(host='localhost', port=6379, db=0)
 

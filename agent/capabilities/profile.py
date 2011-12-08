@@ -119,7 +119,6 @@ class profile():
             res = 0
             for key in self.arguments:
                 lst = self.arguments[key]
-                print lst
                 self.db.sadd('%s:profile:visited:keys' % self.usr, key)
                 self.db.sadd('%s:profile:visited:key:%s' % (self.usr, key), *lst)
                 res += len(lst)

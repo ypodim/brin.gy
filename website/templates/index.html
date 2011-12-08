@@ -78,7 +78,7 @@ $(document).ready(function()
         return false;
     });
     
-    $("#btn").click(function (){
+    $("#btn1").click(function (){
         $("#newuserform").trigger("submit");
     });
     
@@ -103,6 +103,9 @@ $(document).ready(function()
     });
     $("#btn2").click(function(){
         redirect($("select").val());
+    });
+    $("#btn3").click(function(){
+        return false;
     });
     
     $.getJSON(discov_url+"/stats", function(json){
@@ -131,7 +134,7 @@ $(document).ready(function()
     <p>Users to engage with: <stat id="users" class="stat-entry"></stat></p>
     <p>Attributes to choose from: <stat id="values" class="stat-entry"></stat><p>
     <p>
-    Get more statistics by doing an HTTP GET request to <code>http://satellite.brin.gy/stats</code>. The result is in JSON format and looks like this:
+<!--    Get more statistics by doing an HTTP GET request to <code>http://satellite.brin.gy/stats</code>. The result is in JSON format and looks like this:
     <pre>
 {
     "users": 80,    # number of users in the system
@@ -144,36 +147,29 @@ $(document).ready(function()
         }
     }
 }</pre>
-    </p>
-<!--    <div class="stat-entry">
-        <stat class="alert-message success left">users</stat>
-        <stat id="users" class="alert-message success right"></stat>
-        <span>in this system.</span>
-    </div>
-    <div class="stat-entry">
-        <stat class="alert-message left success">attributes</stat>
-        <stat id="keys" class="alert-message success right"></stat>
-    </div>
-    <div class="stat-entry">
-        <stat class="alert-message left success">values</stat>
-        <stat id="values" class="alert-message success right"></stat>
-        to choose from.
-    </div>-->
+    </p>-->
 </div>
 
-<div id="right">
+<div id="right" class="span7">
     <div id="new_pseudonym">
         <h2>Pick a pseudonym</h2>
         <form method="post" id="newuserform">
             <input class="span2" id="username" name="username" type="text" value="" />
-            <a id="btn" class="btn primary" href="#">check</a>
+            <a id="btn1" class="btn primary" href="#">check</a>
         </form>
     </div>
-    <div id="previous_pseudonym">
+    <div id="previous_pseudonym" class="hidden">
         <h2>Previous pseudonyms</h2>
         <form>
             <select class="span2"></select>
             <a id="btn2" class="btn primary" href="#">choose</a>
+        </form>
+    </div>
+    <div id="start_event">
+        <h2>Use it in your company or event</h2>
+        You can use Brin.gy in the context of your company or an event you are holding by starting fresh and allowing your guests to build up the attributes that describe them best without being distracted by existing attributes. All information provided by your guests will remain public so people outside your event would still be able to discover people within the event and vice versa.
+        <form>
+            <a id="btn3" class="btn primary disabled" href="#">coming soon</a>
         </form>
     </div>
 </div>
