@@ -151,10 +151,15 @@ class stats(tornado.web.RequestHandler):
         self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
         self.set_header('Content-Type','application/json; charset=UTF-8')
     def get(self):
-        keys = r.smembers('profile:keys')
+        #keys = r.smembers('profile:keys')
+        
+        zkey = 'profile:all:keys'
+        keys = r.zrevrangebyscore(zkey, '+inf', '-inf') or []
+        
         vals = 0
         for k in keys:
-            vals += r.scard('profile:key:%s' % k)
+            #vals += r.scard('profile:key:%s' % k)
+            vals += r.zscore('profile:all:keys', k)
         
         dic = dict(churn=self.churn(), 
                    users=r.scard('users'),
@@ -250,10 +255,10 @@ class randomstat(tornado.web.RequestHandler):
     def get(self):
         kvlist = []
         while not kvlist:
-            keys = r.zrevrangebyscore('profile:keyscores', '+inf', 2, withscores=True) or []
+            keys = r.zrevrangebyscore('profile:all:keys', '+inf', 2, withscores=True) or []
             key, score = random.choice(keys)
             
-            zkey = 'profile:keyvalscores:%s' % key
+            zkey = 'profile:all:key:%s:values' % key
             kvlist = r.zrevrangebyscore(zkey, '+inf', 2, withscores=True) or []
         val, score = random.choice(kvlist)
         

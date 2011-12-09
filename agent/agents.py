@@ -394,10 +394,10 @@ class api_call(tornado.web.RequestHandler):
         self.write(dict(secret=secret, user=user, error=error))
         
     def api_cleanup(self):
-        for user in db.r.smembers('users'):
-            for key in db.r.smembers('%s:profile:visited:keys' % user):
-                print db.r.delete('%s:profile:visited:key:%s' % (user, key))
-            print db.r.delete('%s:profile:visited:keys' % user)
+        #for user in db.r.smembers('users'):
+            #for key in db.r.smembers('%s:profile:visited:keys' % user):
+                #print db.r.delete('%s:profile:visited:key:%s' % (user, key))
+            #print db.r.delete('%s:profile:visited:keys' % user)
         self.write("ok")
         
         
