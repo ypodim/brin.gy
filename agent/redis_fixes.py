@@ -179,7 +179,7 @@ def migrate_reverse_profile_to_context(fix=False):
 def clb(res):
     #print res
     pass
-def rebuild_reversasdfe_profile():
+def rebuild_reverse_profile():
     print 'in'
     from capabilities.profile import profile
     
