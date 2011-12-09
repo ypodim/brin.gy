@@ -12,18 +12,19 @@ class profile():
         self.cap = __name__.split('.')[-1]
         self.usr = usr
         self.path = path
+        self.context = 'all'
     
     'churn:CAP:keys' # set of recorded keys in churn
     'churn:CAP:KEY:vals' # set of recorded vals for each key in churn
     'churn:CAP:KEY:VAL:add' # counter of adds a key/val has received
     'churn:CAP:KEY:VAL:rem' # counter of rems a key/val has received
     
-    'profile:keys' # set of all keys in use
-    'profile:key:KEY' # set of agents using this key
-    'profile:key:KEY:val:VAL' # set of agents using this key/val pair
+    #'profile:CONTEXT:keys' # set of all keys in use
+    #'profile:CONTEXT:key:KEY' # set of agents using this key
+    #'profile:CONTEXT:key:KEY:val:VAL' # set of agents using this key/val pair
     
-    'profile:keyscores' # set of keys, scored on the number of agents that have it
-    'profile:keyvalscores:KEY' # set of vals corresponding to this key, scored on the number of agents that have it
+    #'profile:CONTEXT:keyscores' # set of keys, scored on the number of agents that have it
+    #'profile:CONTEXT:keyvalscores:KEY' # set of vals corresponding to this key, scored on the number of agents that have it
     
     'USER:profile:visited:keys' # set keys that USER has already seen
     'USER:profile:visited:key:KEY' # set of vals for the given KEY that USER has already seen
@@ -31,36 +32,35 @@ class profile():
     'USER:profile:keys' # set of keys
     'USER:profile:key:KEY' # val
     
+    'profile:CONTEXT:keys' # ordered set of all keys in use
+    'profile:CONTEXT:key:KEY:agents' # set of agents using this key
+    'profile:CONTEXT:key:KEY:values' # ordered set of values for this key
+    'profile:CONTEXT:key:KEY:val:VAL:agents' # set of agents using this key/val pair
+    
+    def getK (self):            return 'profile:%s:keys'                 % (self.context)
+    def getKA(self, key):       return 'profile:%s:key:%s:agents'        % (self.context, key)
+    
+    def getKV(self, key):       return 'profile:%s:key:%s:values'        % (self.context, key)
+    def getKVA(self, key, val): return 'profile:%s:key:%s:val:%s:agents' % (self.context, key, val)
     
     def add_reverse(self, key, val):
-        added = self.db.sadd('profile:keys', key)
-        self.db.sadd('profile:key:%s' % key, self.usr)
-        keyvaladded = self.db.sadd('profile:key:%s:val:%s' % (key, val), self.usr)
+        if self.db.sadd(self.getKA(key), self.usr):   # add agent to set for this key
+            self.db.zincrby(self.getK(), key, 1)     # add key and increase its score
+            
+        if self.db.sadd(self.getKVA(key, val), self.usr):  # add agent to set for this key/val pair
+            self.db.zincrby(self.getKV(key), val, 1)     # add key/val pair and increase its score
         
-        if added:
-            print 'add keyscore for', key
-            self.db.zadd('profile:keyscores', key, 1)
-        else:
-            self.db.zincrby('profile:keyscores', key, 1)
-        
-        #if self.db.zscore('profile:keyvalscores:%s' % key, val) == None:
-            #self.db.zadd('profile:keyvalscores:%s' % key, val, 1)
-        #else:
-        if keyvaladded:
-            self.db.zincrby('profile:keyvalscores:%s' % key, val, 1)
         
     def del_reverse(self, key, val):
-        self.db.srem('profile:key:%s:val:%s' % (key, val), self.usr)
-        self.db.srem('profile:key:%s' % key, self.usr)
-        
-        newscore = self.db.zincrby('profile:keyscores', key, -1)
-        if newscore == 0:
-            self.db.srem('profile:keys', key)
-            self.db.zrem('profile:keyscores', key)
-        
-        newscore = self.db.zincrby('profile:keyvalscores:%s' % key, val, -1)
-        if newscore == 0:
-            self.db.zrem('profile:keyvalscores:%s' % key, val)
+        if self.db.srem(self.getKVA(key, val), self.usr):  # remove agent from set for this key/val pair
+            if self.db.zincrby(self.getKV(key), val, -1) <= 0: # decrease key/val pair's score    
+                self.db.zrem(self.getKV(key), val)
+                self.db.delete(self.getKVA(key, val))
+                
+        if self.db.srem(self.getKA(key), self.usr):   # remove agent from set for this key
+            if self.db.zincrby(self.getK(), key, -1) <= 0: # decrease key's score
+                self.db.zrem(self.getK(), key)
+                self.db.delete(self.getKA(key))
         
     def get_keys(self):
         return self.db.smembers('%s:profile:keys' % self.usr)

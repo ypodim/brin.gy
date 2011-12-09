@@ -133,27 +133,25 @@ class Profile:
     count_tstamp = 0
     def __init__(self, r):
         self.r = r
-    def get_count(self, key, val='', cardinalities_only=False):
-        'profile:keys' # set of all keys in use
-        'profile:key:KEY' # set of agents using this key
-        'profile:key:KEY:val:VAL' # set of agents using this key/val pair
-        
+        self.context = 'all'
+    
+    def getK (self):            return 'profile:%s:keys'                 % (self.context)
+    def getKA(self, key):       return 'profile:%s:key:%s:agents'        % (self.context, key)
+    def getKV(self, key):       return 'profile:%s:key:%s:values'        % (self.context, key)
+    def getKVA(self, key, val): return 'profile:%s:key:%s:val:%s:agents' % (self.context, key, val)
+    
+    def get_count(self, key, val='', cardinalities_only=False):        
         #print 'key', key, 'val', val
         result = dict(error='', count=0, matches=[])
-
-        #if key:
+        
         if val:
-            if cardinalities_only:
-                result['count'] = self.r.scard('profile:key:%s:val:%s' % (key, val))
-            else:
-                result['matches'] = list(self.r.smembers('profile:key:%s:val:%s' % (key, val)))
-                result['count'] = len(result['matches'])
+            result['count'] = self.r.zscore(self.getKV(key), val)
+            if not cardinalities_only:
+                result['matches'] = list(self.r.smembers(self.getKVA(key, val)))
         else:
-            if cardinalities_only:
-                result['count'] = self.r.scard('profile:key:%s' % key)
-            else:
-                result['matches'] = list(self.r.smembers('profile:key:%s' % key))
-                result['count'] = len(result['matches'])
+            result['count'] = self.r.zscore(self.getK(), key)
+            if not cardinalities_only:
+                result['matches'] = list(self.r.smembers(self.getKA(key)))
                 
         return result
     
@@ -164,6 +162,7 @@ class Profile:
         matches = []
         count = 0
         key = val = ''
+        context = 'all'
         
         if len(params) >= 1:
             if params[0] == 'complete':
@@ -172,8 +171,7 @@ class Profile:
                     if len(params) >= 3:
                         val = params[2]
                         
-                        zkey = 'profile:keyvalscores:%s' % key
-                        for m, score in self.r.zrevrangebyscore(zkey, '+inf', '-inf', withscores=True):
+                        for m, score in self.r.zrevrangebyscore(self.getKV(key), '+inf', '-inf', withscores=True):
                             if val:
                                 if m.startswith(val):
                                     matches.append((m, score))
@@ -209,8 +207,8 @@ class Profile:
                 start = 0
                 if len(params) >= 2 and params[1]:
                     start_from = params[1]
-                    #score = self.r.zscore('profile:keyscores', start_from)
-                    rank = self.r.zrevrank('profile:keyscores', start_from)
+                    
+                    rank = self.r.zrevrank(self.getK(), start_from)
                     if rank is not None:
                         start = rank
                 
@@ -219,19 +217,17 @@ class Profile:
                 else:
                     arguments = json.loads(arguments)
                 
-                keyscores = self.r.zrevrangebyscore('profile:keyscores', '+inf', '-inf', withscores=True, num=bucket, start=start)
+                keyscores = self.r.zrevrangebyscore(self.getK(), '+inf', '-inf', withscores=True, num=bucket, start=start)
                 matches = []
                 for key, score in keyscores:
                     dic = dict(key=key, score=score)
                     if 'with_values' in arguments:
                         dic['values'] = []
-                        zkey = 'profile:keyvalscores:%s' % key
-                        for v, score in self.r.zrevrangebyscore(zkey, '+inf', '-inf', withscores=True):
+                        for v, score in self.r.zrevrangebyscore(self.getKV(key), '+inf', '-inf', withscores=True):
                             userhasit = 0
                             if 'user' in arguments:
                                 aid = arguments['user']
-                                rkey = 'profile:key:%s:val:%s' % (key, v)
-                                userhasit = int(self.r.sismember(rkey, aid))
+                                userhasit = int(self.r.sismember(self.getKVA(key, v), aid))
                             dic['values'].append(dict(val=v, score=score, userhasit=userhasit))
                         
 

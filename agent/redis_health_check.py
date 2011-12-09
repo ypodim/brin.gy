@@ -126,20 +126,127 @@ def validate_reverse_profile(fix=False):
                         r.srem('profile:key:%s:val:%s' % (key,v), a)
     
 
-def migrate_reverse_profile_to_context():
-    for k in r.smembers('profile:keys'):
-        for k in r.smembers('profile:key:%s' % k):
-            
-        for a in r.smembers('profile:key:%s' % k):
-            if not r.sismember('users', a):
-                print '*** key group %s %s' % (k, a)
-                if fix:
-                    r.srem('profile:key:%s' % k, a)
+def migrate_reverse_profile_to_context(fix=False):
+    context = 'all'
     
+    if fix:
+        zkey = 'profile:keyscores'
+    else:
+        zkey = 'profile:%s:keyscores' % context
+    for k, sk in r.zrevrangebyscore(zkey, '+inf', '-inf', withscores=True):
+        if fix:
+            print r.zadd('profile:%s:keyscores' % (context), k, sk)
+            print r.zrem('profile:keyscores', k)
+        
+        if fix:
+            zkey = 'profile:keyvalscores:%s' % k
+        else:
+            zkey = 'profile:%s:keyvalscores:%s' % (context, k)
+            
+        for v, sv in r.zrevrangebyscore(zkey, '+inf', '-inf', withscores=True):
+            if fix:
+                print r.zadd('profile:%s:keyvalscores:%s' % (context, k), v, sv)
+                print r.zrem('profile:keyvalscores:%s' % k, v)
+            print '*** key/val %s %s %s %s' % (k, sk, v, sv)
+    
+    print
+    return
+    
+    if fix:
+        keys = r.smembers('profile:keys')
+        print r.sadd('profile:%s:keys' % context, *keys)
+        print r.srem('profile:keys', *keys)
+        print r.delete('profile:keys')
+    else:
+        keys = r.smembers('profile:keys' % context)
+    print
+    for k in keys:
+        if fix:
+            print r.sadd('profile:%s:keys' % context, k)
+            print r.srem('profile:keys', k)
+        
+        zkey = 'profile:keyvalscores:%s' % k
+        for v in r.zrevrangebyscore(zkey, '+inf', '-inf'):
+            agents = r.smembers('profile:key:%s:val:%s' % (k, v))
+            
+            print k, v
+            if fix:
+                print r.sadd('profile:%s:key:%s:val:%s' % (context, k, v), *agents)
+                #print r.srem('profile:key:%s:val:%s' % (k, v), *agents)
+                print r.delete('profile:key:%s:val:%s' % (k, v))
+
+
+def clb(res):
+    #print res
+    pass
+def rebuild_reverse_profile():
+    from capabilities.profile import profile
+    
+    r.delete('profile:keys')
+    r.delete('profile:all:keys')
+    
+    r.delete('profile:keyscores')
+    r.delete('profile:all:keyscores')
+    
+    r.delete('profile:all:keys')
+    
+    dic = {}
+    for u in r.smembers('users'):
+        kvlist = []
+        for k in r.smembers('%s:profile:keys' % u):
+            
+            r.delete('profile:key:%s' % k)
+            r.delete('profile:all:key:%s' % k)
+            
+            r.delete('profile:keyvalscores:%s' % k)
+            r.delete('profile:all:keyvalscores:%s' % k)
+            
+            r.delete('profile:all:key:%s:agents' % k)
+            r.delete('profile:all:key:%s:values' % k)
+            
+            for v in r.smembers('%s:profile:key:%s' % (u,k)):
+                
+                if not v:
+                    print 'skipping', u, k, v
+                    continue
+                
+                r.delete('profile:key:%s:val:%s' % (k,v))
+                r.delete('profile:all:key:%s:val:%s' % (k,v))
+                
+                r.delete('profile:all:key:%s:val:%s:agents' % (k,v))
+                
+                kvlist.append( (k,v) )
+                #print u, k, v
+
+        dic[u] = kvlist
+        
+    for u, arguments in dic.items():
+        p = profile(u, arguments, [''], r, clb)
+        p.post()
+        
 fix = False
 r = redis.Redis(host='localhost', port=6379, db=0)
 
 #upgrade_options_secret()
 #validate_reverse_profile(True)
-migrate_reverse_profile_to_context()
+#migrate_reverse_profile_to_context()
+
+rebuild_reverse_profile()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
