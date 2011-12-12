@@ -72,7 +72,7 @@ class serve_request(tornado.web.RequestHandler):
         if not self.error:
             cap = eval('%s' % self.cap)
             arguments = tornado.escape.url_unescape(self.get_argument('data', ''))
-            res = cap.get(self.path, arguments)
+            res = cap.get(self.path, self.request.arguments)
             
         self.finilize_call(res)
         

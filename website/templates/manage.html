@@ -1084,16 +1084,17 @@ E.fetch_profile = function(visited, clb) {
     if (E.last_fetched.length)
         console.log("continuing from", E.last_fetched);
     
-    data = JSON.stringify({with_values:1, user:E.agent.id});
+//     data = JSON.stringify({with_values:1, user:E.agent.id});
+    data = {user:E.agent.id, start_from:E.last_fetched};
     
-    $.getJSON(E.satellite.url+"/profile/fetch/"+E.last_fetched, {data:data}, function(json){
-        for (i in json.matches) {
-            attribute = json.matches[i].key;
+    $.getJSON(E.satellite.url+"/profile/all/keyvals", data, function(json){
+        for (i in json.items) {
+            attribute = json.items[i].key;
             attr_manager.add_sdata("profile", attribute, 0);
-            for (j in json.matches[i].values) {
-                val = json.matches[i].values[j].val;
-                cnt = json.matches[i].values[j].score;
-                haveit = (json.matches[i].values[j].userhasit==1);
+            for (j in json.items[i].values) {
+                val = json.items[i].values[j].val;
+                cnt = json.items[i].values[j].score;
+                haveit = (json.items[i].values[j].userhasit==1);
                 
                 newval = true;
                 if (attribute in visited && val in visited[attribute])

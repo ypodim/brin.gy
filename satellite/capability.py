@@ -156,84 +156,60 @@ class Profile:
         return result
     
     def get(self, params, arguments):
+        params = [x for x in params if x]
         #print 'satellite profile get', params, arguments
+        #arguments = json.loads(arguments or '{}')
         
         error = ''
-        matches = []
+        items = []
         count = 0
         key = val = ''
-        context = 'all'
+        #self.context = str('all')
+        bucket = 100
+        start_from = arguments.get('start_from')
+        aid = arguments.get('user')
+        if type(start_from) == list: start_from = start_from[0]
+        if type(aid) == list: aid = aid[0]
         
-        if len(params) >= 1:
-            if params[0] == 'complete':
-                if len(params) >= 2:
-                    key = params[1]
-                    if len(params) >= 3:
-                        val = params[2]
-                        
-                        for m, score in self.r.zrevrangebyscore(self.getKV(key), '+inf', '-inf', withscores=True):
-                            if val:
-                                if m.startswith(val):
-                                    matches.append((m, score))
-                            else:
-                                matches.append((m, score))
-                            
-                
-            if params[0] == 'match':
-                if len(params) >= 2:
-                    key = params[1]
-                    if len(params) >= 3:
-                        val = params[2]
-                
-                dic = self.get_count(key, val)
-                count = dic['count']
-                matches = dic['matches']
-                
-            if params[0] == 'multimatch':
-                res = []
-                arguments = json.loads(arguments)
-                for key, val in arguments:
-                    dic = self.get_count(key, val)
-                    res.append([key, val, dic['count'], dic['matches']])
-                    
-                #print res
-                matches = res
-                
-            if params[0] == 'fetch':
-                bucket = 100
-                start_from = ''
-                index = 0
-                
-                start = 0
-                if len(params) >= 2 and params[1]:
-                    start_from = params[1]
-                    
-                    rank = self.r.zrevrank(self.getK(), start_from)
-                    if rank is not None:
-                        start = rank
-                
-                if not arguments:
-                    arguments = {}
-                else:
-                    arguments = json.loads(arguments)
-                
-                keyscores = self.r.zrevrangebyscore(self.getK(), '+inf', '-inf', withscores=True, num=bucket, start=start)
-                matches = []
-                for key, score in keyscores:
-                    dic = dict(key=key, score=score)
-                    if 'with_values' in arguments:
-                        dic['values'] = []
-                        for v, score in self.r.zrevrangebyscore(self.getKV(key), '+inf', '-inf', withscores=True):
-                            userhasit = 0
-                            if 'user' in arguments:
-                                aid = arguments['user']
-                                userhasit = int(self.r.sismember(self.getKVA(key, v), aid))
-                            dic['values'].append(dict(val=v, score=score, userhasit=userhasit))
-                        
-
-                    matches.append(dic)
-                    
-        return dict(matches=matches, error=error, count=count)
+        if len(params) < 2:
+            return dict(items=items, error='invalid/insufficient parameters', count=count)
+            
+        self.context = str(params[0])
+        kparam = params[1]
+        
+        print params
+        
+        if kparam == 'keys':
+            start = self.r.zrevrank(self.getK(), start_from) or 0
+            keyscores = self.r.zrevrangebyscore(self.getK(), '+inf', '-inf', withscores=True, num=bucket, start=start)
+            items = keyscores
+        elif kparam == 'keyvals':
+            start = self.r.zrevrank(self.getK(), start_from) or 0
+            for key, kscore in self.r.zrevrangebyscore(self.getK(), '+inf', '-inf', withscores=True, num=bucket, start=start):
+                item = dict(key=key, values=[], score=kscore)
+                #start = self.r.zrevrank(self.getKV(key), start_from) or 0
+                for val, vscore in self.r.zrevrangebyscore(self.getKV(key), '+inf', '-inf', withscores=True):
+                    userhasit = int(self.r.sismember(self.getKVA(key, val), aid))
+                    #print key, val, aid, userhasit
+                    vitem = dict(val=val, userhasit=userhasit, score=vscore)
+                    item['values'].append(vitem)
+                items.append(item)
+        elif kparam == 'key' and len(params) > 3:
+            key = params[2]
+            if params[3] == 'agents':
+                items = list(self.r.smembers(self.getKA(key)))
+            elif params[3] == 'values':
+                start = self.r.zrevrank(self.getKV(key), start_from) or 0
+                items = self.r.zrevrangebyscore(self.getKV(key), '+inf', '-inf', withscores=True, num=bucket, start=start)
+            elif params[3] == 'val' and len(params) > 5 and params[5] == 'agents':
+                val = params[4]
+                items = list(self.r.smembers(self.getKVA(key, val)))
+            else:
+                error='invalid/insufficient parameters'
+        else:
+            error='invalid/insufficient parameters'
+            
+        return dict(items=items, error=error, count=count)
             
     
     def mutate(self, aid, key, val):
@@ -318,7 +294,7 @@ class Buysell:
         if params == ['']: params = []
         
         error = ''
-        matches = {}
+        matches = []
         count = 0
         key = val = ''
         if len(params) == 0:
