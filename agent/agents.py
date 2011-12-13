@@ -140,7 +140,26 @@ class serve_user(bringy_handler):
             
         res = {'error':error, 'username':self.username, 'deleted':deleted}
         self.write(res)
-
+    def post(self):
+        error = ''
+        secret = self.get_argument('secret','')
+        context = self.get_argument('context','')
+        action = self.get_argument('action','')
+        passed = db.authenticate_user(self.username, secret)
+        if not passed:
+            error = 'authentication failed for user:%s secret:%s' % (self.username, secret)
+        if not context:
+            error = 'invalid context'
+        if action not in ['join','leave']:
+            error = 'invalid action'
+            
+        if not error and action == 'join':
+            db.join_context(context, self.username)
+        if not error and action == 'leave':
+            db.leave_context(context, self.username)
+            
+        res = {'error':error, 'username':self.username}
+        self.write(res)
         
 class serve_capability(bringy_handler):
     def prepare(self):
@@ -400,6 +419,12 @@ class api_call(tornado.web.RequestHandler):
             #print db.r.delete('%s:profile:visited:keys' % user)
         self.write("ok")
         
+    def api_clear_context(self):
+        context = self.get_argument('context')
+        if type(context) == list: context = context[0]
+        print context
+        if context != 'all':
+            db.clear_context(context)
         
 #########################################
 
@@ -416,6 +441,8 @@ application = tornado.web.Application([
     (r"/authenticate_user", api_call),
     (r"/authenticate_admin_secret", api_call),
     (r"/cleanup", api_call),
+    (r"/clear_context", api_call),
+    
     
     (r"/a/[a-zA-Z0-9]+/?$", serve_user),
     (r"/[a-zA-Z0-9]+/?$", serve_user),

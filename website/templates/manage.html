@@ -230,7 +230,7 @@ E.post_visited_keyval = function() {
     console.log("setting visited", params);
     
     $.post(E.agent.url+"/profile/visited", params, function(json){
-        console.log("visited", json);
+//         console.log("visited", json);
     }, "json");
 }
 
@@ -337,14 +337,14 @@ E.set_matches = function(stop, nonce) {
 E.toggle_filter = function(action, cap, key, val){
     attr = {cap:cap,key:key,val:val,type:"valfilter"};
     if (action == "remove") {
-        query = ".filter[cap='"+cap+"'][key='"+key+"']";
+        query = ".filter-item[cap='"+cap+"'][key='"+key+"']";
         if (val != undefined)
             query += "[val='"+val+"']";
         else 
             query += "[type='keyfilter']";
         
         $(query).remove();
-        if ("removed", $(".filter").length == 0)
+        if ("removed", $(".filter-item").length == 0)
             $("#clear-filters-btn").hide();
         return true;
     }
@@ -383,7 +383,7 @@ E.toggle_filter = function(action, cap, key, val){
         return false;
     });
     title = "<span class='highlight'>"+key+"</span> is "+valstr;
-    filter = $("<p></p>").append(title).append(closebtn).addClass("filter");
+    filter = $("<p></p>").append(title).append(closebtn).addClass("filter-item");
     filter.attr(attr);
     $("#filters").append(filter);
 }
@@ -1185,9 +1185,6 @@ var show_admin_url_modal = function() {
     $("#spinning-icon").hide();
     modal = $("#admin-url-modal");
     modal.modal({backdrop:"static", show:true, keyboard:true});
-    modal.bind('shown', function(){
-        $("#admin-url-email").focus();
-    });
     
     $("#admin-url-email").keyup(function(obj){
         value = $(this).val();
@@ -1205,6 +1202,7 @@ var show_admin_url_modal = function() {
     });
     $("#admin-url-send-btn").click(function(){
         that = this;
+        if ($(this).hasClass("disabled")) return false;
         secret = cookies.get_cookie().pseudonyms[E.agent.id];
         email = $("#admin-url-email").val();
         data = {secret:secret, to:email, user:E.agent.id};
@@ -1287,7 +1285,6 @@ E.get_val_input_boxes = function() {
 E.nav_search = function(){
     $("#searchbox").show();
     $("#add-key-div").hide();
-    $("#searchinput").focus();
     
     $("#message").hide();
     $("div.valcontainer").show();
@@ -1319,7 +1316,7 @@ E.nav_new = function(){
 E.nav_me = function(){
     $("#searchbox").hide();
     $("#add-key-div").show();
-    $("#new-key-input").focus();
+//     $("#new-key-input").focus();
     
     $("#choices div.help-block").remove();
     $("div.valcontainer").show();
@@ -1357,32 +1354,47 @@ $(document).ready(function()
     });
     
     $("#clear-filters-btn").click(function(){
-        $(".filter").each(function(){
+        $(".filter-item").each(function(){
             $(this).children("a.closebtn").click();
         });
         return false;
     });
-    $("#search-clear-btn").click(function(){
-        $("#searchinput").val("").keyup().focus();
-        return false;
-    });
+//     $("#search-clear-btn").click(function(){
+//         $("#searchinput").val("").keyup().focus();
+//         return false;
+//     });
     
     
     setInterval(E.poll_matches, 2000); 
     
     $("#delete_btn").show().click(show_delete_modal);
-//     $("#event-btn").show().click(show_admin_url_modal);
+    $("#event-btn").show().click(function(){
+        data = {secret:"{{config.secret}}", context:"ml", action:"join"};
+        $.post(E.agent.url, data, function(json){
+            console.log(json);
+        }, "json");
+    });
     $("#whatisthis").show().click(show_admin_url_modal);
     $("#pseudonym").show();
     
-    $("nav a").click(function (){
-        $("nav a").removeClass("selected");
+    $("nav.filter1 a").click(function (){
+        $("nav.filter1 > a").removeClass("selected");
         $(this).addClass("selected");
-        if ($(this).html() == "search") E.nav_search();
-        if ($(this).html() == "new") E.nav_new();
+        if ($(this).html() == "people") console.log("people");
+        if ($(this).html() == "events") console.log("events");
+        return false;
+    });
+    
+    $("nav.filter2 a").click(function (){
+        $("nav.filter2 > a").removeClass("selected");
+        $(this).addClass("selected");
+        if ($(this).html() == "all") E.nav_search();
+        if ($(this).html() == "unseen") E.nav_new();
         if ($(this).html() == "me") E.nav_me();
         return false;
     });
+    
+
     
     E.resize_overflow_divs();
     
@@ -1394,16 +1406,13 @@ $(document).ready(function()
 //             console.log(obj.keyCode);
 //             return false;
         }
-    }).keyup(function(obj) {
+    }).bind("search keyup", function(obj){
+//         console.log(obj.handleObj.type);
 //         attr_manager.deselect_keyvals();
         
         text = $(this).val();
         attr_manager.show_keyvals();
-        if (text.length == 0)
-            $("#search-clear-btn").hide();
-        else
-            $("#search-clear-btn").show();
-            
+        
         if (text.length == 1) {
             return true;
         }
@@ -1605,21 +1614,24 @@ $(document).ready(function()
 {% block body %}
 
 <div id="left-panel" class="span6">
-    <nav class="">
-        <a href="#" class="selected">search</a>
-        <a href="#" class="">new</a>
-        <a href="#" class="">me</a>
-<!--         <a href="#" class="">add</a> -->
+    <nav class="filter1">
+        <a href="#" class="selected">people</a>
+        <a href="#" class="">events</a>
     </nav>
+    <nav class="filter2">
+        <a href="#" class="selected">all</a>
+        <a href="#" class="">unseen</a>
+        <a href="#" class="">me</a>
+    </nav>
+    
+    <a href="#" class="btn danger" style="float:right;">add new</a>
+    
     <form id="searchbox">
-        <div class="help-block">search for attribute</div>
-        <input type="text" id="searchinput" class="" />
-        <a href='#' class="closebtn" id="search-clear-btn">×</a>
+        <input autofocus="autofocus" type="search" id="searchinput" results="10" placeholder="Search..." />
     </form>
     <div id="message"></div>
     <form id="add-key-div">
-        <div class="help-block">type to add new attribute</div>
-        <input type="text" id="new-key-input" title='add new attribute' data-content='press enter to add this attribute' />
+        <input autofocus="autofocus" type="text" id="new-key-input" placeholder="add new attribute" title='add new attribute' data-content='press enter to add this attribute' />
     </form>
     
     <div id="userinfo"></div>
@@ -1628,7 +1640,7 @@ $(document).ready(function()
 <div id="right-panel" class="">            
     <div id="results-container" class="span3">
         <div id="filters">
-            <div id="clear-filters-btn" class="btn hidden" style="width">clear filters</div>
+            <div id="clear-filters-btn" class="btn hidden" style="width">clear query</div>
         </div>
         <div id="results"></div>
         <div id="cart-btn" class="btn success">
@@ -1697,7 +1709,7 @@ $(document).ready(function()
         <p>Your admin URL allows you to edit your profile. You may want to bookmark this URL.</p>
         <p>
             Email it to me: 
-            <input id="admin-url-email" class="span4" />
+            <input autofocus="autofocus" type="email" id="admin-url-email" class="span4" />
             <a href="#" class="btn success disabled" id="admin-url-send-btn">Send</a>
             <img id="spinning-icon" src="{{ static_url("images/website/spinning.gif") }}" />
         </p>

@@ -114,6 +114,9 @@ class message(tornado.web.RequestHandler):
         user = self.get_argument('user')
         ip = self.request.headers.get('X-Real-Ip')
         
+        if not you or not secret or not user:
+            self.write(dict(error='missing parameter'))
+        
         import redis
         r = redis.Redis(host='localhost', port=6379, db=0)
         r.sadd('adminemails', '%s:%s:%s' % (user,you,ip))
@@ -126,7 +129,7 @@ class message(tornado.web.RequestHandler):
         
         me = 'info@brin.gy'
         msg = MIMEText(message)
-        msg['Subject'] = 'Your "%s" pse%sudonym' % user
+        msg['Subject'] = 'Your "%s" pseudonym' % user
         msg['From'] = 'Brin.gy <%s>' % me
         msg['To'] = you
 

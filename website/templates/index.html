@@ -121,15 +121,13 @@ $(document).ready(function()
 
 {% block body %}
 
+<div id="ticker">
+    <pre id="ticker-score" class="ticker-label">23</pre> people have specified their <pre id="ticker-key" class="ticker-label">sex</pre> as <pre id="ticker-val" class="ticker-label">male</pre> 
+</div>
+
 <div id="left">
     <h2>What it is</h2>
     <p>Brin.gy allows people to announce bits of information about themselves and find others based on that information. It implements an experimental protocol for human discovery, namely <b>Human Discovery Protocol</b>. HDP allows us to form dynamic groups such as the group of people interested in buying the same product, people with similar expertise, people in the same location, or any intersection of these examples.</p>
-    
-    <h2>Random picks</h2>
-    <span id="ticker">
-       <pre id="ticker-score" class="ticker-label">23</pre> people have specified their <pre id="ticker-key" class="ticker-label">sex</pre> as <pre id="ticker-val" class="ticker-label">male</pre> 
-    </span>
-    </p>
     
     <h2>Statistics</h2>
     <p>Users to engage with: <stat id="users" class="stat-entry"></stat></p>

@@ -70,14 +70,14 @@ class serve_request(tornado.web.RequestHandler):
     def get(self):
         res = {}
         if not self.error:
-            cap = eval('%s' % self.cap)
+            cap = eval('%s' % self.cap)(r)
             arguments = tornado.escape.url_unescape(self.get_argument('data', ''))
             res = cap.get(self.path, self.request.arguments)
             
         self.finilize_call(res)
         
     def post(self):
-        #cap = eval('%s' % self.cap)()
+        cap = eval('%s' % self.cap)(r)
         
         agents = self.params.get('agents')
         if agents:
@@ -96,7 +96,7 @@ class serve_request(tornado.web.RequestHandler):
         
         
         response = dict(agents={}, cap=self.cap)
-        cap = eval('%s' % self.cap)
+        
         
         for agent, params in agents.items():
             #agent = tornado.escape.url_unescape(agent)
@@ -224,7 +224,7 @@ class multimatch(tornado.web.RequestHandler):
         for capname, key, val in arguments:
             innerstart = time.time()
             try:
-                cap = eval('%s' % capname)
+                cap = eval('%s' % capname)(r)
             except Exception, e:
                 self.error = '%s' % e
                 continue
@@ -309,9 +309,9 @@ if __name__ == "__main__":
     
     r = redis.Redis(host='localhost', port=6379, db=0)
     
-    profile = Profile(r)
-    location = Location(r)
-    buysell = Buysell(r)
+    #profile = Profile(r)
+    #location = Location(r)
+    #buysell = Buysell(r)
     
     #gc = GarbageC()
     

@@ -37,6 +37,10 @@ class profile():
     'profile:CONTEXT:key:KEY:values' # ordered set of values for this key
     'profile:CONTEXT:key:KEY:val:VAL:agents' # set of agents using this key/val pair
     
+    'contexts' # set of all contexts available
+    'USER:contexts' # set of contexts to which USER participates in
+    'context:CONTEXT' # set of users participating in CONTEXT
+    
     def getK (self):            return 'profile:%s:keys'                 % (self.context)
     def getKA(self, key):       return 'profile:%s:key:%s:agents'        % (self.context, key)
     

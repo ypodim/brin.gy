@@ -4,6 +4,12 @@ from datetime import datetime
 import redis
 import random
 
+
+def getK  (context):           return 'profile:%s:keys'                 % (context)
+def getKA (context, key):      return 'profile:%s:key:%s:agents'        % (context, key)
+def getKV (context, key):      return 'profile:%s:key:%s:values'        % (context, key)
+def getKVA(context, key, val): return 'profile:%s:key:%s:val:%s:agents' % (context, key, val)
+
 class DB:
     def __init__(self):
         self.r = redis.Redis(host='localhost', port=6379, db=0)
@@ -60,4 +66,40 @@ class DB:
         #print '****res (%s): %s' % (self.dbtype, res)
         return res
         
+    def join_context(self, context, user):
+        for key in self.r.smembers('%s:profile:keys' % user):
+            if self.r.sadd(getKA(context, key), user):
+                self.r.zincrby(getK(context), key, 1)
+            for val in self.r.smembers('%s:profile:key:%s' % (user, key)):
+                if self.r.sadd(getKVA(context, key, val), user):
+                    self.r.zincrby(getKV(context, key), val, 1)
+        self.r.sadd('contexts', context)
+        self.r.sadd('context:%s' % context, user)
+        
+    def clear_context(self, context):
+        for user in self.r.smembers('context:%s' % context):
+            self.r.delete(getK(context))
+            for key in self.r.smembers('%s:profile:keys' % user):
+                self.r.delete(getKA(context, key))
+                self.r.delete(getKV(context, key))
+                for val in self.r.smembers('%s:profile:key:%s' % (user, key)):
+                    self.r.delete(getKVA(context, key, val))
+            
+            self.r.srem('context:%s' % context, user)
+        
+    def leave_context(self, context, user):
+        for key in self.r.smembers('%s:profile:keys' % user):
+            if self.r.srem(getKA(context, key), user):
+                score = self.r.zincrby(getK(context), key, -1)
+                if score == 0:
+                    self.r.zrem(getK(context), key)
+            for val in self.r.smembers('%s:profile:key:%s' % (user, key)):
+                if self.r.srem(getKVA(context, key, val), user):
+                    score = self.r.zincrby(getKV(context, key), val, -1)
+                    if score == 0:
+                        self.r.zrem(getKV(context, key), val)
+
+        self.r.srem('context:%s' % context, user)
+
+
 

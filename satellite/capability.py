@@ -9,7 +9,7 @@ from copy import copy
 from math import sqrt
 
 
-class Location:
+class location:
     agents = {}
     def __init__(self, r):
         self.r = r
@@ -127,7 +127,7 @@ class Location:
         return dict(matches=matches, error=error, count=count, lat=lat, lon=lon)
 
         
-class Profile:
+class profile:
     agents = {}
     count = {}
     count_tstamp = 0
@@ -183,6 +183,7 @@ class Profile:
             start = self.r.zrevrank(self.getK(), start_from) or 0
             keyscores = self.r.zrevrangebyscore(self.getK(), '+inf', '-inf', withscores=True, num=bucket, start=start)
             items = keyscores
+            
         elif kparam == 'keyvals':
             start = self.r.zrevrank(self.getK(), start_from) or 0
             for key, kscore in self.r.zrevrangebyscore(self.getK(), '+inf', '-inf', withscores=True, num=bucket, start=start):
@@ -194,16 +195,20 @@ class Profile:
                     vitem = dict(val=val, userhasit=userhasit, score=vscore)
                     item['values'].append(vitem)
                 items.append(item)
+                
         elif kparam == 'key' and len(params) > 3:
             key = params[2]
             if params[3] == 'agents':
                 items = list(self.r.smembers(self.getKA(key)))
+                
             elif params[3] == 'values':
                 start = self.r.zrevrank(self.getKV(key), start_from) or 0
                 items = self.r.zrevrangebyscore(self.getKV(key), '+inf', '-inf', withscores=True, num=bucket, start=start)
+                
             elif params[3] == 'val' and len(params) > 5 and params[5] == 'agents':
                 val = params[4]
                 items = list(self.r.smembers(self.getKVA(key, val)))
+                
             else:
                 error='invalid/insufficient parameters'
         else:
@@ -242,7 +247,7 @@ class Profile:
         return matches
 
 
-class Buysell:
+class buysell:
     #buy/sell
         #productid
             #price
