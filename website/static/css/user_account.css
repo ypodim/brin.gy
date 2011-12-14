@@ -1,0 +1,11 @@
+.urllabel { 
+    text-transform: lowercase;
+    font-weight: bold;
+    color: rgba(0,0,0,0.5);
+    border-radius: 3px;
+    border: 1px solid gray;
+    padding: 1px 3px 0px 3px;
+    height:18px;
+    width:200px;
+    cursor:pointer;
+}
