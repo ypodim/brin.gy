@@ -344,11 +344,21 @@ E.toggle_filter = function(action, cap, key, val){
             query += "[type='keyfilter']";
         
         $(query).remove();
-        if ("removed", $(".filter-item").length == 0)
-            $("#clear-filters-btn").hide();
+        setTimeout(function(){
+            if ("removed", $(".filter-item").length == 0) {
+                $("#clear-filters-btn").hide();
+                $("#results-container").animate({width:"100%"}, 200);
+//                 $("#results-container").width("100%");
+            }
+        }, 400);
         return true;
     }
     
+    $("#results-container").animate({width:"160px"}, 200);
+//     $("#results-container").width("160px");
+//     setTimeout(function(){
+        
+//     }, 200);
     $("#clear-filters-btn").show();
     
     valstr = "<span class='highlight'>"+val+"</span>";
@@ -1273,9 +1283,9 @@ var show_getlocation_modal = function() {
 E.resize_overflow_divs = function(){
     offset = $("#choices").offset();
     dheight = $(document).height();
-    $("#choices").height(dheight - offset.top - 40);
-    $("#results").height(dheight - offset.top + 20);// - 70);
-    $("#map_canvas").height(dheight - offset.top + 20);
+    $("#choices").height(dheight - offset.top - 25);
+    $("#results-container").height(dheight - offset.top + 60);
+    $("#map_canvas").height(dheight - offset.top + 60);
 }
 
 E.get_val_input_boxes = function() {
@@ -1367,6 +1377,15 @@ $(document).ready(function()
     
     setInterval(E.poll_matches, 2000); 
     
+    $("#account-btn").show().click(function(){
+//         $(this).children().childre("img").attr("src"
+        $("#user-dropdown").toggle();
+        if ($("#user-dropdown").is(':visible'))
+            $("#account-btn").addClass("clicked");
+        else
+            $("#account-btn").removeClass("clicked");
+    });
+    
     $("#delete_btn").show().click(show_delete_modal);
     $("#event-btn").show().click(function(){
         data = {secret:"{{config.secret}}", context:"ml", action:"join"};
@@ -1374,6 +1393,7 @@ $(document).ready(function()
             console.log(json);
         }, "json");
     });
+    
     $("#whatisthis").show().click(show_admin_url_modal);
     $("#pseudonym").show();
     
@@ -1614,17 +1634,17 @@ $(document).ready(function()
 {% block body %}
 
 <div id="left-panel" class="span6">
-<!--    <nav class="filter1">
+    <nav class="filter1">
         <a href="#" class="selected">people</a>
         <a href="#" class="">events</a>
-    </nav>-->
+    </nav>
     <nav class="filter2">
         <a href="#" class="selected">all</a>
         <a href="#" class="">unseen</a>
         <a href="#" class="">me</a>
     </nav>
     
-<!--     <a href="#" class="btn danger" style="float:right;">add new</a> -->
+    <a href="#" class="btn success" style="float:right;">add new</a>
     
     <form id="searchbox">
         <input autofocus="autofocus" type="search" id="searchinput" results="10" placeholder="Search..." />
@@ -1638,7 +1658,7 @@ $(document).ready(function()
     <div id="choices"></div>
 </div>
 <div id="right-panel" class="">            
-    <div id="results-container" class="span3">
+    <div id="results-container" class="">
         <div id="filters">
             <div id="clear-filters-btn" class="btn hidden" style="width">clear query</div>
         </div>
