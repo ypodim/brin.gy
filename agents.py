@@ -14,7 +14,9 @@ from threading import Thread
 from urllib import urlencode
 
 from db import DB
-#from cron import Cron
+from profile import profile
+from location import location
+from buysell import buysell
 
 capability_names = ['profile','location','buysell']
 
@@ -132,7 +134,6 @@ class serve_user(bringy_handler):
         if passed:
             deleted = db.delete_user(self.username)
             for capname in capability_names:
-                exec 'from capabilities.%s import %s' % (capname, capname)
                 capability = eval(capname)(self.username, self.arguments, self.path, db.r, self.on_response)
                 capability.clear_all()
         else:
@@ -152,6 +153,8 @@ class serve_user(bringy_handler):
             error = 'invalid context'
         if action not in ['join','leave']:
             error = 'invalid action'
+        if action == 'leave' and context == 'all':
+            error = 'You can check in any time you like, but you can never leave'
             
         if not error and action == 'join':
             db.join_context(context, self.username)
@@ -178,9 +181,10 @@ class serve_capability(bringy_handler):
         
     def post(self):
         secret = self.get_argument('secret', None)
+        context = self.get_argument('context')
         passed = db.authenticate_user(self.username, secret)
         if passed:
-            res = self.execute()
+            res = self.execute(context=context)
             if type(passed) == str:
                 res['secret'] = passed
             if res: self.write(res)
@@ -196,9 +200,10 @@ class serve_capability(bringy_handler):
         arguments = tornado.escape.json_decode(arguments)
         #print 'delete:', arguments, type(arguments)
         secret = params.get('secret')
+        context = params.get('context')
         passed = db.authenticate_user(self.username, secret)
         if passed:
-            res = self.execute(arguments)
+            res = self.execute(context=context, arguments=arguments)
             if type(passed) == str:
                 res['secret'] = passed
             if res: self.write(res)
@@ -206,17 +211,14 @@ class serve_capability(bringy_handler):
             res = dict(error='authentication failed for user:%s secret:%s' % (self.username, secret))
             self.write(res)
         
-    def execute(self, arguments=None):
-        exec 'from capabilities.%s import %s' % (self.cap, self.cap)
+    def execute(self, context='all', arguments=None):
         capability = eval(self.cap)(
             self.username, 
             arguments or self.arguments, 
             self.path, 
             db.r, 
             self.on_response)
-        return eval('capability.%s' % (self.request.method.lower()) )()
-    
-
+        return eval('capability.%s' % (self.request.method.lower()) )(context)
         
         
 class api_call(tornado.web.RequestHandler):
@@ -263,7 +265,6 @@ class api_call(tornado.web.RequestHandler):
             res['profiles'][dic['user']] = dic
             
         arguments = tornado.escape.json_decode(self.get_argument('data'))
-        from capabilities.profile import profile
         for agent in arguments:
             
             if not db.user_exists(agent):
@@ -272,7 +273,7 @@ class api_call(tornado.web.RequestHandler):
             
             if self.request.method == 'GET':
                 p = profile(agent, [], self.request.path.split('/'), db.r, clb)
-                p.get()
+                p.get("")
                 
             if self.request.method == 'POST':
                 p = profile(agent, arguments[agent].items(), db.r, clb)
@@ -285,7 +286,6 @@ class api_call(tornado.web.RequestHandler):
     def api_batch_location(self):
         res = dict(locations={})
         arguments = tornado.escape.json_decode(self.get_argument('data'))
-        from capabilities.location import location
         
         key = 'my location'
         #print 'LOCATION update for', arguments
@@ -302,7 +302,6 @@ class api_call(tornado.web.RequestHandler):
         
     def api_batch_buysell(self):
         arguments = tornado.escape.json_decode(self.get_argument('data'))
-        from capabilities.buysell import buysell
         #agents = {}
         for agent, prof in arguments.items():
             
@@ -319,7 +318,6 @@ class api_call(tornado.web.RequestHandler):
         
     def api_batch_location2(self):
         arguments = tornado.escape.json_decode(self.get_argument('data'))
-        from capabilities.location import location
         
         key = 'my location'
         resolution = 10000

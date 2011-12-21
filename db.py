@@ -67,6 +67,7 @@ class DB:
         return res
         
     def join_context(self, context, user):
+        print 'joining context', context, user
         for key in self.r.smembers('%s:profile:keys' % user):
             if self.r.sadd(getKA(context, key), user):
                 self.r.zincrby(getK(context), key, 1)

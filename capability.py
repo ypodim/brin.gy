@@ -8,6 +8,7 @@ import sys
 from copy import copy
 from math import sqrt
 
+from keys import *
 
 class location:
     agents = {}
@@ -133,25 +134,19 @@ class profile:
     count_tstamp = 0
     def __init__(self, r):
         self.r = r
-        self.context = 'all'
     
-    def getK (self):            return 'profile:%s:keys'                 % (self.context)
-    def getKA(self, key):       return 'profile:%s:key:%s:agents'        % (self.context, key)
-    def getKV(self, key):       return 'profile:%s:key:%s:values'        % (self.context, key)
-    def getKVA(self, key, val): return 'profile:%s:key:%s:val:%s:agents' % (self.context, key, val)
-    
-    def get_count(self, key, val='', cardinalities_only=False):        
+    def get_count(self, context, key, val='', cardinalities_only=False):        
         #print 'key', key, 'val', val
         result = dict(error='', count=0, matches=[])
         
         if val:
-            result['count'] = self.r.zscore(self.getKV(key), val)
+            result['count'] = self.r.zscore(getKV(context, key), val)
             if not cardinalities_only:
-                result['matches'] = list(self.r.smembers(self.getKVA(key, val)))
+                result['matches'] = list(self.r.smembers(getKVA(context, key, val)))
         else:
-            result['count'] = self.r.zscore(self.getK(), key)
+            result['count'] = self.r.zscore(getK(context), key)
             if not cardinalities_only:
-                result['matches'] = list(self.r.smembers(self.getKA(key)))
+                result['matches'] = list(self.r.smembers(getKA(context, key)))
                 
         return result
     
@@ -164,7 +159,7 @@ class profile:
         items = []
         count = 0
         key = val = ''
-        #self.context = str('all')
+
         bucket = 100
         start_from = arguments.get('start_from')
         aid = arguments.get('user')
@@ -174,23 +169,24 @@ class profile:
         if len(params) < 2:
             return dict(items=items, error='invalid/insufficient parameters', count=count)
             
-        self.context = str(params[0])
+        context = str(params[0])
         kparam = params[1]
         
-        print params
+        #print params
         
         if kparam == 'keys':
-            start = self.r.zrevrank(self.getK(), start_from) or 0
-            keyscores = self.r.zrevrangebyscore(self.getK(), '+inf', '-inf', withscores=True, num=bucket, start=start)
+            start = self.r.zrevrank(getK(context), start_from) or 0
+            keyscores = self.r.zrevrangebyscore(getK(context), '+inf', '-inf', withscores=True, num=bucket, start=start)
             items = keyscores
             
         elif kparam == 'keyvals':
-            start = self.r.zrevrank(self.getK(), start_from) or 0
-            for key, kscore in self.r.zrevrangebyscore(self.getK(), '+inf', '-inf', withscores=True, num=bucket, start=start):
+            start = self.r.zrevrank(getK(context), start_from) or 0
+            keyscores = self.r.zrevrangebyscore(getK(context), '+inf', '-inf', withscores=True, num=bucket, start=start)
+            for key, kscore in keyscores:
                 item = dict(key=key, values=[], score=kscore)
                 #start = self.r.zrevrank(self.getKV(key), start_from) or 0
-                for val, vscore in self.r.zrevrangebyscore(self.getKV(key), '+inf', '-inf', withscores=True):
-                    userhasit = int(self.r.sismember(self.getKVA(key, val), aid))
+                for val, vscore in self.r.zrevrangebyscore(getKV(context, key), '+inf', '-inf', withscores=True):
+                    userhasit = int(self.r.sismember(getKVA(context, key, val), aid))
                     #print key, val, aid, userhasit
                     vitem = dict(val=val, userhasit=userhasit, score=vscore)
                     item['values'].append(vitem)
@@ -199,22 +195,22 @@ class profile:
         elif kparam == 'key' and len(params) > 3:
             key = params[2]
             if params[3] == 'agents':
-                items = list(self.r.smembers(self.getKA(key)))
+                items = list(self.r.smembers(getKA(context, key)))
                 
             elif params[3] == 'values':
-                start = self.r.zrevrank(self.getKV(key), start_from) or 0
-                items = self.r.zrevrangebyscore(self.getKV(key), '+inf', '-inf', withscores=True, num=bucket, start=start)
+                start = self.r.zrevrank(getKV(context, key), start_from) or 0
+                items = self.r.zrevrangebyscore(getKV(context, key), '+inf', '-inf', withscores=True, num=bucket, start=start)
                 
             elif params[3] == 'val' and len(params) > 5 and params[5] == 'agents':
                 val = params[4]
-                items = list(self.r.smembers(self.getKVA(key, val)))
+                items = list(self.r.smembers(getKVA(context, key, val)))
                 
             else:
                 error='invalid/insufficient parameters'
         else:
             error='invalid/insufficient parameters'
             
-        return dict(items=items, error=error, count=count)
+        return dict(items=items, error=error, count=count, start_from=start_from)
             
     
     def mutate(self, aid, key, val):

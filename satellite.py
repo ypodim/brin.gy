@@ -10,7 +10,6 @@ import sys, os, time, random
 from optparse import OptionParser
 
 from capability import *
-#from simulation import Simulation#, Sender
 
 import redis
 
@@ -207,6 +206,8 @@ class multimatch(tornado.web.RequestHandler):
         matches = []
         
         arguments = self.get_argument('data', '')
+        context = self.get_argument('context', 'all')
+        print context
         #print
         #print self.request
         #print escaped_data
@@ -228,7 +229,10 @@ class multimatch(tornado.web.RequestHandler):
             except Exception, e:
                 self.error = '%s' % e
                 continue
-            dic = cap.get_count(key, val)
+            if capname == 'profile':
+                dic = cap.get_count(context, key, val)
+            else:
+                dic = cap.get_count(key, val)
             matches.append([capname, key, val, dic['count'], dic['matches']])
             
             #if capname == 'location':
@@ -266,6 +270,29 @@ class randomstat(tornado.web.RequestHandler):
         self.write(res)
         
 
+class contexts(tornado.web.RequestHandler):
+    def options(self):
+        self.write({})
+    def prepare(self):
+        statistics.hit()
+        self.start_time = time.time()
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
+        self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
+        self.set_header('Content-Type','application/json; charset=UTF-8')    
+    def get(self):
+        user = self.get_argument('user','')
+        dic = dict(contexts=[])
+        contexts=list(r.smembers('contexts'))
+        for c in contexts:
+            count = r.scard('context:%s' % c)
+            context = dict(name=c, count=count)
+            if user:
+                context['userhasit'] = r.sismember('context:%s' % c, user)
+            dic['contexts'].append(context)    
+        self.write(dic)
+        
+        
 class GarbageC():
     def __init__(self):
         self.last_post = dict(location=0, profile=0, buysell=0)
@@ -299,6 +326,8 @@ application = tornado.web.Application([
     (r"/multimatch", multimatch),
     (r"/stats", stats),
     (r"/randomstat", randomstat),
+    (r"/contexts", contexts),
+    
     (r"/.+", serve_request),
 ], **settings)    
 

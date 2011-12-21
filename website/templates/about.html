@@ -4,9 +4,11 @@
 <style>
 .date { font-size:14px; color: gray; padding-bottom:8px; }
 h2 { padding-top: 10px; }
+ol > li {color:black;}
+.left-panel { overflow-y: scroll;  }
 </style>
 
-<div class="left">
+<div class="left-panel">
     <h2>About</h2>
     <!-- <div class="date">submitted 23 Feb 2011</div> -->
     <p>Brin.gy allows people to announce bits of information about themselves and find others based on that information. It implements an experimental protocol for human discovery, namely <b>Human Discovery Protocol</b>. HDP allows us to form dynamic groups such as the group of people interested in buying the same product, people with similar expertise, people in the same location, or any intersection of these examples.</p>
@@ -21,7 +23,7 @@ h2 { padding-top: 10px; }
        A: While this interface works on iPad, it is not designed to be used on a mobile device. An iOS app is under development.</p>
     
     <p>Q: How do I login using my pseudonym on a different device?<br>
-       A: You can use your "admin URL" to edit your profile on any browser. The "admin URL" looks like <code>http://brin.gy/a/SECRETCODE</code> and appears when you create an account, at the top of the page.</p>
+       A: You can use your "admin URL" to edit your profile on any browser. The "admin URL" looks like <code>http://brin.gy/a/SECRETCODE</code> and appears when you create an account, in your "Account" box at the top-right of the page.</p>
     
     <p>Q: Is there an API to access this data?<br>
        A: That's the whole idea behind this project. I'm writing documentation about it as we speak (sort of).</p>
@@ -35,5 +37,16 @@ h2 { padding-top: 10px; }
     <h2>Credits</h2>
     <p>iOS app: <a href="http://cinnamondevelopment.com/">Ian Cinnamon</a></p>
     <p>We would like to also thank <a href="http://mattblackshaw.com">Matt Blackshaw</a> and <a href="http://supermechanical.com">John Kestner</a> for their feedback.</p>
+    
+    <h2>Disclaimer</h2>
+    <p>By using this service you agree to the following terms:</p>
+    <ol>
+    <li>Your participation is voluntary.</li>
+    <li>You may permanently remove any data you have inserted to the system by clicking the "Delete" option in your account.</li>
+    <li>All information you insert to this system is information that you wish to publicly announce about you and based on which you wish to be contacted by other users.</li>
+    <li>You may insert personally identifiable information about you at your own discretion and risk, but you are not allowed to impersonate others.</li>
+    <li>Proper measures are taken to ensure that any data you insert to the system can not be altered by unauthorized users.</li>
+    <li>There is no guarantee that information inserted to the system by other users will be complete and/or accurate.</li>
+    </ol>
 </div>
 {% end %}

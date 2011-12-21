@@ -10,7 +10,7 @@ cookies.get_cookie = function()
     cookie_str = $.cookie('bringy', {path:"/"});
     if (typeof(cookie_str) == "string"){
         cookie = JSON.parse(cookie_str);
-        console.log("get_cookie:",cookie_str);
+//         console.log("get_cookie:",cookie_str);
     }
     return cookie;
 }
@@ -20,7 +20,7 @@ cookies.set_cookie = function(name, secret)
     if (secret == undefined)
         secret = 0
     cookie_str = $.cookie('bringy', {path:"/"});
-    console.log("set_cookie other_names1", cookie_str, name);
+//     console.log("set_cookie other_names1", cookie_str, name);
     if (typeof(cookie_str) != "string") 
         cookie_str = "{}";
     
@@ -29,7 +29,7 @@ cookies.set_cookie = function(name, secret)
         cookie.pseudonyms = {};
     cookie.pseudonyms[name] = secret;    
     cookie_str = JSON.stringify(cookie);
-    console.log("set_cookie other_names2", cookie_str, secret);
+//     console.log("set_cookie other_names2", cookie_str, secret);
     $.cookie('bringy', cookie_str, {expires:7, path:"/"});
 }
 

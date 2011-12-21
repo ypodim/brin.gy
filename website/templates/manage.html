@@ -4,63 +4,6 @@
 {% autoescape None %}
 <script language="javascript" type="text/javascript">
 
-///////////////////////////////////
-//////        START SUGGESTION BOX
-
-suggestion_box = {};
-suggestion_box.data = {};
-
-suggestion_box.fetch_data = function(key, val, obj)
-{
-    val = val.toLowerCase();
-    
-    $.getJSON(E.satellite.url+"/profile/complete/"+key+"/"+val, function(json){
-        suggestion_box.data = {};
-        for (i in json.matches) {
-            val = json.matches[i][0];
-            card = json.matches[i][1];
-            suggestion_box.data[val] = card;
-        }
-        suggestion_box.show_suggestions(obj);
-    });
-};
-
-suggestion_box.show_suggestions = function(obj)
-{   
-    if( ! $("#dropdown").length ) {
-        offset = obj.offset();
-        _top = offset.top + obj.height() + 10;
-        _left = offset.left;
-        width = 100;
-        
-        css = {top:_top, left:_left, border:"1px solid #dddddd", backgroundColor:"white"};
-        dropdown = $("<div id='dropdown'></div>").css(css).addClass("flying medium");
-        $("body").append(dropdown);
-    }
-    
-    $("#dropdown").empty();
-    
-    for (sug in suggestion_box.data) {
-        val = $("<a></a>").html(sug).attr("sug",sug).addClass("suggestionVal");
-        val.click(function(){
-            obj.val($(this).attr("sug"));
-            obj.trigger("keydown", [{obj:{keyCode:13}}]);
-            return false;
-        });
-        card = $("<span></span>").html(suggestion_box.data[sug]).addClass("label suggestionCard");
-        entry = $("<div></div>").addClass("suggestionEntry");
-        entry.append(val).append(card);
-        $("#dropdown").append(entry);
-    }
-};
-
-suggestion_box.hide_suggestions = function(obj)
-{
-//     console.log( "closing" );
-    $("#dropdown").remove();
-};
-
-
 Object.size = function(obj) {
     var size = 0, key;
     for (key in obj) {
@@ -74,11 +17,6 @@ if (typeof String.prototype.startsWith != 'function') {
     return this.indexOf(str) == 0;
   };
 }
-
-//////        END SUGGESTION BOX
-////////////////////////////////
-
-
 
 // sdata example:
 // profile = {
@@ -113,6 +51,15 @@ attr_manager.sdata = {
 //         "product":{},
 //     },
 };
+
+attr_manager.reset_sdata = function() {
+    attr_manager.sdata = {
+        location:{
+            "my location":{cnt:0, values:{}, selected:0, display:true, matches:{}},
+        },
+        profile:{},
+    };
+}
 
 attr_manager.add_sdata = function(cap, key, cnt) {
     if (cap==undefined || key==undefined || cnt==undefined){
@@ -185,6 +132,7 @@ E.agent.id = "{{config.agentid}}";
 E.agent.baseurl = "{{config.ego_url_prefix}}";
 E.agent.url = "{{config.ego_url_prefix}}/{{config.agentid}}";
 E.website_url = "{{config.website_url_prefix}}";
+E.context = "all";
 
 E.post_keyval = null;
 // save key/val to agent.
@@ -213,7 +161,7 @@ E.formatted_length = 24;
 ///////////////////////////////////////////////
 
 
-E.post_visited_keyval = function() {
+E.post_visited_keyval = function(context) {
     data = {};
     for (key in attr_manager.sdata.profile) {
         data[key] = [];
@@ -226,7 +174,7 @@ E.post_visited_keyval = function() {
         console.log("Not allowed to change "+E.agent.id+"'s profile.");
         return {error:"Not allowed to change "+E.agent.id+"'s profile."};
     }
-    params = {data:JSON.stringify(data), secret:secret};
+    params = {data:JSON.stringify(data), secret:secret, context:context};
     console.log("setting visited", params);
     
     $.post(E.agent.url+"/profile/visited", params, function(json){
@@ -246,7 +194,7 @@ E.post_keyval = function(cap, key, val, clb) {
         clb({error:"Not allowed to change "+E.agent.id+"'s profile."});
         return false;
     }
-    $.post(E.agent.url+"/"+cap, {data:data, secret:secret}, function(json){
+    $.post(E.agent.url+"/"+cap, {data:data, secret:secret, context:E.context}, function(json){
         clb(json);
     }, "json");
 }
@@ -266,12 +214,11 @@ E.delete_keyval = function(cap, key, val, clb) {
     $.ajax({
         type: "DELETE",
         url: E.agent.url+"/"+cap,
-        data: {data:data, secret:secret},
+        data: {data:data, secret:secret, context:E.context},
         success: clb,
         dataType: "json",
     });
 }
-
 
 E.populate_map = function(obj) {
     for (agent in obj) {
@@ -334,6 +281,10 @@ E.set_matches = function(stop, nonce) {
     }
 }
 
+E.post_toggle_filter = function(){
+    newtop = $("#filters").height() + 10;
+    $("#results").css("top",newtop);
+}
 E.toggle_filter = function(action, cap, key, val){
     attr = {cap:cap,key:key,val:val,type:"valfilter"};
     if (action == "remove") {
@@ -351,6 +302,7 @@ E.toggle_filter = function(action, cap, key, val){
 //                 $("#results-container").width("100%");
             }
         }, 400);
+        
         return true;
     }
     
@@ -383,13 +335,9 @@ E.toggle_filter = function(action, cap, key, val){
         
         if ($(query).length == 0) {
             E.toggle_filter("remove", cap, key, val);
-//             if (val == undefined) {
-//                 E.toggle_filter("remove", cap, key);
-//             } else {
-                
-//             }
         } else
             $(query).click();
+        
         return false;
     });
     title = "<span class='highlight'>"+key+"</span> is "+valstr;
@@ -416,6 +364,8 @@ E.handle_key_click = function(){
         }
         E.toggle_filter("add", cap, key);
     }
+    E.post_toggle_filter();
+    
     E.poll_matches(cap);
     E.reset_map_bounds = true;
     return false;
@@ -438,6 +388,7 @@ E.handle_val_click = function(){
         E.toggle_filter("remove", cap, key);
         E.toggle_filter("add", cap, key, val);
     }
+    E.post_toggle_filter();
     
     E.poll_matches(cap);
     E.reset_map_bounds = true;
@@ -956,7 +907,7 @@ E.poll_matches = function(capname) {
     
     data = JSON.stringify(query);
     
-    $.post(E.satellite.url+"/multimatch", {data:data}, function(json){
+    $.post(E.satellite.url+"/multimatch", {data:data, context:E.context}, function(json){
         E.monitor.user_matches.by_keyval = {};
         
         for (i in json.matches) {
@@ -1074,6 +1025,7 @@ E.poll_matches = function(capname) {
 
 
 E.fetch_initial_info = function(clb) {
+    attr_manager.reset_sdata();
     targetcount = 2;
     count = 0;
     finished = function() {
@@ -1090,14 +1042,15 @@ E.fetch_initial_info = function(clb) {
 }
 
 E.fetch_profile = function(visited, clb) {
-    console.log("visited", visited);
     if (E.last_fetched.length)
         console.log("continuing from", E.last_fetched);
     
 //     data = JSON.stringify({with_values:1, user:E.agent.id});
     data = {user:E.agent.id, start_from:E.last_fetched};
     
-    $.getJSON(E.satellite.url+"/profile/all/keyvals", data, function(json){
+    url = E.satellite.url+"/profile/"+E.context+"/keyvals";
+    $.getJSON(url, data, function(json){
+
         for (i in json.items) {
             attribute = json.items[i].key;
             attr_manager.add_sdata("profile", attribute, 0);
@@ -1107,7 +1060,7 @@ E.fetch_profile = function(visited, clb) {
                 haveit = (json.items[i].values[j].userhasit==1);
                 
                 newval = true;
-                if (attribute in visited && val in visited[attribute])
+                if (visited && attribute in visited && val in visited[attribute])
                     newval = false
 //                 if (newval)
 //                     console.log("new val:", attribute, val);
@@ -1124,7 +1077,6 @@ E.fetch_profile = function(visited, clb) {
             E.last_fetched = attribute;
         }
         clb();
-        console.log("finish  profile");
     });
 }
 
@@ -1175,7 +1127,6 @@ E.fetch_location = function(clb) {
                 matches:json.matches,
             };
             clb();
-            console.log("finish  location");
         }
     });
 }
@@ -1191,10 +1142,54 @@ E.update_monitor = function() {
     return false;
 }
 
-var show_admin_url_modal = function() {
+var init_new_key_modal = function() {
+    modal = $("#new-key-modal");
+    modal.modal({backdrop:"static", keyboard:true});
+    modal.bind('shown', function(){
+        searchterm = $("#searchinput").val();
+        if (searchterm.length) {
+            terms = searchterm.split(" ");
+            $(".keypart-override > span > input").val(terms[0]);
+            if (terms.length > 1) 
+                $(".valpart-override div:nth-child(1) > a > span.value > input").val(terms[1]);
+            console.log("from SEARCHBOX:", searchterm, terms);
+        }
+        $("#searchinput").val("").keyup();
+        $("#message").hide();
+    });
+    
+    $("#new-key-btn").click(function(){
+        key = $(".keypart-override > span > input").val();
+        vals = [];
+        val = $(".valpart-override div:nth-child(1) > a > span.value > input").val();
+        if (val.length) vals.push(val);
+        val = $(".valpart-override div:nth-child(2) > a > span.value > input").val();
+        if (val.length) vals.push(val);
+        val = $(".valpart-override div:nth-child(3) > a > span.value > input").val();
+        if (val.length) vals.push(val);
+        
+        $(this).parent().parent().modal("hide");
+        
+        counter = 0;
+        clb = function(){
+            counter++;
+            if (counter == vals.length) {
+                console.log("posted ALL");
+                E.last_fetched = "";
+                E.fetch_initial_info(E.populate_attrs);
+            }   
+        }
+        for (i in vals) {
+            E.post_keyval("profile", key, vals[i], clb);
+        }
+        return false;
+    });
+}
+
+var init_admin_url_modal = function() {
     $("#spinning-icon").hide();
     modal = $("#admin-url-modal");
-    modal.modal({backdrop:"static", show:true, keyboard:true});
+    modal.modal({backdrop:"static", keyboard:true});
     
     $("#admin-url-email").keyup(function(obj){
         value = $(this).val();
@@ -1206,9 +1201,6 @@ var show_admin_url_modal = function() {
             
         if (obj.keyCode == 13 && filter.test(value))
             $("#admin-url-send-btn").click();
-    });
-    $("#admin-url-cancel-btn").click(function(){
-        modal.modal("hide");
     });
     $("#admin-url-send-btn").click(function(){
         that = this;
@@ -1228,13 +1220,10 @@ var show_admin_url_modal = function() {
     });
 }
 
-var show_delete_modal = function() {
+var init_delete_modal = function() {
     modal = $("#delete-confirmation-modal");
-    modal.modal({backdrop:"static", show:true, keyboard:true});
+    modal.modal({backdrop:"static", keyboard:true});
     
-    $("#delete-cancel-btn").click(function(){
-        modal.modal("hide");
-    });
     $("#delete-delete-btn").click(function(){
         that = this;
         secret = cookies.get_cookie().pseudonyms[E.agent.id];
@@ -1257,13 +1246,10 @@ var show_delete_modal = function() {
     });
 }
 
-var show_getlocation_modal = function() {
+var init_getlocation_modal = function() {
     modal = $("#get-location-modal");
-    modal.modal({backdrop:"static", show:true, keyboard:true});
+    modal.modal({backdrop:"static", keyboard:true});
     
-    $("#location-cancel-btn").click(function(){
-        modal.modal("hide");
-    });
     $("#location-ok-btn").click(function(){
         geoclb = function(val, results, formatted) {
             console.log("geoclb:", val, results, formatted);
@@ -1280,36 +1266,23 @@ var show_getlocation_modal = function() {
     });
 }
 
-E.resize_overflow_divs = function(){
-    offset = $("#choices").offset();
-    dheight = $(document).height();
-    $("#choices").height(dheight - offset.top - 25);
-    $("#results-container").height(dheight - offset.top + 60);
-    $("#map_canvas").height(dheight - offset.top + 60);
-}
 
 E.get_val_input_boxes = function() {
     return $("input[cap=\"profile\"]");
 }
 
-E.nav_search = function(){
-    $("#searchbox").show();
-    $("#add-key-div").hide();
-    
-    $("#message").hide();
+E.show_all_keyvals = function() {
     $("div.valcontainer").show();
     $("pill").show();
-    $("#choices div.help-block").remove();
-    
+}
+E.nav_search = function(){
+    E.show_all_keyvals();
+    $("#message").hide();
     if ("{{config.secret}}".length)
         E.get_val_input_boxes().show();
 }
 E.nav_new = function(){
-    $("#searchbox").hide();
-    $("#add-key-div").hide();
-    
-    $("div.valcontainer").show();
-    $("pill").show();
+    E.show_all_keyvals();
     $("div.valcontainer[new!=\"true\"]").hide();
     $("pill[new!=\"true\"]").hide();
     
@@ -1321,16 +1294,10 @@ E.nav_new = function(){
     }
     
     E.get_val_input_boxes().hide();
-    E.post_visited_keyval();
+    E.post_visited_keyval("all");
 }
 E.nav_me = function(){
-    $("#searchbox").hide();
-    $("#add-key-div").show();
-//     $("#new-key-input").focus();
-    
-    $("#choices div.help-block").remove();
-    $("div.valcontainer").show();
-    $("pill").show();
+    E.show_all_keyvals();
     $("div.valcontainer[me!=\"true\"]").hide();
     $("pill[me!=\"true\"]").hide();
     
@@ -1343,6 +1310,33 @@ E.nav_me = function(){
     
     if ("{{config.secret}}".length)
         E.get_val_input_boxes().show();
+}
+
+
+E.join_context = function(context) {
+    action = 'join';
+    secret = cookies.get_cookie().pseudonyms[E.agent.id];
+    data = {context:context, secret:secret, action:action};
+    $.post(E.agent.url, data, function(json){
+        E.on_context_changed(context);
+    }, "json");
+}
+
+E.leave_context = function(context) {
+    action = 'leave';
+    secret = cookies.get_cookie().pseudonyms[E.agent.id];
+    data = {context:context, secret:secret, action:action};
+    $.post(E.agent.url, data, function(json){
+        E.on_context_changed(context);
+    }, "json");
+}
+
+E.on_context_changed = function(context){
+    E.context = context;
+    E.last_fetched = "";
+    clb = E.populate_attrs;
+    E.fetch_initial_info(clb);
+    $("#context-title").html("# "+E.context);
 }
 
 //////////////////////////////////////////////////
@@ -1369,44 +1363,124 @@ $(document).ready(function()
         });
         return false;
     });
-//     $("#search-clear-btn").click(function(){
-//         $("#searchinput").val("").keyup().focus();
-//         return false;
-//     });
-    
     
     setInterval(E.poll_matches, 2000); 
     
-    $("#account-btn").show().click(function(){
-//         $(this).children().childre("img").attr("src"
-        $("#user-dropdown").toggle();
-        if ($("#user-dropdown").is(':visible'))
-            $("#account-btn").addClass("clicked");
-        else
+    $("#account-btn").click(function(){
+        if ($("#user-dropdown").is(':visible')) {
+            $("#user-dropdown").hide();
             $("#account-btn").removeClass("clicked");
+        } else {
+            
+            $("#account-btn").addClass("clicked");
+            $("#user-dropdown").fadeIn(200, function(){
+                $("body").one("click", function(obj){
+//                     console.log("fire", obj, $(obj), $(this));
+                    $("#user-dropdown").hide();
+                    $("#account-btn").removeClass("clicked");
+                });
+            });
+        }
     });
-    
-    $("#delete_btn").show().click(show_delete_modal);
-    $("#event-btn").show().click(function(){
-        data = {secret:"{{config.secret}}", context:"ml", action:"join"};
-        $.post(E.agent.url, data, function(json){
-            console.log(json);
-        }, "json");
+    $("#context-btn").click(function(){
+        if ($("#context-dropdown").is(':visible')) {
+            $("#context-dropdown").hide();
+            $("#context-btn").removeClass("clicked");
+        } else {
+            offset = $(this).prev().offset();
+            left = $(window).width() - offset.left + 10;
+            $("#context-dropdown").css("right",left);
+            
+            $.getJSON(E.satellite.url+"/contexts", {user:E.agent.id}, function(json){
+                $("#context-dropdown > ul").empty();
+                
+                for (i in json.contexts) {
+                    context = json.contexts[i].name;
+                    count = json.contexts[i].count;
+                    userhasit = json.contexts[i].userhasit;
+                    
+                    btn = $("<button class='btn'></button>");
+                    if (userhasit) {
+                        action = "leave";
+                        btn.addClass("danger").html("Leave");
+                    } else {
+                        action = "join";
+                        btn.addClass("success").html("Join");
+                    }
+                    attr = {context:context, action:action};
+                    btn.attr(attr).click(function(event){
+                        context = $(this).attr("context");
+                        action = $(this).attr("action");
+                        count = parseInt($(this).siblings("span").html());
+                        if (action == "join") {
+                            count += 1;
+                            $(this).removeClass("success").addClass("danger").html("Leave").attr("action","leave");
+                            E.join_context(context);
+                        } else {
+                            count -= 1;
+                            $(this).removeClass("danger").addClass("success").html("Join").attr("action","join");
+                            
+                            E.leave_context(context);
+                            console.log("context is now", E.context);
+                        }
+                        $(this).siblings("span").html(count);
+                        console.log("result", json);
+                        
+                        event.stopPropagation();
+                    });
+                    
+                    counter = $("<span class='count'></span>").html(count);
+                    
+                    libtn = "# "+context;
+                    li = $("<li class='context-entry'></li>");
+                    li.append(counter).append(libtn);
+                    if (context != "all")
+                        li.append(btn);
+                    
+                    li.attr("context",context).click(function(){
+                        context = $(this).attr("context");
+                        E.on_context_changed(context);
+                    });
+                    $("#context-dropdown > ul").append(li);
+                }
+            });
+
+            $("#context-btn").addClass("clicked");
+            $("#context-dropdown").fadeIn(200, function(){
+                $("body").one("click", function(obj){
+//                     console.log("one", $(this).html());
+                    $("#context-dropdown").hide();
+                    $("#context-btn").removeClass("clicked");
+                });
+            });
+        }
     });
-    
-    $("#whatisthis").show().click(show_admin_url_modal);
-    $("#pseudonym").show();
-    
-    $("nav.filter1 a").click(function (){
-        $("nav.filter1 > a").removeClass("selected");
-        $(this).addClass("selected");
-        if ($(this).html() == "people") console.log("people");
-        if ($(this).html() == "events") console.log("events");
+    $("#context-dropdown > a").click(function() {
+        $("#new-context-modal").modal({backdrop:"static", show:true, keyboard:true}).bind('shown', function () {
+            $("#context-name").val("").focus();
+        });
+    });
+    $("#context-title").html("# "+E.context);
+    $("#context-name-form").submit(function(){
+        context = $("#context-name").val();
+        $("#new-context-modal").modal("hide");
+        console.log("submit context", context);
+        E.join_context(context);
         return false;
     });
     
-    $("nav.filter2 a").click(function (){
-        $("nav.filter2 > a").removeClass("selected");
+    
+    $("#delete_btn").show().click(function(){
+        $("#delete-confirmation-modal").modal("show");
+    });    
+    $("#whatisthis").show().click(function(){
+        $("#spinning-icon").hide();
+        $("#admin-url-modal").modal("show");
+    });
+    $("#pseudonym").show();
+    
+    $("nav a").click(function (){
+        $("nav > a").removeClass("selected");
         $(this).addClass("selected");
         if ($(this).html() == "all") E.nav_search();
         if ($(this).html() == "unseen") E.nav_new();
@@ -1414,9 +1488,6 @@ $(document).ready(function()
         return false;
     });
     
-
-    
-    E.resize_overflow_divs();
     
     mapman.initialize();
     
@@ -1450,114 +1521,54 @@ $(document).ready(function()
         }
         re = new RegExp(rexpr, 'i');
         
+        no_match_at_all = true;
         for (cap in attr_manager.sdata)
             for (key in attr_manager.sdata[cap]) {
                 if (key.match(re)) {
                     attr_manager.sdata[cap][key].display = true;
-                    
+                    no_match_at_all = false;
                 } else {
-                    no_match = true;
+                    no_vmatch = true;
                 
                     for (val in attr_manager.sdata[cap][key].values) {
                         if (val.match(re)) {
                             attr_manager.sdata[cap][key].values[val].display = true;
-                            no_match = false;
+                            no_vmatch = false;
+                            no_match_at_all = false;
                         } else {
                             attr_manager.sdata[cap][key].values[val].display = false;
                         } 
                     }
                     
-                    if (no_match)
+                    if (no_vmatch)
                         attr_manager.sdata[cap][key].display = false;
                 }
             }
-        E.populate_attrs();
-    });
-    
-    $("#new-key-input").attr("tabindex", 1).keyup(function(obj) {
-        text = $(this).val();
-        attr_manager.show_keyvals();
-            
-        if (text.length == 1) {
-            return true;
-        }
-        $(this).attr("key",text.toLowerCase());
-        $(this).popover("show");
         
-        matches = text.split(' ');
-        rexpr = "";
-        for (i in matches) {
-            if (matches[i].length == 0)
-                continue;
-            if (i>0)
-                rexpr += "|";
-            rexpr += matches[i];
-        }
-        re = new RegExp(rexpr, 'i');
-        
-        for (cap in attr_manager.sdata)
-            for (key in attr_manager.sdata[cap]) {
-                if (key.match(re)) {
-                    attr_manager.sdata[cap][key].display = true;
-                    
-                } else {
-                    no_match = true;
-                
-                    for (val in attr_manager.sdata[cap][key].values) {
-                        if (val.match(re)) {
-                            attr_manager.sdata[cap][key].values[val].display = true;
-                            no_match = false;
-                        } else {
-                            attr_manager.sdata[cap][key].values[val].display = false;
-                        } 
-                    }
-                    
-                    if (no_match)
-                        attr_manager.sdata[cap][key].display = false;
-                }
-            }
-        E.populate_attrs();
-    }).popover({content:function(){
-        key = $("#searchinput").attr("key");
-        html = $("<div></div>");
-        
-        if (key == undefined || key.length == 0)
-            return "Type to add new attribute";
-            
-        if (key in attr_manager.sdata.profile) {
-            html.html(key+": already exists").addClass("error");
-        } else
-            html.html('press enter to add "<b>'+key+'</b>"');
-            
-        return html;
-    }, offset:15, html:true, animate:false, trigger:"focus"});
-    
-    $("#add-key-div").submit(function(){
-        searchinput = $(this).children("input");
-        newkey = searchinput.val();
-        if (newkey in attr_manager.sdata.profile) {
-            searchinput.popover("hide");
-            $(".editor").children().focus();
+        if (no_match_at_all) {            
+            msg = $("<div class='message'></div>").html("No results found.");
+            btn = $("<div class='btn danger'></div>").html("add \""+text+"\" to the system");
+            btn.click(function() { 
+                $("#new-key-modal").modal("show");
+            });
+            $("#message").show().html(msg).append(btn);
+            $(".controls").hide();
         } else {
-            searchinput.popover("hide").val("").attr("key","");
-            attr_manager.show_keyvals();
-            E.populate_attrs(true);
-            
-            cap = "profile";
-            attr_manager.add_sdata(cap, newkey, 0);
-            
-            keypart = E.generate_key_entry(cap, newkey);
-            editor = E.generate_val_entry_editor(newkey);
-            valpart = $("<div class='valpart'></div>").append(editor);
-            
-            pill = $("<pill></pill>").append(keypart).append(valpart);
-            $("#choices").children("div:nth-child(2)").prepend(pill);
-            editor.children("input").focus();
+            $("#message").hide();
+            $(".controls").show();
         }
-        return false;
+            
+    
+        E.populate_attrs();
     });
     
+    $("div.controls > button").click(function() { 
+        $("#new-key-modal").modal("show");
+    });
     
+    $(".cancel-btn").click(function(){ 
+        $(this).parent().parent().modal("hide");
+    });
     
     $("#searchbox").submit(function(){
         return false;
@@ -1614,7 +1625,7 @@ $(document).ready(function()
             Tour.close_tour();
             have_location = attr_manager.get_location();
             if (have_location == null)
-                show_getlocation_modal();
+                $("#get-location-modal").modal("show");
         } else {
             Tour.do_tour(index+1);
         }
@@ -1626,6 +1637,12 @@ $(document).ready(function()
             Tour.do_tour(index-1);
         return false;
     });
+    
+    
+    init_new_key_modal();
+    init_admin_url_modal();
+    init_delete_modal();
+    init_getlocation_modal();
 });
 
 
@@ -1633,27 +1650,20 @@ $(document).ready(function()
 {% end %}
 {% block body %}
 
-<div id="left-panel" class="span6">
-    <nav class="filter1">
-        <a href="#" class="selected">people</a>
-        <a href="#" class="">events</a>
-    </nav>
-    <nav class="filter2">
-        <a href="#" class="selected">all</a>
-        <a href="#" class="">unseen</a>
-        <a href="#" class="">me</a>
-    </nav>
-    
-    <a href="#" class="btn success" style="float:right;">add new</a>
-    
+<div id="left-panel" class="">
     <form id="searchbox">
-        <input autofocus="autofocus" type="search" id="searchinput" results="10" placeholder="Search..." />
+        <input autofocus="autofocus" type="search" id="searchinput" results="10" placeholder="Search or Add attributes..." />
     </form>
+    <div class="controls">
+        <nav class="inline">
+            <a href="#" class="selected">all</a>
+            <a href="#" class="">unseen</a>
+            <a href="#" class="">me</a>
+        </nav>
+        
+        <button class="btn danger inline">add new attribute</button>
+    </div>
     <div id="message"></div>
-    <form id="add-key-div">
-        <input autofocus="autofocus" type="text" id="new-key-input" placeholder="add new attribute" title='add new attribute' data-content='press enter to add this attribute' />
-    </form>
-    
     <div id="userinfo"></div>
     <div id="choices"></div>
 </div>
@@ -1685,7 +1695,7 @@ $(document).ready(function()
         <p>To find others near you, please choose to share your location above.</p>
     </div>
     <div class="modal-footer">
-        <a href="#" class="btn danger" id="modal-cancel-btn">Cancel</a>
+        <a href="#" class="btn danger cancel-btn">Cancel</a>
     </div>
 </div>
 
@@ -1700,7 +1710,7 @@ $(document).ready(function()
     </div>
     <div class="modal-footer">
         <a href="#" class="btn danger" id="delete-delete-btn">Trash everything</a>
-        <a href="#" class="btn primary" id="delete-cancel-btn">Cancel</a>
+        <a href="#" class="btn primary cancel-btn">Cancel</a>
     </div>
 </div>
 
@@ -1714,7 +1724,7 @@ $(document).ready(function()
         <p>Would you like to use your location to get more relevant results?</p>
     </div>
     <div class="modal-footer">
-        <a href="#" class="btn danger" id="location-cancel-btn">No</a>
+        <a href="#" class="btn danger cancel-btn">No</a>
         <a href="#" class="btn success" id="location-ok-btn">Yes</a>
     </div>
 </div>
@@ -1729,13 +1739,72 @@ $(document).ready(function()
         <p>Your admin URL allows you to edit your profile. You may want to bookmark this URL.</p>
         <p>
             Email it to me: 
-            <input autofocus="autofocus" type="email" id="admin-url-email" class="span4" />
+            <input placeholder="your@email.com" autofocus="autofocus" type="email" id="admin-url-email" class="span4" />
             <a href="#" class="btn success disabled" id="admin-url-send-btn">Send</a>
             <img id="spinning-icon" src="{{ static_url("images/website/spinning.gif") }}" />
         </p>
     </div>
     <div class="modal-footer">
-        <a href="#" class="btn primary" id="admin-url-cancel-btn">Close</a>
+        <a href="#" class="btn primary cancel-btn">Close</a>
+    </div>
+</div>
+
+
+<div id="new-key-modal" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close">&times;</a>
+        <h3>Add new attribute</h3>
+    </div>
+    <div class="modal-body">
+        <div id="title-placeholder">Your attribute</div>
+        <div id="key-placeholder">
+            <pill class="pill-override">
+                <a href="#" class="keypart-override">
+                    <span><input placeholder="eg. Name" type="text" tabindex="1000" class="add-key-input" /></span>
+                    <span class="count attr_counters">0</span>
+                </a>
+                <div class="valpart valpart-override">
+                    <div class="valcontainer">
+                        <a href="#" type="valpart" data-original-title="">
+                            <span class="count attr_counters">0</span>
+                            <span class="value"><input placeholder="eg. John" type="text" tabindex="1001" class="add-key-input" /></span>
+                        </a>
+                    </div>
+                    <div class="valcontainer">
+                        <a href="#" type="valpart" data-original-title="">
+                            <span class="count attr_counters">0</span>
+                            <span class="value"><input placeholder="eg. Nick" type="text" tabindex="1002" class="add-key-input" /></span>
+                        </a>
+                    </div>
+                    <div class="valcontainer">
+                        <a href="#" type="valpart" data-original-title="">
+                            <span class="count attr_counters">0</span>
+                            <span class="value"><input placeholder="eg. Mark" type="text" tabindex="1003" class="add-key-input" /></span>
+                        </a>
+                    </div>
+                </div>
+            </pill>
+        </div>
+        <div id="example">Example</div>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn success" id="new-key-btn">Add</a>
+        <a href="#" class="btn danger cancel-btn">Cancel</a>
+    </div>
+</div>
+
+
+<div id="new-context-modal" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close">&times;</a>
+        <h3>Create new context</h3>
+    </div>
+    <div class="modal-body">
+        <form id="context-name-form"><input placeholder="Type context name..." id="context-name" autofocus="autofocus" required maxlength="20" type="text" class="span4" /></form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn success" type="submit" form="context-name-form"  id="new-context-btn">Create</button>
+        <button class="btn danger cancel-btn">Cancel</button>
     </div>
 </div>
 
@@ -1755,6 +1824,14 @@ $(document).ready(function()
 <div id="popup"></div>
 
 <div class='confirmation label'></div>
+
+
+<div id="context-dropdown" class="hidden">
+<input type="search" id="context-input" results="10" placeholder="Search contexts..." />
+<a href="#" class="btn danger">create new context</a>
+<ul></ul>
+</div>
+
 
 {% end %}
 

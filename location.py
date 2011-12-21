@@ -107,7 +107,7 @@ class location():
         res = {'data':saved_items}
         self.finish(res)
     
-    def post(self):
+    def post(self, context):
         #print 'location post arguments:', self.arguments
         for key, valstr in self.arguments:
             if key != 'my location':
@@ -140,7 +140,7 @@ class location():
             
         return {'result':'', 'data':self.arguments, 'error':''}
     
-    def delete(self):
+    def delete(self, context):
         error = ''
         for key, valstr in self.arguments:
             

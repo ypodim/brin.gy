@@ -1,6 +1,12 @@
 
-@pill-loc-color-start: rgba(34,139,34, 0.7);
-@pill-loc-color-end: rgba(34,139,34, 0.9);
+
+@pill-loc-color-start: rgba(0,100,0, 0.7);
+@pill-loc-color-end: rgba(0,100,0, 0.9);
+/* @pill-loc-color-start: rgba(255,60,0, 0.7); */
+/* @pill-loc-color-end: rgba(255,69,0, 0.9); */
+
+/* @pill-loc-color-start: rgba(34,139,34, 0.7); */
+/* @pill-loc-color-end: rgba(34,139,34, 0.9); */
 
 .page-header{
     font-weight: bold;
@@ -12,8 +18,7 @@
     background-image: -moz-linear-gradient(90deg, @pill-loc-color-start, @pill-loc-color-end);
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(@pill-loc-color-start), to(@pill-loc-color-end));
 }
-.menu-item { 
-    width:120px;
+.menu-item {
     float:left; 
     text-align: right;  
     padding: 8px 0 0 0;
@@ -24,8 +29,7 @@
     color: inherit;
     text-align:center; 
     font-size: 14px;
-    &:hover {
-/*         color:red; */
+    &:hover :not(:fist-child) {
         background-color:rgba(25, 25, 25, 0.25);
     }
 }
@@ -54,12 +58,12 @@
 #delete_btn, #tourBtn, #cart-btn, #pseudonym { display:none; }
 
 #user-dropdown {
-    background-color:rgba(25, 25, 25, 1);
+    background-color: rgba(40, 40, 40, 1);
     
     z-index:999;
     position:absolute;
-    top:65px;
-    right:10px;
+    top:66px;
+    right:20px;
     width:430px;
     border-radius: 5px;
     border-top-right-radius: 0;
@@ -105,25 +109,41 @@
     display: inline-block;
 }
 
-#account-btn {
-    background-image: url('/static/images/website/user_gray.png');
+.menu-btn {
     background-repeat: no-repeat;
-    background-position: 15px center;
+    background-position: 10px 10px;
+    background-color: rgba(40, 40, 40, 0.50);
     
     border-radius: 5px 5px 0 0;
-    padding: 20px 15px 20px 0;
+    padding: 15px 15px 15px 0;
+    margin: 18px 10px 0 0;
+    max-width:220px;
+    padding: 7px 15px 5px 60px;
+    text-align: left;
     float: right;
-    margin: 8px 0 0 0;
     cursor: pointer;
     &:hover {
-        background-color: rgba(25, 25, 25, 0.50);
+        background-color: rgba(40, 40, 40, 1);
     }
 }
+.menu-btn-title {
+    text-shadow: rgba(255, 255, 0, 1) 0px 0px 2px;
+}
+
+#account-btn {
+    background-image: url('/static/images/website/user_gray.png');
+}
+
+#context-btn {
+    background-image: url('/static/images/website/outpost_gray.png');
+}
+
+
 .clicked {
     background-image: url('/static/images/website/user_green.png'); 
-    background-color:rgba(25, 25, 25, 1);
+    background-color:rgba(40, 40, 40, 1);
     &:hover {
-        background-color: rgba(25, 25, 25, 1);
+        background-color: rgba(40, 40, 40, 1);
     }
 }
 

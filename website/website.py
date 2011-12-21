@@ -45,6 +45,7 @@ class serve_user(tornado.web.RequestHandler):
             http_client.fetch("%s/authenticate_admin_secret?secret=%s" % (config.ego_url_prefix, self.secret), self.evaluate_agentid_clb)
         else:
             self.agentid = path[0]
+            if self.agentid[-1] == '?': self.agentid = self.agentid[:-1]
             self.examine_cookie()
         
     def examine_cookie(self):

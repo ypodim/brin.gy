@@ -16,15 +16,21 @@
 
     <link rel="shortcut icon" href='{{ static_url("images/website/bringy.logo.png") }}' />
     
+    
     <script src="http://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
     <script src='{{ static_url("js/markermanager_packed.js") }}'></script>
-    <script src='{{ static_url("js/jquery-1.5.1.min.js") }}'></script>
+    <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'></script>
+    
+    <script src="http://ajax.cdnjs.com/ajax/libs/underscore.js/1.1.4/underscore-min.js"></script>
+    <script src='http://documentcloud.github.com/backbone/backbone-min.js'></script>
+    
 
     <script src='{{ static_url("bootstrap/js/bootstrap-modal.js") }}'></script>
     <script src='{{ static_url("bootstrap/js/bootstrap-twipsy.js") }}'></script>
     <script src='{{ static_url("bootstrap/js/bootstrap-popover.js") }}'></script>
     <script src='{{ static_url("bootstrap/js/bootstrap-alerts.js") }}'></script>
     
+    <script src='{{ static_url("js/urls.js") }}'></script>
     <script src='{{ static_url("js/geo.js") }}'></script>
     <script src='{{ static_url("js/tour.js") }}'></script>
     <script src='{{ static_url("js/ego_website.js") }}'></script>
@@ -48,7 +54,8 @@
     <script>
     E = {};
     $(document).ready(function(){
-        $(".urllabel").click(function(){
+        $(".urllabel").click(function(event){
+            event.stopPropagation();
             this.select();
         }).keydown(function(obj){
             if (obj.metaKey || obj.altKey || obj.ctrlKey)
@@ -87,36 +94,42 @@
 </div>
 
 
-<div class="grid">
-    <div class="row page-header">
-        <div class="menu-item">
-            <a href="/">
-                <img width=120 src='{{ static_url("images/website/bringy.logo2.png") }}' alt="" />
-            </a>
-        </div>
-        <ul class="menu">
-            <li><a href="http://github.com/ypodim/brin.gy">Download</a></li>
-            <li id="event-btn">event</li>
-            <li><a href="/api">API</a></li>
-            <li><a href="/about">About</a></li>
-        </ul>
-        
-        <div id="account-btn" class="menu-item hidden">{{config.agentid}}</div>
+<div class="row page-header">
+    <div class="menu-item">
+        <a href="/">
+            <img width=120 src='{{ static_url("images/website/bringy.logo3.png") }}' alt="" />
+        </a>
     </div>
+    <ul class="menu">
+        <li><a href="http://github.com/ypodim/brin.gy">Download</a></li>
+        <li><a href="/api">API</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/press">Press Kit</a></li>
+    </ul>
     
-    <div class="container" style="width:100%;"> 
-        {% block body %}{% end %}
+    <div id="account-btn" class="menu-item menu-btn">
+        <div>User:</div>
+        <div class="menu-btn-title">{{config.agentid}}</div>
     </div>
-
-    <footer>
-        <a class="logo" target="_blank" href="http://brin.gy">Brin.gy</a>
-        is a an 
-        <a class="logo" target="_blank" href="http://github.com/ypodim/brin.gy">open-source project</a> 
-        from the 
-        <a class="logo" target="_blank" href="http://media.mit.edu">MIT Media Lab</a>
-    </footer>
+    <div id="context-btn" class="menu-item menu-btn">
+        <div>Context:</div>
+        <div id="context-title" class="menu-btn-title"></div>
+    </div>
 </div>
 
+
+<footer>
+    <a class="logo" target="_blank" href="http://brin.gy">Brin.gy</a>
+    is a an 
+    <a class="logo" target="_blank" href="http://github.com/ypodim/brin.gy">open-source project</a> 
+    from the 
+    <a class="logo" target="_blank" href="http://media.mit.edu">MIT Media Lab</a>
+</footer>
+
+
+<div class="container"> 
+    {% block body %}{% end %}
+</div>
 
 </body>
 </html>

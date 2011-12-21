@@ -3,6 +3,7 @@ import tornado.escape
 import tornado.httpclient
 
 from urllib import urlencode
+from keys import *
 
 class profile():
     def __init__(self, usr, arguments, path, db, finish):
@@ -12,7 +13,6 @@ class profile():
         self.cap = __name__.split('.')[-1]
         self.usr = usr
         self.path = path
-        self.context = 'all'
     
     'churn:CAP:keys' # set of recorded keys in churn
     'churn:CAP:KEY:vals' # set of recorded vals for each key in churn
@@ -41,30 +41,30 @@ class profile():
     'USER:contexts' # set of contexts to which USER participates in
     'context:CONTEXT' # set of users participating in CONTEXT
     
-    def getK (self):            return 'profile:%s:keys'                 % (self.context)
-    def getKA(self, key):       return 'profile:%s:key:%s:agents'        % (self.context, key)
     
-    def getKV(self, key):       return 'profile:%s:key:%s:values'        % (self.context, key)
-    def getKVA(self, key, val): return 'profile:%s:key:%s:val:%s:agents' % (self.context, key, val)
-    
-    def add_reverse(self, key, val):
-        if self.db.sadd(self.getKA(key), self.usr):   # add agent to set for this key
-            self.db.zincrby(self.getK(), key, 1)     # add key and increase its score
+    def add_reverse(self, context, key, val):
+        if self.db.sadd(getKA(context, key), self.usr):   # add agent to set for this key
+            self.db.zincrby(getK(context), key, 1)     # add key and increase its score
             
-        if self.db.sadd(self.getKVA(key, val), self.usr):  # add agent to set for this key/val pair
-            self.db.zincrby(self.getKV(key), val, 1)     # add key/val pair and increase its score
+        if self.db.sadd(getKVA(context, key, val), self.usr):  # add agent to set for this key/val pair
+            self.db.zincrby(getKV(context, key), val, 1)     # add key/val pair and increase its score
         
+    def del_reverse(self, context, key, val):
+        if self.db.srem(getKVA(context, key, val), self.usr):  # remove agent from set for this key/val pair
+            if self.db.zincrby(getKV(context, key), val, -1) <= 0: # decrease key/val pair's score    
+                self.db.zrem(getKV(context, key), val)
+                self.db.delete(getKVA(context, key, val))
         
-    def del_reverse(self, key, val):
-        if self.db.srem(self.getKVA(key, val), self.usr):  # remove agent from set for this key/val pair
-            if self.db.zincrby(self.getKV(key), val, -1) <= 0: # decrease key/val pair's score    
-                self.db.zrem(self.getKV(key), val)
-                self.db.delete(self.getKVA(key, val))
-                
-        if self.db.srem(self.getKA(key), self.usr):   # remove agent from set for this key
-            if self.db.zincrby(self.getK(), key, -1) <= 0: # decrease key's score
-                self.db.zrem(self.getK(), key)
-                self.db.delete(self.getKA(key))
+        key_is_stale = True
+        for v in self.db.zrevrangebyscore(getKV(context, key), '+inf', '-inf'):
+            if self.db.sismember(getKVA(context, key, v), self.usr): # if user has no more vals in this key
+                key_is_stale = False
+            
+        if key_is_stale:
+            if self.db.srem(getKA(context, key), self.usr):   # remove agent from set for this key
+                if self.db.zincrby(getK(context), key, -1) <= 0: # decrease key's score
+                    self.db.zrem(getK(context), key)
+                    self.db.delete(getKA(context, key))
         
     def get_keys(self):
         return self.db.smembers('%s:profile:keys' % self.usr)
@@ -80,26 +80,46 @@ class profile():
             key = unicode(key, errors='replace')
         return self.db.smembers('%s:profile:key:%s' % (self.usr, key))
     
-    def set_val(self, key, val):
+    def set_val(self, context, key, val):
+        self.db.sadd('contexts', context)
+        self.db.sadd('%s:contexts' % self.usr, context)
+        self.db.sadd('context:%s' % context, self.usr)
+        
         self.set_key(key)
-        self.add_reverse(key, val)
+        self.add_reverse(context, key, val)
         return self.db.sadd('%s:profile:key:%s' % (self.usr, key), val)
     
-    def del_val(self, key, val):
-        self.del_reverse(key, val)
+    def del_val(self, context, key, val):
+        self.del_reverse(context, key, val)
         res = self.db.srem('%s:profile:key:%s' % (self.usr, key), val)
         if res:
             if not self.get_vals(key):
+                print 'also deleting key', key
                 self.db.delete('%s:profile:key:%s' % (self.usr, key))
                 self.del_key(key)
+            
+                user_left_context = True
+                for k in self.db.zrevrangebyscore(getK(context), '+inf', '-inf'):
+                    if self.db.sismember(getKA(context, k), self.usr):
+                        user_left_context = False
+                    
+                if user_left_context:
+                    print 'also removing from context', self.usr, context
+                    self.db.srem('%s:contexts' % self.usr, context)
+                    self.db.srem('context:%s' % context, self.usr)
+                    
+                    if self.db.scard('context:%s' % context) == 0 and context != 'all':
+                        print 'also removing context', context
+                        self.db.srem('contexts', context)
+                            
         return res
     
     def clear_all(self):
         for key in self.get_keys():
             for val in self.get_vals(key):
-                self.del_val(key, val)
+                self.del_val(context, key, val)
         
-    def get(self):
+    def get(self, context):
         if self.path[-1] == 'visited':
             visited_items = {}
             for key in self.db.smembers('%s:profile:visited:keys' % self.usr):
@@ -118,11 +138,12 @@ class profile():
         res = {'data':saved_items, 'user':self.usr}
         self.finish( res )
         
-    def post(self):
+    def post(self, context):        
         if self.path[-1] == 'visited':
             res = 0
             for key in self.arguments:
                 lst = self.arguments[key]
+                print 'profile to add', lst, '-', key
                 self.db.sadd('%s:profile:visited:keys' % self.usr, key)
                 self.db.sadd('%s:profile:visited:key:%s' % (self.usr, key), *lst)
                 res += len(lst)
@@ -138,11 +159,11 @@ class profile():
             self.db.sadd('churn:%s:%s:vals' % (self.cap, key), val)
             self.db.incr('churn:%s:%s:%s:add' % (self.cap, key, val))
             
-            self.set_val(key, val)
+            self.set_val(context, key, val)
         
         return {'result':res, 'data':self.arguments, 'error':''}
     
-    def delete(self):
+    def delete(self, context):
         error = ''
         for key, val in self.arguments:
             #key = unicode(key, errors='replace')
@@ -153,7 +174,7 @@ class profile():
             self.db.incr('churn:%s:%s:%s:rem' % (self.cap, key, val))
             
             if key and val:
-                res = '%s' % self.del_val(key, val)
+                res = '%s' % self.del_val(context, key, val)
             else:
                 error = 'invalid key/val: %s/%s' % (key, val)
             
