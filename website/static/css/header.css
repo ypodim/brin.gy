@@ -55,53 +55,58 @@
     text-decoration:none;
 }
 
+.container {
+    position: absolute;
+    left: 0;
+    top: 66px;
+    bottom: 0;
+    
+    margin: 0px auto;
+    width:100%;
+    background-color: rgba(0,0,0,0.05);
+    text-shadow: rgba(255, 255, 255, 0.45) 0px 1px 0px;
+}
+
 #delete_btn, #tourBtn, #cart-btn, #pseudonym { display:none; }
 
-#user-dropdown {
+
+.dropdown {
     background-color: rgba(40, 40, 40, 1);
-    
     z-index:999;
     position:absolute;
-    top:66px;
-    right:20px;
+    top:0;
     width:430px;
     border-radius: 5px;
     border-top-right-radius: 0;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, .4);
     opacity:1;
     padding: 10px;
+    color: white;
 }
-#user-dropdown > ul {
-    list-style: none;
-}
-#user-dropdown > ul > li {
-    cursor: pointer;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding: 10px 10px 10px 10px;
-    &:hover {
-/*         background-color:gray; */
-        
-    }
-    &:first-child {
-        cursor: inherit;
-        &:hover {
-            backgdround-color:inherit;
-        }
-    }
-    &:last-child {
-        border-bottom: 0px;
-    }
-}
-#user-dropdown > ul > li > a {
+.dropdown a {
     color: white;
     font-weight: bold;
     text-shadow: rgba(25, 25, 25, 0.45) 0px -1px 0px;
-/*     padding-left: 10px; */
     text-decoration: none;
     &:hover {
         color: gray;
     }
 }
+    
+#start-dropdown {
+    width: 350px;
+    right:20px;
+    top:66px;
+    color:white;
+    padding-left:20px;
+}
+#start-dropdown > div > * {
+    color:white;
+}
+#start-dropdown h2 {
+    margin:0;
+}
+
 
 .header-title {
     text-align:right;
@@ -114,8 +119,8 @@
     background-position: 10px 10px;
     background-color: rgba(40, 40, 40, 0.50);
     
+    text-shadow: rgba(255, 255, 0, 1) 0px 0px 2px;
     border-radius: 5px 5px 0 0;
-    padding: 15px 15px 15px 0;
     margin: 18px 10px 0 0;
     max-width:220px;
     padding: 7px 15px 5px 60px;
@@ -125,11 +130,19 @@
     &:hover {
         background-color: rgba(40, 40, 40, 1);
     }
+    
 }
 .menu-btn-title {
-    text-shadow: rgba(255, 255, 0, 1) 0px 0px 2px;
+    text-shadow: none;
 }
-
+.start-btn {
+    font-size:20px;
+    padding-left:15px;
+    height: 36px;
+}
+.start-btn > div {
+    margin-top: 10px;
+}
 #account-btn {
     background-image: url('/static/images/website/user_gray.png');
 }
@@ -140,7 +153,7 @@
 
 
 .clicked {
-    background-image: url('/static/images/website/user_green.png'); 
+/*     background-image: url('/static/images/website/user_green.png');  */
     background-color:rgba(40, 40, 40, 1);
     &:hover {
         background-color: rgba(40, 40, 40, 1);

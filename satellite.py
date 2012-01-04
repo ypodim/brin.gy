@@ -160,10 +160,13 @@ class stats(tornado.web.RequestHandler):
             #vals += r.scard('profile:key:%s' % k)
             vals += r.zscore('profile:all:keys', k)
         
+        queries = 0
+        
         dic = dict(churn=self.churn(), 
                    users=r.scard('users'),
                    keys=len(keys),
-                   values=vals)
+                   values=vals,
+                   queries=queries)
         self.write(dic)
     def churn(self):
         dic = {}
@@ -259,11 +262,16 @@ class randomstat(tornado.web.RequestHandler):
     def get(self):
         kvlist = []
         while not kvlist:
-            keys = r.zrevrangebyscore('profile:all:keys', '+inf', 2, withscores=True) or []
+            keys = r.zrevrangebyscore(getK('all'), '+inf', '-inf', withscores=True)
+            
+            if not keys:
+                self.write(dict(error='No data. Nichts.'))
+                return
+                
             key, score = random.choice(keys)
             
             zkey = 'profile:all:key:%s:values' % key
-            kvlist = r.zrevrangebyscore(zkey, '+inf', 2, withscores=True) or []
+            kvlist = r.zrevrangebyscore(zkey, '+inf', '-inf', withscores=True) or []
         val, score = random.choice(kvlist)
         
         res = dict(key=key, val=val, score=score)

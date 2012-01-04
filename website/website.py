@@ -28,6 +28,7 @@ class website_call(tornado.web.RequestHandler):
     def get(self):
         self.start_time = time.time()
         self.callback = self.get_argument("callback", None)
+        print config
         self.render("%s.html" % self.path, config=config)
         
     def prepare(self):
@@ -155,7 +156,7 @@ class message(tornado.web.RequestHandler):
 debug = os.environ.get("SERVER_SOFTWARE", "").startswith("Development/")
 
 settings = {
-    "template_path": os.path.join(os.path.dirname(__file__), "templates"),
+    "template_path": os.path.join(os.path.dirname(__file__), "static"),
     "cookie_secret": "61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
     "xsrf_cookies": True,
     "debug": debug,

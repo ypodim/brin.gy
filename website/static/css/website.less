@@ -1,4 +1,4 @@
-@import "/static/bootstrap/lib/bootstrap.less";
+
 
 * {
     margin: 0;
@@ -8,6 +8,8 @@
 body { 
     font-family:helvetica; 
     font-size:12px;
+    margin: 0;
+    padding: 0;
 }
 
 footer {
@@ -27,21 +29,6 @@ ul {
     list-style: none;
     margin: 0;
     padding: 0;
-}
-
-.inline { 
-    display:inline-block;
-}
-
-.container {
-    position: absolute;
-    left: 0;
-    top: 66px;
-    bottom: 0;
-    
-    margin: 0px auto;
-    width:100%;
-    background-color: rgba(0,0,0,0.2);
 }
 
 /*#left { 
@@ -164,19 +151,11 @@ div.clear {clear:both;}
 
 
 #context-input { width:370px; font-size:inherit; margin-top:2px;}
+
 #context-dropdown {
-    position: absolute;
-    top:0;
-    bottom:0;
-    background-color: rgba(40, 40, 40, 1);
-    z-index:999;
+    bottom:50px;
     right:150px;
     width:575px;
-    border-radius: 5px;
-    border-top-right-radius: 0;
-    box-shadow: 1px 1px 4px rgba(0, 0, 0, .4);
-    opacity:1;
-    padding: 10px;
     font-size: 16px;
 }
 #context-dropdown > a {
@@ -215,8 +194,31 @@ div.clear {clear:both;}
 }
 #context-dropdown > ul > li > span {
     margin-right: 10px;
-/*     float:left; */
 }
+
+
+
+#user-dropdown {
+    right:20px;
+}
+#user-dropdown > ul {
+    list-style: none;
+}
+#user-dropdown > ul > li {
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 10px 10px 10px 10px;
+    &:first-child {
+        cursor: inherit;
+        &:hover {
+            backgdround-color:inherit;
+        }
+    }
+    &:last-child {
+        border-bottom: 0px;
+    }
+}
+
 
 
 #map_canvas {
@@ -373,14 +375,48 @@ div.input {
 }
 
 
-
-.suggestionEntry { width:100px; height:22px; }
-a.suggestionVal { float:left; width: 70px; height:22px; }
-a.suggestionVal:hover { color:white; background-color:#0050a3; text-decoration: none; }
-.suggestionCard { float:right; }
-
 .hidden {display:none;}
-/* .indicator {display:none;} */
+.inline {
+    display: inline-block;
+}
+.index-aside {
+    padding-left:20px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+.index-body {
+    padding-top:10px;
+    position:absolute;
+    right:0;
+    bottom:0;
+    left:250px;
+    top:80px;
+}
+.index-body p { 
+    font-size: 20px; 
+    line-height: 1.5;
+    display: inline-block;
+}
+#userstat {
+    background-image: url('/static/images/website/user_gray.png');
+}
+#attrstat {
+    background-image: url('/static/images/website/info_gray.png');
+}
+#querystat {
+    background-image: url('/static/images/website/gears_gray.png');
+}
+.stat-div {
+    font-size: 20px;
+    height: 40px;
+    background-repeat: no-repeat;
+    background-position: 10px 5px;
+    padding: 15px 0 0 60px;
+}
+.stat-entry {
+    font-weight:bold;
+}
+
+
 
 #pseudonym { 
     float:left; 
@@ -388,12 +424,11 @@ a.suggestionVal:hover { color:white; background-color:#0050a3; text-decoration: 
 }
 
 
-/* #previous_pseudonym, #start_event { margin-top: 70px; } */
 h2 { margin-top: 30px; }
 
 
 #ticker {
-    padding: 20px 0 0 0;
+    padding: 30px 0 0 0;
     height: 50px;
     text-align: center;
     font-size:26px;
@@ -402,7 +437,7 @@ h2 { margin-top: 30px; }
     display:inline;
     font-weight: bold;
     padding: 5px 10px 5px 10px;
-    text-shadow: 0;
+/*     text-shadow: 0; */
     background-color: #FEE9CC;
     font-size: inherit;
 }
@@ -625,14 +660,6 @@ pill {
             }
         }
     }
-}
-
-
-
-
-.stat-entry {
-    font-size: 14px;
-    font-weight:bold;
 }
 
 div.controls > button {

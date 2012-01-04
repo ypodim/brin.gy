@@ -128,6 +128,7 @@ class serve_user(bringy_handler):
         deleted = ''
         error = ''
         secret = ''
+        #print self.request.body
         if self.request.body:
             secret = self.request.body.split('=')[1]
         passed = db.authenticate_user(self.username, secret)
@@ -159,7 +160,9 @@ class serve_user(bringy_handler):
         if not error and action == 'join':
             db.join_context(context, self.username)
         if not error and action == 'leave':
-            db.leave_context(context, self.username)
+            #db.leave_context(context, self.username)
+            p = profile(self.username, [], self.request.path.split('/'), db.r, None)
+            p.leave_context(context)
             
         res = {'error':error, 'username':self.username}
         self.write(res)

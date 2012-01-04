@@ -116,8 +116,12 @@ class profile():
     
     def clear_all(self):
         for key in self.get_keys():
+            print 'clearing key', key
             for val in self.get_vals(key):
-                self.del_val(context, key, val)
+                print 'clearing val', val
+                for context in self.db.smembers('%s:contexts' % self.usr):
+                    print 'clearing context', context
+                    self.del_val(context, key, val)
         
     def get(self, context):
         if self.path[-1] == 'visited':
@@ -160,10 +164,13 @@ class profile():
             self.db.incr('churn:%s:%s:%s:add' % (self.cap, key, val))
             
             self.set_val(context, key, val)
+            if context != 'all':
+                self.set_val('all', key, val)
         
         return {'result':res, 'data':self.arguments, 'error':''}
     
     def delete(self, context):
+        #print 'DELETE', self.usr, self.path, self.arguments
         error = ''
         for key, val in self.arguments:
             #key = unicode(key, errors='replace')
@@ -180,7 +187,15 @@ class profile():
             
         return dict(result='deleted ok', error=error)
         
+    def leave_context(self, context):
+        print 'LEAVING context', context, self.usr
+        for key in self.db.smembers('%s:profile:keys' % self.usr):
+            for val in self.db.smembers('%s:profile:key:%s' % (self.usr, key)):
+                self.del_val(context, key, val)
 
+        self.db.srem('%s:contexts' % self.usr, context)
+        self.db.srem('context:%s' % context, self.usr)
         
-
-            
+        if self.db.scard('context:%s' % context) == 0 and context != 'all':
+            print 'also removing context', context
+            self.db.srem('contexts', context)

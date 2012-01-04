@@ -4,11 +4,7 @@ from datetime import datetime
 import redis
 import random
 
-
-def getK  (context):           return 'profile:%s:keys'                 % (context)
-def getKA (context, key):      return 'profile:%s:key:%s:agents'        % (context, key)
-def getKV (context, key):      return 'profile:%s:key:%s:values'        % (context, key)
-def getKVA(context, key, val): return 'profile:%s:key:%s:val:%s:agents' % (context, key, val)
+from keys import *
 
 class DB:
     def __init__(self):
@@ -43,7 +39,6 @@ class DB:
         #if secret == '1':
             #return secret
         res = (len(secret)>0 and stored_secret == secret)
-        print 'returning', secret, stored_secret, res
         return res
         
     def delete_user(self, username):

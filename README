@@ -1,0 +1,17 @@
+Status:
+Brin.gy is a research project under heavy development. The codebase is still messy and some critical pieces of functionality are still missing, such as the ability to communicate with other users.
+
+Running Brin.gy:
+Three components are involved in running Brin.gy:
+1) Agents module, which holds user data (USER -> ATTRIBUTES)
+    
+    python agents.py [-h HOST][-p PORT]
+
+2) Discovery module, which performs the reverse queries for user discovery (ATTRIBUTE -> USERS)
+
+    python satellite.py [-h HOST][-p PORT]
+    
+3) Web-based UI:
+    
+    cd website
+    python website.py [-d SATELLITE_ADDRESS][-a AGENTS_ADDRESS]

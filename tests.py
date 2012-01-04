@@ -8,6 +8,8 @@ import httplib2
 import urllib
 import json
 
+from keys import *
+
 h = httplib2.Http()
 
 def post(dic, path='', method='POST', url='http://localhost:10007'):
@@ -19,183 +21,200 @@ def post(dic, path='', method='POST', url='http://localhost:10007'):
 
 
 r = redis.Redis(host='localhost', port=6379, db=0)
-r.flushall()
+#r.flushall()
+
+class State:
+        #def setUp(self):
+    print 'setup'
+    
+    u = 'tester'
+    p = dict(key='name', val='pol')
+    
+    lat = 10.01
+    lon = 20.02
+    l = dict(key='current location', val=dict(lat=lat,lon=lon))
+    bs = dict(key='', val=dict(action='buy',price=300,product='ipad'))
+        
+    if r.sismember('users', u):
+        print 'oops user exists, deleting'
+        s = r.hget('options:user:%s' % u, 'secret')
+        res = post({'secret':s}, path='/%s'%u, method='DELETE')
+        print res, s
+
+state = State()
 
 class TestSequenceFunctions(unittest.TestCase):
-
-    def setUp(self):
-        self.seq = range(10)
-        self.u = 'tester'
-        self.p = dict(key='name', val='pol')
-        
-        lat = 10.01
-        lon = 20.02
-        self.l = dict(key='current location', val=dict(lat=lat,lon=lon))
-        
-        self.bs = dict(key='', val=dict(action='buy',price=300,product='ipad'))
-        
     def test_create_user(self):
-        res = post(dict(username=self.u))
-        self.assertTrue(res['created'])
-        self.assertTrue(r.sismember('users', self.u))
-    
+        res = post(dict(username=state.u))
+        self.assertTrue(r.sismember('users', state.u))
+        state.secret = res['secret']
+        
     def test_post_profile(self):
-        params = [[self.p['key'],self.p['val']]]
+        context = 'context1'
+        params = [[state.p['key'],state.p['val']]]
         
-        body = dict(data=json.dumps(params))
-        res = post(body, path='/%s/profile'%self.u)
+        body = dict(data=json.dumps(params), secret=state.secret, context=context)
+        res = post(body, path='/%s/profile'%state.u)
+        print 'PROFILE', res, state.secret
         self.assertTrue(res['result']=='')
         
-        keys = r.smembers('%s:profile:keys' % self.u)
-        self.assertTrue(list(keys)==[self.p['key']])
+        keys = r.smembers('%s:profile:keys' % state.u)
+        self.assertTrue(list(keys)==[state.p['key']])
         
-        vals = r.smembers('%s:profile:key:%s' % (self.u, self.p['key']))
-        self.assertTrue(list(vals)==[self.p['val']])
+        vals = r.smembers('%s:profile:key:%s' % (state.u, state.p['key']))
+        self.assertTrue(list(vals)==[state.p['val']])
         
-        agents = r.smembers('profile:key:%s' % self.p['key'])
-        self.assertTrue(list(agents)==[self.u])
+        agents = r.smembers(getKA(context, state.p['key']))
+        self.assertTrue(list(agents)==[state.u])
         
-        agents = r.smembers('profile:key:%s:val:%s' % (self.p['key'],self.p['val']))
-        self.assertTrue(list(agents)==[self.u])
+        agents = r.smembers(getKVA(context, state.p['key'],state.p['val']))
+        self.assertTrue(list(agents)==[state.u])
         
         
         
-        keys = r.zrevrangebyscore('profile:keyscores', '+inf', '-inf')
-        self.assertTrue(list(keys)==[self.p['key']])
+        keys = r.zrevrangebyscore(getK(context), '+inf', '-inf')
+        self.assertTrue(list(keys)==[state.p['key']])
         
-        score = r.zscore('profile:keyscores', self.p['key'])
+        score = r.zscore(getK(context), state.p['key'])
         self.assertTrue(score==1)
         
-        keys = r.zrevrangebyscore('profile:keyvalscores:%s' % self.p['key'], '+inf', '-inf')
-        self.assertTrue((list(keys)==[self.p['val']]))
+        vals = r.zrevrangebyscore(getKV(context, state.p['key']), '+inf', '-inf')
+        self.assertTrue((list(vals)==[state.p['val']]))
         
-        score = r.zscore('profile:keyvalscores:%s' % self.p['key'], self.p['val'])
+        score = r.zscore(getKV(context, state.p['key']), state.p['val'])
         self.assertTrue(score==1)
         
         
-    def test_post_location(self):
-        params = [[self.l['key'],self.l['val']]]
+        
+        body = dict(data=json.dumps(params), secret=state.secret, context=context)
+        res = post(body, method='DELETE', path='/%s/profile'%state.u)
+        self.assertTrue(res['error']=='')
+        print res
+        
+        
+    def notest_post_location(self):
+        params = [[state.l['key'],state.l['val']]]
         
         body = dict(data=json.dumps(params))
-        res = post(body, path='/%s/location'%self.u)
+        res = post(body, path='/%s/location'%state.u)
         self.assertTrue(res['result']=='')
         
-        keys = r.smembers('%s:location:keys' % self.u)
-        self.assertTrue(list(keys)==[self.l['key']])
+        keys = r.smembers('%s:location:keys' % state.u)
+        self.assertTrue(list(keys)==[state.l['key']])
         
-        lat = r.get('%s:location:%s:lat' % (self.u, self.l['key']))
-        self.assertTrue(float(lat)==self.l['val']['lat'])
+        lat = r.get('%s:location:%s:lat' % (state.u, state.l['key']))
+        self.assertTrue(float(lat)==state.l['val']['lat'])
         
-        lon = r.get('%s:location:%s:lon' % (self.u, self.l['key']))
-        self.assertTrue(float(lon)==self.l['val']['lon'])
+        lon = r.get('%s:location:%s:lon' % (state.u, state.l['key']))
+        self.assertTrue(float(lon)==state.l['val']['lon'])
         
-        buckets = r.smembers('location:%s:buckets' % self.l['key'])
-        match = '%s %s' % (self.l['val']['lat'], self.l['val']['lon'])
+        buckets = r.smembers('location:%s:buckets' % state.l['key'])
+        match = '%s %s' % (state.l['val']['lat'], state.l['val']['lon'])
         self.assertTrue(list(buckets)==[match])
         
-        agents = r.smembers('location:%s:latlon:%s' % (self.l['key'], match))
-        self.assertTrue(list(agents)==[self.u])
+        agents = r.smembers('location:%s:latlon:%s' % (state.l['key'], match))
+        self.assertTrue(list(agents)==[state.u])
         
         
-    def test_post_buysell(self):
-        params = [[self.bs['key'],json.dumps(self.bs['val'])]]
+    def notest_post_buysell(self):
+        params = [[state.bs['key'],json.dumps(state.bs['val'])]]
         
         body = dict(data=json.dumps(params))
-        res = post(body, path='/%s/buysell'%self.u)
+        res = post(body, path='/%s/buysell'%state.u)
         pid = res['result']['key']
         self.assertTrue(pid==1)
         
-        pids = r.smembers('%s:buysell:pids' % self.u)
+        pids = r.smembers('%s:buysell:pids' % state.u)
         self.assertTrue(list(pids)==[str(pid)])
         
-        action = r.get('%s:buysell:pid:%s:action' % (self.u, pid))
-        self.assertTrue(action==self.bs['val']['action'])
+        action = r.get('%s:buysell:pid:%s:action' % (state.u, pid))
+        self.assertTrue(action==state.bs['val']['action'])
         
-        price = r.get('%s:buysell:pid:%s:price' % (self.u, pid))
-        self.assertTrue(int(price)==self.bs['val']['price'])
+        price = r.get('%s:buysell:pid:%s:price' % (state.u, pid))
+        self.assertTrue(int(price)==state.bs['val']['price'])
         
-        product = r.get('%s:buysell:pid:%s:product' % (self.u, pid))
-        self.assertTrue(product==self.bs['val']['product'])
+        product = r.get('%s:buysell:pid:%s:product' % (state.u, pid))
+        self.assertTrue(product==state.bs['val']['product'])
         
         products = r.smembers('buysell:product')
-        self.assertTrue(list(products)==[self.bs['val']['product']])
+        self.assertTrue(list(products)==[state.bs['val']['product']])
         
         agents = r.smembers('buysell:product:%s:action:%s' % (product, action))
-        self.assertTrue(list(agents)==[self.u])
+        self.assertTrue(list(agents)==[state.u])
         
         
     def test_delete_user(self):
-        res = post({}, path='/%s'%self.u, method='DELETE')
+        res = post({'secret':state.secret}, path='/%s'%state.u, method='DELETE')
         self.assertTrue(res['deleted'])
-        self.assertTrue(r.smembers('users')==set([]))
+        self.assertFalse(r.sismember('users', state.u))
         
     
-    def test_post_profile(self):
-        params = [[self.p['key'],self.p['val']]]
+    #def test_post_profile(self):
+        #params = [[state.p['key'],state.p['val']]]
         
-        keys = r.smembers('%s:profile:keys' % self.u)
+        #keys = r.smembers('%s:profile:keys' % state.u)
+        #self.assertTrue(list(keys)==[])
+        
+        #vals = r.smembers('%s:profile:key:%s' % (state.u, state.p['key']))
+        #self.assertTrue(list(vals)==[])
+        
+        #agents = r.smembers('profile:key:%s' % state.p['key'])
+        #self.assertTrue(list(agents)==[])
+        
+        #agents = r.smembers('profile:key:%s:val:%s' % (state.p['key'],state.p['val']))
+        #self.assertTrue(list(agents)==[])
+        
+        
+        #keys = r.zrevrangebyscore('profile:keyscores', '+inf', '-inf')
+        #self.assertTrue(list(keys)==[])
+        
+        #score = r.zscore('profile:keyscores', state.p['key'])
+        #self.assertTrue(score==None)
+        
+        #keys = r.zrevrangebyscore('profile:keyvalscores:%s' % state.p['key'], '+inf', '-inf')
+        #self.assertTrue((list(keys)==[]))
+        
+        #score = r.zscore('profile:keyvalscores:%s' % state.p['key'], state.p['val'])
+        #self.assertTrue(score==None)
+        
+        
+    def notest_deleted_location(self):
+        keys = r.smembers('%s:location:keys' % state.u)
         self.assertTrue(list(keys)==[])
         
-        vals = r.smembers('%s:profile:key:%s' % (self.u, self.p['key']))
-        self.assertTrue(list(vals)==[])
-        
-        agents = r.smembers('profile:key:%s' % self.p['key'])
-        self.assertTrue(list(agents)==[])
-        
-        agents = r.smembers('profile:key:%s:val:%s' % (self.p['key'],self.p['val']))
-        self.assertTrue(list(agents)==[])
-        
-        
-        keys = r.zrevrangebyscore('profile:keyscores', '+inf', '-inf')
-        self.assertTrue(list(keys)==[])
-        
-        score = r.zscore('profile:keyscores', self.p['key'])
-        self.assertTrue(score==None)
-        
-        keys = r.zrevrangebyscore('profile:keyvalscores:%s' % self.p['key'], '+inf', '-inf')
-        self.assertTrue((list(keys)==[]))
-        
-        score = r.zscore('profile:keyvalscores:%s' % self.p['key'], self.p['val'])
-        self.assertTrue(score==None)
-        
-        
-    def test_deleted_location(self):
-        keys = r.smembers('%s:location:keys' % self.u)
-        self.assertTrue(list(keys)==[])
-        
-        lat = r.get('%s:location:%s:lat' % (self.u, self.l['key']))
+        lat = r.get('%s:location:%s:lat' % (state.u, state.l['key']))
         self.assertTrue(lat==None)
         
-        lon = r.get('%s:location:%s:lon' % (self.u, self.l['key']))
+        lon = r.get('%s:location:%s:lon' % (state.u, state.l['key']))
         self.assertTrue(lon==None)
         
-        buckets = r.smembers('location:%s:buckets' % self.l['key'])
+        buckets = r.smembers('location:%s:buckets' % state.l['key'])
         self.assertTrue(list(buckets)==[])
         
-        match = '%s %s' % (self.l['val']['lat'], self.l['val']['lon'])
-        agents = r.smembers('location:%s:latlon:%s' % (self.l['key'], match))
+        match = '%s %s' % (state.l['val']['lat'], state.l['val']['lon'])
+        agents = r.smembers('location:%s:latlon:%s' % (state.l['key'], match))
         self.assertTrue(list(agents)==[])
         
         
-    def test_deleted_buysell(self):        
-        pids = r.smembers('%s:buysell:pids' % self.u)
+    def notest_deleted_buysell(self):        
+        pids = r.smembers('%s:buysell:pids' % state.u)
         self.assertTrue(list(pids)==[])
         
         pid = 1
         
-        action = r.get('%s:buysell:pid:%s:action' % (self.u, pid))
+        action = r.get('%s:buysell:pid:%s:action' % (state.u, pid))
         self.assertTrue(action==None)
         
-        price = r.get('%s:buysell:pid:%s:price' % (self.u, pid))
+        price = r.get('%s:buysell:pid:%s:price' % (state.u, pid))
         self.assertTrue(price==None)
         
-        product = r.get('%s:buysell:pid:%s:product' % (self.u, pid))
+        product = r.get('%s:buysell:pid:%s:product' % (state.u, pid))
         self.assertTrue(product==None)
         
         products = r.smembers('buysell:product')
         self.assertTrue(list(products)==[])
         
-        agents = r.smembers('buysell:product:%s:action:%s' % (product, self.bs['val']['action']))
+        agents = r.smembers('buysell:product:%s:action:%s' % (product, state.bs['val']['action']))
         self.assertTrue(list(agents)==[])
         
 
