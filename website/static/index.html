@@ -11,30 +11,30 @@
     <link rel="stylesheet/less" type="text/css" href="/static/css/user_account.css">
     <link rel="stylesheet/less" type="text/css" href="/static/css/header.css">
 
-    <script data-main="static/js/main" src="/static/js/libs/less/less-1.1.3.min.js"></script>
+    <script src="/static/js/libs/less/less-1.1.3.min.js"></script>
     <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=geometry&sensor=false"></script>
     
     <script>
     E = {};
     E.satellite = {};
     E.satellite.url = "{{config.discov_url}}";
-    E.satellite.url = "http://localhost:22222";
+//     E.satellite.url = "http://localhost:22222";
     
     E.agent = {};
     E.agent.id = "{{config.agentid}}";
-    E.agent.id = "ypodim";
     
     E.agent.baseurl = "{{config.ego_url_prefix}}";
-    E.agent.baseurl = "http://localhost:10007";
+//     E.agent.baseurl = "http://localhost:10007";
     
     E.agent.url = "{{config.ego_url_prefix}}/{{config.agentid}}";
     E.agent.url = E.agent.baseurl+"/"+E.agent.id;
     
     E.website_url = "{{config.website_url_prefix}}";
-    E.website_url = "http://localhost:8889";
+    E.context = {context:"all"};
+//     E.website_url = "http://localhost:8889";
     </script>
     
-    <script data-main="static/js/main" src="/static/js/libs/require/require.js"></script>
+    <script data-main="/static/js/main" src="/static/js/libs/require/require.js"></script>
     <script type="text/javascript">
         var _gaq = _gaq || [];
         _gaq.push(['_setAccount', 'UA-2011459-2']);
@@ -54,7 +54,7 @@
         <h2>Pick a pseudonym</h2>
         <form method="post" id="newuserform">
             <input autofocus="autofocus" placeholder="Type pseudonym..." class="span3" id="username" name="username" type="text" />
-            <a id="btn1" class="btn primary" href="#">check</a> (<a href="/about">terms of use</a>)
+            <a id="btn1" class="btn primary" href="#">check</a> (<a href="/#about">terms of use</a>)
         </form>
     </div>
     <div id="previous_pseudonym" class="hidden">
@@ -76,7 +76,7 @@
     <ul class="menu">
         <li><a href="/api">API</a></li>
         <li><a href="http://github.com/ypodim/brin.gy">Download</a></li>
-        <li><a href="/about">About</a></li>
+        <li><a href="/#about">About</a></li>
         <li><a href="/press">Press Kit</a></li>
     </ul>
     
@@ -104,26 +104,7 @@
 </footer>
 
 
-<div class="container"> 
-    <div id="ticker">
-        <pre id="ticker-score" class="ticker-label">23</pre> people have specified their <pre id="ticker-key" class="ticker-label">gender</pre> as <pre id="ticker-val" class="ticker-label">male</pre> 
-    </div>
-
-    <div class="index-aside">
-        <div id="userstat" class="stat-div">
-            <span id="users" class="stat-entry"></span> users
-        </div>
-        <div id="attrstat" class="stat-div">
-            <span id="values" class="stat-entry"></span> attributes
-        </div>
-        <div id="querystat" class="stat-div">
-            <span id="queries" class="stat-entry"></span> queries
-        </div>
-    </div>
-    <div class="index-body">    
-        <p>Brin.gy allows people to announce any bit of information about themselves and then find others based on that information. Browse people based on any type of information ranging from skills and expertise to favorite books and dating preferences.</p>
-    </div>
-    {% block body %}{% end %}
+<div id="container"> 
 </div>
 
 </body>

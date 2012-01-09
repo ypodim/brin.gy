@@ -2,23 +2,21 @@ define([
   'jquery', 
   'underscore', 
   'backbone',
-  'text!templates/todos.html'
-  ], function($, _, Backbone, todosTemplate){
-  var TodoView = Backbone.View.extend({
+  'text!templates/value.html'
+  ], function($, _, Backbone, valuesTemplate){
+  var ValueView = Backbone.View.extend({
 
     //... is a list tag.
-    tagName:  "li",
+    // tagName:  "div",
+    // el: $(".valpart"),
 
     // Cache the template function for a single item.
-    template: _.template(todosTemplate),
+    template: _.template(valuesTemplate),
 
     // The DOM events specific to an item.
     events: {
-      "click .check"              : "toggleDone",
-      "dblclick div.todo-content" : "edit",
-      "click span.todo-destroy"   : "clear",
-      "keypress .todo-input"      : "updateOnEnter",
-      "blur .todo-input"          : "close"
+      "click .add_btn"            : "toggle",
+      "click a"                   : "select",
     },
 
     // The TodoView listens for changes to its model, re-rendering. Since there's
@@ -30,10 +28,8 @@ define([
       this.model.bind('destroy', this.remove);
     },
 
-    // Re-render the contents of the todo item.
     render: function() {
       $(this.el).html(this.template(this.model.toJSON()));
-      this.input = this.$('.todo-input');
       return this;
     },
 
@@ -48,10 +44,17 @@ define([
       this.input.focus();
     },
 
-    // Close the `"editing"` mode, saving changes to the todo.
     close: function() {
       this.model.save({content: this.input.val()});
       $(this.el).removeClass("editing");
+    },
+
+    select: function() {
+      console.log("select", this.model);
+    },
+
+    toggle: function() {
+      console.log("toggle", this.model);
     },
 
     // If you hit `enter`, we're through editing the item.
@@ -65,5 +68,5 @@ define([
     }
 
   });
-  return TodoView;
+  return ValueView;
 });

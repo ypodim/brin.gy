@@ -2,14 +2,15 @@ define([
   'jquery',
   'underscore', 
   'backbone',
+  'router',
   'common/ego_website',
 //   'collections/todos',
-//   'views/todos',
-//   'text!templates/stats.html'
-  ], function($, _, Backbone, common){
+  ], function($, _, Backbone, router, common){
   var headerView = Backbone.View.extend({
     el: $("body"),
     events: {
+        "click #start-btn":  "showStartDropdown",
+
         "click #whatisthis":  "emailAdminUrl",
         "click #account-btn":  "showUserDropdown",
         "click .urllabel":  "selectUrlAddress",
@@ -45,32 +46,30 @@ define([
             $("select").append("<option>"+name+"</option>")
             $("#previous_pseudonym").show();
         }
-        
-        $.getJSON(E.satellite.url+"/stats", function(json){
-            $("#users").html(json.users);
-            $("#values").html(json.values);
-            $("#queries").html(json.queries);
-        });
-        
-        this.roll_ticker();
     },
     
     valid_username: null,
     
     check_username: function() {
+        that = this;
         username = $("#username").val();
+        console.log("checking", username, E.agent.baseurl+"/"+username);
         $.getJSON(E.agent.baseurl+"/"+username, function(json){
+            console.log("got back", json, username);
             if (username && username != "<username>" && typeof json == "object" && json.error) {
+                
                 $("#btn1").html("get it!").removeClass("primary").addClass("success");
-                this.valid_username = username;
+                that.valid_username = username;
+                console.log("valid_username is now", that.valid_username);
             } else {
                 $("#btn1").html("check").removeClass("primary success").addClass("danger").html("pseudonym taken!");
-                this.valid_username = undefined;
+                that.valid_username = undefined;
             }
         });
     },
     
     post_new_user: function() {
+        that = this;
         $.post(E.agent.baseurl, {username:this.valid_username}, function(data) {
             error = data.error;
             if (data.error)
@@ -78,28 +77,9 @@ define([
             console.log(data);
             if (! error.length) {
                 common.cookies.set_cookie(data.username, data.secret);
-                this.redirect(data.username);
+                that.redirect(data.username);
             }
         }, "json");
-    },
-    
-    roll_ticker: function() {
-        $.getJSON(E.satellite.url+"/randomstat", function(json){
-            if (json.error) {
-                $("#ticker").html(json.error);
-                return;
-            }
-            
-            $("#ticker").fadeOut(1000, function(){
-                $("#ticker-key").text(json.key);
-                $("#ticker-val").text(json.val);
-                $("#ticker-score").text(json.score);
-                
-                $("#ticker").fadeIn(1000, function(){
-                    setTimeout(this.roll_ticker, 1500);
-                });
-            });
-        });
     },
     
     redirect: function(username) {
@@ -130,6 +110,7 @@ define([
             this.valid_username = undefined;
             $("#btn1").removeClass("primary success").addClass("danger").html("Please use only letters and/or numbers");
         } else {
+            console.log("ok checking valid_username", this.valid_username);
             if (this.valid_username) {
                 this.post_new_user();
             } else {
@@ -235,9 +216,12 @@ define([
         return false;
     },
     emailAdminUrl: function() {
+        $("#spinning-icon").hide();
+        $("#admin-url-modal").modal("show");
         return false;
     },
     showStartDropdown: function () {
+        console.log("START BTN");
         if ($("#start-dropdown").is(':visible')) {
             $("#start-dropdown").hide();
             $("#start-btn").removeClass("clicked");
@@ -297,6 +281,11 @@ define([
             this.trigger_context_changed(context);
         }, "json");
     },
+
+    render: function() {
+        
+    },
   });
+
   return headerView;
 });

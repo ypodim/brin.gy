@@ -55,7 +55,7 @@
     text-decoration:none;
 }
 
-.container {
+#container {
     position: absolute;
     left: 0;
     top: 66px;

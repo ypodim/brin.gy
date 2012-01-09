@@ -26,10 +26,8 @@ class Config:
     
 class website_call(tornado.web.RequestHandler):
     def get(self):
-        self.start_time = time.time()
-        self.callback = self.get_argument("callback", None)
-        print config
-        self.render("%s.html" % self.path, config=config)
+        self.render("index.html", config=config)
+        #self.render("%s.html" % self.path, config=config)
         
     def prepare(self):
         path = self.request.path.split('/')
@@ -37,6 +35,9 @@ class website_call(tornado.web.RequestHandler):
         
         
 class serve_user(tornado.web.RequestHandler):
+    #def get(self):
+        #self.redirect("/#/user%s" % self.request.path)
+        
     @tornado.web.asynchronous
     def get(self):
         path = self.request.uri.split('/')[1:]
@@ -46,7 +47,8 @@ class serve_user(tornado.web.RequestHandler):
             http_client.fetch("%s/authenticate_admin_secret?secret=%s" % (config.ego_url_prefix, self.secret), self.evaluate_agentid_clb)
         else:
             self.agentid = path[0]
-            if self.agentid[-1] == '?': self.agentid = self.agentid[:-1]
+            if self.agentid and self.agentid[-1] == '?':
+                self.agentid = self.agentid[:-1]
             self.examine_cookie()
         
     def examine_cookie(self):
@@ -106,7 +108,7 @@ class serve_user(tornado.web.RequestHandler):
         else:
             config.agent_url_private = "<not available>"
         
-        self.render("manage.html", config=config)
+        self.render("index.html", config=config)
 
 
 class message(tornado.web.RequestHandler):
@@ -165,11 +167,11 @@ settings = {
 }
 
 application = tornado.web.Application([
-    (r"/", website_call),
-    (r"/api", website_call),
-    (r"/about", website_call),
-    (r"/UROP", website_call),
-    (r"/message", message),
+    (r"/", serve_user),
+    #(r"/api", website_call),
+    #(r"/about", website_call),
+    #(r"/UROP", website_call),
+    #(r"/message", message),
     
     (r"/a/[a-zA-Z0-9]+/?$", serve_user),
     (r"/[a-zA-Z0-9]+/?$", serve_user),
