@@ -9,7 +9,7 @@ define([
     el: $("#container"),
     
     roll_ticker: function() {
-        $.getJSON(E.satellite.url+"/randomstat", function(json){
+        $.getJSON(require.E.satellite.url+"/randomstat", function(json){
             if (json.error) {
                 $("#ticker").html(json.error);
                 return;
@@ -31,7 +31,7 @@ define([
         var compiled_template = _.template( welcomeViewTemplate );
         this.el.html( compiled_template() );
         
-        $.getJSON(E.satellite.url+"/stats", function(json){
+        $.getJSON(require.E.satellite.url+"/stats", function(json){
             $("#users").html(json.users);
             $("#values").html(json.values);
             $("#queries").html(json.queries);
@@ -40,6 +40,10 @@ define([
         this.roll_ticker();       
     },
 
+    initialize: function(){
+      console.log('welcome init')
+      this.render();
+    },
   });
   return welcomeView;
 });

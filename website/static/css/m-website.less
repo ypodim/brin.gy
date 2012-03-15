@@ -25,17 +25,27 @@ footer {
     background-color:inherit;
 }
 
+div.mobile {
+    padding:10px 0 20px 0;
+    height: 15px;
+    /*position: absolute;*/
+    /*bottom:0;*/
+    /*right:0;*/
+    width:100%;
+    /*z-index:10;*/
+    text-align:center;
+    color: gray;
+    font-size:20px;
+    text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+    /*background-color:yellow;*/
+}
+
 ul {
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-/*#left { 
-    padding-right:50px;
-    margin-left: 50px;
-    width:40%;
-}*/
 .left {margin-left: 50px;}
 /* #right { width:40%; } */
 
@@ -93,7 +103,8 @@ div.clear {clear:both;}
 }
 
 #searchbox {
-    margin: 0 0 5px 0;
+    padding:0;
+    margin: 0 0 0px 0;
 }
 
 #userinfo {
@@ -102,6 +113,21 @@ div.clear {clear:both;}
     margin-top: 40px;
     display: none;
 }
+
+#m-choices {
+    /*position:absolute;*/
+    /*left:0px;*/
+    /*top: 68px;*/
+    /*bottom: 0;*/
+    padding: inherit;
+    /*width: inherit;*/
+    width: 100%;
+    padding: 0;
+
+    overflow-y: scroll;
+    z-index: 10;
+}
+
 #choices, #message {
     position:absolute;
     left:0px;
@@ -138,7 +164,7 @@ div.clear {clear:both;}
     top: 0px;
     bottom: 0;
     width: 360px;
-    padding: 5px 5px 5px 5px;
+    /*padding: 5px 5px 5px 5px;*/
     margin: 0px;
 }
 
@@ -539,6 +565,52 @@ pill.location {
     a { color: white; }
 }
 
+attribute {
+    display: block;
+    font-size:60px;
+    margin-bottom: 5px;
+    background: rgba(25, 25, 25, 0.15);
+    background-image: -moz-linear-gradient(90deg, @pill-color-start, @pill-color-end);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(@pill-color-start), to(@pill-color-end));
+    border-radius: @pill-radius;
+    box-shadow: 0 0.15em 0.17em rgba(0, 0, 0, 0.5);
+    width: 100%;
+    min-height:200px;
+    line-height: 60px;
+    /*position: relative;*/   
+}
+attribute a {
+    color: black;
+    text-shadow: 0 -5px rgba(255, 255, 255, 0.6);
+}
+attribute a:hover { text-decoration: none; }
+
+attribute > a.keypart {
+    /*width: 100%;*/
+    display: block;
+    color: black;
+    text-shadow: 0 1px rgba(255, 255, 255, .7);
+    padding: 10px 0px 5px 0px;
+    background-color: gray;
+}
+
+attribute > div.valpart {
+    display: block;
+    width: 20%;
+    /*float:left;*/
+    /*color: black;*/
+    /*text-shadow: 0 0.08em 0.1em rgba(220, 220, 220, 0.65);*/
+    /*border-left: 1px solid rgba(50, 50, 50, 0.3);*/
+
+    background-color: red;
+}
+attribute > div.valpart > a {
+    color: black;
+    text-shadow: 0 0.08em 0.1em rgba(220, 220, 220, 0.65);
+    border-left: 1px solid rgba(50, 50, 50, 0.3);
+}
+
+
 pill {
     display: table;
     text-align: left;
@@ -565,7 +637,6 @@ pill {
         &:hover {
             text-decoration: none;
             background: rgba(25, 25, 25, 0.15);
-/*             color: #353535; */
             color: black;
             text-shadow: 0 0.08em 0.1em rgba(220, 220, 220, 0.45);
         }
@@ -579,11 +650,6 @@ pill {
         }
         &.pressed:hover {
             background: rgba(00, 80, 163, 0.85);
-        }
-        
-        span.count {
-/*             position: absolute; */
-/*             right: 0px; */
         }
     }
     div.valpart {

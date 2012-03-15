@@ -15,32 +15,53 @@ require.config({
     modal: 'libs/bootstrap/bootstrap-modal',
     twipsy: 'libs/bootstrap/bootstrap-twipsy',
     popover: 'libs/bootstrap/bootstrap-popover',
-    
-  }
-
+  },
+  urlArgs: "bust=" +  (new Date()).getTime(),
 });
 
 require([
-    'views/app',
-    'views/welcome',
-    'views/manager',
+    'underscore',
+    // 'views/desktopFrame',
+    // 'views/mobileFrame',
+    // 'views/welcome',
+    // 'views/manager',
     'router',
     'backbone',
-], function(AppView, WelcomeView, ManagerView, Router, Backbone){
-    var app_view = new AppView;
-    app_view.render();
+], function(_, Router, Backbone){
+    console.log('------');
+    require.E = {};
+
+    $.getJSON('/config', function(config){
+        console.log(config);
+
+        require.E.satellite = {};
+        require.E.satellite.url = config.discov_url;
+        require.E.agent = {};
+        require.E.agent.id = config.agentid;
+        require.E.agent.baseurl = config.ego_url_prefix;
+        require.E.agent.url = config.ego_url_prefix+"/"+config.agentid;
+        require.E.agent.url = config.ego_url_prefix+"/"+config.agentid;
+        require.E.website_url = config.website_url_prefix;
+        require.E.context = {context:"all"};
+        require.E.device = config.device;
+
+        var app_router = new Router;
+        Backbone.history.start();
+    });
+
+
+
+    // var frame_view = new DesktopAppView;
+    // frame_view.render();
     
-    var page_view;
 
-    if (E.agent.id) {
-        console.log("going manager");
-        page_view = new ManagerView;
-    } else {
-        console.log("going index");
-        page_view = new WelcomeView;
-    }
-    page_view.render();
+    // var page_view;
 
-    var app_router = new Router;
-    Backbone.history.start();
+    // if (E.agent.id) {
+    //     console.log("going manager");
+    //     page_view = new ManagerView;
+    // } else {
+    //     console.log("going index");
+    //     page_view = new WelcomeView;
+    // }
 });

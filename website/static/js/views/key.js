@@ -1,16 +1,16 @@
 define([
-  'jquery', 
-  'underscore', 
-  'backbone',
-  'text!templates/key.html'
-  ], function($, _, Backbone, keysTemplate){
-  var KeyView = Backbone.View.extend({
+    'jquery', 
+    'underscore', 
+    'backbone',
+    'text!templates/key.html',
+], function($, _, Backbone, keyTemplate){
+    var KeyView = Backbone.View.extend({
 
     //... is a list tag.
-    tagName:  "div",
+    // el:  $("#m-choices")[0],
 
     // Cache the template function for a single item.
-    template: _.template(keysTemplate),
+    template: _.template(keyTemplate),
 
     // The DOM events specific to an item.
     events: {
@@ -21,21 +21,20 @@ define([
     // a one-to-one correspondence between a **Todo** and a **TodoView** in this
     // app, we set a direct reference on the model for convenience.
     initialize: function() {
-      _.bindAll(this, 'render', 'close', 'remove', 'toggleSelected');
+      _.bindAll(this, 'render', 'close', 'toggleSelected');
       this.model.bind('change', this.render);
-      this.model.bind('destroy', this.remove);
+      // this.model.bind('destroy', this.remove);
       this.model.view = this;
     },
 
     render: function() {
-        // console.log("key view render: I will render the pill");
-        valpart = this.$('div.valpart').children();
-
         html = this.template(this.model.toJSON());
         $(this.el).html(html);
 
-        this.valplaceholder = this.$('div.valpart');
-        this.valplaceholder.append(valpart);
+        // valpart = this.$('div.valpart').children();
+        // this.valplaceholder = this.$('div.valpart');
+        // this.valplaceholder.append(valpart);
+
         return this;
     },
 
@@ -64,6 +63,6 @@ define([
       this.model.clear();
     }
 
-  });
-  return KeyView;
+    });
+    return KeyView;
 });

@@ -16,22 +16,37 @@ from email.mime.text import MIMEText
 
 
 
-class Config:
+
+
+class Config():
     discov_url = ''
     ego_url_prefix = ''
     website_url_prefix = ''
     agentid = ''
     agent_url_private = ''
     agent_url = ''
-    
-class website_call(tornado.web.RequestHandler):
+
+class config_handler(tornado.web.RequestHandler):
     def get(self):
-        self.render("index.html", config=config)
-        #self.render("%s.html" % self.path, config=config)
+        options = dict(
+            discov_url=config.discov_url,
+            ego_url_prefix=config.ego_url_prefix,
+            website_url_prefix=config.website_url_prefix,
+            agentid=config.agentid,
+            agent_url_private=config.agent_url_private,
+            agent_url=config.agent_url,
+            device='mobile',
+        )
+        self.write(options)
+    
+# class website_call(tornado.web.RequestHandler):
+#     def get(self):
+#         self.render("index.html", config=config)
+#         #self.render("%s.html" % self.path, config=config)
         
-    def prepare(self):
-        path = self.request.path.split('/')
-        self.path = path[1] or 'index'
+#     def prepare(self):
+#         path = self.request.path.split('/')
+#         self.path = path[1] or 'index'
         
         
 class serve_user(tornado.web.RequestHandler):
@@ -108,7 +123,7 @@ class serve_user(tornado.web.RequestHandler):
         else:
             config.agent_url_private = "<not available>"
         
-        self.render("index.html", config=config)
+        self.render("m-index.html", config=config)
 
 
 class message(tornado.web.RequestHandler):
@@ -167,6 +182,7 @@ settings = {
 }
 
 application = tornado.web.Application([
+    (r"/config", config_handler),
     (r"/", serve_user),
     #(r"/api", website_call),
     #(r"/about", website_call),
@@ -182,27 +198,21 @@ if __name__ == "__main__":
     config = Config()
     
     parser = OptionParser(add_help_option=False)
-    parser.add_option("-h", "--host", dest="host", default='localhost')
+    parser.add_option("-h", "--host", dest="host", default='0.0.0.0')
     parser.add_option("-p", "--port", dest="port", default='8889')
     
-    parser.add_option("-w", "--websiteurl", dest="website_url")
-    parser.add_option("-d", "--discovurl", dest="discov_url")
-    parser.add_option("-a", "--agentsurl", dest="agents_url")
+    parser.add_option("-w", "--websiteurl", dest="website_url", default='localhost')
+    parser.add_option("-d", "--discovurl", dest="discov_url", default='localhost')
+    parser.add_option("-a", "--agentsurl", dest="agents_url", default='localhost')
     (options, args) = parser.parse_args()
     
     PORT = int(options.port)
     HOST = options.host
     
     website_url = 'http://%s:%s' % (HOST, PORT)
-    discov_url = 'http://%s:22222' % HOST
-    agents_url = 'http://%s:10007' % HOST
+    discov_url = 'http://%s:22222' % options.discov_url
+    agents_url = 'http://%s:10007' % options.agents_url
     
-    if (options.website_url):
-        website_url = 'http://%s' % options.website_url
-    if (options.discov_url):
-        discov_url = 'http://%s' % options.discov_url
-    if (options.agents_url):
-        agents_url = 'http://%s' % options.agents_url
         
     config.website_url_prefix = website_url
     config.discov_url = discov_url

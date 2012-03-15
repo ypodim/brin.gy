@@ -56,16 +56,15 @@
 }
 
 #container {
-    position: absolute;
-    left: 0;
-    top: 66px;
-    bottom: 0;
+    /*position: absolute;*/
+    /*left: 0;*/
+    /*top: 66px;*/
+    /*bottom: 0;*/
     
     margin: 0px auto;
     width:100%;
     background-color: rgba(0,0,0,0.05);
     text-shadow: rgba(255, 255, 255, 0.45) 0px 1px 0px;
-    padding:0;
 }
 
 #delete_btn, #tourBtn, #cart-btn, #pseudonym { display:none; }

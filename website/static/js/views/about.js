@@ -18,5 +18,5 @@ define([
         this.el.html( compiled_template() );        
     },
   });
-  return new aboutView;
+  return aboutView;
 });

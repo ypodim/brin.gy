@@ -1,31 +1,32 @@
 
 define([
-  'jquery',
-  'underscore', 
-  'backbone',
+    'jquery',
+    'underscore', 
+    'backbone',
 
-  'alerts',
-  'modal',
-  'order!twipsy',
-  'order!popover',
-  
-  'common/ego_website',
-  'common/setup_modals',
-  'common/attr_manager',
+    'alerts',
+    'modal',
+    'order!twipsy',
+    'order!popover',
 
-  'text!templates/manage.html',
+    'common/ego_website',
+    'common/setup_modals',
+    'common/attr_manager',
 
-  'views/key',
-  'views/value',
-  
-  'collections/keys',
-  'collections/values',
-  ], function($, _, Backbone, 
-      alerts, modal, popover, twipsy, 
-      common, modals, attr_manager, 
-      manageViewTemplate, 
-      keyView, valueView,
-      Keys, Values){
+    'text!templates/mobileManage.html',
+
+    'views/keyCollection',
+    // 'views/value',
+
+    'collections/keys',
+    'collections/values',
+    ], function(
+        $, _, Backbone, 
+        alerts, modal, popover, twipsy, 
+        common, modals, attr_manager, 
+        manageViewTemplate, 
+        KeysView,
+        Keys, Values){
   var managerView = Backbone.View.extend({
     el: $("#container"),
     events: {
@@ -58,7 +59,7 @@ define([
             valpart = $("<div class='valpart'></div>").append(editor);
             
             pill = $("<pill></pill>").append(keypart).append(valpart);
-            $("#choices").children("div:first-child").prepend(pill);
+            $("#m-choices").children("div:first-child").prepend(pill);
             editor.children("input").focus();
         }
         return false;
@@ -152,7 +153,7 @@ define([
     addOneKey: function(key) {
         var view = new keyView({model: key});
         html = view.render().el;
-        this.$("#choices").append(html);
+        this.$("#m-choices").append(html);
         // console.log("add KEY model", this.$("#choices"), html, key.view);
     },
 
@@ -175,17 +176,16 @@ define([
         Values.each(this.addOneValue);
     },
 
-
+    keysView: null,
     initialize: function() {
-        _.bindAll(this, 'addOneKey', 'addOneValue', 'addAllValues', 'render');
+        _.bindAll(this, 'addAllValues', 'render');
 
-        Keys.bind('add',     this.addOneKey);
+        // Values.bind('add',     this.addOneValue);
+        // Values.bind('reset',   this.addAllValues);
 
-        Values.bind('add',     this.addOneValue);
-        Values.bind('reset',   this.addAllValues);
-        // Values.bind('all',     this.render);
 
-        that = this;
+
+        var that = this;
         url = require.E.satellite.url+"/profile/"+require.E.context.context+"/keyvals";
         $.getJSON(url, function(json){
             console.log("got items", json.items.length)
@@ -223,15 +223,17 @@ define([
                 }
             }
             console.log("data received in collection");
+            keysView = new KeysView({collection:Keys});
+
+            var compiled_template = _.template( manageViewTemplate );
+            that.el.html( compiled_template() );
+
+            $('#m-choices').html( $(keysView.el).children() );
         });
         
         // Values.initialize();
-
-
-
         // attr_manager.initialize();
 
-        
         // clb = attr_manager.populate_attrs;
         // attr_manager.fetch_initial_info(clb);
         
@@ -262,9 +264,7 @@ define([
     },
     
     render: function(){
-        var compiled_template = _.template( manageViewTemplate );
-        this.el.html( compiled_template() );
-        console.log("manager view rendered");
+        // console.log("manager view rendered");
     },
   });
   return managerView;
