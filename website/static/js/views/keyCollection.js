@@ -27,6 +27,8 @@ keyView, valueView,
 Keys, Values){
 
 var managerView = Backbone.View.extend({
+    // el: $('#m-choices'),
+
     initialize : function(options) {
         // bind the functions 'add' and 'remove' to the view.
         _.bindAll(this, 'render', 'add');
@@ -41,16 +43,26 @@ var managerView = Backbone.View.extend({
         this.collection.bind('add', this.add);
     },
 
-    add : function(model) {
-        // We create an updating donut view for each donut that is added.
-        var kv = new keyView({
-          tagName : 'attribute',
+    addValue : function(model) {
+        var vv = new valueView({
+          tagName : 'div',
           model : model,
         });
 
-        // And add it to the collection so that it's easy to reuse.
         this._keyViews.push(kv);
+        $(this.el).append(kv.render().el);
+    },
 
+    add : function(model) {
+        console.log('a', this.el)
+        var that = this;
+        var kv = new keyView({
+          // tagName : 'attribute',
+          // el: $(that.el),
+          model : model,
+        });
+
+        this._keyViews.push(kv);
         $(this.el).append(kv.render().el);
     },
 

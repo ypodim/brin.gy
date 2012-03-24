@@ -8,6 +8,17 @@ define([
 
     // Reference to this collection's model.
     model: Value,
+    initialize: function() {
+        this.bind('add', this.added);
+    },
+
+    added: function(obj) {
+        // console.log('added', obj);
+    },
+
+    byKey: function(key) {
+      return this.filter(function(value){ return (value.get('key') == key); });
+    },
 
     haveit: function() {
         return this.filter(function(value){ return value.get('haveit'); });
@@ -26,7 +37,16 @@ define([
     // Values are sorted by their original insertion order.
     comparator: function(value) {
         return value.get('order');
-    }
+    },
+
+    byCnt: function(descending) {
+        if (descending==undefined)
+            descending = -1;
+
+        return this.sortBy(function(model){
+            return descending * model.get('cnt');
+        });
+    },
 
   });
   return new ValuesCollection;

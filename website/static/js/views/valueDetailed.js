@@ -2,38 +2,44 @@ define([
   'jquery', 
   'underscore', 
   'backbone',
-  'text!templates/value.html'
+  'text!templates/valueDetailed.html'
   ], function($, _, Backbone, valuesTemplate){
   var ValueView = Backbone.View.extend({
 
-    //... is a list tag.
-    // tagName:  "div",
-    // el: $(".valpart"),
-
-    // Cache the template function for a single item.
+    className: 'valcontainer',
     template: _.template(valuesTemplate),
 
-    // The DOM events specific to an item.
     events: {
-      "click .add_btn"            : "toggle",
-      "click a"                   : "select",
+      "click .add_btn"     : "toggle",
+      "click a"            : "select",
+      'click #searchBtn'   : 'searchBtn',
+      'click #addBtn'      : 'addBtn',
     },
 
-    // The TodoView listens for changes to its model, re-rendering. Since there's
-    // a one-to-one correspondence between a **Todo** and a **TodoView** in this
-    // app, we set a direct reference on the model for convenience.
-    initialize: function() {
-      _.bindAll(this, 'render', 'close', 'remove');
+    initialize: function(options) {
+      _.bindAll(this, 'render', 'close', 'remove', 'searchBtn', 'addBtn');
       this.model.bind('change', this.render);
       this.model.bind('destroy', this.remove);
+      this.state = options.state;
     },
 
     render: function() {
-      $(this.el).append(this.template(this.model.toJSON()));
-      return this;
+        $(this.el).append(this.template(this.model.toJSON()));
+        return this;
     },
 
-    // Toggle the `"done"` state of the model.
+    searchBtn: function(e) {
+        var added = $(e.target).toggleClass('btn-primary').hasClass('btn-primary');
+        this.state.trigger('change', {btn:'search', added:added});
+        e.stopPropagation();
+    },
+
+    addBtn: function(e) {
+        var added = $(e.target).toggleClass('btn-success').hasClass('btn-success');
+        this.state.trigger('change', {btn:'me', added:added});
+        e.stopPropagation();
+    },
+
     toggleDone: function() {
       this.model.toggle();
     },

@@ -4,31 +4,41 @@ define([
     'underscore', 
     'backbone',
 
+    'order!button',
     'alerts',
     'modal',
     'order!twipsy',
     'order!popover',
 
-    'common/ego_website',
-    'common/setup_modals',
-    'common/attr_manager',
+    // 'common/ego_website',
+    // 'common/setup_modals',
+    // 'common/attr_manager',
 
     'text!templates/mobileManage.html',
 
-    'views/keyCollection',
-    // 'views/value',
+    // 'views/keyCollection',
+    'views/key',
+    'views/value',
+    'views/valueDetailed',
 
     'collections/keys',
     'collections/values',
     ], function(
         $, _, Backbone, 
-        alerts, modal, popover, twipsy, 
-        common, modals, attr_manager, 
+        button, alerts, modal, popover, twipsy, 
+        // common, modals, attr_manager, 
         manageViewTemplate, 
-        KeysView,
+        // KeysView,
+        keyView, valueView, valueDetailedView,
         Keys, Values){
   var managerView = Backbone.View.extend({
     el: $("#container"),
+    template: _.template(manageViewTemplate),
+    state: {
+        all:0,
+        me:0,
+        search:0,
+    },
     events: {
         "click #clear-filters-btn": "clearFilters",
         "click nav > a": "navFilter",
@@ -36,8 +46,16 @@ define([
         "keyup #searchinput": "searchAttributes",
         "click div.controls > button": "newAttributeModal",
         "click .cancel-btn": "cancelBtn",
+        'click attribute': 'attrClick',
         "submit #searchbox": "submitNewAttribute", 
+
+        'click #resultsBtn': 'showResults',
     },
+
+    showResults: function() {
+        console.log('results');
+    },
+
     submitNewAttribute: function(){
         return false;
         
@@ -176,14 +194,33 @@ define([
         Values.each(this.addOneValue);
     },
 
-    keysView: null,
+    attrClick: function(obj) {
+        // console.log( $(this) );
+    },
+
+    badgeChange: function(evt) {
+        console.log('badge now', evt);
+        diff = (evt.added) ? 1 : -1;
+        this.state[evt.btn] += diff;
+
+        if (this.state[evt.btn] > 0)
+            this.$('#'+evt.btn+'Badge').show();
+        else
+            this.$('#'+evt.btn+'Badge').hide();
+
+        this.$('#'+evt.btn+'Badge').html(this.state[evt.btn]);
+    },
+
     initialize: function() {
-        _.bindAll(this, 'addAllValues', 'render');
+        _.bindAll(this, 'addAllValues', 'render', 'badgeChange');
 
         // Values.bind('add',     this.addOneValue);
         // Values.bind('reset',   this.addAllValues);
 
+        _.extend(this.state, Backbone.Events);
+        this.state.bind('change', this.badgeChange);
 
+        $(this.el).append(this.template());
 
         var that = this;
         url = require.E.satellite.url+"/profile/"+require.E.context.context+"/keyvals";
@@ -195,7 +232,7 @@ define([
 
                 Keys.add({
                     key:attribute,
-                    cnt:score, 
+                    cnt:parseInt(score), 
                     selected:false,
                     display:true, 
                     matches:{},
@@ -213,7 +250,7 @@ define([
                     Values.add([{
                         key:attribute,
                         val:val,
-                        cnt:cnt, 
+                        cnt:parseInt(cnt), 
                         selected:false,
                         display:true,
                         haveit:haveit, 
@@ -223,27 +260,49 @@ define([
                 }
             }
             console.log("data received in collection");
-            keysView = new KeysView({collection:Keys});
 
-            var compiled_template = _.template( manageViewTemplate );
-            that.el.html( compiled_template() );
+            var sortedValues = Values.byCnt();
 
-            $('#m-choices').html( $(keysView.el).children() );
+            _.each(Keys.byCnt(1), function(kmodel){
+                var kv = new keyView({
+                    model : kmodel,
+                    // el: $('#m-choices:last')[0],
+                });
+
+                var attribute = $(kv.render().el);
+                
+                var keystr = kmodel.get('key');
+
+                var valuesforkey = Values.byKey(keystr);
+                var sortedValues = _.sortBy(valuesforkey, function(model){
+                    return -model.get('cnt');
+                });
+                var limitedValues = _.first(sortedValues, 6);
+                kv.values = sortedValues;
+                
+                _.each(limitedValues, function(vmodel){
+                    var vv = new valueView({
+                        model : vmodel,
+                        el : kv.$('.valpart'),
+                    });
+                    vv.render();
+                });
+
+
+                // _.each(sortedValues, function(vmodel){
+                //     var vvdetailed = new valueDetailedView({
+                //         model : vmodel,
+                //         state : that.state,
+                //     });
+                //     kv.$('.valpartdetailed').append(vvdetailed.render().el);
+                // });
+
+
+                // this._keyViews.push(kv);
+                this.$('#m-choices').prepend(attribute);
+            })
         });
         
-        // Values.initialize();
-        // attr_manager.initialize();
-
-        // clb = attr_manager.populate_attrs;
-        // attr_manager.fetch_initial_info(clb);
-        
-        // console.log("SECRET", "{{config.secret}}", "{{config.secret}}");
-        // if ("{{config.secret}}".length)
-        //     common.cookies.set_cookie("{{config.agentid}}", "{{config.secret}}");
-        // else
-        //     attr_manager.get_val_input_boxes().hide();
-        
-        // setInterval(attr_manager.poll_matches, 2000); 
         
         $("#context-title").html("# "+require.E.context.context);
         $("#pseudonym").show();
@@ -256,7 +315,7 @@ define([
         
         $("#tourBtn").show();
 
-        modals.initialize();
+        // modals.initialize();
         
         $("#start-btn").hide();
         $("#account-btn").show();

@@ -2,27 +2,26 @@ define([
     'jquery', 
     'underscore', 
     'backbone',
+    'scroll',
+
+    'views/valueDetailed',
     'text!templates/key.html',
-], function($, _, Backbone, keyTemplate){
+], function($, _, Backbone, scroll, valueDetailedView, keyTemplate){
     var KeyView = Backbone.View.extend({
 
-    //... is a list tag.
-    // el:  $("#m-choices")[0],
-
-    // Cache the template function for a single item.
+    tagName: 'attribute',
     template: _.template(keyTemplate),
+    detailViewRendered: false,
 
-    // The DOM events specific to an item.
     events: {
-      "click a"                   : "toggleSelected",
+        "click a.keypart" : "toggleSelected",
+        'click attribute': 'clicked',
     },
 
-    // The TodoView listens for changes to its model, re-rendering. Since there's
-    // a one-to-one correspondence between a **Todo** and a **TodoView** in this
-    // app, we set a direct reference on the model for convenience.
     initialize: function() {
       _.bindAll(this, 'render', 'close', 'toggleSelected');
       this.model.bind('change', this.render);
+
       // this.model.bind('destroy', this.remove);
       this.model.view = this;
     },
@@ -30,16 +29,37 @@ define([
     render: function() {
         html = this.template(this.model.toJSON());
         $(this.el).html(html);
-
-        // valpart = this.$('div.valpart').children();
-        // this.valplaceholder = this.$('div.valpart');
-        // this.valplaceholder.append(valpart);
-
         return this;
     },
 
+    clicked: function() {
+        if (! this.detailViewRendered) {
+            _.each(this.values, function(vmodel){
+                var vvdetailed = new valueDetailedView({
+                    model : vmodel,
+                    // state : that.state,
+                });
+                this.$('.valpartdetailed').append(vvdetailed.render().el);
+            });
+            this.detailViewRendered = true;
+        }
+
+
+        var detailedIsHidden = this.$('.valpart').toggle().is(':visible');
+        if (detailedIsHidden) {
+            this.$('.valpartdetailed').hide();
+            // $('.controls').slideUp();
+            $(this.el).scrollIntoView();
+        } else {
+            this.$('.valpartdetailed').slideDown();
+            // $('.controls').slideDown();
+        }
+        return false;
+    },
+
     toggleSelected: function() {
-      this.model.toggleSelected();
+        // console.log('toggleSelected', this.model.attributes.key);
+        // this.model.toggleSelected();
     },
 
     // Switch this view into `"editing"` mode, displaying the input field.

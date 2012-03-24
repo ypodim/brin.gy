@@ -30,8 +30,16 @@ define([
     // Values are sorted by their original insertion order.
     comparator: function(value) {
         return value.get('order');
-    }
+    },
 
+    byCnt: function(descending) {
+        if (descending==undefined)
+            descending = -1;
+
+        return this.sortBy(function(model){
+            return descending * model.get('cnt');
+        });
+    },
   });
   return new KeysCollection;
 });

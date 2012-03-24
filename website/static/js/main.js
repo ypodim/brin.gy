@@ -11,10 +11,13 @@ require.config({
     text: 'libs/require/text',
     order: 'libs/require/order',
 
+    scroll: 'libs/scroller/jquery.scrollIntoView',
+
     alerts: 'libs/bootstrap/bootstrap-alerts',
     modal: 'libs/bootstrap/bootstrap-modal',
     twipsy: 'libs/bootstrap/bootstrap-twipsy',
     popover: 'libs/bootstrap/bootstrap-popover',
+    button: 'libs/bootstrap/bootstrap-button',
   },
   urlArgs: "bust=" +  (new Date()).getTime(),
 });

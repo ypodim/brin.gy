@@ -27,13 +27,11 @@ define([
     clientType: 'desktop',
     setClientType: function(t) {
         this.clientType = t;
-        console.log('clientType', this.clientType);
-        console.log('fragment', Backbone.history.fragment);
-        
-        console.log(DesktopAppView);
-        console.log(ManagerView);
-        console.log(aboutView);
-        console.log('device', require.E.device);
+        // console.log('clientType', this.clientType);
+        // console.log(DesktopAppView);
+        // console.log(ManagerView);
+        // console.log(aboutView);
+        // console.log('device', require.E.device);
 
         var frame_view = new DesktopAppView;
         frame_view.render();
