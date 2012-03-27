@@ -16,44 +16,34 @@ define([
 
     'text!templates/mobileManage.html',
 
-    // 'views/keyCollection',
     'views/key',
     'views/value',
     'views/valueDetailed',
 
     'collections/keys',
     'collections/values',
+    
+    'models/key',
+    'models/value',
+    'models/attribute',
     ], function(
         $, _, Backbone, 
         button, alerts, modal, popover, twipsy, 
         // common, modals, attr_manager, 
         manageViewTemplate, 
-        // KeysView,
+
         keyView, valueView, valueDetailedView,
-        Keys, Values){
+        Keys, Values,
+        kModel, vModel, attrModel){
   var managerView = Backbone.View.extend({
     el: $("#container"),
     template: _.template(manageViewTemplate),
-    state: {
-        all:0,
-        me:0,
-        search:0,
-    },
     events: {
-        "click #clear-filters-btn": "clearFilters",
-        "click nav > a": "navFilter",
-        "search #searchinput": "searchAttributes",
-        "keyup #searchinput": "searchAttributes",
+        // "search #searchinput": "searchAttributes",
+        // "keyup #searchinput": "searchAttributes",
         "click div.controls > button": "newAttributeModal",
-        "click .cancel-btn": "cancelBtn",
-        'click attribute': 'attrClick',
-        "submit #searchbox": "submitNewAttribute", 
-
-        'click #resultsBtn': 'showResults',
-    },
-
-    showResults: function() {
-        console.log('results');
+        // "click .cancel-btn": "cancelBtn",
+        // "submit #searchbox": "submitNewAttribute", 
     },
 
     submitNewAttribute: function(){
@@ -82,9 +72,7 @@ define([
         }
         return false;
     },
-    cancelBtn: function(){ 
-        $(this).parent().parent().modal("hide");
-    },
+
     newAttributeModal: function() { 
         // $("#new-key-modal").modal("show");
         cnt = Math.floor(Math.random()*11);
@@ -151,22 +139,6 @@ define([
     
         attr_manager.populate_attrs();
     },
-    navFilter: function (){
-        $("nav > a").removeClass("selected");
-        $(this).addClass("selected");
-        if ($(this).html() == "all") attr_manager.nav_search();
-        if ($(this).html() == "unseen") attr_manager.nav_new();
-        if ($(this).html() == "me") attr_manager.nav_me();
-        return false;
-    },
-    clearFilters: function(){
-        $(".filter-item").each(function(){
-            $(this).children("a.closebtn").click();
-        });
-        return false;
-    },
-
-
 
     addOneKey: function(key) {
         var view = new keyView({model: key});
@@ -185,8 +157,6 @@ define([
         html = view.render().el;
         // console.log(valplaceholder, html, value.get('val'));
         valplaceholder.append( html );
-
-
     },
 
     // Add all items in the **Todos** collection at once.
@@ -194,132 +164,54 @@ define([
         Values.each(this.addOneValue);
     },
 
-    attrClick: function(obj) {
-        // console.log( $(this) );
+    _keysInserted: {},
+    _keyViews: {},
+
+    addOneAttribute: function(model) {
+        var key = model.get('key');
+        var val = model.get('val');
+        var kcnt = model.get('kcnt');
+        var vcnt = model.get('vcnt');
+        var haveit = model.get('haveit');
+        var newval = model.get('newval');
+
+        if (!(key in this._keysInserted)) {
+            this._keysInserted[key] = {};
+            // console.log('inserted', key);
+
+            kmodel = new kModel({
+                key:key,
+                cnt:kcnt,
+            });
+            var kv = new keyView({
+                model : kmodel,
+            });
+            this.$('#m-choices').append($(kv.render().el));
+
+            this._keyViews[key] = kv;
+        }
+
+        // vmodel = new vModel({
+        //     key:key,
+        //     val:val,
+        //     cnt:vcnt,
+        // });
+        var vvdetailed = new valueDetailedView({
+            model : model,
+            // state : this.state,
+        });
+        this._keyViews[key].$('.valpartdetailed').append(vvdetailed.render().el);
     },
 
-    badgeChange: function(evt) {
-        console.log('badge now', evt);
-        diff = (evt.added) ? 1 : -1;
-        this.state[evt.btn] += diff;
 
-        if (this.state[evt.btn] > 0)
-            this.$('#'+evt.btn+'Badge').show();
-        else
-            this.$('#'+evt.btn+'Badge').hide();
-
-        this.$('#'+evt.btn+'Badge').html(this.state[evt.btn]);
-    },
-
-    initialize: function() {
-        _.bindAll(this, 'addAllValues', 'render', 'badgeChange');
-
-        // Values.bind('add',     this.addOneValue);
-        // Values.bind('reset',   this.addAllValues);
-
-        _.extend(this.state, Backbone.Events);
-        this.state.bind('change', this.badgeChange);
+    initialize: function(options) {
+        _.bindAll(this, 'addOneAttribute', 'render');
+        
+        // this.attrCollection = new Attributes();
+        options.attrCollection.bind('add', this.addOneAttribute);
+        this.state = options.state;
 
         $(this.el).append(this.template());
-
-        var that = this;
-        url = require.E.satellite.url+"/profile/"+require.E.context.context+"/keyvals";
-        $.getJSON(url, function(json){
-            console.log("got items", json.items.length)
-            for (i in json.items) {
-                attribute = json.items[i].key;
-                score = json.items[i].score;
-
-                Keys.add({
-                    key:attribute,
-                    cnt:parseInt(score), 
-                    selected:false,
-                    display:true, 
-                    matches:{},
-                    // values: values,
-                });
-
-                values = {};
-                // attr_manager.add_sdata("profile", attribute, 0);
-                for (j in json.items[i].values) {
-                    val = json.items[i].values[j].val;
-                    cnt = json.items[i].values[j].score;
-                    haveit = (json.items[i].values[j].userhasit==1);
-                    newval = true;
-    
-                    Values.add([{
-                        key:attribute,
-                        val:val,
-                        cnt:parseInt(cnt), 
-                        selected:false,
-                        display:true,
-                        haveit:haveit, 
-                        matches:{},
-                        new:newval,
-                    }]);
-                }
-            }
-            console.log("data received in collection");
-
-            var sortedValues = Values.byCnt();
-
-            _.each(Keys.byCnt(1), function(kmodel){
-                var kv = new keyView({
-                    model : kmodel,
-                    // el: $('#m-choices:last')[0],
-                });
-
-                var attribute = $(kv.render().el);
-                
-                var keystr = kmodel.get('key');
-
-                var valuesforkey = Values.byKey(keystr);
-                var sortedValues = _.sortBy(valuesforkey, function(model){
-                    return -model.get('cnt');
-                });
-                var limitedValues = _.first(sortedValues, 6);
-                kv.values = sortedValues;
-                
-                _.each(limitedValues, function(vmodel){
-                    var vv = new valueView({
-                        model : vmodel,
-                        el : kv.$('.valpart'),
-                    });
-                    vv.render();
-                });
-
-
-                // _.each(sortedValues, function(vmodel){
-                //     var vvdetailed = new valueDetailedView({
-                //         model : vmodel,
-                //         state : that.state,
-                //     });
-                //     kv.$('.valpartdetailed').append(vvdetailed.render().el);
-                // });
-
-
-                // this._keyViews.push(kv);
-                this.$('#m-choices').prepend(attribute);
-            })
-        });
-        
-        
-        $("#context-title").html("# "+require.E.context.context);
-        $("#pseudonym").show();
-        
-        // common.mapman.initialize();
-        
-        attr_manager.tabindex = 2;
-        $("#searchinput").attr("tabindex", 1).focus();
-        
-        
-        $("#tourBtn").show();
-
-        // modals.initialize();
-        
-        $("#start-btn").hide();
-        $("#account-btn").show();
-        $("#context-btn").show();
     },
     
     render: function(){

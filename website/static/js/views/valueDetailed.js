@@ -10,17 +10,16 @@ define([
     template: _.template(valuesTemplate),
 
     events: {
-      "click .add_btn"     : "toggle",
       "click a"            : "select",
-      'click #searchBtn'   : 'searchBtn',
+      'click #searchBtn'   : 'filterBtn',
       'click #addBtn'      : 'addBtn',
     },
 
     initialize: function(options) {
-      _.bindAll(this, 'render', 'close', 'remove', 'searchBtn', 'addBtn');
-      this.model.bind('change', this.render);
+      _.bindAll(this, 'render', 'close', 'filterBtn', 'addBtn');
+      // this.model.bind('change', this.render);
       this.model.bind('destroy', this.remove);
-      this.state = options.state;
+      // this.state = options.state;
     },
 
     render: function() {
@@ -28,20 +27,20 @@ define([
         return this;
     },
 
-    searchBtn: function(e) {
+    filterBtn: function(e) {
         var added = $(e.target).toggleClass('btn-primary').hasClass('btn-primary');
-        this.state.trigger('change', {btn:'search', added:added});
+        // var attr = {key:this.model.get('key'), val:this.model.get('val')};
+        // this.state.toggle(attr, 'filters', added);
+        this.model.set({selected: added});
         e.stopPropagation();
     },
 
     addBtn: function(e) {
         var added = $(e.target).toggleClass('btn-success').hasClass('btn-success');
-        this.state.trigger('change', {btn:'me', added:added});
+        // var attr = {key:this.model.get('key'), val:this.model.get('val')};
+        // this.state.toggle(attr, 'myattrs', added);
+        this.model.set({haveit: added});
         e.stopPropagation();
-    },
-
-    toggleDone: function() {
-      this.model.toggle();
     },
 
     // Switch this view into `"editing"` mode, displaying the input field.
@@ -59,11 +58,6 @@ define([
       // console.log("select", this.model);
     },
 
-    toggle: function() {
-      console.log("toggle", this.model);
-    },
-
-    // If you hit `enter`, we're through editing the item.
     updateOnEnter: function(e) {
       if (e.keyCode == 13) this.close();
     },

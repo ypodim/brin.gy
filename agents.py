@@ -184,7 +184,7 @@ class serve_capability(bringy_handler):
         
     def post(self):
         secret = self.get_argument('secret', None)
-        context = self.get_argument('context')
+        context = self.get_argument('context','all')
         passed = db.authenticate_user(self.username, secret)
         if passed:
             res = self.execute(context=context)

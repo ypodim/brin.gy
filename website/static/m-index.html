@@ -7,12 +7,13 @@
     <!-- <link rel="stylesheet"      type="text/css" href="/static/css/reset.css"> -->
     <link rel="stylesheet"      type="text/css" href="/static/css/bootstrap-responsive.min.css">
     <link rel="stylesheet"      type="text/css" href="/static/css/bootstrap.min.css">
-    <link rel="stylesheet/less" type="text/css" href="/static/css/m-website.less">
+    <link rel="stylesheet" type="text/css" href="/static/css/m-website.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/loading.css">
     <!-- <link rel="stylesheet/less" type="text/css" href="/static/css/tour.css"> -->
     <!-- <link rel="stylesheet/less" type="text/css" href="/static/css/user_account.css"> -->
-    <link rel="stylesheet/less" type="text/css" href="/static/css/m-header.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/m-header.css">
 
-    <script src="/static/js/libs/less/less-1.1.3.min.js"></script>
+    <!-- <script src="/static/js/libs/less/less-1.1.3.min.js"></script> --> 
     
     
     <script data-main="/static/js/main" src="/static/js/libs/require/require.js"></script>
@@ -30,184 +31,17 @@
 </head>
 <body>
 
+<div id="controls">
+</div>
+
+<div id='loader'>
+    <span>Brin.gy aligning human satellites...</span>
+    <div class="circle1"></div>
+    <div class="circle2"></div>
+</div>
+
 <div id="container"> 
 </div>
-
-
-<!-- <div id="right-panel" class="">            
-    <div id="results-container" class="">
-        <div id="filters">
-            <div id="clear-filters-btn" class="btn hidden" style="width">clear query</div>
-        </div>
-        <div id="results"></div>
-        <div id="cart-btn" class="btn success">
-            <img height=50 src='/static/images/website/cart.svg' alt="" />
-            <span class="description">add people to cart</span>
-        </div>
-    </div>
-    <div id="map_canvas" class=""></div>
-    <button id="match_btn" class="btn info">
-        <div id="matches" curpos="0">0</div>
-        <div id="matches_caption">people match</div>
-    </button>
-</div> -->
-
-
-<div id="modal-from-dom" class="modal hide fade">
-    <div class="modal-header">
-        <a href="#" class="close">&times;</a>
-        <h3>Current Location</h3>
-    </div>
-    <div class="modal-body">
-        <p>To find others near you, please choose to share your location above.</p>
-    </div>
-    <div class="modal-footer">
-        <a href="#" class="btn danger cancel-btn">Cancel</a>
-    </div>
-</div>
-
-
-<div id="delete-confirmation-modal" class="modal hide fade">
-    <div class="modal-header">
-        <a href="#" class="close">&times;</a>
-        <h3>What?! Are you sure?</h3>
-    </div>
-    <div class="modal-body">
-        <p>You understand that this is <b>not</b> Facebook,<br> if you delete this agent all associated data will <b>actually</b> be deleted ;)</p>
-    </div>
-    <div class="modal-footer">
-        <a href="#" class="btn danger" id="delete-delete-btn">Trash everything</a>
-        <a href="#" class="btn primary cancel-btn">Cancel</a>
-    </div>
-</div>
-
-
-<div id="get-location-modal" class="modal hide fade">
-    <div class="modal-header">
-        <a href="#" class="close">&times;</a>
-        <h3>Location</h3>
-    </div>
-    <div class="modal-body">
-        <p>Would you like to use your location to get more relevant results?</p>
-    </div>
-    <div class="modal-footer">
-        <a href="#" class="btn danger cancel-btn">No</a>
-        <a href="#" class="btn success" id="location-ok-btn">Yes</a>
-    </div>
-</div>
-
-
-<div id="admin-url-modal" class="modal hide fade">
-    <div class="modal-header">
-        <a href="#" class="close">&times;</a>
-        <h3>Admin URL</h3>
-    </div>
-    <div class="modal-body">
-        <p>Your admin URL allows you to edit your profile. You may want to bookmark this URL.</p>
-        <p>
-            Email it to me: 
-            <input placeholder="your@email.com" autofocus="autofocus" type="email" id="admin-url-email" class="span4" />
-            <a href="#" class="btn success disabled" id="admin-url-send-btn">Send</a>
-            <img id="spinning-icon" src="/static/images/website/spinning.gif" />
-        </p>
-    </div>
-    <div class="modal-footer">
-        <a href="#" class="btn primary cancel-btn">Close</a>
-    </div>
-</div>
-
-
-<div id="new-key-modal" class="modal hide fade">
-    <div class="modal-header">
-        <a href="#" class="close">&times;</a>
-        <h3>Add new attribute</h3>
-    </div>
-    <div class="modal-body">
-        <div id="title-placeholder">Your attribute</div>
-        <div id="key-placeholder">
-            <pill class="pill-override">
-                <a href="#" class="keypart-override">
-                    <span><input placeholder="eg. Name" type="text" tabindex="1000" class="add-key-input" /></span>
-                    <span class="count attr_counters">0</span>
-                </a>
-                <div class="valpart valpart-override">
-                    <div class="valcontainer">
-                        <a href="#" type="valpart" data-original-title="">
-                            <span class="count attr_counters">0</span>
-                            <span class="value"><input placeholder="eg. John" type="text" tabindex="1001" class="add-key-input" /></span>
-                        </a>
-                    </div>
-                    <div class="valcontainer">
-                        <a href="#" type="valpart" data-original-title="">
-                            <span class="count attr_counters">0</span>
-                            <span class="value"><input placeholder="eg. Nick" type="text" tabindex="1002" class="add-key-input" /></span>
-                        </a>
-                    </div>
-                    <div class="valcontainer">
-                        <a href="#" type="valpart" data-original-title="">
-                            <span class="count attr_counters">0</span>
-                            <span class="value"><input placeholder="eg. Mark" type="text" tabindex="1003" class="add-key-input" /></span>
-                        </a>
-                    </div>
-                </div>
-            </pill>
-        </div>
-        <div id="example">Example</div>
-    </div>
-    <div class="modal-footer">
-        <a href="#" class="btn success" id="new-key-btn">Add</a>
-        <a href="#" class="btn danger cancel-btn">Cancel</a>
-    </div>
-</div>
-
-
-<div id="new-context-modal" class="modal hide fade">
-    <div class="modal-header">
-        <a href="#" class="close">&times;</a>
-        <h3>Create new context</h3>
-    </div>
-    <div class="modal-body">
-        <form id="context-name-form"><input placeholder="Type context name..." id="context-name" autofocus="autofocus" required maxlength="20" type="text" class="span4" /></form>
-    </div>
-    <div class="modal-footer">
-        <button class="btn success" type="submit" form="context-name-form"  id="new-context-btn">Create</button>
-        <button class="btn danger cancel-btn">Cancel</button>
-    </div>
-</div>
-
-
-
-
-<div class='confirmation label'></div>
-
-
-<div id="context-dropdown" class="dropdown hidden">
-    <input type="search" id="context-input" results="10" placeholder="Search contexts..." />
-    <a href="#" class="btn danger">create new context</a>
-    <ul></ul>
-</div>
-
-
-<div id="user-dropdown" class="dropdown hidden">
-<ul>
-    <li>
-        <span class="title header-title">admin URL:</span>
-        <input class="urllabel" value="{{config.agent_url_private}}" /> 
-        <a id="whatisthis" href="#">email it to me</a>
-        <br>
-        <span class="title header-title">read-only URL:</span>
-        <input class="urllabel" value="{{config.agent_url}}" />
-        <br>
-    </li>
-    <li><a href="#/tour/0">Take the tour<a/></li>
-    <li><a href="#/delete">Delete<a/></li>
-    <li><a href="/">Exit<a/></li>
-</ul>
-</div>
-
-
-
-
 
 </body>
 </html>

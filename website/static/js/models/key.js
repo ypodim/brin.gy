@@ -1,11 +1,4 @@
-
 define(['underscore', 'backbone'], function(_, Backbone) {
-    Backbone.sync = function(method, model) {
-        // console.log("SYNC", method + ": " + JSON.stringify(model));
-        model.id = 1;
-    };
-
-
     var KeyModel = Backbone.Model.extend({
 
     // Default attributes for the todo.

@@ -59,7 +59,8 @@
     position: absolute;
     left: 0;
     top: 66px;
-    bottom: 0;
+    /*bottom: 0;*/
+    display: none;
     
     margin: 0px auto;
     width:100%;

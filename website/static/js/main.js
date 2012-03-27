@@ -24,47 +24,53 @@ require.config({
 
 require([
     'underscore',
-    // 'views/desktopFrame',
-    // 'views/mobileFrame',
-    // 'views/welcome',
-    // 'views/manager',
+    
     'router',
     'backbone',
-], function(_, Router, Backbone){
-    console.log('------');
-    require.E = {};
+    'models/state',
+    'collections/attributes',
+
+    'views/desktopFrame',
+    'views/mobileManager',
+    'views/controls',
+    'views/manager',
+], function(_, Router, Backbone, appState, Attributes,
+    DesktopAppView, mobileManagerView, controlsView, ManagerView
+    ){
+
+    state = new appState();
 
     $.getJSON('/config', function(config){
-        console.log(config);
+        state.satellite = {};
+        state.satellite.url = config.discov_url;
+        state.agent = {};
+        state.agent.id = config.agentid;
+        state.agent.baseurl = config.ego_url_prefix;
+        state.agent.url = config.ego_url_prefix+"/"+config.agentid;
+        state.website_url = config.website_url_prefix;
+        state.context = {context:"all"};
+        state.device = config.device;
 
-        require.E.satellite = {};
-        require.E.satellite.url = config.discov_url;
-        require.E.agent = {};
-        require.E.agent.id = config.agentid;
-        require.E.agent.baseurl = config.ego_url_prefix;
-        require.E.agent.url = config.ego_url_prefix+"/"+config.agentid;
-        require.E.agent.url = config.ego_url_prefix+"/"+config.agentid;
-        require.E.website_url = config.website_url_prefix;
-        require.E.context = {context:"all"};
-        require.E.device = config.device;
+        var frame_view = new DesktopAppView();
+        frame_view.render();
 
-        var app_router = new Router;
-        Backbone.history.start();
+        var attrCollection = new Attributes([], {state:state});
+        attrCollection.state = state;
+        attrCollection.ffetch();
+
+        var cview = new controlsView({
+            state:state,
+            attrCollection: attrCollection,
+        });
+
+        var contents_view = new mobileManagerView({
+            state: state,
+            attrCollection: attrCollection,
+        });
+        // var contents_view = new ManagerView();
+        contents_view.render();
     });
 
-
-
-    // var frame_view = new DesktopAppView;
-    // frame_view.render();
-    
-
-    // var page_view;
-
-    // if (E.agent.id) {
-    //     console.log("going manager");
-    //     page_view = new ManagerView;
-    // } else {
-    //     console.log("going index");
-    //     page_view = new WelcomeView;
-    // }
+    var app_router = new Router();
+    Backbone.history.start();
 });

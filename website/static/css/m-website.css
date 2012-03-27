@@ -1,0 +1,286 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body { 
+    font-family:helvetica; 
+    font-size:12px;
+    margin: 0;
+    padding: 0;
+    /*width:480px;*/
+    /*height:800px;*/
+}
+
+footer {
+    padding:0;
+    height: 15px;
+    position: absolute;
+    bottom:0;
+    right:0;
+    /*width:340px;*/
+    z-index:10;
+    text-align:center;
+    color: inherit;
+    background-color:inherit;
+}
+
+div.mobile {
+    padding:10px 0 20px 0;
+    height: 15px;
+    width:100%;
+    text-align:center;
+    color: gray;
+    font-size:20px;
+    text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+    background-color:white;
+}
+
+
+
+
+#m-choices {
+    /*background-color:white;*/
+    /*position:absolute;*/
+    /*top: 65px;*/
+    /*bottom: 0;*/
+    width: 100%;
+    /*margin-bottom:300px;*/
+
+    /*overflow-y: scroll;*/
+    /*-webkit-overflow-scrolling: touch;*/
+    /*z-index: 10;*/
+}
+.closingpane {
+    /*position: absolute;*/
+    height:300px;
+    /*bottom:0;*/
+    background: #fff url('/static/images/website/edgeoflist.png') no-repeat 20px bottom;
+    margin: auto;
+}
+.closingpane > button {
+    width:350px;
+    height:100px;
+    margin: 195px 0 0 180px;
+    font-size:35px;
+}
+
+
+
+
+
+
+#searchinput {
+    font-size:18px;
+    height: 28px;
+    padding:0;
+    margin:0;
+    width: 100%;
+}
+
+#searchbox {
+    padding:0;
+    margin: 0 0 0px 0;
+    display:none;
+}
+
+
+
+#map_canvas {
+    position:absolute;
+    top: 0px;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    width: 100%;
+}
+
+
+
+
+
+
+
+
+
+/* ======== ATTRIBUTE ========= */
+
+attribute {
+    display: block;
+    font-size:40px;
+    margin: 0 0 20px 0;
+    background: rgba(25, 25, 25, 0.15);
+    background-image: -moz-linear-gradient(90deg, #dddddd, #aaaaaa);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#dddddd), to(#aaaaaa));
+    /*border-radius: 5px;*/
+    box-shadow: 0 0.15em 0.17em rgba(0, 0, 0, 0.5);
+    /*width: 100%;*/
+    min-height:200px;
+    line-height: 60px;
+}
+attribute a { color: black; }
+attribute a:hover { 
+    text-decoration: none; 
+    color:black;
+}
+
+attribute > a.keypart {
+    /*width: 100%;*/
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    -webkit-text-overflow: ellipsis;
+
+    display: block;
+    text-shadow: 0 1px rgba(255, 255, 255, .7);
+    padding: 5px 0px 0px 0px;
+    margin: 0 0 0 5px;
+    background-color: rgba(255,255,255,0.01);
+}
+
+/* ======== VALPART ========= */
+
+attribute > div.valpart {
+    line-height:20px;
+    margin: 0 0 0 5px;
+    display: none;
+}
+attribute > div.valpart > div.valcontainer {
+    float:left;
+    /*width: 150px;*/
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    -webkit-text-overflow: ellipsis;
+
+    font-size:20px;
+    border-radius:2px;
+    background-color: rgba(255,255,255,0.5);
+    padding: 5px 5px 5px 5px;
+    margin: 5px 5px 0px 0;
+    box-shadow:0px -1px 2px #333333;
+}
+attribute > div.valpart > div.valcontainer > a > span.value {
+    color:rgba(0,0,0,0.5);
+}
+attribute > div.valpart > div.valcontainer > a > span.count {
+    color: white;
+    background-color:#ff2244;
+    /*margin-left: 10px;*/
+    padding: 1px 5px;
+    text-shadow: 0 0px 1px #fff;
+    border-radius: 3px;
+    background-color:rgba(255,0,0,0.3);
+}
+
+/* ======== VALPART DETAILED ========= */
+
+attribute > div.valpartdetailed {
+    line-height:60px;
+    margin: 0 0 0 5px;
+    padding: 0 0 5px 0;
+    max-height: 600px;
+    overflow-y: scroll;
+    /*display: none;*/
+}
+attribute > div.valpartdetailed > div.valcontainer {
+    font-size:20px;
+    border-radius:2px;
+    background-color: rgba(255,255,255,0.5);
+    padding: 5px 5px 5px 5px;
+    margin: 5px 5px 0px 0;
+    box-shadow:0px -1px 2px #333333;
+}
+attribute > div.valpartdetailed > div.valcontainer > button {
+    float:right;
+    width:90px;
+    height:60px;
+    margin: 0 0 0 5px;
+    font-size:30px;
+}
+attribute > div.valpartdetailed > div.valcontainer > a > span.value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    -webkit-text-overflow: ellipsis;
+}
+attribute > div.valpartdetailed > div.valcontainer > a > span.count {
+    color: white;
+    background-color:#ff2244;
+    padding: 1px 5px;
+    text-shadow: 0 0px 1px #fff;
+    border-radius: 3px;
+}
+
+/* ========================================= */
+
+span.count {
+    /*margin-left: 10px;*/
+    color: white;
+    padding: 1px 5px;
+    text-shadow: 0 0px 1px #fff;
+    border-radius: 3px;
+    background-color:#ff2244;
+}
+
+div#controls {
+    display:none;
+    position: absolute;
+    top:0;
+    width:100%;
+    height:60px;
+    background-color:gray;
+}
+
+div#controls button {
+    font-size:30px;
+}
+
+div.controlFilters {
+    position:absolute;
+    left:5px;
+    top:5px;
+}
+div.controlSorters {
+    position:absolute;
+    right:5px;
+    top:5px;
+}
+div.btn-group > button {
+    height: 50px;
+    width: 120px;
+}
+
+button#likemeBtn, button#resultsBtn {
+    position:absolute;
+    right:5px;
+    top:5px;
+    height: 50px;
+    display:none;
+}
+span.badge {
+    position: absolute;
+    right:5px;
+    top:5px;
+    display: none;
+}
+
+
+/*############# WEBKIT fadeIn #############*/
+
+.fadeout{
+    height: 0;
+    overflow: hidden;
+    -moz-transition: height 0.3s ease-in-out;
+    -webkit-transition: height 0.3s ease-in-out;
+    -o-transition: height 0.3s ease-in-out;
+    transition: height 0.3s ease-in-out; 
+}
+
+
+
+
+
