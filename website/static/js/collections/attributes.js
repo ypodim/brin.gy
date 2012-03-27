@@ -15,7 +15,6 @@ define([
     },
 
     modelChange: function(model) {
-        // console.log('change', model.get('key'), model.get('val'), a2, a3);
         var selectedlist = this.filter(function(attr){
             return attr.get('selected');
         });
@@ -32,16 +31,17 @@ define([
         html = (count > 0) ? count : '';
         badge = $('#meBadge').html(html);
         (count)? badge.show() : badge.hide();
-        // console.log('selected', selectedlist.length, 'melist', melist.length);
     },
 
     ffetch: function() {
-        // console.log(models, options);
-        // this.state = options.state;
+        this.reset();
+        this.state.progress('fetching attributes');
+        $('#progressbar').children().width('10%');
 
         var that = this;
         url = this.state.satellite.url+"/profile/"+this.state.context.context+"/keyvals";
-        $.getJSON(url, function(json){
+        $.getJSON(url, {user:this.state.user.name}, function(json){
+            that.state.progress('fetched '+json.items.length+' attribute groups');
             for (i in json.items) {
                 var key = json.items[i].key;
                 var score = json.items[i].score;
@@ -66,11 +66,16 @@ define([
                     attr.bind('change', that.modelChange)
                     that.add(attr);
                 }
+
+                progress = parseInt(100*i/json.items.length)+'%';
+                $('#progressbar').children().width(progress);
             }
 
             $('#container').show();
             $('#controls').show();
             $('#loader').hide();
+            that.modelChange();
+            that.state.progress('rendering...');
         });
     },
 

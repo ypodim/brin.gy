@@ -17,5 +17,5 @@ define([
     },
 
   });
-  return new personCollection;
+  return personCollection;
 });

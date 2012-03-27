@@ -10,9 +10,12 @@ define([
     'order!twipsy',
     'order!popover',
 
+    'models/person',
+
     'text!templates/controls.html',
     ], function($, _, Backbone, 
         button, alerts, modal, popover, twipsy, 
+        userModel,
         controlsViewTemplate){
   var controlsView = Backbone.View.extend({
     el: $("#controls")[0],
@@ -31,48 +34,75 @@ define([
     },
 
     filterBtn: function(evt) {
-        var bid = $(evt.target).attr('id');
+        var btnid = $(evt.target).attr('id');
         this.$('.secondOrder').hide();
-        if (bid == 'all')
+
+        if (btnid == 'all') {
             this.$('.controlSorters').show();
-        if (bid == 'me')
+            $('attribute').show();
+            $('.valcontainer').show();
+        } else {
+            $('attribute').hide();
+            $('.valcontainer').hide();
+        }
+
+        if (btnid == 'me') {
+            $('.haveitTag').show();
             this.$('#likemeBtn').show();
-        if (bid == 'filters')
+            _.each($('attribute'), function(attr){
+                if ($(attr).children('.valpartdetailed').children('.haveitTag').length)
+                    $(attr).show();
+            });
+            this.$('#likemeBtn').show();
+        }
+
+        if (btnid == 'filters') {
+            $('.filterTag').show();
+            _.each($('attribute'), function(attr){
+                if ($(attr).children('.valpartdetailed').children('.filterTag').length)
+                    $(attr).show();
+            });
             this.$('#resultsBtn').show();
+            this.state.getMatches(this.matchesClb);
+        }
     },
     sortBtn: function(evt) {
-        var bid = $(evt.target).attr('id');
-        if (bid == 'all');
-        if (bid == 'me');
-        if (bid == 'filters');
+        var btnid = $(evt.target).attr('id');
+        if (btnid == 'all');
+        if (btnid == 'me');
+        if (btnid == 'filters');
     },
 
+    animateMatchesTo: function(target) {
+        this.$('#resultsBtn').html(target+' matches!');
+    },
+    matchesClb: function(matches){
+        var that = this;
+        this.animateMatchesTo(matches.length);
+        that.state.personCollection.reset();
+        _.each(matches, function(username){
+            uModel = new userModel({username:username});
+            that.state.personCollection.add(uModel);
+        });
+    },
     showResults: function() {
-        console.log('results');
+        this.state.router.navigate('matches', {trigger:true});
     },
 
-    // filtersChange: function(evt) {
-    //     var count = this.state.filters.length;
-    //     var html = (count > 0) ? count : '';
-    //     var badge = this.$('#searchBadge').html(html);
-    //     (count)? badge.show() : badge.hide();
-    // },
-    // myattrsChange: function(evt) {
-    //     var count = this.state.myattrs.length;
-    //     var html = (count > 0) ? count : '';
-    //     var badge = this.$('#meBadge').html(html);
-    //     (count)? badge.show() : badge.hide();
-    // },
-
+    doDefault: function(){
+        this.$('*').hide();
+        this.$('div').show();
+        this.$('div > button').show();
+    },
+    doLogin: function() {
+        $('.controlSorters, .controlFilters').hide();
+        this.$('#loginBtn').show();
+    },
     initialize: function(options) {
-        // _.bindAll(this, 'render', 'filtersChange', 'myattrsChange');
+        _.bindAll(this, 'animateMatchesTo', 'matchesClb');
         this.state = options.state;
         this.attrCollection = options.attrCollection;
 
-
-        // this.model.bind('change', this.render);
-        // this.state.bind('change:filters', this.filtersChange);
-        // this.state.bind('change:myattrs', this.myattrsChange);
         $(this.el).append(this.template());
     },
     

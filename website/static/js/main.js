@@ -29,16 +29,17 @@ require([
     'backbone',
     'models/state',
     'collections/attributes',
+    'collections/persons',
 
     'views/desktopFrame',
-    'views/mobileManager',
     'views/controls',
     'views/manager',
-], function(_, Router, Backbone, appState, Attributes,
-    DesktopAppView, mobileManagerView, controlsView, ManagerView
+], function(_, Router, Backbone, appState, Attributes, Persons,
+    DesktopAppView, controlsView, ManagerView
     ){
 
     state = new appState();
+    this.state.progress('static files loaded, getting config');
 
     $.getJSON('/config', function(config){
         state.satellite = {};
@@ -51,26 +52,24 @@ require([
         state.context = {context:"all"};
         state.device = config.device;
 
-        var frame_view = new DesktopAppView();
-        frame_view.render();
-
         var attrCollection = new Attributes([], {state:state});
         attrCollection.state = state;
-        attrCollection.ffetch();
+        state.attrCollection = attrCollection;
+
+        var personCollection = new Persons([], {state:state});
+        state.personCollection = personCollection;
 
         var cview = new controlsView({
             state:state,
             attrCollection: attrCollection,
         });
 
-        var contents_view = new mobileManagerView({
+        var app_router = new Router({
+            controlsView: cview,
             state: state,
             attrCollection: attrCollection,
         });
-        // var contents_view = new ManagerView();
-        contents_view.render();
+        state.router = app_router;
+        Backbone.history.start();
     });
-
-    var app_router = new Router();
-    Backbone.history.start();
 });

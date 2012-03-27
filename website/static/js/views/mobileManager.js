@@ -187,18 +187,13 @@ define([
                 model : kmodel,
             });
             this.$('#m-choices').append($(kv.render().el));
-
             this._keyViews[key] = kv;
         }
 
-        // vmodel = new vModel({
-        //     key:key,
-        //     val:val,
-        //     cnt:vcnt,
-        // });
         var vvdetailed = new valueDetailedView({
             model : model,
-            // state : this.state,
+            parentView: this._keyViews[key],
+            state : this.state,
         });
         this._keyViews[key].$('.valpartdetailed').append(vvdetailed.render().el);
     },
@@ -206,16 +201,16 @@ define([
 
     initialize: function(options) {
         _.bindAll(this, 'addOneAttribute', 'render');
-        
-        // this.attrCollection = new Attributes();
-        options.attrCollection.bind('add', this.addOneAttribute);
+        this.attrCollection = options.attrCollection;
+        this.attrCollection.bind('add', this.addOneAttribute);
         this.state = options.state;
-
-        $(this.el).append(this.template());
     },
     
     render: function(){
-        // console.log("manager view rendered");
+        $(this.el).html(this.template());
+        this._keysInserted = {};
+        this.attrCollection.ffetch();
+        console.log('rendered.')
     },
   });
   return managerView;

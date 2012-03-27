@@ -10,63 +10,56 @@ define([
     template: _.template(valuesTemplate),
 
     events: {
-      "click a"            : "select",
+      // "click a"            : "select",
       'click #searchBtn'   : 'filterBtn',
       'click #addBtn'      : 'addBtn',
     },
 
     initialize: function(options) {
-      _.bindAll(this, 'render', 'close', 'filterBtn', 'addBtn');
-      // this.model.bind('change', this.render);
+      _.bindAll(this, 'render', 'filterBtn', 'addBtn');
+      this.state = options.state;
       this.model.bind('destroy', this.remove);
-      // this.state = options.state;
+      this.parentView = options.parentView;
     },
 
     render: function() {
         $(this.el).append(this.template(this.model.toJSON()));
+        if (this.model.get('haveit'))
+            $(this.el).addClass('haveitTag');
         return this;
     },
 
     filterBtn: function(e) {
         var added = $(e.target).toggleClass('btn-primary').hasClass('btn-primary');
-        // var attr = {key:this.model.get('key'), val:this.model.get('val')};
-        // this.state.toggle(attr, 'filters', added);
         this.model.set({selected: added});
+        $(this.el).toggleClass('filterTag');
         e.stopPropagation();
     },
 
     addBtn: function(e) {
+        if (! this.state.isLoggedin())
+            return false;
+
         var added = $(e.target).toggleClass('btn-success').hasClass('btn-success');
-        // var attr = {key:this.model.get('key'), val:this.model.get('val')};
-        // this.state.toggle(attr, 'myattrs', added);
         this.model.set({haveit: added});
+        $(this.el).toggleClass('haveitTag');
+
+        var key = this.model.get('key');
+        var val = this.model.get('val');
+        var url = this.state.agent.baseurl+'/'+this.state.user.name+'/profile';
+        var data = JSON.stringify([[key, val]]);
+        var type = (added) ? 'POST' : 'DELETE';
+
+        $.ajax({
+            type: type,
+            url: url,
+            data: {data:data, secret:this.state.user.pwd},
+            success: function(json){},
+            dataType: "json",
+        });
+
         e.stopPropagation();
     },
-
-    // Switch this view into `"editing"` mode, displaying the input field.
-    edit: function() {
-      $(this.el).addClass("editing");
-      this.input.focus();
-    },
-
-    close: function() {
-      this.model.save({content: this.input.val()});
-      $(this.el).removeClass("editing");
-    },
-
-    select: function() {
-      // console.log("select", this.model);
-    },
-
-    updateOnEnter: function(e) {
-      if (e.keyCode == 13) this.close();
-    },
-
-    // Remove the item, destroy the model.
-    clear: function() {
-      this.model.clear();
-    }
-
   });
   return ValueView;
 });

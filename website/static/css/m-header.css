@@ -1,7 +1,8 @@
 #container {
     position: absolute;
+    z-index:0;
     left: 0;
-    top: 65px;
+    top: 70px;
     bottom: 0;
     display: none;
 
@@ -13,3 +14,7 @@
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
 }
+ #progressbar {
+    width: 200px;
+    margin: auto;
+ }
