@@ -27,7 +27,7 @@ body {
 div.mobile {
     padding:10px 0 20px 0;
     height: 15px;
-    width:100%;
+    /*width:100%;*/
     text-align:center;
     color: gray;
     font-size:20px;
@@ -43,7 +43,7 @@ div.mobile {
     /*position:absolute;*/
     /*top: 65px;*/
     /*bottom: 0;*/
-    width: 100%;
+    /*width: 100%;*/
     /*margin-bottom:300px;*/
 
     /*overflow-y: scroll;*/
@@ -74,7 +74,7 @@ div.mobile {
     height: 28px;
     padding:0;
     margin:0;
-    width: 100%;
+    /*width: 100%;*/
 }
 
 #searchbox {
@@ -91,22 +91,56 @@ div.mobile {
     right: 0;
     bottom: 0;
     z-index: 1;
-    width: 100%;
+    /*width: 100%;*/
 }
 
 
 
+div.resultsTitle{
+    padding: 20px 0 0 10px;
+    font-size:60px;
+    line-height:60px;
+    color: gray;
+    text-shadow: rgba(0,0,0,0.5) -1px 0, rgba(0,0,0,0.3) 0 -1px, rgba(255,255,255,0.5) 0 1px, rgba(0,0,0,0.3) -1px -2px;
+    display:none;
+}
 
+/* ======== PERSON ========= */
+person {
+    display: block;
+    font-size:60px;
+    background: rgba(25, 25, 25, 0.15);
+    background-image: -moz-linear-gradient(90deg, #dddddd, #aaaaaa);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#dddddd), to(#aaaaaa));
+    line-height: 90px;
 
-
-
+    border-radius:2px;
+    background-color: rgba(250,250,250,0.4);
+    padding: 5px 5px 5px 5px;
+    margin: 5px 5px 5px 5px;
+    box-shadow:0px -1px 2px #333333;
+}
+person a { 
+    margin: 0 0 0 5px;
+    color: black; 
+}
+person a:hover { 
+    text-decoration: none; 
+    color:black;
+}
+person > button {
+    font-size:60px ! important;
+    float:right;
+    height:90px;
+    margin: 0 5px 0 0;
+}
 
 
 /* ======== ATTRIBUTE ========= */
 
 attribute {
     display: block;
-    font-size:60px;
+    font-size:90px;
     margin: 0 0 20px 0;
     background: rgba(25, 25, 25, 0.15);
     background-image: -moz-linear-gradient(90deg, #dddddd, #aaaaaa);
@@ -114,8 +148,7 @@ attribute {
     /*border-radius: 5px;*/
     box-shadow: 0 0.15em 0.17em rgba(0, 0, 0, 0.5);
     /*width: 100%;*/
-    min-height:70px;
-    line-height: 70px;
+    line-height: 90px;
 }
 attribute a { color: black; }
 attribute a:hover { 
@@ -130,6 +163,7 @@ attribute > a.keypart {
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
     -webkit-text-overflow: ellipsis;
+    /*max-width:480px;*/
 
     display: block;
     text-shadow: 0 1px rgba(255, 255, 255, .7);
@@ -175,27 +209,25 @@ attribute > div.valpart > div.valcontainer > a > span.count {
 /* ======== VALPART DETAILED ========= */
 
 attribute > div.valpartdetailed {
-    line-height:60px;
+    line-height:90px;
     margin: 0 0 0 5px;
     padding: 0 0 5px 0;
-    /*max-height: 600px;*/
-    /*overflow-y: scroll;*/
-    /*display: none;*/
 }
 attribute > div.valpartdetailed > div.valcontainer {
-    font-size:30px;
+    font-size:60px;
     border-radius:2px;
     background-color: rgba(250,250,250,0.4);
     padding: 5px 5px 5px 5px;
     margin: 5px 5px 0px 0;
     box-shadow:0px -1px 2px #333333;
+    /*max-width:480px;*/
 }
 attribute > div.valpartdetailed > div.valcontainer > button {
     float:right;
-    width:90px;
-    height:60px;
+    width:150px;
+    height:90px;
     margin: 0 0 0 5px;
-    font-size:30px;
+    font-size:60px;
 }
 attribute > div.valpartdetailed > div.valcontainer > button#searchBtn {
     background-image: url('http://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg');
@@ -203,12 +235,14 @@ attribute > div.valpartdetailed > div.valcontainer > button#searchBtn {
     background-position: center center;
     background-size: 40%;
 }
-attribute > div.valpartdetailed > div.valcontainer > a > span.value {
+attribute > div.valpartdetailed > div.valcontainer > a > div.value {
+    display:inline-block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
     -webkit-text-overflow: ellipsis;
+    max-width:560px;
 }
 attribute > div.valpartdetailed > div.valcontainer > a > span.count {
     color: white;
@@ -234,13 +268,19 @@ div#controls {
     z-index:1000;
     top:0;
     width:100%;
-    height:70px;
+    height:90px;
     background-color:gray;
     box-shadow: 0 5px 5px 0 rgba(0,0,0,0.5);
+
+    text-shadow: #000 -1px -1px 0;
+    text-align:center;
+    color:white;
+    font-size:60px;
+    line-height:60px;
 }
 
 div#controls button {
-    font-size:30px;
+    font-size:60px;
 }
 
 div.controlFilters {
@@ -254,22 +294,38 @@ div.controlSorters {
     top:5px;
 }
 div.btn-group > button {
-    height: 60px;
-    width: 120px;
+    height: 80px;
+    width: 180px;
 }
-
+div#controls > div.secondOrder {
+    position:absolute;
+    right:10px;
+    top:30px;
+    height: 90px;
+}
 div#controls > button {
     position:absolute;
     right:5px;
     top:5px;
-    height: 60px;
+    height: 80px;
     display:none;
+    font-size:40px;
 }
-span.badge {
+div#controls > button#cancelMessageBtn {
+    position:absolute;
+    left:5px;
+    right:inherit;
+    top:5px;
+    height: 80px;
+    display:none;
+    font-size:40px;
+}
+div#controls span.badge {
     position: absolute;
     right:5px;
     top:5px;
     display: none;
+    font-size:20px;
 }
 
 
@@ -286,3 +342,29 @@ form.login > div.alert{
     display:none;
 }
 
+/*############# SEND MESSAGE #############*/
+form.sendMessage {
+    text-align:center;
+}
+form.sendMessage > textarea {
+    display:block;
+    margin: 10px auto;
+    height:400px;
+    width:90%;
+    font-size:30px;
+}
+form.sendMessage > div {
+    /*display:block;*/
+    margin: auto;
+    font-size:40px;
+    line-height:40px;
+}
+form.sendMessage > div > span {
+    font-size:inherit;
+}
+form.sendMessage > label > input {
+    line-height: 40px;
+    margin: 15px 20px 0 0;
+    -webkit-transform: scale(3,3);
+    -moz-transform: scale(3,3);
+}

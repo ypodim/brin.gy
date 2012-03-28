@@ -7,7 +7,7 @@ define(['underscore', 'backbone',
 
     filters: null,
     myattrs: null,
-
+    matches: [],
     user: {name:'', pwd:''}, 
 
 
@@ -37,14 +37,15 @@ define(['underscore', 'backbone',
             query.push([cap, model.get('key'), model.get('val')]);
         });
         
-        data = JSON.stringify(query);
-        that = this;
+        var data = JSON.stringify(query);
+        var that = this;
         $.post(this.satellite.url+"/multimatch", {data:data, context:context}, function(json){
             if (json.error) {
                 console.log('getMatches: error:', json.error);
                 return false;
             }
 
+            var target = json.matches.length;
             var test_intersection = {};
             for (var i in json.matches) {
                 var cap = json.matches[i][0];
@@ -58,14 +59,21 @@ define(['underscore', 'backbone',
                 }
             }
 
-            var target = _.max(_.values(test_intersection));
             var result = [];
             for (user in test_intersection)
                 if (test_intersection[user] == target)
                     result.push(user);
 
-            clb(result);
+            that.matches = result;
+            if (clb != undefined) clb(result);
+            that.trigger('matchesChanged');
         });
+    },
+
+    hideSplash: function(){
+        $('#container').show();
+        $('#controls').show();
+        $('#loader').hide();
     },
     });
     return stateModel;

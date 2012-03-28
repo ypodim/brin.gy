@@ -10,15 +10,12 @@ define([
     'order!twipsy',
     'order!popover',
 
-    // 'common/ego_website',
-    // 'common/setup_modals',
-    // 'common/attr_manager',
-
     'text!templates/mobileManage.html',
 
     'views/key',
     'views/value',
     'views/valueDetailed',
+    'views/person',
 
     'collections/keys',
     'collections/values',
@@ -26,142 +23,21 @@ define([
     'models/key',
     'models/value',
     'models/attribute',
+    'models/person',
     ], function(
         $, _, Backbone, 
         button, alerts, modal, popover, twipsy, 
         // common, modals, attr_manager, 
         manageViewTemplate, 
 
-        keyView, valueView, valueDetailedView,
+        keyView, valueView, valueDetailedView, personView,
         Keys, Values,
-        kModel, vModel, attrModel){
+        kModel, vModel, attrModel, personModel){
   var managerView = Backbone.View.extend({
     el: $("#container"),
     template: _.template(manageViewTemplate),
     events: {
-        // "search #searchinput": "searchAttributes",
-        // "keyup #searchinput": "searchAttributes",
-        "click div.controls > button": "newAttributeModal",
-        // "click .cancel-btn": "cancelBtn",
-        // "submit #searchbox": "submitNewAttribute", 
-    },
 
-    submitNewAttribute: function(){
-        return false;
-        
-        searchinput = $(this).children("input");
-        newkey = searchinput.val();
-        if (newkey in attr_manager.sdata.profile) {
-            $("#searchinput").popover("hide");
-            $(".editor").children().focus();
-        } else {
-            searchinput.popover("hide").val("").attr("key","");
-            attr_manager.show_keyvals();
-            attr_manager.populate_attrs(true);
-            
-            cap = "profile";
-            attr_manager.add_sdata(cap, newkey, 0);
-            
-            keypart = attr_manager.generate_key_entry(cap, newkey);
-            editor = attr_manager.generate_val_entry_editor(newkey);
-            valpart = $("<div class='valpart'></div>").append(editor);
-            
-            pill = $("<pill></pill>").append(keypart).append(valpart);
-            $("#m-choices").children("div:first-child").prepend(pill);
-            editor.children("input").focus();
-        }
-        return false;
-    },
-
-    newAttributeModal: function() { 
-        // $("#new-key-modal").modal("show");
-        cnt = Math.floor(Math.random()*11);
-        console.log(Keys.models[0].set({cnt:cnt}));
-    },
-    searchAttributes: function(){
-        text = $(this).val();
-        attr_manager.show_keyvals();
-        
-        if (text.length == 1) {
-            return true;
-        }
-        
-        attr_manager.get_val_input_boxes().hide();
-        
-        matches = text.split(' ');
-        rexpr = "";
-        for (i in matches) {
-            if (matches[i].length == 0)
-                continue;
-            if (i>0)
-                rexpr += "|";
-            rexpr += matches[i];
-        }
-        re = new RegExp(rexpr, 'i');
-        
-        no_match_at_all = true;
-        for (cap in attr_manager.sdata)
-            for (key in attr_manager.sdata[cap]) {
-                if (key.match(re)) {
-                    attr_manager.sdata[cap][key].display = true;
-                    no_match_at_all = false;
-                } else {
-                    no_vmatch = true;
-                
-                    for (val in attr_manager.sdata[cap][key].values) {
-                        if (val.match(re)) {
-                            attr_manager.sdata[cap][key].values[val].display = true;
-                            no_vmatch = false;
-                            no_match_at_all = false;
-                        } else {
-                            attr_manager.sdata[cap][key].values[val].display = false;
-                        } 
-                    }
-                    
-                    if (no_vmatch)
-                        attr_manager.sdata[cap][key].display = false;
-                }
-            }
-        
-        if (no_match_at_all) {            
-            msg = $("<div class='message'></div>").html("No results found.");
-            btn = $("<div class='btn danger'></div>").html("add \""+text+"\" to the system");
-            btn.click(function() { 
-                $("#new-key-modal").modal("show");
-            });
-            $("#message").show().html(msg).append(btn);
-            $(".controls").hide();
-        } else {
-            $("#message").hide();
-            $(".controls").show();
-        }
-            
-    
-        attr_manager.populate_attrs();
-    },
-
-    addOneKey: function(key) {
-        var view = new keyView({model: key});
-        html = view.render().el;
-        this.$("#m-choices").append(html);
-        // console.log("add KEY model", this.$("#choices"), html, key.view);
-    },
-
-    addOneValue: function(value) {
-        key = value.get('key');
-        kmodel = Keys.getKey(key);
-        valplaceholder = kmodel[0].view.$('div.valpart');
-        // valplaceholder.html('yyyyy')
-        
-        var view = new valueView({model: value});
-        html = view.render().el;
-        // console.log(valplaceholder, html, value.get('val'));
-        valplaceholder.append( html );
-    },
-
-    // Add all items in the **Todos** collection at once.
-    addAllValues: function() {
-        Values.each(this.addOneValue);
     },
 
     _keysInserted: {},
@@ -198,19 +74,91 @@ define([
         this._keyViews[key].$('.valpartdetailed').append(vvdetailed.render().el);
     },
 
+    addOnePerson: function(model){
+        // var username = model.get('username');
+        var pv = new personView({
+            model : model,
+        });
+        this.$('#results').append($(pv.render().el));
+    },
+
+    showMe: function(){
+        this.$('attribute').hide();
+        this.$('.valcontainer').hide();
+
+        this.$('.haveitTag').show();
+        _.each(this.$('attribute'), function(attr){
+            if ($(attr).children('.valpartdetailed').children('.haveitTag').length)
+                $(attr).show();
+        });
+
+        this.$('.resultsTitle').hide();
+        this.$('#results').hide();
+        this.$('.closingpane').show();
+        // this.$('#likemeBtn').show();
+    },
+
+    showFilters: function(){
+        this.$('attribute').hide();
+        this.$('.valcontainer').hide();
+
+        this.$('.filterTag').show();
+        _.each(this.$('attribute'), function(attr){
+            if ($(attr).children('.valpartdetailed').children('.filterTag').length)
+                $(attr).show();
+        });
+        this.$('.closingpane').hide();
+        this.$('#results').show();
+        this.$('.resultsTitle').show();
+
+        this.matchesClb();
+    },
+
+    matchesClb: function(arg){
+        var that = this;
+        this.controls.animateMatchesTo(this.state.matches.length);
+        that.state.personCollection.reset();
+        this.$('#results').empty();
+        _.each(this.state.matches, function(username){
+            pModel = new personModel({username:username});
+            that.state.personCollection.add(pModel);
+        });
+
+        this.$('#filtersTitle').html('Filters ('+this.state.filterCount+')');
+        this.$('#resultsTitle').html('Results ('+this.state.matches.length+')');
+    },
 
     initialize: function(options) {
-        _.bindAll(this, 'addOneAttribute', 'render');
-        this.attrCollection = options.attrCollection;
-        this.attrCollection.bind('add', this.addOneAttribute);
+        _.bindAll(this, 'addOneAttribute', 'addOnePerson', 'render', 'matchesClb');
         this.state = options.state;
+        this.controls = options.controls;
+
+        this.state.attrCollection.bind('add', this.addOneAttribute);
+        this.state.bind('matchesChanged', this.matchesClb);
+        this.state.personCollection.bind('add', this.addOnePerson);
     },
     
+    _isRendered: false,
     render: function(){
-        $(this.el).html(this.template());
-        this._keysInserted = {};
-        this.attrCollection.ffetch();
-        console.log('rendered.')
+        if (this.state.renderManager) {
+            this._isRendered = false;
+            this.state.renderManager = false;
+        }
+
+        this.$('.resultsTitle').hide();
+        this.$('#results').hide();
+        this.$('.closingpane').show();
+        this.controls.doDefault();
+
+        if (this._isRendered) {
+            this.$('attribute').show();
+            this.$('.valcontainer').show();
+        } else {
+            $(this.el).html(this.template());
+            this._keysInserted = {};
+            this.state.attrCollection.ffetch();
+            this._isRendered = true;
+        }
     },
   });
   return managerView;

@@ -8,8 +8,10 @@ define([
     'views/about',
     'views/login',
     'views/mobileManager',
+    'views/sendMessage',
 ], function(
-    $, _, Backbone, common, aboutView, loginView, mobileManagerView
+    $, _, Backbone, common, 
+    aboutView, loginView, mobileManagerView, sendMessageView
     ){
   var AppRouter = Backbone.Router.extend({
     routes: {
@@ -19,7 +21,11 @@ define([
         "user/:user/context/:context": "setUserContext",
         "context/:context/user/:user": "setContextUser",
         'login': 'login',
-        'matches': 'matches',
+        // 'matches': 'matches',
+        'sendmessage': 'sendmessage',
+
+        'filters': 'showFilters',
+        'me': 'showMe',
 
         "tour": "takeTour",
         "tour/:page": "takeTour",
@@ -30,26 +36,56 @@ define([
     initialize: function(options){
         this.state = options.state;
         this.controlsView = options.controlsView;
-        this.attrCollection = options.attrCollection;
         loginView.state = options.state;
         loginView.router = this;
 
         this.contents_view = new mobileManagerView({
             state: this.state,
-            attrCollection: this.attrCollection,
+            controls: this.controlsView,
         });
 
         this.controlsView.$('#loginBtn').click(loginView.loginBtn);
     },
+
+    showFilters: function(options){
+        if (! this.contents_view._isRendered)
+            this.navigate('#', {trigger:true});
+
+        this.contents_view.showFilters();
+    },
+    showMe: function(){
+        if (! this.contents_view._isRendered)
+            this.navigate('#', {trigger:true});
+
+        this.contents_view.showMe();  
+    },
+
     login: function() {
         loginView.render();
         this.controlsView.doLogin();
+        this.state.hideSplash();
     },
-    matches: function(){
-        console.log(this.state.personCollection.length);
+    // matches: function(){
+    //     this.matchesView = new matchesManagerView({
+    //         state: this.state,
+    //     });
+    //     this.matchesView.render();
+
+    //     this.state.hideSplash();
+    // },
+    sendmessage: function(){
+        if (! this.contents_view._isRendered)
+            this.navigate('#', {trigger:true});
+
+        this.message = new sendMessageView({
+            state: this.state,
+        });
+        this.message.render();
+        this.controlsView.doMessage();
     },
     showAbout: function() {
         aboutView.render();
+        this.state.hideSplash();
     },
     setUserContext: function( user, context ) {
         console.log( "**** Set user:", user, "context:", context  );   

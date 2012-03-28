@@ -57,17 +57,16 @@ require([
         state.attrCollection = attrCollection;
 
         var personCollection = new Persons([], {state:state});
+        personCollection.state = state;
         state.personCollection = personCollection;
 
         var cview = new controlsView({
             state:state,
-            attrCollection: attrCollection,
         });
 
         var app_router = new Router({
             controlsView: cview,
             state: state,
-            attrCollection: attrCollection,
         });
         state.router = app_router;
         Backbone.history.start();

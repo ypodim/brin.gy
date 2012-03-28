@@ -26,6 +26,7 @@ define([
         var html = (count > 0) ? count : '';
         var badge = $('#searchBadge').html(html);
         (count)? badge.show() : badge.hide();
+        this.state.filterCount = count;
 
         count = melist.length;
         html = (count > 0) ? count : '';
@@ -71,9 +72,7 @@ define([
                 $('#progressbar').children().width(progress);
             }
 
-            $('#container').show();
-            $('#controls').show();
-            $('#loader').hide();
+            that.state.hideSplash();
             that.modelChange();
             that.state.progress('rendering...');
         });

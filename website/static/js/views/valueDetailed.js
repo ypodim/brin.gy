@@ -34,6 +34,8 @@ define([
         this.model.set({selected: added});
         $(this.el).toggleClass('filterTag');
         e.stopPropagation();
+
+        this.state.getMatches(this.matchesClb);
     },
 
     addBtn: function(e) {

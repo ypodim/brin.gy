@@ -1,8 +1,13 @@
+#loader span {
+    font-size:50px;
+    padding-bottom:30px;
+}
+
 #container {
     position: absolute;
     z-index:0;
     left: 0;
-    top: 70px;
+    top: 95px;
     bottom: 0;
     display: none;
 
@@ -17,4 +22,5 @@
  #progressbar {
     width: 200px;
     margin: auto;
+    display:none;
  }
