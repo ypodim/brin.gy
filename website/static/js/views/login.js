@@ -19,13 +19,7 @@ define([
         return filter.test(username);
     },
 
-    loginBtn: function(){
-        username = this.$('input[type=text]').val();
-        password = this.$('input[type=password]').val();
-
-        // if (this.isValidEmail(username))
-            // username, password,
-
+    doLogin: function(username, password) {
         var that = this;
         var data = {user:username, secret:password};
         var url = this.state.agent.baseurl+'/authenticate_user';
@@ -36,7 +30,9 @@ define([
                 common.cookies.set_cookie(username, password);
                 that.router.navigate('#', {trigger: true});
             } else {
-                that.$('div.alert').show();
+                that.$('div.alert')
+                    .html('Wrong username/email or password.')
+                    .slideDown();
                 setTimeout(function(){
                     that.$('div.alert').fadeOut();
                 }, 3000);
@@ -44,20 +40,75 @@ define([
         });
         return false;
     },
+    doCreate: function(username, email) {
+        var that = this;
+        if (! this.isValidEmail(email)) {
+            this.$('div.alert')
+                .html('Invalid email address.')
+                .slideDown();
+            setTimeout(function(){
+                that.$('div.alert').fadeOut();
+            }, 3000);
+            return false;
+        }
+
+        var url = this.state.agent.baseurl;
+        $.post(url, {username:username, email:email}, function(json){
+            if (json.error.length>0) {
+                that.$('div.alert')
+                    .html('User '+username+' already exists.')
+                    .slideDown();
+                setTimeout(function(){
+                    that.$('div.alert').fadeOut();
+                }, 3000);
+                return false;
+            } else {
+                that.state.user.name = username;
+                that.state.user.email = email;
+                that.state.user.pwd = json.secret;
+                common.cookies.set_cookie(username, json.secret);
+                that.router.navigate('#', {trigger: true});
+            }
+        }, 'json');
+        
+        return false;
+    },
+    loginBtn: function(){
+        var username = this.$('input#useremail').val();
+        var password = this.$('input#password').val();
+        var newusername = this.$('input#newusername').val();
+        var newemail = this.$('input#newemail').val();
+
+        if (username.length>0 && password.length>0)
+            return this.doLogin(username, password);
+
+        if (newusername.length>0 && newemail.length>0)
+            return this.doCreate(newusername, newemail);
+    },
     render: function(){
         var compiled_template = _.template( loginViewTemplate );
         this.el.html( compiled_template() );
 
         var that = this;
-        this.$('input[type=text]').focus().keypress(function(evt){
+        this.$('input#useremail').focus().keypress(function(evt){
             if (evt.keyCode==13)
-                that.$('input[type=password]').focus();
-        });
-        this.$('input[type=password]').keypress(function(evt){
+                that.$('input#password').focus();
+        })
+        this.$('input#password').keypress(function(evt){
             if (evt.keyCode==13)
-                that.$('form').submit();
-        });
-        this.$('form').submit(this.loginBtn);
+                that.loginBtn();
+        })
+
+        this.$('input#newusername').keypress(function(evt){
+            if (evt.keyCode==13)
+                that.$('input#newemail').focus();
+        })
+        this.$('input#newemail').keypress(function(evt){
+            if (evt.keyCode==13)
+                that.loginBtn();
+        })
+
+        this.$('form').one('submit', this.loginBtn);
     },
   });
   return new loginView;

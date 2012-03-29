@@ -8,6 +8,7 @@ define(['underscore', 'backbone'], function(_, Backbone) {
         selected: false,
         display: true,
         matches: {},
+        showControls: true,
      },
 
     // Ensure that each todo created has `content`.

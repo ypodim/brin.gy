@@ -13,12 +13,41 @@ from optparse import OptionParser
 from threading import Thread
 from urllib import urlencode
 
+import smtplib
+from email.mime.text import MIMEText
+
 from db import DB
 from profile import profile
 from location import location
 from buysell import buysell
 
 capability_names = ['profile','location','buysell']
+
+class sendEmail:
+    def __init__(self, to, fromuser, subject, message):
+        if not to or not fromuser:
+            return
+        
+        msg = MIMEText(message)
+        msg['Subject'] = subject
+        msg['From'] = 'Brin.gy <%s>' % fromuser
+        msg['To'] = to
+
+        LOGIN = 'info@brin.gy'
+        LOGIN = 'ypodim'
+        PASSWD = open('email.pwd').read()
+        
+        error = ''
+        s = smtplib.SMTP('smtp.gmail.com', 587)
+        s.ehlo()
+        s.starttls()
+        try:
+            s.login(LOGIN, PASSWD)
+            print 'sendmail', s.sendmail(fromuser, [to], msg.as_string())
+            s.quit()
+        except Exception,e:
+            error = '%s'%e
+
 
 class bringy_handler(tornado.web.RequestHandler):
     callback = None
@@ -104,15 +133,29 @@ class bringy_handler(tornado.web.RequestHandler):
 class serve_index(bringy_handler):
     def post(self):            
         user_name = self.get_argument('username')
+        email = self.get_argument('email')
         created, secret = db.create_user(user_name)
-        res = dict(error='', username=user_name, created=created, secret=secret)
-        
-        #print 'CREATE USER', res
+        db.set_email(user_name, email)
+        print user_name, email
+
+        subject = 'Your Brin.gy username: %s' % user_name
+        ip = self.request.headers.get('X-Real-Ip')
+        message = 'Hello,\n\n'
+        message+= 'You received this message because someone (probably you) created user "%s" on Brin.gy:\n\n' % user_name
+        message+= 'Account access: http://brin.gy/a/%s\n\n' % secret
+        message+= 'You can use the above URL to manage your pseudonym.\n\n'
+        message+= 'Cheers\nBrin.gy\n\nPS: IP address that was used: %s' % ip
+        sendEmail(email, 'ypodim@gmail.com', subject, message)
+
+        error = ''
+        if not created: error = 'user already exists'
+        res = dict(error=error, username=user_name, created=created, secret=secret)
         self.write(res)
     def get(self):
         dic = dict(message='this is ego')
         self.write(dic)
         
+
         
 class serve_user(bringy_handler):
     def prepare(self):
@@ -152,8 +195,8 @@ class serve_user(bringy_handler):
             error = 'authentication failed for user:%s secret:%s' % (self.username, secret)
         if not context:
             error = 'invalid context'
-        if action not in ['join','leave']:
-            error = 'invalid action'
+        if action not in ['join','leave','email']:
+            error = 'invalid action %s' % action
         if action == 'leave' and context == 'all':
             error = 'You can check in any time you like, but you can never leave'
             
@@ -163,7 +206,30 @@ class serve_user(bringy_handler):
             #db.leave_context(context, self.username)
             p = profile(self.username, [], self.request.path.split('/'), db.r, None)
             p.leave_context(context)
+        if not error and action == 'email':
+            msg = self.get_argument('msg')
+            to = self.get_argument('to')
+            selectedAttrs = self.get_argument('selectedAttrs')
+            subject = 'Brin.gy message from user: %s' % self.username
+
+            to = tornado.escape.json_decode(to)
+            selectedAttrs = tornado.escape.json_decode(selectedAttrs)
+            replyTo = db.get_email(self.username)
+            sendTo = [db.get_email(x) for x in to]
+
+            body = 'User %s (%s) sent you a message based on your attributes:\n\n' % (self.username, replyTo)
+            for attr in selectedAttrs:
+                body += '%s:%s\n' % (attr['key'], attr['val'])
+            body += '\nATTENTION: Please reply to the user\'s email, NOT to this message directly!\n'
+            body += 'User\'s message follows:\n'
+            body += '====================\n\n'
+            body += msg
+
             
+            for destination in sendTo:
+                print destination, subject, body
+                sendEmail(destination, 'ypodim@gmail.com', subject, body)
+
         res = {'error':error, 'username':self.username}
         self.write(res)
         
@@ -203,7 +269,7 @@ class serve_capability(bringy_handler):
         arguments = tornado.escape.json_decode(arguments)
         #print 'delete:', arguments, type(arguments)
         secret = params.get('secret')
-        context = params.get('context')
+        context = params.get('context', 'all')
         passed = db.authenticate_user(self.username, secret)
         if passed:
             res = self.execute(context=context, arguments=arguments)

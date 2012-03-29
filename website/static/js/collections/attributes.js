@@ -41,6 +41,7 @@ define([
 
         var that = this;
         url = this.state.satellite.url+"/profile/"+this.state.context.context+"/keyvals";
+        console.log(url);
         $.getJSON(url, {user:this.state.user.name}, function(json){
             that.state.progress('fetched '+json.items.length+' attribute groups');
             for (i in json.items) {
@@ -84,7 +85,7 @@ define([
         dic = [obj.get('key'), obj.get('val')];
         secret = '';
         username = 'ypodim';
-        url = this.state.agent.url+'/profile';
+        url = this.state.agent.baseurl+'/'+this.state.user.name+'/profile';
         data = {secret:secret, data:JSON.stringify(dic)};
 
         console.log('posting', url, data, secret);
@@ -103,6 +104,10 @@ define([
 
     haveit: function() {
         return this.filter(function(attribute){ return attribute.get('haveit'); });
+    },
+
+    selected: function() {
+        return this.filter(function(attribute){ return attribute.get('selected'); });
     },
 
     remaining: function() {

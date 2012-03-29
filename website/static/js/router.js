@@ -9,23 +9,27 @@ define([
     'views/login',
     'views/mobileManager',
     'views/sendMessage',
+    'views/profile',
+    'views/newAttribute',
 ], function(
     $, _, Backbone, common, 
-    aboutView, loginView, mobileManagerView, sendMessageView
+    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView
     ){
   var AppRouter = Backbone.Router.extend({
     routes: {
         "about": "showAbout",
-        "user/:user": "setUserContext",
         "context/:context": "setContext",
         "user/:user/context/:context": "setUserContext",
         "context/:context/user/:user": "setContextUser",
+
+        "u/:user": "showUser",
         'login': 'login',
         // 'matches': 'matches',
         'sendmessage': 'sendmessage',
 
         'filters': 'showFilters',
         'me': 'showMe',
+        'new': 'newAttribute',
 
         "tour": "takeTour",
         "tour/:page": "takeTour",
@@ -39,30 +43,59 @@ define([
         loginView.state = options.state;
         loginView.router = this;
 
+        var pseudonyms = common.cookies.get_cookie().pseudonyms;
+        for (username in pseudonyms) {
+            this.state.user.name = username;
+            this.state.user.pwd = pseudonyms[username];
+        }
+
         this.contents_view = new mobileManagerView({
             state: this.state,
             controls: this.controlsView,
         });
+        this.contents_view.resetCollections();
 
         this.controlsView.$('#loginBtn').click(loginView.loginBtn);
     },
 
+    showUser: function(username) {
+        var pview = new profileView({
+            state: this.state,
+            username:username,
+        });
+        pview.render();
+        this.controlsView.doProfile(username);
+        this.state.hideSplash();
+    },
     showFilters: function(options){
         if (! this.contents_view._isRendered)
             this.navigate('#', {trigger:true});
 
+        this.contents_view.render();
         this.contents_view.showFilters();
+        this.controlsView.doFilters();
     },
     showMe: function(){
         if (! this.contents_view._isRendered)
             this.navigate('#', {trigger:true});
 
-        this.contents_view.showMe();  
+        this.contents_view.render();
+        this.contents_view.showMe();
+        this.controlsView.doMe();
     },
 
     login: function() {
         loginView.render();
         this.controlsView.doLogin();
+        this.state.hideSplash();
+    },
+
+    newAttribute: function() {
+        var aview = new newAttrView({
+            state: this.state,
+        });
+        aview.render();
+        this.controlsView.doNewAttr();
         this.state.hideSplash();
     },
     // matches: function(){
@@ -98,12 +131,6 @@ define([
     },
     
     defaultRoute: function( cntx ){
-        var pseudonyms = common.cookies.get_cookie().pseudonyms;
-        for (username in pseudonyms) {
-            this.state.user.name = username;
-            this.state.user.pwd = pseudonyms[username];
-        }
-
         this.contents_view.render();
         this.controlsView.doDefault();
     },

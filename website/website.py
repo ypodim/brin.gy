@@ -11,6 +11,7 @@ import os.path
 import time
 from optparse import OptionParser
 import json
+
 import smtplib
 from email.mime.text import MIMEText
 
@@ -128,31 +129,33 @@ class serve_user(tornado.web.RequestHandler):
 
 class message(tornado.web.RequestHandler):
     def post(self):
-        you = self.get_argument('to')
+        to = self.get_argument('to')
         secret = self.get_argument('secret')
         user = self.get_argument('user')
+        message = self.get_argument('msg')
         ip = self.request.headers.get('X-Real-Ip')
         
-        if not you or not secret or not user:
+        if not to or not secret or not user:
             self.write(dict(error='missing parameter'))
         
         import redis
         r = redis.Redis(host='localhost', port=6379, db=0)
-        r.sadd('adminemails', '%s:%s:%s' % (user,you,ip))
+        r.sadd('adminemails', '%s:%s:%s' % (user,to,ip))
         
-        message = 'Hello,\n\n'
-        message+= 'You received this message because someone (probably you) emailed to you the "admin URL" for user "%s" on Brin.gy:\n\n' % user
-        message+= 'http://brin.gy/a/%s\n\n' % secret
-        message+= 'You can use the above URL to manage your pseudonym.\n\n'
-        message+= 'Cheers\nBrin.gy\n\nPS: IP address that was used: %s' % ip
+        # message = 'Hello,\n\n'
+        # message+= 'You received this message because someone (probably you) emailed to you the "admin URL" for user "%s" on Brin.gy:\n\n' % user
+        # message+= 'http://brin.gy/a/%s\n\n' % secret
+        # message+= 'You can use the above URL to manage your pseudonym.\n\n'
+        # message+= 'Cheers\nBrin.gy\n\nPS: IP address that was used: %s' % ip
         
-        me = 'info@brin.gy'
+        # me = 'info@brin.gy'
         msg = MIMEText(message)
         msg['Subject'] = 'Your "%s" pseudonym' % user
-        msg['From'] = 'Brin.gy <%s>' % me
-        msg['To'] = you
+        msg['From'] = 'Brin.gy <%s>' % user
+        msg['To'] = to
 
         LOGIN = 'info@brin.gy'
+        LOGIN = 'ypodim'
         PASSWD = open('email.pwd').read()
         
         error = ''
@@ -161,11 +164,11 @@ class message(tornado.web.RequestHandler):
         s.starttls()
         try:
             s.login(LOGIN, PASSWD)
-            s.sendmail(me, [you], msg.as_string())
+            s.sendmail(user, [to], msg.as_string())
             s.quit()
         except Exception,e:
             error = '%s'%e
-        self.write(dict(error=error, to=you))
+        self.write(dict(error=error, to=to))
         if not self._finished:
             self.finish()
         

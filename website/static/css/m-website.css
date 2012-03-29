@@ -105,6 +105,24 @@ div.resultsTitle{
     display:none;
 }
 
+div#noFilters {
+    display:none;
+    background-color: rgba(0,0,0,0.2);
+    text-shadow: 0 1px rgba(255, 255, 255, .5);
+    padding:20px 40px 20px 40px;
+    font-size:40px;
+    line-height:60px;
+}
+div#noFilters > button {
+    width:150px;
+    height:90px;
+    margin: 0 0 0 5px;
+    background-image: url('http://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 40%;
+}
+
 /* ======== PERSON ========= */
 person {
     display: block;
@@ -141,13 +159,11 @@ person > button {
 attribute {
     display: block;
     font-size:90px;
-    margin: 0 0 20px 0;
+    margin: 20px 0 20px 0;
     background: rgba(25, 25, 25, 0.15);
-    background-image: -moz-linear-gradient(90deg, #dddddd, #aaaaaa);
-    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#dddddd), to(#aaaaaa));
-    /*border-radius: 5px;*/
-    box-shadow: 0 0.15em 0.17em rgba(0, 0, 0, 0.5);
-    /*width: 100%;*/
+    background-image: -moz-linear-gradient(90deg, #aaa, #ddd);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#aaa), to(#ddd));
+    box-shadow: 0 3px 1px rgba(0, 0, 0, 0.5);
     line-height: 90px;
 }
 attribute a { color: black; }
@@ -171,7 +187,23 @@ attribute > a.keypart {
     margin: 0 0 0 5px;
     background-color: rgba(255,255,255,0.01);
 }
-
+attribute > a.keypart > span.count {
+    display:inline-block;
+    color: white;
+    background-color:#ff2244;
+    line-height:90px;
+    padding: 0px 10px 0px 10px;
+    text-align:center;
+    text-shadow: 0px -2px 0px rgba(0,0,0,0.5);
+    border-radius: 3px;
+}
+attribute > form > input {
+    height:70px;
+    width:50%;
+    font-size:60px;
+    line-height:60px;
+    margin: 0 0 10px 10px;
+}
 /* ======== VALPART ========= */
 
 /*attribute > div.valpart {
@@ -245,22 +277,25 @@ attribute > div.valpartdetailed > div.valcontainer > a > div.value {
     max-width:560px;
 }
 attribute > div.valpartdetailed > div.valcontainer > a > span.count {
+    display:inline-block;
     color: white;
     background-color:#ff2244;
-    padding: 1px 5px;
-    text-shadow: 0 0px 1px #fff;
+    line-height:60px;
+    padding: 0px 10px 0px 10px;
+    text-align:center;
+    text-shadow: 0px -2px 0px rgba(0,0,0,0.5);
     border-radius: 3px;
 }
 
 /* ========================================= */
 
-span.count {
+/*span.count {
     color: white;
+    background-color:#ff2244;
     padding: 1px 5px;
     text-shadow: 0 0px 1px #fff;
     border-radius: 3px;
-    background-color:#ff2244;
-}
+}*/
 
 div#controls {
     display:none;
@@ -270,9 +305,9 @@ div#controls {
     width:100%;
     height:90px;
     background-color:gray;
+
     box-shadow: 0 5px 5px 0 rgba(0,0,0,0.5);
 
-    text-shadow: #000 -1px -1px 0;
     text-align:center;
     color:white;
     font-size:60px;
@@ -320,26 +355,97 @@ div#controls > button#cancelMessageBtn {
     display:none;
     font-size:40px;
 }
+div#controls > button#backBtn {
+    position:absolute;
+    left:5px;
+    right:inherit;
+    top:5px;
+    height: 80px;
+    display:none;
+    font-size:40px;
+}
 div#controls span.badge {
     position: absolute;
     right:5px;
     top:5px;
     display: none;
-    font-size:20px;
+    font-size:30px;
+    line-height:30px;
+    height:32px;
 }
 
+div#controls > div#profileinfo {
+    position: absolute;
+    right:15px;
+    top:15px;
+    display:none;
+    text-shadow: #000 0px -1px 1px;
+    height:80px;
+    line-height:80px;
+    /*background-color: yellow;*/
+}
+div#controls > div#profileinfo > img{
+    width: 80px;
+    padding-bottom:30px;
+}
 
 /*############# LOGIN #############*/
-form.login > input {
+form.account {
+    background-color: rgba(220,220,220,1);
+    width:400px;
+    margin: auto;
+    /*padding-top:30px;*/
+}
+form.account > label {
+    line-height:40px;
+    font-size:40px;
+    text-shadow: 0 1px rgba(255, 255, 255, 0.9);
+    width:300px;
+    margin:auto;
+}
+form.account > label.note {
+    font-size:20px;
+    line-height:20px;
+}
+form.account > input {
     display:block;
     margin: 10px auto;
-    font-size:40px;
+    font-size:30px;
     line-height:40px;
     height:40px;
-    width:400px;
+    width:300px;
 }
-form.login > div.alert{
+form.account.login {
+    height:170px;
+}
+form.account.create {
+    padding-top:30px;
+}
+
+div.account#divider {
+    position:absolute;
+    top:187px;
+    width:100%;
+    text-align:center;
+}
+div.account#divider > span{
+    display:inline-block;
+    font-size:40px;
+    line-height:40px;
+    background-color: rgba(220,220,220,1);
+    text-align:center;
+    width:100px;
+    color:gray;
+}
+div.account.alert{
+    position:absolute;
+    top:0px;
+    width:100%;
     display:none;
+    text-align:center;
+    font-size:30px;
+    line-height:50px;
+    height:50px;
 }
 
 /*############# SEND MESSAGE #############*/
@@ -368,3 +474,60 @@ form.sendMessage > label > input {
     -webkit-transform: scale(3,3);
     -moz-transform: scale(3,3);
 }
+
+form.sendMessage .selectedAttr {
+    font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+}
+
+div.sendMessage {
+    position:absolute;
+    top:0px;
+    width:100%;
+    display:none;
+    text-align:center;
+    font-size:30px;
+    line-height:50px;
+    height:50px;
+}
+
+/*############# PROFILE #############*/
+
+profile > div#header {
+    background-color: rgba(0,0,0,0.3);
+    font-size:40px;
+    line-height:40px;
+    height:50px;
+    text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+    padding: 10px;
+}
+
+/*############# NEW ATTRIBUTE #############*/
+
+newattribute > div {
+    margin: auto;
+    width: 700px;
+}
+newattribute > div > form > div.title {
+    background-color: rgba(0,0,0,0.2);
+}
+newattribute > div > form > div.value {
+    background-color: rgba(0,0,0,0.2);
+}
+newattribute > div > form > div > label {
+    font-size:40px;
+    line-height:40px;
+    text-shadow: 0 1px rgba(255, 255, 255, 0.9);
+}
+newattribute > div > form > div > input {
+    display:block;
+    font-size:40px;
+    line-height:40px;
+    height:50px;
+    width:400px;
+    /*margin: auto;*/
+}
+
+
+
+
+

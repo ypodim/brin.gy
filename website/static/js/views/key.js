@@ -4,9 +4,11 @@ define([
     'backbone',
     'scroll',
 
+    'models/attribute',
+
     'views/valueDetailed',
     'text!templates/key.html',
-], function($, _, Backbone, scroll, valueDetailedView, keyTemplate){
+], function($, _, Backbone, scroll, Attr, valueDetailedView, keyTemplate){
     var KeyView = Backbone.View.extend({
 
     tagName: 'attribute',
@@ -14,13 +16,15 @@ define([
     detailViewRendered: false,
 
     events: {
-        'click attribute': 'clicked',
+        'click a.keypart': 'sink',
+        'keypress input': 'valueKey',
+        'submit form': 'submitNewValue',
     },
 
-    initialize: function() {
-      _.bindAll(this, 'render');
+    initialize: function(options) {
+      _.bindAll(this, 'render', 'valueKey', 'submitNewValue');
       this.model.bind('change', this.render);
-
+      this.state = options.state;
       // this.model.bind('destroy', this.remove);
       this.model.view = this;
     },
@@ -31,21 +35,42 @@ define([
         return this;
     },
 
-    detailedIsHidden: false,
-    clicked: function() {
-        // var detailedIsHidden = this.$('.valpart').toggle().is(':visible');
-
-        if (this.detailedIsHidden) {
-            this.$('.valpartdetailed').slideDown();
-            $(this.el).scrollIntoView();
-        } else {
-            this.$('.valpartdetailed').slideUp();
-        }
-        this.detailedIsHidden = ! this.detailedIsHidden;
-
+    valueKey: function(evt){
+        if (evt.keyCode == 32 || evt.keyCode == 13 ||(evt.keyCode >= 45 && evt.keyCode <= 126))
+            return true;
         return false;
     },
 
+    submitNewValue: function() {
+        
+        var key = this.model.get('key');
+        var val = this.$('input').val();
+        var type = 'POST';
+        var that = this;
+        console.log('posting', key, val, type);
+        this.state.mutateKeyValue(key, val, type, function(json){
+            console.log(json);
+            this.$('input').val('');
+
+            var attr = new Attr({
+                key:key,
+                val:val,
+                kcnt:0, 
+                vcnt:1, 
+                selected:false,
+                display:true,
+                haveit:true, 
+                matches:{},
+                new:false,
+            });
+            attr.bind('change', that.state.attrCollection.modelChange)
+            that.state.attrCollection.add(attr);
+        });
+        
+        return false;
+    },
+
+    sink: function(){ return false; },
     });
     return KeyView;
 });

@@ -23,6 +23,12 @@ class DB:
         self.r.set('options:reverse-secret:%s' % secret, username)
         return secret
         
+    def get_email(self, username):
+        return self.r.hget('options:user:%s' % username, 'email')
+
+    def set_email(self, username, email):
+        self.r.hset('options:user:%s' % username, 'email', email)
+
     def create_user(self, username):
         created = self.r.sadd('users', username)
         secret = ''

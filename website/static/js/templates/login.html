@@ -1,5 +1,14 @@
-<form class="well login">
-    <input type="text" placeholder="Email or username...">
-    <input type="password" placeholder="Password">
-    <div class='alert alert-error'>Wrong username/email or password.</div>
+<div class='alert alert-error account'></div>
+<form class="well account login">
+    <label>Sign in</label>
+    <input id='useremail' type="text" placeholder="Email or username...">
+    <input id='password' type="password" placeholder="Password">
+</form>
+<div class='account' id='divider'><span>OR</span></div>
+<form class="well account create">
+    <label>Create user</label>
+    <input id='newusername' type="text" placeholder="pick a username...">
+    <label class='note'>Why both a username and an email? Your username ensures anonymity, while your email puts you in contact with others when you want to.</label>
+    <input id='newemail' type="text" placeholder="email...">
+    <label class='note'>Your email is only used to receive notifications from other users and is never shared with anyone. When you send messages to other users, your email is provided in your message so others can reply to you directly.</label>
 </form>

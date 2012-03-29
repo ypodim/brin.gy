@@ -17,8 +17,9 @@ define([
         'click #moreBtn': 'moreBtn',
     },
 
-    initialize: function() {
+    initialize: function(options) {
       _.bindAll(this, 'render');
+      this.state = options.state;
       this.model.bind('change', this.render);
       // this.model.bind('destroy', this.remove);
       this.model.view = this;
@@ -35,6 +36,8 @@ define([
         return false;
     },
     moreBtn: function() {
+        this.state.stats('profile', this.model.get('username'));
+        this.state.router.navigate('/u/'+this.model.get('username'), {trigger:true});
         return false;
     },
 

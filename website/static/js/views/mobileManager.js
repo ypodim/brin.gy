@@ -37,19 +37,26 @@ define([
     el: $("#container"),
     template: _.template(manageViewTemplate),
     events: {
-
+        'click button.newattrbtn': 'newAttribute',
     },
 
     _keysInserted: {},
     _keyViews: {},
 
+    newAttribute: function() {
+        if (! this.state.isLoggedin())
+            return false;
+
+        this.state.stats('newattrbtnBottom');
+        this.state.router.navigate('#/new', {trigger:true});
+    },
     addOneAttribute: function(model) {
         var key = model.get('key');
         var val = model.get('val');
         var kcnt = model.get('kcnt');
-        var vcnt = model.get('vcnt');
-        var haveit = model.get('haveit');
-        var newval = model.get('newval');
+        // var vcnt = model.get('vcnt');
+        // var haveit = model.get('haveit');
+        // var newval = model.get('newval');
 
         if (!(key in this._keysInserted)) {
             this._keysInserted[key] = {};
@@ -61,6 +68,7 @@ define([
             });
             var kv = new keyView({
                 model : kmodel,
+                state: this.state,
             });
             this.$('#m-choices').append($(kv.render().el));
             this._keyViews[key] = kv;
@@ -75,9 +83,9 @@ define([
     },
 
     addOnePerson: function(model){
-        // var username = model.get('username');
         var pv = new personView({
             model : model,
+            state: state,
         });
         this.$('#results').append($(pv.render().el));
     },
@@ -95,7 +103,6 @@ define([
         this.$('.resultsTitle').hide();
         this.$('#results').hide();
         this.$('.closingpane').show();
-        // this.$('#likemeBtn').show();
     },
 
     showFilters: function(){
@@ -109,8 +116,17 @@ define([
         });
         this.$('.closingpane').hide();
         this.$('#results').show();
-        this.$('.resultsTitle').show();
 
+        if (this.$('.filterTag').length > 0) {
+            this.$('.resultsTitle').show();
+            this.$('#noFilters').hide();
+        } else {
+            this.$('.resultsTitle').hide();
+            this.$('#noFilters').show();
+        }
+
+
+        this.state.stats('filters');
         this.matchesClb();
     },
 
@@ -129,7 +145,7 @@ define([
     },
 
     initialize: function(options) {
-        _.bindAll(this, 'addOneAttribute', 'addOnePerson', 'render', 'matchesClb');
+        _.bindAll(this, 'addOneAttribute', 'addOnePerson', 'render', 'matchesClb', 'resetCollections', 'newAttribute');
         this.state = options.state;
         this.controls = options.controls;
 
@@ -138,8 +154,33 @@ define([
         this.state.personCollection.bind('add', this.addOnePerson);
     },
     
+    showAll: function(){
+        this.$('.resultsTitle').hide();
+        this.$('#results').hide();
+        this.$('.closingpane').show();
+        // this.controls.doDefault();
+
+        this.$('attribute').show();
+        this.$('.valcontainer').show();
+    },
+
+    resetCollections: function() {
+        this._isRendered = false;
+        this._keysInserted = {};
+        this.state.attrCollection.ffetch();
+        this.state.personCollection.reset();
+    },
+
     _isRendered: false,
     render: function(){
+        $(this.el).html(this.template());
+        this._keysInserted = {};
+        console.log('render: attrs:', this.state.attrCollection.length)
+        this.state.attrCollection.each(this.addOneAttribute);
+        this.state.personCollection.each(this.addOnePerson);
+        this._isRendered = true;
+        return true;
+
         if (this.state.renderManager) {
             this._isRendered = false;
             this.state.renderManager = false;

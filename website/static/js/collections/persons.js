@@ -12,6 +12,10 @@ define([
         this.bind('add', this.added);
     },
 
+    included: function() {
+        return this.filter(function(attribute){ return attribute.get('include'); });
+    },
+
     byKey: function(key) {
         return this.filter(function(attribute){ return (attribute.get('username') == key); });
     },

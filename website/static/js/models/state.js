@@ -1,8 +1,8 @@
 
 define(['underscore', 'backbone',
     // 'collections/attributes',
-    'collections/persons',
-    ], function(_, Backbone, Persons) {
+    // 'collections/persons',
+    ], function(_, Backbone) {
     var stateModel = Backbone.Model.extend({
 
     filters: null,
@@ -68,6 +68,66 @@ define(['underscore', 'backbone',
             if (clb != undefined) clb(result);
             that.trigger('matchesChanged');
         });
+    },
+
+    showMessage: function(msg) {
+        $('div#message').html(msg).slideDown();
+        setTimeout(function(){
+            $('div#message').slideUp();
+        }, 5000);
+    },
+
+    mutateKeyValue: function(key, val, type, clb) {
+        var url = this.agent.baseurl+'/'+this.user.name+'/profile';
+        var data = JSON.stringify([[key, val]]);
+        if (type != 'POST' && type != 'DELETE')
+            return false;
+
+        $.ajax({
+            type: type,
+            url: url,
+            data: {data:data, secret:this.user.pwd},
+            success: function(json){ 
+                if (clb != undefined)
+                    clb(json);
+            },
+            dataType: "json",
+        });
+    },
+
+    stats: function(type, arg) {
+        if (type == 'filters') {
+            stat = {
+                type:type,
+                filters:[],
+                user:this.user.name,
+            };
+            this.attrCollection.each(function(attribute){ 
+                if (attribute.get('selected'))
+                    stat.filters.push({
+                        key:attribute.get('key'),
+                        val:attribute.get('val'),
+                    });
+            });
+            console.log('STATS:', type, stat);
+        }
+
+        if (type == 'newattrbtnTop' || type == 'newattrbtnBottom') {
+            stat = {
+                type:type,
+                user:this.user.name,
+            };
+            console.log('STATS:', type, stat);
+        }
+
+        if (type == 'profile') {
+            stat = {
+                type:type,
+                user:this.user.name,
+                targetUser: arg,
+            };
+            console.log('STATS:', type, stat);
+        }
     },
 
     hideSplash: function(){
