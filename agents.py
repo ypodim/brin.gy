@@ -145,7 +145,7 @@ class serve_index(bringy_handler):
         # message+= 'Account access: http://brin.gy/a/%s\n\n' % secret
         message+= 'Username: %s\n' % user_name
         message+= 'Password: %s\n' % secret
-        message+= 'Login: http://brin.gy/#/login\n\n' % secret
+        message+= 'Login: http://brin.gy/#/login\n\n'
         message+= 'You can use the above URL to manage your pseudonym.\n\n'
         message+= 'Cheers\nBrin.gy\n\nPS: IP address that was used: %s' % ip
         sendEmail(email, 'ypodim@gmail.com', subject, message)
