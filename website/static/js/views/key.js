@@ -45,6 +45,9 @@ define([
         
         var key = this.model.get('key');
         var val = this.$('input').val();
+        if (val.length == 0)
+            return false;
+
         var type = 'POST';
         var that = this;
         console.log('posting', key, val, type);
