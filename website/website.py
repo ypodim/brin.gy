@@ -213,8 +213,8 @@ if __name__ == "__main__":
     HOST = options.host
     
     website_url = 'http://%s:%s' % (HOST, PORT)
-    discov_url = 'http://%s:22222' % options.discov_url
-    agents_url = 'http://%s:10007' % options.agents_url
+    discov_url = 'http://%s' % options.discov_url
+    agents_url = 'http://%s' % options.agents_url
     
         
     config.website_url_prefix = website_url
