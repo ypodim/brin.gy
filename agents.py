@@ -142,7 +142,9 @@ class serve_index(bringy_handler):
         ip = self.request.headers.get('X-Real-Ip')
         message = 'Hello,\n\n'
         message+= 'You received this message because someone (probably you) created user "%s" on Brin.gy:\n\n' % user_name
-        message+= 'Account access: http://brin.gy/a/%s\n\n' % secret
+        # message+= 'Account access: http://brin.gy/a/%s\n\n' % secret
+        message+= 'Username: %s\n' % user_name
+        message+= 'Password: %s\n\n' % secret
         message+= 'You can use the above URL to manage your pseudonym.\n\n'
         message+= 'Cheers\nBrin.gy\n\nPS: IP address that was used: %s' % ip
         sendEmail(email, 'ypodim@gmail.com', subject, message)
