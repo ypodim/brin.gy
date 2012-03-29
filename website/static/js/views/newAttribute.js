@@ -33,8 +33,11 @@ define([
         var that = this;
         var saved = false;
         this.$('input.value').each(function(i, obj){
+
             if ($(obj).val().length > 0) {
                 var val = $(obj).val();
+                console.log('adding', i, key, val);
+
                 that.state.mutateKeyValue(key, val, 'POST', function(json){
                     var attr = new attrModel({
                         key:key,
@@ -59,7 +62,7 @@ define([
     initialize: function(options) {
         _.bindAll(this, 'render', 'save');
         this.state = options.state;
-        $('button#saveAttrBtn').click(this.save);
+        $('button#saveAttrBtn').one('click', this.save);
     },
 
     valueKey: function(evt){
