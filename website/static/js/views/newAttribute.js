@@ -36,7 +36,7 @@ define([
 
             if ($(obj).val().length > 0) {
                 var val = $(obj).val();
-                console.log('adding', i, key, val);
+                // console.log('adding', i, key, val);
 
                 that.state.mutateKeyValue(key, val, 'POST', function(json){
                     var attr = new attrModel({
