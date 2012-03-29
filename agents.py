@@ -492,7 +492,24 @@ class api_call(tornado.web.RequestHandler):
         print context
         if context != 'all':
             db.clear_context(context)
-        
+
+
+class stats(tornado.web.RequestHandler):
+    def options(self):
+        self.write('')
+    def prepare(self):
+        self.start_time = time.time()
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
+        self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
+        self.set_header('Content-Type','application/json; charset=UTF-8')
+    def post(self):
+        dic = self.request.arguments
+        dic['tstamp'] = '%s' % time.time()
+        db.r.sadd('statbag', dic)
+        print dic
+        self.write(dict(error=''))
+
 #########################################
 
 settings = {
@@ -509,6 +526,8 @@ application = tornado.web.Application([
     (r"/authenticate_admin_secret", api_call),
     (r"/cleanup", api_call),
     (r"/clear_context", api_call),
+    (r"/stats", stats),
+
     
     
     (r"/a/[a-zA-Z0-9]+/?$", serve_user),

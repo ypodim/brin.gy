@@ -96,6 +96,7 @@ define(['underscore', 'backbone',
     },
 
     stats: function(type, arg) {
+        var stat = {};
         if (type == 'filters') {
             stat = {
                 type:type,
@@ -128,6 +129,12 @@ define(['underscore', 'backbone',
             };
             console.log('STATS:', type, stat);
         }
+
+        url = this.agent.baseurl+'/stats';
+        console.log(url);
+        $.post(url, stat, function(json){
+            console.log('STATS RES', json)
+        }, 'json');
     },
 
     hideSplash: function(){
