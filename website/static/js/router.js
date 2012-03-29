@@ -132,6 +132,7 @@ define([
     
     defaultRoute: function( cntx ){
         this.contents_view.render();
+        this.contents_view.showAll();
         this.controlsView.doDefault();
     },
     delUser: function() {
