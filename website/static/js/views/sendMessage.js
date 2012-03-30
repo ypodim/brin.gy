@@ -25,8 +25,15 @@ define([
             targets.push(model.get('username'));
         }
 
+        var args = {
+            from: this.state.user.name,
+            to: targets,
+            msg: this.$('textarea').val(),
+        };
+        this.state.stats('message', args);
+
         var url = this.state.agent.baseurl+'/'+this.state.user.name;
-        console.log('send', targets, url);
+        // console.log('send', targets, url);
         var that = this;
         var data = {
             to:JSON.stringify(targets), 
@@ -65,7 +72,7 @@ define([
         this.el.html( compiled_template() );
         this.$('span.badge').html(this.state.personCollection.included().length);
 
-        console.log(this.$('#selectedAttrs'));
+        // console.log(this.$('#selectedAttrs'));
         this.$('#selectedAttrs').empty();
         this.selectedAttrs = [];
         var that = this;

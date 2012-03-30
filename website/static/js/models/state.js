@@ -110,7 +110,6 @@ define(['underscore', 'backbone',
                         val:attribute.get('val'),
                     });
             });
-            console.log('STATS:', type, stat);
         }
 
         if (type == 'newattrbtnTop' || type == 'newattrbtnBottom') {
@@ -118,7 +117,6 @@ define(['underscore', 'backbone',
                 type:type,
                 user:this.user.name,
             };
-            console.log('STATS:', type, stat);
         }
 
         if (type == 'profile') {
@@ -126,6 +124,14 @@ define(['underscore', 'backbone',
                 type:type,
                 user:this.user.name,
                 targetUser: arg,
+            };
+        }
+
+        if (type == 'message') {
+            stat = {
+                type:type,
+                user:this.user.name,
+                args: arg,
             };
             console.log('STATS:', type, stat);
         }
