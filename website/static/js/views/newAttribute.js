@@ -56,7 +56,7 @@ define([
                 saved = true;
             }
             if (saved && i > 1)
-                that.state.router.navigate('#', {trigger:true});
+                that.state.router.navigate('#/all', {trigger:true});
         });
     },
     initialize: function(options) {

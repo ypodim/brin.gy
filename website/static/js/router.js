@@ -28,12 +28,12 @@ define([
         'sendmessage': 'sendmessage',
 
         'filters': 'showFilters',
+        'all': 'showAll',
         'me': 'showMe',
         'new': 'newAttribute',
 
-        "tour": "takeTour",
-        "tour/:page": "takeTour",
-        "delete": "delUser",
+        // "tour": "takeTour",
+        // "tour/:page": "takeTour",
         "*actions": "defaultRoute",
     },
     
@@ -59,6 +59,7 @@ define([
     },
 
     showUser: function(username) {
+        this.state.stats('user');
         var pview = new profileView({
             state: this.state,
             username:username,
@@ -69,22 +70,31 @@ define([
     },
     showFilters: function(options){
         if (! this.contents_view._isRendered)
-            this.navigate('#', {trigger:true});
+            this.navigate('#/all', {trigger:true});
 
+        this.state.stats('filters:filters');
         this.contents_view.render();
         this.contents_view.showFilters();
         this.controlsView.doFilters();
     },
+    showAll: function( cntx ){
+        this.state.stats('filters:all');
+        this.contents_view.render();
+        this.contents_view.showAll();
+        this.controlsView.doDefault();
+    },
     showMe: function(){
         if (! this.contents_view._isRendered)
-            this.navigate('#', {trigger:true});
+            this.navigate('#/all', {trigger:true});
 
+        this.state.stats('filters:me');
         this.contents_view.render();
         this.contents_view.showMe();
         this.controlsView.doMe();
     },
 
     login: function() {
+        this.state.stats('login');
         loginView.render();
         this.controlsView.doLogin();
         this.state.hideSplash();
@@ -108,8 +118,9 @@ define([
     // },
     sendmessage: function(){
         if (! this.contents_view._isRendered)
-            this.navigate('#', {trigger:true});
+            this.navigate('#/all', {trigger:true});
 
+        this.state.stats('message');
         this.message = new sendMessageView({
             state: this.state,
         });
@@ -130,18 +141,16 @@ define([
         this.setUserContext(undefined, context);
     },
     
+    
+
     defaultRoute: function( cntx ){
-        this.contents_view.render();
-        this.contents_view.showAll();
-        this.controlsView.doDefault();
+        this.state.stats('home');
+        aboutView.render();
+        this.state.hideSplash();
     },
-    delUser: function() {
-        console.log("DELETE USER", E.agent.id);
-        $("#delete-confirmation-modal").modal("show");
-    },
-    takeTour: function(page) {
-        console.log("TOUR", page);
-    },
+    // takeTour: function(page) {
+    //     console.log("TOUR", page);
+    // },
   });
 
   return AppRouter;

@@ -47,7 +47,7 @@ define([
         if (! this.state.isLoggedin())
             return false;
 
-        this.state.stats('newattrbtnBottom');
+        this.state.stats('newattr:btnBottom');
         this.state.router.navigate('#/new', {trigger:true});
     },
     addOneAttribute: function(model) {
@@ -124,9 +124,6 @@ define([
             this.$('.resultsTitle').hide();
             this.$('#noFilters').show();
         }
-
-
-        this.state.stats('filters');
         this.matchesClb();
     },
 
@@ -204,3 +201,17 @@ define([
   });
   return managerView;
 });
+/*
+
+TODO:
+- CONTEXT with event branding
+- logged in user indication!
+- loading icons when sending message, creating user
+- account management: pwd reminders, direct url
+- return to the same entry in the long list when returning to it.
+- don't re-render when switching tabs
+- realtime updates
+- login with twitter
+
+*/
+

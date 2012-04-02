@@ -507,11 +507,83 @@ class stats(tornado.web.RequestHandler):
         self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
         self.set_header('Content-Type','application/json; charset=UTF-8')
     def post(self):
-        dic = self.request.arguments
-        dic['tstamp'] = '%s' % time.time()
-        db.r.sadd('statbag', dic)
+        dic = {}
+        dic['tstamp'] = time.time()
+        dic['type'] = self.get_argument('type')
+
+        dic['user'] = self.get_argument('user','')
+        dic['user'] = dic['user']
+
+        dic['body'] = self.get_argument('body','{}')
+        dic['body'] = tornado.escape.json_decode(dic['body'])
+
+
+        etype = self.get_argument('type')
+        db.r.sadd('stat:etypes', etype)
+        db.r.lpush('stat:type:%s' % etype, tornado.escape.json_encode(dic))
+        
         print dic
         self.write(dict(error=''))
+    def get(self):
+        if (self.get_argument('clear','')):
+            return self.clearstats()
+        if (self.get_argument('trans','')):
+            return self.trans()
+
+        res = {}
+        for etype in db.r.smembers('stat:etypes'):
+            res[etype] = []
+            elen = db.r.llen('stat:type:%s'%etype)
+            for evt in db.r.lrange('stat:type:%s'%etype, 0, elen):
+                res[etype].append(tornado.escape.json_decode( evt ))
+        self.write(res)
+    def clearstats(self):
+        for etype in db.r.smembers('stat:etypes'):
+            db.r.delete('stat:type:%s'%etype)
+        db.r.delete('stat:etypes')
+        self.write(dict(error=''))
+        return 
+    def trans(self):
+        res = []
+        for evt in db.r.smembers('statbag'):
+            evt = evt.replace('\'','"')
+            evt = tornado.escape.json_decode(evt)
+
+            dic = {}
+            dic['user'] = evt.get('user',[''])[0]
+            dic['type'] = evt.get('type',[''])[0]
+            dic['tstamp'] = evt['tstamp']
+            dic['body'] = {}
+
+            if dic['user'] == 'ypodim':
+                continue
+
+            if dic['type'] == 'filters':
+                keys = evt.keys()
+                keys.remove('type')
+                if 'user' in keys: keys.remove('user') 
+                keys.remove('tstamp')
+                if keys:
+                    for i in xrange(len(keys)/2):
+                        tdic = []
+                        _dic = dict(key=evt['filters[%i][key]' % i])
+                        if 'filters[%i][val]' % i in evt:
+                            _dic['val'] = evt['filters[%i][val]' % i]
+                        tdic.append(_dic)
+                    dic['body'] = tdic
+
+            if dic['type'] == 'profile':
+                dic['body'] = evt['targetUser'][0]
+
+            # if evt['type'] == 'newattrbtnTop':
+                # continue
+
+            # if evt['type'] == 'newattrbtnBottom':
+                # continue
+
+            res.append(dic)
+        self.write(dict(res=res))
+
 
 #########################################
 

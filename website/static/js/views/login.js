@@ -28,7 +28,7 @@ define([
                 that.state.user.name = username;
                 that.state.user.pwd = password;
                 common.cookies.set_cookie(username, password);
-                that.router.navigate('#', {trigger: true});
+                that.router.navigate('#/all', {trigger: true});
             } else {
                 that.$('div.alert')
                     .html('Wrong username/email or password.')
@@ -67,7 +67,7 @@ define([
                 that.state.user.email = email;
                 that.state.user.pwd = json.secret;
                 common.cookies.set_cookie(username, json.secret);
-                that.router.navigate('#', {trigger: true});
+                that.router.navigate('#/all', {trigger: true});
             }
         }, 'json');
         

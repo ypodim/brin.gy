@@ -30,7 +30,7 @@ define([
             to: targets,
             msg: this.$('textarea').val(),
         };
-        this.state.stats('message', args);
+        this.state.stats('message:send', args);
 
         var url = this.state.agent.baseurl+'/'+this.state.user.name;
         // console.log('send', targets, url);
@@ -62,7 +62,7 @@ define([
     },
     cancel: function() {
         this.state.renderManager = true;
-        this.state.router.navigate('#', {trigger:true});
+        this.state.router.navigate('#/all', {trigger:true});
     },
 
     selectedAttrs: [],

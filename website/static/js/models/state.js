@@ -96,51 +96,38 @@ define(['underscore', 'backbone',
     },
 
     stats: function(type, arg) {
-        var stat = {};
-        if (type == 'filters') {
-            stat = {
-                type:type,
-                filters:[],
-                user:this.user.name,
-            };
+        var url = this.agent.baseurl+'/stats';
+        var stat = {
+            type:type,
+            user:this.user.name,
+            body:'',
+        };
+
+        if (type == 'filters:filters') {
+            var filters = [];
             this.attrCollection.each(function(attribute){ 
                 if (attribute.get('selected'))
-                    stat.filters.push({
+                    filters.push({
                         key:attribute.get('key'),
                         val:attribute.get('val'),
                     });
             });
+            stat.body = JSON.stringify(filters);
         }
 
         if (type == 'newattrbtnTop' || type == 'newattrbtnBottom') {
-            stat = {
-                type:type,
-                user:this.user.name,
-            };
+
         }
 
         if (type == 'profile') {
-            stat = {
-                type:type,
-                user:this.user.name,
-                targetUser: arg,
-            };
+            stat.body = JSON.stringify(arg);
         }
 
-        if (type == 'message') {
-            stat = {
-                type:type,
-                user:this.user.name,
-                args: arg,
-            };
-            console.log('STATS:', type, stat);
+        if (type == 'message:send') {
+            stat.body = JSON.stringify(arg);
         }
 
-        url = this.agent.baseurl+'/stats';
-        console.log(url);
-        $.post(url, stat, function(json){
-            console.log('STATS RES', json)
-        }, 'json');
+        $.post(url, stat, 'json');
     },
 
     hideSplash: function(){

@@ -23,8 +23,13 @@ define([
         'click #backBtn': 'goBack',
         'click #newBtn': 'newAttribute',
         'click #saveAttrBtn': 'saveNewAttribute',
+        'click #homeBtn': 'goHome',
+        
     },
 
+    goHome: function(){
+        this.state.router.navigate('#', {trigger:true});
+    },
     saveNewAttribute: function(){
 
     },
@@ -32,7 +37,7 @@ define([
         if (! this.state.isLoggedin())
             return false;
 
-        this.state.stats('newattrbtnTop');
+        this.state.stats('newattr:btnTop');
         this.state.router.navigate('#/new', {trigger:true});
     },
     goBack: function(){
@@ -41,7 +46,7 @@ define([
     filterBtn: function(evt) {
         var btnid = $(evt.target).attr('id');
         if (btnid == 'all') {
-            this.state.router.navigate('#', {trigger:true});
+            this.state.router.navigate('#/all', {trigger:true});
         }
         if (btnid == 'me') {
             this.state.router.navigate('#me', {trigger:true});
