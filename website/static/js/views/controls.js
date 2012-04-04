@@ -68,30 +68,34 @@ define([
             this.state.router.navigate('sendmessage', {trigger:true});
     },
 
-    doDefault: function(){
+    doAll: function(){
+        $(this.el).show();
         this.$('.controlFilters').show();
         this.$('.secondOrder').hide();
         this.$('div#profileinfo').hide();
         this.$('#newBtn').show();
     },
     doMe: function() {
+        $(this.el).show();
         this.$('.controlFilters').show();
         this.$('.secondOrder').hide();
         // this.$('#likemeBtn').show();
     },
     doFilters: function() {
+        $(this.el).show();
         this.$('.controlFilters').show();
         this.$('.secondOrder').hide();
         this.$('#resultsBtn').show();
     },
-
     doLogin: function() {
+        $(this.el).show();
         this.$('.controlFilters').hide();
         this.$('.secondOrder').hide();
         this.$('#loginBtn').show();
         this.$('div#profileinfo').hide();
     },
     doMessage: function() {
+        $(this.el).show();
         this.$('.controlFilters').hide();
         this.$('button.secondOrder').hide();
         this.$('#cancelMessageBtn').show();
@@ -99,6 +103,7 @@ define([
         this.$('div#profileinfo').hide();
     },
     doProfile: function(username) {
+        $(this.el).show();
         this.$('.controlFilters').hide();
         this.$('button.secondOrder').hide();
         this.$('button#backBtn').show();
@@ -106,12 +111,16 @@ define([
         this.$('div#profileinfo #username').html(username);
     },
     doNewAttr: function() {
+        $(this.el).show();
         this.$('.controlFilters').hide();
         this.$('button.secondOrder').hide();
         // this.$('div#profileinfo').show();
         // this.$('div#profileinfo #username').html(username);
         this.$('button#backBtn').show();
         this.$('button#saveAttrBtn').show();
+    },
+    hideControls:function() {
+        $(this.el).hide();
     },
     initialize: function(options) {
         _.bindAll(this, 'animateMatchesTo', 'showResults', 'doNewAttr');

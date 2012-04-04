@@ -3,46 +3,57 @@ define([
   'underscore', 
   'backbone',
   'router',
-  'text!templates/welcome.html'
-  ], function($, _, Backbone, router, welcomeViewTemplate){
+
+  'views/nametag',
+  'text!templates/welcome.html',
+  ], function($, _, Backbone, router, nametagView, welcomeViewTemplate){
   var welcomeView = Backbone.View.extend({
     el: $("#container"),
-    
-    roll_ticker: function() {
-        $.getJSON(require.E.satellite.url+"/randomstat", function(json){
-            if (json.error) {
-                $("#ticker").html(json.error);
-                return;
-            }
-            
-            $("#ticker").fadeOut(1000, function(){
-                $("#ticker-key").text(json.key);
-                $("#ticker-val").text(json.val);
-                $("#ticker-score").text(json.score);
-                
-                $("#ticker").fadeIn(1000, function(){
-                    setTimeout(this.roll_ticker, 1500);
-                });
-            });
-        });
-    },
 
+    pointer: 0,
+    taglist: [],
+    throwTag: function(tag){
+        var nview = new nametagView({attr:tag.key, value:tag.val});
+        nview.render(tag.x*200, tag.y*110);
+        $(this.el).append(nview.el);
+        nview.animate();
+    },
+    processNext: function(){
+        if (this.pointer < this.taglist.length) {
+            this.throwTag(this.taglist[this.pointer]);
+            this.pointer++;
+            setTimeout(this.processNext, 100);
+        }
+    },
     render: function(){
-        var compiled_template = _.template( welcomeViewTemplate );
-        this.el.html( compiled_template() );
-        
-        $.getJSON(require.E.satellite.url+"/stats", function(json){
-            $("#users").html(json.users);
-            $("#values").html(json.values);
-            $("#queries").html(json.queries);
+        // var compiled_template = _.template( welcomeViewTemplate );
+        // this.el.html( compiled_template() );
+        var that = this;
+        var x = -1;
+        var y = -1;
+        $.getJSON(this.state.satellite.url+"/profile/all/keyvals", function(json){
+            for (var i in json.items) {
+                var attr = json.items[i];
+                for (var j in attr.values){
+                    var val = attr.values[j];
+
+                    if (y < 4)
+                        that.taglist.push({key:attr.key, val:val.val, x:x, y:y});
+
+                    x++;
+                    if (x >= 4) {
+                        y += 1;
+                        x = -1;
+                    }
+                }
+            }
+            that.processNext();
         });
-        
-        this.roll_ticker();       
     },
 
-    initialize: function(){
-      console.log('welcome init')
-      this.render();
+    initialize: function(options){
+        _.bindAll(this, 'render', 'throwTag', 'processNext');
+        this.state = options.state;
     },
   });
   return welcomeView;

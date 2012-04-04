@@ -4,16 +4,15 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Brin.gy</title>
     
-    <link rel="stylesheet"      type="text/css" href="/static/css/reset.css">
-    <link rel="stylesheet"      type="text/css" href="/static/css/bootstrap.css">
+    <!-- <link rel="stylesheet"      type="text/css" href="/static/css/reset.css"> -->
+    <link rel="stylesheet"      type="text/css" href="/static/css/bootstrap-responsive.min.css">
+    <link rel="stylesheet"      type="text/css" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/loading.css">
     <link rel="stylesheet/less" type="text/css" href="/static/css/website.less">
-    <link rel="stylesheet/less" type="text/css" href="/static/css/tour.css">
-    <link rel="stylesheet/less" type="text/css" href="/static/css/user_account.css">
-    <link rel="stylesheet/less" type="text/css" href="/static/css/header.css">
 
-    <script src="/static/js/libs/less/less-1.1.3.min.js"></script>
-    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=geometry&sensor=false"></script>
+    <script src="/static/js/libs/less/less-1.1.3.min.js"></script> 
     
+    <script type="text/javascript">console.log('app started')</script>
     <script data-main="/static/js/main" src="/static/js/libs/require/require.js"></script>
     <script type="text/javascript">
         var _gaq = _gaq || [];
@@ -24,65 +23,25 @@
         var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
         ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();
-    </script>
+     })();
+     </script>
 </head>
 <body>
 
-<div id="start-dropdown" class="dropdown hidden">
-    <div id="new_pseudonym">
-        <h2>Pick a pseudonym</h2>
-        <form method="post" id="newuserform">
-            <input autofocus="autofocus" placeholder="Type pseudonym..." class="span3" id="username" name="username" type="text" />
-            <a id="btn1" class="btn primary" href="#">check</a> (<a href="/#about">terms of use</a>)
-        </form>
-    </div>
-    <div id="previous_pseudonym" class="hidden">
-        <h2>Previous pseudonyms</h2>
-        <form>
-            <select class="span3"></select>
-            <a id="btn2" class="btn primary" href="#">choose</a>
-        </form>
+<div id="controls">
+</div>
+
+<div id='loader'>
+    <span>Brin.gy is aligning human satellites...</span>
+    <div class="circle1"></div>
+    <div class="circle2"></div>
+
+    <div id='progressbar' class="progress progress-danger progress-striped active">
+        <div class="bar" style='width:0'></div>
     </div>
 </div>
 
-
-<div class="row page-header">
-    <div class="menu-item">
-        <a href="/">
-            <img width=120 src='{{ static_url("images/website/bringy.logo3.png") }}' alt="" />
-        </a>
-    </div>
-    <ul class="menu">
-        <li><a href="/api">API</a></li>
-        <li><a href="http://github.com/ypodim/brin.gy">Download</a></li>
-        <li><a href="/#about">About</a></li>
-        <li><a href="/press">Press Kit</a></li>
-    </ul>
-    
-    
-    <div id="start-btn" class="menu-item menu-btn start-btn">
-        <div>START HERE!</div>
-    </div>
-    <div id="account-btn" class="menu-item menu-btn hidden">
-        <div class="menu-btn-title">User:</div>
-        <div >{{config.agentid}}</div>
-    </div>
-    <div id="context-btn" class="menu-item menu-btn hidden">
-        <div class="menu-btn-title">Context:</div>
-        <div id="context-title"></div>
-    </div>
-</div>
-
-
-<footer>
-    <a class="logo" target="_blank" href="http://brin.gy">Brin.gy</a>
-    is a an 
-    <a class="logo" target="_blank" href="http://github.com/ypodim/brin.gy">open-source project</a> 
-    from the 
-    <a class="logo" target="_blank" href="http://media.mit.edu">MIT Media Lab</a>
-</footer>
-
+<div id='message' class="alert alert-error"></div>
 
 <div id="container"> 
 </div>

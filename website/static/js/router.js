@@ -11,9 +11,10 @@ define([
     'views/sendMessage',
     'views/profile',
     'views/newAttribute',
+    'views/welcome',
 ], function(
     $, _, Backbone, common, 
-    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView
+    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView
     ){
   var AppRouter = Backbone.Router.extend({
     routes: {
@@ -40,8 +41,6 @@ define([
     initialize: function(options){
         this.state = options.state;
         this.controlsView = options.controlsView;
-        loginView.state = options.state;
-        loginView.router = this;
 
         var pseudonyms = common.cookies.get_cookie().pseudonyms;
         for (username in pseudonyms) {
@@ -54,8 +53,6 @@ define([
             controls: this.controlsView,
         });
         this.contents_view.resetCollections();
-
-        this.controlsView.$('#loginBtn').click(loginView.loginBtn);
     },
 
     showUser: function(username) {
@@ -81,7 +78,7 @@ define([
         this.state.stats('filters:all');
         this.contents_view.render();
         this.contents_view.showAll();
-        this.controlsView.doDefault();
+        this.controlsView.doAll();
     },
     showMe: function(){
         if (! this.contents_view._isRendered)
@@ -94,9 +91,14 @@ define([
     },
 
     login: function() {
-        this.state.stats('login');
-        loginView.render();
+        var lview = new loginView({
+            state: this.state,
+        });
+
+        lview.render();
         this.controlsView.doLogin();
+
+        this.state.stats('login');
         this.state.hideSplash();
     },
 
@@ -144,9 +146,16 @@ define([
     
 
     defaultRoute: function( cntx ){
-        this.state.stats('home');
-        aboutView.render();
         this.state.hideSplash();
+        this.state.stats('home');
+        var wview = new welcomeView({
+            state: this.state,
+        });
+        wview.render();
+
+
+        this.state.hideSplash();
+        this.controlsView.hideControls();
     },
     // takeTour: function(page) {
     //     console.log("TOUR", page);

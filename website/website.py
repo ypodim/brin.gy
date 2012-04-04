@@ -40,15 +40,6 @@ class config_handler(tornado.web.RequestHandler):
         )
         self.write(options)
     
-# class website_call(tornado.web.RequestHandler):
-#     def get(self):
-#         self.render("index.html", config=config)
-#         #self.render("%s.html" % self.path, config=config)
-        
-#     def prepare(self):
-#         path = self.request.path.split('/')
-#         self.path = path[1] or 'index'
-        
         
 class serve_user(tornado.web.RequestHandler):
     #def get(self):
@@ -124,8 +115,12 @@ class serve_user(tornado.web.RequestHandler):
         else:
             config.agent_url_private = "<not available>"
         
-        self.render("m-index.html", config=config)
+        self.render("static/index.html", config=config)
 
+
+class presentation(tornado.web.RequestHandler):
+    def get(self):
+        self.render('static/presentation/index.html')
 
 class message(tornado.web.RequestHandler):
     def post(self):
@@ -176,7 +171,7 @@ class message(tornado.web.RequestHandler):
 debug = os.environ.get("SERVER_SOFTWARE", "").startswith("Development/")
 
 settings = {
-    "template_path": os.path.join(os.path.dirname(__file__), "static"),
+    # "template_path": os.path.join(os.path.dirname(__file__), "static"),
     "cookie_secret": "61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
     "xsrf_cookies": True,
     "debug": debug,
@@ -186,6 +181,7 @@ settings = {
 
 application = tornado.web.Application([
     (r"/config", config_handler),
+    (r"/presentation", presentation),
     (r"/", serve_user),
     #(r"/api", website_call),
     #(r"/about", website_call),
@@ -230,3 +226,4 @@ if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(PORT, address=HOST)
     tornado.ioloop.IOLoop.instance().start()
+# 

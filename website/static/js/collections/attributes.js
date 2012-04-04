@@ -41,8 +41,8 @@ define([
 
         var that = this;
         url = this.state.satellite.url+"/profile/"+this.state.context.context+"/keyvals";
-        console.log(url);
         $.getJSON(url, {user:this.state.user.name}, function(json){
+
             that.state.progress('fetched '+json.items.length+' attribute groups');
             for (i in json.items) {
                 var key = json.items[i].key;
@@ -72,10 +72,9 @@ define([
                 progress = parseInt(100*i/json.items.length)+'%';
                 $('#progressbar').children().width(progress);
             }
-
+            
             that.state.hideSplash();
             that.modelChange();
-            that.state.progress('rendering...');
         });
     },
 

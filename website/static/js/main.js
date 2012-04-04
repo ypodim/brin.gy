@@ -31,11 +31,9 @@ require([
     'collections/attributes',
     'collections/persons',
 
-    'views/desktopFrame',
     'views/controls',
-    'views/manager',
 ], function(_, Router, Backbone, appState, Attributes, Persons,
-    DesktopAppView, controlsView, ManagerView
+    controlsView
     ){
 
     state = new appState();

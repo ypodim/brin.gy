@@ -1,9 +1,22 @@
-#loader {
-    margin: auto;
-    margin-top:250px;
 
+
+div#loader {
+    margin: auto;
+    padding-top:250px;
+
+    position: absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    background-color:white;
+    z-index:1000;
+    height:100%;
 }
-#loader span {
+div#loader > span {
+    /*font-size:50px;*/
+    /*padding-bottom:30px;*/
+
     display:block;
     text-align: center;
     color: #2187e7;

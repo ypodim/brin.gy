@@ -131,9 +131,9 @@ define(['underscore', 'backbone',
     },
 
     hideSplash: function(){
-        $('#container').show();
-        $('#controls').show();
-        $('#loader').hide();
+        // $('#container').show();
+        // $('#controls').show();
+        $('#loader').fadeOut();
     },
     });
     return stateModel;

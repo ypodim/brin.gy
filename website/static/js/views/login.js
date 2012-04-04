@@ -3,16 +3,19 @@ define([
   'underscore', 
   'backbone',
   'common/ego_website',
-  'text!templates/login.html'
-  ], function($, _, Backbone, common, loginViewTemplate){
+  'text!templates/login.html',
+
+  'views/nametag',
+  ], function($, _, Backbone, common, loginViewTemplate, nametag){
   var loginView = Backbone.View.extend({
     el: $("#container"),
     events: {
-        
+        'click button#toggle': 'toggle',
     },
     initialize: function(options) {
         _.bindAll(this, 'loginBtn', 'render');
-        // this.state = options.state;
+        this.state = options.state;
+        $('#loginBtn').one('click', this.loginBtn);
     },
     isValidEmail: function(username) {
         var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -28,7 +31,7 @@ define([
                 that.state.user.name = username;
                 that.state.user.pwd = password;
                 common.cookies.set_cookie(username, password);
-                that.router.navigate('#/all', {trigger: true});
+                that.state.router.navigate('#/all', {trigger: true});
             } else {
                 that.$('div.alert')
                     .html('Wrong username/email or password.')
@@ -67,13 +70,17 @@ define([
                 that.state.user.email = email;
                 that.state.user.pwd = json.secret;
                 common.cookies.set_cookie(username, json.secret);
-                that.router.navigate('#/all', {trigger: true});
+                that.state.router.navigate('#/all', {trigger: true});
             }
         }, 'json');
         
         return false;
     },
     loginBtn: function(){
+        var deg = Math.floor(Math.random()*60) - 30;
+        console.log(deg);
+        this.$('#nametag').addClass('anime').css('-webkit-transform', 'rotate('+deg+'deg)');
+
         var username = this.$('input#useremail').val();
         var password = this.$('input#password').val();
         var newusername = this.$('input#newusername').val();
@@ -85,12 +92,15 @@ define([
         if (newusername.length>0 && newemail.length>0)
             return this.doCreate(newusername, newemail);
     },
+    toggle: function(){
+        this.$('#nametag').addClass('anime').addClass('flip-horizontal');
+    },
     render: function(){
         var compiled_template = _.template( loginViewTemplate );
         this.el.html( compiled_template() );
 
         var that = this;
-        this.$('input#useremail').focus().keypress(function(evt){
+        this.$('input#useremail').keypress(function(evt){
             if (evt.keyCode==13)
                 that.$('input#password').focus();
         })
@@ -109,7 +119,9 @@ define([
         })
 
         this.$('form').one('submit', this.loginBtn);
+
+        setTimeout(function(){this.$('#nametag input').focus();}, 100);
     },
   });
-  return new loginView;
+  return loginView;
 });

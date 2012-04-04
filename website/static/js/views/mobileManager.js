@@ -13,7 +13,6 @@ define([
     'text!templates/mobileManage.html',
 
     'views/key',
-    'views/value',
     'views/valueDetailed',
     'views/person',
 
@@ -30,7 +29,7 @@ define([
         // common, modals, attr_manager, 
         manageViewTemplate, 
 
-        keyView, valueView, valueDetailedView, personView,
+        keyView, valueDetailedView, personView,
         Keys, Values,
         kModel, vModel, attrModel, personModel){
   var managerView = Backbone.View.extend({
@@ -155,7 +154,6 @@ define([
         this.$('.resultsTitle').hide();
         this.$('#results').hide();
         this.$('.closingpane').show();
-        // this.controls.doDefault();
 
         this.$('attribute').show();
         this.$('.valcontainer').show();
@@ -176,27 +174,6 @@ define([
         this.state.attrCollection.each(this.addOneAttribute);
         this.state.personCollection.each(this.addOnePerson);
         this._isRendered = true;
-        return true;
-
-        if (this.state.renderManager) {
-            this._isRendered = false;
-            this.state.renderManager = false;
-        }
-
-        this.$('.resultsTitle').hide();
-        this.$('#results').hide();
-        this.$('.closingpane').show();
-        this.controls.doDefault();
-
-        if (this._isRendered) {
-            this.$('attribute').show();
-            this.$('.valcontainer').show();
-        } else {
-            $(this.el).html(this.template());
-            this._keysInserted = {};
-            this.state.attrCollection.ffetch();
-            this._isRendered = true;
-        }
     },
   });
   return managerView;
