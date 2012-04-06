@@ -10,7 +10,7 @@ define([
   var loginView = Backbone.View.extend({
     el: $("#container"),
     events: {
-        'click button#toggle': 'toggle',
+        
     },
     initialize: function(options) {
         _.bindAll(this, 'loginBtn', 'render');
@@ -92,9 +92,7 @@ define([
         if (newusername.length>0 && newemail.length>0)
             return this.doCreate(newusername, newemail);
     },
-    toggle: function(){
-        this.$('#nametag').addClass('anime').addClass('flip-horizontal');
-    },
+    
     render: function(){
         var compiled_template = _.template( loginViewTemplate );
         this.el.html( compiled_template() );

@@ -48,8 +48,9 @@ body {
  }
 
 
-
+@height-01: 100px;
 @height-1: 90px;
+@height-12: 70px;
 @height-2: 60px;
 @height-3: 40px;
 @height-s1: 30px;
@@ -176,7 +177,7 @@ person > button {
 
 attribute {
     .font-1;
-    line-height: @height-1;
+    /*line-height: @height-1;*/
     display: block;
     margin: 20px 0 20px 0;
     background: rgba(25, 25, 25, 0.15);
@@ -191,6 +192,7 @@ attribute a:hover {
 }
 
 attribute > a.keypart {
+    height:@height-01;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -229,6 +231,8 @@ attribute > div.valpartdetailed {
 }
 attribute > div.valpartdetailed > div.valcontainer {
     .font-2;
+    height:@height-12;
+    line-height:@height-12;
     border-radius:2px;
     /*background-color: rgba(250,250,250,0.4);*/
     padding: 5px 5px 5px 5px;
@@ -237,6 +241,7 @@ attribute > div.valpartdetailed > div.valcontainer {
 }
 attribute > div.valpartdetailed > div.valcontainer > button {
     .font-2;
+    /*line-height:@height-2;*/
     float:right;
     width:150px;
     margin: 0 0 0 5px;
@@ -373,27 +378,24 @@ div#controls > div#profileinfo > img{
 }
 
 /*############# LOGIN #############*/
-form.account {
+/*form.account {
     background-color: rgba(220,220,220,1);
     width:400px;
     margin: auto;
 }
 form.account > label {
     .font-3;
-    /*line-height:40px;*/
     text-shadow: 0 1px rgba(255, 255, 255, 0.9);
     width:300px;
     margin:auto;
 }
 form.account > label.note {
     .font-s2;
-    /*line-height:20px;*/
 }
 form.account > input {
     .font-s1;
     display:block;
     margin: 10px auto;
-    /*line-height:40px;*/
     height:40px;
     width:300px;
 }
@@ -413,12 +415,14 @@ div.account#divider {
 div.account#divider > span{
     .font-3;
     display:inline-block;
-    /*line-height:40px;*/
     background-color: rgba(220,220,220,1);
     text-align:center;
     width:100px;
     color:gray;
 }
+*/
+/*########### NAMETAG ################*/
+
 div.account.alert{
     .font-s1;
     position:absolute;
@@ -430,7 +434,7 @@ div.account.alert{
     height:50px;
 }
 
-div.account#nametag {
+div.account.nametag {
     position: relative;
     background-color:red;
     border-radius:30px;
@@ -444,19 +448,19 @@ div.account#nametag {
     font-weight: bold;
     line-height:50px;
 }
-div.account#nametag > b {
+div.account.nametag > b {
     display: block;
     font-size:60px;
     line-height:60px;
 }
-div.account#nametag > div {
+div.account.nametag > div {
     position:absolute;
     bottom:8%;
     top:40%;
     width:inherit;
     background-color:white;
 }
-div.account#nametag > div > input {
+div.account.nametag > div > input {
     font-size:40px;
     line-height:40px;
     height:50%;
@@ -474,7 +478,7 @@ div.account#nametag > div > input {
     text-transform: capitalize;
     font-variant: small-caps;
 }
-div.account#nametag > div > input:focus {
+div.account.nametag > div > input:focus {
     outline: none;
     outline-color:white ! important;
     border-color:white ! important;

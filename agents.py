@@ -517,10 +517,8 @@ class stats(tornado.web.RequestHandler):
         dic['body'] = self.get_argument('body','{}')
         dic['body'] = tornado.escape.json_decode(dic['body'])
 
-
-        etype = self.get_argument('type')
-        db.r.sadd('stat:etypes', etype)
-        db.r.lpush('stat:type:%s' % etype, tornado.escape.json_encode(dic))
+        db.r.sadd('stat:etypes', dic['type'])
+        db.r.lpush('stat:type:%s' % dic['type'], tornado.escape.json_encode(dic))
         
         print dic
         self.write(dict(error=''))
@@ -530,12 +528,27 @@ class stats(tornado.web.RequestHandler):
         if (self.get_argument('trans','')):
             return self.trans()
 
-        res = {}
+        res = dict(summary={'emptyfilters':0, 'filtersbyuser':{}})
         for etype in db.r.smembers('stat:etypes'):
             res[etype] = []
             elen = db.r.llen('stat:type:%s'%etype)
-            for evt in db.r.lrange('stat:type:%s'%etype, 0, elen):
-                res[etype].append(tornado.escape.json_decode( evt ))
+            
+            res['summary'][etype] = db.r.llen('stat:type:%s' % etype)
+
+            for evtstr in db.r.lrange('stat:type:%s'%etype, 0, elen):
+                evt = tornado.escape.json_decode( evtstr )
+                res[etype].append(evt)
+                
+                if etype == 'filters' and evt['body'] == {}:
+                    res['summary']['emptyfilters'] += 1
+                if etype == 'filters' and evt['body']:
+                    if evt['user'] not in res['summary']['filtersbyuser']:
+                        res['summary']['filtersbyuser'][evt['user']] = 0    
+                    res['summary']['filtersbyuser'][evt['user']] += 1
+                    
+
+        db.r.llen('stat:type:filters')
+        
         self.write(res)
     def clearstats(self):
         for etype in db.r.smembers('stat:etypes'):
@@ -545,8 +558,8 @@ class stats(tornado.web.RequestHandler):
         return 
     def trans(self):
         res = []
-        for evt in db.r.smembers('statbag'):
-            evt = evt.replace('\'','"')
+        for evtstr in db.r.smembers('statbag'):
+            evt = evtstr.replace('\'','"')
             evt = tornado.escape.json_decode(evt)
 
             dic = {}
@@ -556,6 +569,7 @@ class stats(tornado.web.RequestHandler):
             dic['body'] = {}
 
             if dic['user'] == 'ypodim':
+                db.r.srem('statbag', evtstr)
                 continue
 
             if dic['type'] == 'filters':
@@ -582,6 +596,14 @@ class stats(tornado.web.RequestHandler):
                 # continue
 
             res.append(dic)
+
+            db.r.sadd('stat:etypes', dic['type'])
+            db.r.lpush('stat:type:%s' % dic['type'], tornado.escape.json_encode(dic))
+
+            print db.r.srem('statbag', evtstr)
+
+        print db.r.scard('statbag')
+        print db.r.smembers('statbag')
         self.write(dict(res=res))
 
 

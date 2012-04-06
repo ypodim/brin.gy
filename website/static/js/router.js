@@ -24,7 +24,10 @@ define([
         "context/:context/user/:user": "setContextUser",
 
         "u/:user": "showUser",
-        'login': 'login',
+        'signin': 'login',
+        'newuser': 'login',
+        'reminder': 'login',
+        
         // 'matches': 'matches',
         'sendmessage': 'sendmessage',
 

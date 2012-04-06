@@ -73,7 +73,10 @@ define([
         this.$('.controlFilters').show();
         this.$('.secondOrder').hide();
         this.$('div#profileinfo').hide();
-        this.$('#newBtn').show();
+        if (this.state.isLoggedin())
+            this.$('#newBtn').show();
+        else
+            this.$('#startBtn').show();
     },
     doMe: function() {
         $(this.el).show();
