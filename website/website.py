@@ -183,21 +183,17 @@ if __name__ == "__main__":
     parser.add_option("-p", "--port", dest="port", default='8889')
     
     parser.add_option("-w", "--websiteurl", dest="website_url")
-    parser.add_option("-d", "--discovurl", dest="discov_url")
-    parser.add_option("-a", "--agentsurl", dest="agents_url")
+    parser.add_option("-d", "--discovurl", dest="discov_url", default='localhost:22222')
+    parser.add_option("-a", "--agentsurl", dest="agents_url", default='localhost:10007')
     (options, args) = parser.parse_args()
     
     PORT = int(options.port)
     HOST = options.host
     
     website_url = 'http://%s:%s' % (HOST, PORT)
-    discov_url = 'http://%s:22222' % HOST
-    agents_url = 'http://%s:10007' % HOST
+    discov_url = 'http://%s' % options.discov_url
+    agents_url = 'http://%s' % options.agents_url
     
-    if (options.discov_url):
-        discov_url = 'http://%s' % options.discov_url
-    if (options.agents_url):
-        agents_url = 'http://%s' % options.agents_url
         
     config.website_url_prefix = website_url
     config.discov_url = discov_url
@@ -207,6 +203,7 @@ if __name__ == "__main__":
     print 'Discovery at: %s' % discov_url
     print 'Agents at: %s' % agents_url
     print 'host:port %s:%s' % (HOST, PORT)
+    print
 
 
     http_server = tornado.httpserver.HTTPServer(application)
