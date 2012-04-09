@@ -206,7 +206,7 @@ if __name__ == "__main__":
     print 'Brin.gy website running at %s' % website_url
     print 'Discovery at: %s' % discov_url
     print 'Agents at: %s' % agents_url
-    
+    print 'host:port %s:%s' % (HOST, PORT)
 
 
     http_server = tornado.httpserver.HTTPServer(application)
