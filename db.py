@@ -11,8 +11,8 @@ def getKV (context, key):      return 'profile:%s:key:%s:values'        % (conte
 def getKVA(context, key, val): return 'profile:%s:key:%s:val:%s:agents' % (context, key, val)
 
 class DB:
-    def __init__(self):
-        self.r = redis.Redis(host='localhost', port=6379, db=0)
+    def __init__(self, db=0):
+        self.r = redis.Redis(host='localhost', port=6379, db=db)
 
     def generate_secret(self, username):
         secret = ''

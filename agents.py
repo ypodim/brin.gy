@@ -457,10 +457,12 @@ if __name__ == "__main__":
     parser = OptionParser(add_help_option=False)
     parser.add_option("-h", "--host", dest="host", default='')
     parser.add_option("-p", "--port", dest="port", default='10007')
+    parser.add_option("-d", "--dbno", dest="dbno", default='0')
     (options, args) = parser.parse_args()
     
     HOST    = options.host
     PORT    = int(options.port)
+    dbno    = int(options.dbno)
     
     satellite_url = 'http://localhost:22222'
     
@@ -468,7 +470,7 @@ if __name__ == "__main__":
     if settings['debug']:
         mode = '(debug)'
         
-    db = DB()
+    db = DB(dbno)
     
     print 'Ego agent running at %s:%s using %s' % (HOST,PORT,mode)
     
