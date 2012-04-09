@@ -7,8 +7,8 @@ import random
 from keys import *
 
 class DB:
-    def __init__(self):
-        self.r = redis.Redis(host='localhost', port=6379, db=0)
+    def __init__(self, db=0):
+        self.r = redis.Redis(host='localhost', port=6379, db=db)
 
     def generate_secret(self, username):
         secret = ''

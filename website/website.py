@@ -217,7 +217,7 @@ if __name__ == "__main__":
     config.discov_url = discov_url
     config.ego_url_prefix = agents_url
     
-    print 'Brin.gy website running at %s' % website_url
+    print 'Brin.gy website running at %s' % options.website_url
     print 'Discovery at: %s' % discov_url
     print 'Agents at: %s' % agents_url
     
