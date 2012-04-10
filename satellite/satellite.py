@@ -259,7 +259,8 @@ class randomstat(tornado.web.RequestHandler):
             if keys:
                 key, score = random.choice(keys)
             else:
-                return dict(key='', val='', score='-')
+                self.write(dict(key='', val='', score='-'))
+                return 
             
             zkey = 'profile:all:key:%s:values' % key
             kvlist = r.zrevrangebyscore(zkey, '+inf', 2, withscores=True) or []
