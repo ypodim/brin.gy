@@ -1,5 +1,5 @@
 /* ==========================================================
- * bootstrap-twipsy.js v1.4.0
+ * bootstrap-twipsy.js v1.3.0
  * http://twitter.github.com/bootstrap/javascript.html#twipsy
  * Adapted from the original jQuery.tipsy by Jason Frame
  * ==========================================================
@@ -19,9 +19,7 @@
  * ========================================================== */
 
 
-!function( $ ) {
-
-  "use strict"
+(function( $ ) {
 
  /* CSS TRANSITION SUPPORT (https://gist.github.com/373874)
   * ======================================================= */
@@ -72,7 +70,7 @@
         , $tip
         , tp
 
-      if (this.hasContent() && this.enabled) {
+      if (this.getTitle() && this.enabled) {
         $tip = this.tip()
         this.setContent()
 
@@ -92,8 +90,7 @@
 
         actualWidth = $tip[0].offsetWidth
         actualHeight = $tip[0].offsetHeight
-
-        placement = maybeCall(this.options.placement, this, [ $tip[0], this.$element[0] ])
+        placement = _.maybeCall(this.options.placement, this.$element[0])
 
         switch (placement) {
           case 'below':
@@ -145,10 +142,6 @@
       }
     }
 
-  , hasContent: function () {
-      return this.getTitle()
-    }
-
   , getTitle: function() {
       var title
         , $e = this.$element
@@ -169,7 +162,7 @@
 
   , tip: function() {
       if (!this.$tip) {
-        this.$tip = $('<div class="twipsy" />').html(this.options.template)
+        this.$tip = $('<div class="twipsy" />').html('<div class="twipsy-arrow"></div><div class="twipsy-inner"></div>')
       }
       return this.$tip
     }
@@ -200,9 +193,14 @@
  /* TWIPSY PRIVATE METHODS
   * ====================== */
 
-   function maybeCall ( thing, ctx, args ) {
-     return typeof thing == 'function' ? thing.apply(ctx, args) : thing
+   var _ = {
+
+     maybeCall: function ( thing, ctx ) {
+       return (typeof thing == 'function') ? (thing.call(ctx)) : thing
+     }
+
    }
+
 
  /* TWIPSY PLUGIN DEFINITION
   * ======================== */
@@ -300,11 +298,10 @@
   , offset: 0
   , title: 'title'
   , trigger: 'hover'
-  , template: '<div class="twipsy-arrow"></div><div class="twipsy-inner"></div>'
   }
 
   $.fn.twipsy.elementOptions = function(ele, options) {
-    return $.extend({}, options, $(ele).data())
+    return $.metadata ? $.extend({}, options, $(ele).metadata()) : options
   }
 
-}( window.jQuery || window.ender );
+})( window.jQuery || window.ender )
