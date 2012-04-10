@@ -256,7 +256,10 @@ class randomstat(tornado.web.RequestHandler):
         kvlist = []
         while not kvlist:
             keys = r.zrevrangebyscore('profile:all:keys', '+inf', 2, withscores=True) or []
-            key, score = random.choice(keys)
+            if keys:
+                key, score = random.choice(keys)
+            else:
+                return {}
             
             zkey = 'profile:all:key:%s:values' % key
             kvlist = r.zrevrangebyscore(zkey, '+inf', 2, withscores=True) or []
