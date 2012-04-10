@@ -307,21 +307,19 @@ if __name__ == "__main__":
     
     statistics = Statistics()
     
-    r = redis.Redis(host='localhost', port=6379, db=0)
-    
-    #profile = Profile(r)
-    #location = Location(r)
-    #buysell = Buysell(r)
-    
     #gc = GarbageC()
     
     parser = OptionParser(add_help_option=False)
     parser.add_option("-h", "--host", dest="host", default='')
     parser.add_option("-p", "--port", dest="port", default='22222')
+    parser.add_option("-d", "--dbno", dest="dbno", default='0')
     (options, args) = parser.parse_args()
     
     HOST    = options.host
     PORT    = int(options.port)
+    dbno    = int(options.dbno)
+
+    r = redis.Redis(host='localhost', port=6379, db=dbno)
     
     mode = ''
     if settings['debug']:
