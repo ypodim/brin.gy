@@ -15,19 +15,17 @@ define([
         this.attr = options.attr;
         this.value = options.value;
     },
-    animate: function(rotation, scale){
-        if (scale == undefined)
-            scale = 0.4;
-
+    animate: function(rotation, scale, isException){
         var deg = Math.floor(Math.random()*2*rotation) - rotation;
         var that = this;
         setTimeout(function(){
             $(that.el).css('-webkit-transform', 'rotate('+deg+'deg) scale('+scale+')');    
         }, 1);
         $(this.el).attr('id','nametag').addClass('welcome anime');
-        if (this.value in {'backbone.js':1, 'Spanish':1}) {
-            $(this.el).addClass('exception');
-        }
+        // if (this.value in {'backbone.js':1, 'Spanish':1}) {
+        //     $(this.el).addClass('exception');
+        // }
+        if (isException) $(this.el).addClass('exception');
         
         return this;
     },

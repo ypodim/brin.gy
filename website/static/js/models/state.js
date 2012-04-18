@@ -19,10 +19,16 @@ define(['underscore', 'backbone',
         console.log('step', step);
     },
 
-    isLoggedin: function() {
+    doFullscreen: function(options){
+        if (options==undefined) var options = {switch:true};
+        $('#container').toggleClass('fullscreen', options.switch);
+    },
+    isLoggedin: function(options) {
+        if (options == undefined)
+            options = {redirect:true};
         var loggedin = (this.user.name!='' && this.user.pwd!='');
-        if (!loggedin)
-            this.router.navigate('#login', {trigger:true});
+        if ((!loggedin) && options.redirect)
+            this.router.navigate('#signup', {trigger:true});
         return loggedin;
     },
 

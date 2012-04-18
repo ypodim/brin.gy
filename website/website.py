@@ -75,7 +75,6 @@ class serve_authuser(tornado.web.RequestHandler):
             print cookie
             cookiestr = tornado.escape.json_encode(cookie).replace(' ','')
             self.set_cookie('bringy', str(cookiestr))
-            # self.redirect("/#/u/%s" % dic['user'])
             self.redirect("/#/all")
 
 class presentation(tornado.web.RequestHandler):

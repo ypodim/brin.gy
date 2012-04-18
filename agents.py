@@ -34,7 +34,6 @@ class sendEmail:
         msg['To'] = to
 
         LOGIN = 'info@brin.gy'
-        LOGIN = 'ypodim'
         PASSWD = open('email.pwd').read()
         
         error = ''
@@ -129,7 +128,7 @@ class bringy_handler(tornado.web.RequestHandler):
         self.write(dic)
         self.finish()
 
-
+# /
 class serve_index(bringy_handler):
     def post(self):            
         user_name = self.get_argument('username')
@@ -148,7 +147,7 @@ class serve_index(bringy_handler):
         message+= 'Login: http://brin.gy/#/login\n\n'
         message+= 'You can use the above URL to manage your pseudonym.\n\n'
         message+= 'Cheers\nBrin.gy\n\nPS: IP address that was used: %s' % ip
-        sendEmail(email, 'ypodim@gmail.com', subject, message)
+        sendEmail(email, 'info@brin.gy', subject, message)
 
         error = ''
         if not created: error = 'user already exists'
@@ -159,7 +158,7 @@ class serve_index(bringy_handler):
         self.write(dic)
         
 
-        
+# /USERNAME
 class serve_user(bringy_handler):
     def prepare(self):
         bringy_handler.prepare(self)
@@ -231,11 +230,12 @@ class serve_user(bringy_handler):
             
             for destination in sendTo:
                 print destination, subject, body
-                sendEmail(destination, 'ypodim@gmail.com', subject, body)
+                sendEmail(destination, 'info@brin.gy', subject, body)
 
         res = {'error':error, 'username':self.username}
         self.write(res)
         
+# /USERNAME/CAPABILITY
 class serve_capability(bringy_handler):
     def prepare(self):
         bringy_handler.prepare(self)
@@ -496,6 +496,29 @@ class api_call(tornado.web.RequestHandler):
         if context != 'all':
             db.clear_context(context)
 
+    def api_email_reminder(self):
+        error = ''
+        result = []
+        email = self.get_argument('email','')
+        if not email:
+            error = 'invalid email address'
+        else:
+            result = db.usernames_by_email(email)
+
+        subject = 'Brin.gy password reminder'
+        ip = self.request.headers.get('X-Real-Ip')
+        message = 'Hello,\n\n'
+        message+= 'You received this message because someone (probably you) requested a password reminder on Brin.gy:\n\n'
+        
+        for user_name, secret in result:
+            message+= 'Username: %s\n' % user_name
+            message+= 'Password: %s\n' % secret
+            message+= 'Direct access: http://brin.gy/a/%s\n\n' % secret
+
+        message+= 'Cheers\nBrin.gy\n\nPS: IP address that was used: %s' % ip
+        if not error:
+            sendEmail(email, 'info@brin.gy', subject, message)
+        self.write(dict(error=error, result=result))
 
 class stats(tornado.web.RequestHandler):
     def options(self):
@@ -620,6 +643,7 @@ application = tornado.web.Application([
     (r"/batch_buysell", api_call),
     (r"/controller", api_call),
     (r"/authenticate_user", api_call),
+    (r"/email_reminder", api_call),
     (r"/authenticate_admin_secret", api_call),
     (r"/cleanup", api_call),
     (r"/clear_context", api_call),
@@ -627,7 +651,7 @@ application = tornado.web.Application([
 
     
     
-    (r"/a/[a-zA-Z0-9]+/?$", serve_user),
+    # (r"/a/[a-zA-Z0-9]+/?$", serve_user),
     (r"/[a-zA-Z0-9]+/?$", serve_user),
     (r"/.+", serve_capability),
     (r"/$", serve_index),

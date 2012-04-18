@@ -1,49 +1,28 @@
 
 <div class='account nametag signin'>
     <b>SIGN IN</b>
-    <!-- username and password -->
-    <div>
+    <form>
         <input type='text' placeholder='username...' />
         <input type='password' placeholder='password...' />
-    </div>
+    </form>
 </div>
-<a href='#'>Create new user</a>
-<a href='#'>Forgot the password? No problem</a>
 
-<div class='account nametag create'>
-    <b>CREATE USER</b>
-    <!-- username and email -->
-    <div>
+<div class='account nametag signup'>
+    <b>SIGN UP</b>
+    <form>
         <input type='text' placeholder='pick username...' />
         <input type='email' placeholder='your email...' />
-    </div>
-</div>
-<a href='#'>Already a user? Sign in.</a>
-
-<div class='account nametag create'>
-    <b>FORGOT IT?</b>
-    password reminder
-    <div>
-        <input type='email' placeholder='type your email...' />
-    </div>
+    </form>
 </div>
 
 
+<div class='account nametag reminder'>
+    <b>PASSWORD</b>
+    get email reminder
+    <form><input type='email' placeholder='type your email...' /></form>
+</div>
 
 
-<!-- <div class='alert alert-error account'></div>
-<form class="well account login">
-    <label>Sign in</label>
-    <input id='useremail' type="email" placeholder="Username...">
-    <input id='password' type="password" placeholder="Password">
-</form>
-<div class='account' id='divider'><span>OR</span></div>
-<form class="well account create">
-    <label>Create user</label>
-    <input id='newusername' type="text" placeholder="pick a username...">
-    <label class='note'>Why both a username and an email? Your username ensures anonymity, while your email puts you in contact with others when you want to.</label>
-    <input id='newemail' type="email" placeholder="email...">
-    <label class='note'>Your email is only used to receive notifications from other users and is never shared with anyone. When you send messages to other users, your email is provided in your message so others can reply to you directly.</label>
-</form>
-
- -->
+<a href='#signup' class='account signin'>....or create new user.</a>
+<a href='#signin' class='account signup'>Already a user? Sign in.</a>
+<a href='#reminder' class='account signin'>Forgot password?</a>

@@ -15,7 +15,7 @@ define([
     initialize: function(options) {
         _.bindAll(this, 'loginBtn', 'render');
         this.state = options.state;
-        $('#loginBtn').one('click', this.loginBtn);
+        $('#okBtn').click('click', this.loginBtn);
     },
     isValidEmail: function(username) {
         var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -33,11 +33,13 @@ define([
                 common.cookies.set_cookie(username, password);
                 that.state.router.navigate('#/all', {trigger: true});
             } else {
-                that.$('div.alert')
+                $('div.alert')
+                    .removeClass('alert-success')
+                    .addClass('alert-error')
                     .html('Wrong username/email or password.')
                     .slideDown();
                 setTimeout(function(){
-                    that.$('div.alert').fadeOut();
+                    $('div.alert').fadeOut();
                 }, 3000);
             }
         });
@@ -46,11 +48,13 @@ define([
     doCreate: function(username, email) {
         var that = this;
         if (! this.isValidEmail(email)) {
-            this.$('div.alert')
+            $('div.alert')
+                .removeClass('alert-success')
+                .addClass('alert-error')
                 .html('Invalid email address.')
                 .slideDown();
             setTimeout(function(){
-                that.$('div.alert').fadeOut();
+                $('div.alert').fadeOut();
             }, 3000);
             return false;
         }
@@ -76,49 +80,98 @@ define([
         
         return false;
     },
+    doReminder: function(email) {
+        var that = this;
+        var data = {email:email};
+        var url = this.state.agent.baseurl+'/email_reminder';
+        $.post(url, data, function(json){
+            console.log(json);
+            if (json.error) {
+                $('div.alert')
+                    .removeClass('alert-success')
+                    .addClass('alert-error')
+                    .html('Email address not found.')
+                    .slideDown();
+                setTimeout(function(){
+                    $('div.alert').fadeOut();
+                }, 3000);
+            } else {
+                $('div.alert')
+                    .addClass('alert-success')
+                    .removeClass('alert-error')
+                    .html('Email reminder sent successfully.')
+                    .slideDown();
+                setTimeout(function(){
+                    $('div.alert').fadeOut();
+                    that.state.router.navigate('#/all', {trigger: true});
+                }, 3000);
+            }
+        }, 'json');
+        return false;
+    },
     loginBtn: function(){
-        var deg = Math.floor(Math.random()*60) - 30;
-        console.log(deg);
-        this.$('#nametag').addClass('anime').css('-webkit-transform', 'rotate('+deg+'deg)');
+        // var deg = Math.floor(Math.random()*60) - 30;
+        // console.log(deg);
+        // this.$('#nametag').addClass('anime').css('-webkit-transform', 'rotate('+deg+'deg)');
 
-        var username = this.$('input#useremail').val();
-        var password = this.$('input#password').val();
-        var newusername = this.$('input#newusername').val();
-        var newemail = this.$('input#newemail').val();
+        var username = this.$('div.'+Backbone.history.fragment+' input[type=text]').val();
+        var password = this.$('div.'+Backbone.history.fragment+' input[type=password]').val();
+        var email = this.$('div.'+Backbone.history.fragment+' input[type=email]').val();
 
-        if (username.length>0 && password.length>0)
+        console.log('upe', username, password, email);
+
+        if (username && password && username.length>0 && password.length>0)
             return this.doLogin(username, password);
 
-        if (newusername.length>0 && newemail.length>0)
-            return this.doCreate(newusername, newemail);
+        if (username && email && username.length>0 && email.length>0)
+            return this.doCreate(username, email);
+
+        if (email && email.length>0)
+            return this.doReminder(email)
     },
     
-    render: function(){
+    render: function(options){
+        if (options==undefined)
+            options = {action:'signup'};
+
         var compiled_template = _.template( loginViewTemplate );
         this.el.html( compiled_template() );
 
+        this.$('div.account.nametag').hide();
+        this.$('a').hide();
+        var actions = {signup:1, signin:1, reminder:1};
+        if (options.action in actions) {
+            this.$('div.account.nametag.'+options.action).show();
+            this.$('.'+options.action).show();
+        }
+
         var that = this;
-        this.$('input#useremail').keypress(function(evt){
+
+        var email = this.$('div.'+options.action+' input[type=email]');
+        var password = this.$('div.'+options.action+' input[type=password]');
+        
+        this.$('input[type=text]').focus().keypress(function(evt){
             if (evt.keyCode==13)
-                that.$('input#password').focus();
-        })
-        this.$('input#password').keypress(function(evt){
+                if (options.action=='signin')
+                    password.focus();
+                if (options.action=='signup')
+                    email.focus();
+        });
+        password.keypress(function(evt){
             if (evt.keyCode==13)
                 that.loginBtn();
-        })
-
-        this.$('input#newusername').keypress(function(evt){
-            if (evt.keyCode==13)
-                that.$('input#newemail').focus();
-        })
-        this.$('input#newemail').keypress(function(evt){
+        });
+        email.keypress(function(evt){
             if (evt.keyCode==13)
                 that.loginBtn();
-        })
+        });
 
-        this.$('form').one('submit', this.loginBtn);
+        if (options.action=='reminder')
+            email.focus();
+        
+        this.$('form').bind('submit', this.loginBtn);
 
-        setTimeout(function(){this.$('#nametag input').focus();}, 100);
+        // setTimeout(function(){this.$('#nametag input').focus();}, 100);
     },
   });
   return loginView;

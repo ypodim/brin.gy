@@ -12,9 +12,10 @@ define([
     'views/profile',
     'views/newAttribute',
     'views/welcome',
+    'views/presentation',
 ], function(
     $, _, Backbone, common, 
-    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView
+    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView, presentationView
     ){
   var AppRouter = Backbone.Router.extend({
     routes: {
@@ -23,9 +24,10 @@ define([
         "user/:user/context/:context": "setUserContext",
         "context/:context/user/:user": "setContextUser",
 
+        'presentation/:sno': 'presentation',
         "u/:user": "showUser",
         'signin': 'login',
-        'newuser': 'login',
+        'signup': 'login',
         'reminder': 'login',
         
         // 'matches': 'matches',
@@ -36,12 +38,11 @@ define([
         'me': 'showMe',
         'new': 'newAttribute',
 
-        // "tour": "takeTour",
-        // "tour/:page": "takeTour",
         "*actions": "defaultRoute",
     },
     
     initialize: function(options){
+        _.bindAll(this, 'login');
         this.state = options.state;
         this.controlsView = options.controlsView;
 
@@ -56,9 +57,22 @@ define([
             controls: this.controlsView,
         });
         this.contents_view.resetCollections();
+
+        this.presView = new presentationView({
+            router:this,
+        });
+    },
+
+    presentation: function(sno){
+        sno = parseInt(sno);
+        this.presView.slide = sno;
+        this.presView.showSlide(sno);
+        this.presView.show();
     },
 
     showUser: function(username) {
+        
+
         this.state.stats('user');
         var pview = new profileView({
             state: this.state,
@@ -78,6 +92,8 @@ define([
         this.controlsView.doFilters();
     },
     showAll: function( cntx ){
+        this.state.doFullscreen({switch:false});
+        this.presView.hide();
         this.state.stats('filters:all');
         this.contents_view.render();
         this.contents_view.showAll();
@@ -94,13 +110,17 @@ define([
     },
 
     login: function() {
+        
+        this.state.doFullscreen({switch:false});
         var lview = new loginView({
             state: this.state,
         });
 
-        lview.render();
-        this.controlsView.doLogin();
+        var actions = {signup:1, signin:1, reminder:1};
+        if (Backbone.history.fragment in actions)
+            lview.render({action:Backbone.history.fragment});
 
+        this.controlsView.doLogin();
         this.state.stats('login');
         this.state.hideSplash();
     },
@@ -149,6 +169,8 @@ define([
     
 
     defaultRoute: function( cntx ){
+        this.presView.hide();
+        
         this.state.hideSplash();
         this.state.stats('home');
         var wview = new welcomeView({
@@ -160,9 +182,6 @@ define([
         this.state.hideSplash();
         this.controlsView.hideControls();
     },
-    // takeTour: function(page) {
-    //     console.log("TOUR", page);
-    // },
   });
 
   return AppRouter;

@@ -174,6 +174,7 @@ define([
         this.state.attrCollection.each(this.addOneAttribute);
         this.state.personCollection.each(this.addOnePerson);
         this._isRendered = true;
+        return this;
     },
   });
   return managerView;

@@ -17,9 +17,9 @@ body {
     position: absolute;
     z-index:0;
     left: 0;
-    top: 0;
-    bottom: 0;
-    padding-top:95px;
+    top: 80px;
+    bottom: 95px;
+    /*padding: 95px 0 0 0;*/
     background-color: rgba(0,0,0,0.1);
     margin: 0 auto;
     width:100%;
@@ -27,6 +27,15 @@ body {
 
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
+}
+
+div.fullscreen {
+    padding:0 ! important;
+    position: absolute;
+    left:0;
+    right:0;
+    top:0 ! important;
+    bottom:0 ! important;
 }
 
 #message {
@@ -50,7 +59,7 @@ body {
 
 @height-01: 100px;
 @height-1: 90px;
-@height-12: 70px;
+@height-12: 80px;
 @height-2: 60px;
 @height-3: 40px;
 @height-s1: 30px;
@@ -213,6 +222,7 @@ attribute > a.keypart > span.count {
     padding: 0px 10px 0px 10px;
     text-align:center;
     text-shadow: 0px -2px 0px rgba(0,0,0,0.5);
+    box-shadow: 0px 3px 1px rgba(0,0,0,0.5);
     border-radius: 3px;
 }
 attribute > form > input {
@@ -241,7 +251,7 @@ attribute > div.valpartdetailed > div.valcontainer {
 }
 attribute > div.valpartdetailed > div.valcontainer > button {
     .font-2;
-    /*line-height:@height-2;*/
+    line-height:@height-2;
     float:right;
     width:150px;
     margin: 0 0 0 5px;
@@ -265,7 +275,7 @@ attribute > div.valpartdetailed > div.valcontainer > a > span.count {
     display:inline-block;
     color: white;
     background-color:#ff2244;
-    /*line-height:60px;*/
+    box-shadow: 0px 3px 1px rgba(0,0,0,0.5);
     padding: 0px 10px 0px 10px;
     text-align:center;
     text-shadow: 0px -2px 0px rgba(0,0,0,0.5);
@@ -305,7 +315,7 @@ div.controlSorters {
     right:5px;
     top:5px;
 }
-div.btn-group > button {
+div#controls > div.btn-group > button {
     height: 80px;
     width: 180px;
 }
@@ -376,65 +386,29 @@ div#controls > div#profileinfo > img{
     width: 80px;
     padding-bottom:30px;
 }
+div#controls > button#okBtn {
+    width:180px;
+    /*background-image: url(/static/images/website/glyphicons_206_ok.png);*/
+    /*background-repeat: no-repeat;*/
+    /*background-position: 20px center;*/
+    text-shadow: 0 -3px gray;
+}
+
 
 /*############# LOGIN #############*/
-/*form.account {
-    background-color: rgba(220,220,220,1);
-    width:400px;
-    margin: auto;
-}
-form.account > label {
-    .font-3;
-    text-shadow: 0 1px rgba(255, 255, 255, 0.9);
-    width:300px;
-    margin:auto;
-}
-form.account > label.note {
-    .font-s2;
-}
-form.account > input {
-    .font-s1;
-    display:block;
-    margin: 10px auto;
-    height:40px;
-    width:300px;
-}
-form.account.login {
-    height:170px;
-}
-form.account.create {
-    padding-top:30px;
-}
 
-div.account#divider {
-    position:absolute;
-    top:187px;
-    width:100%;
-    text-align:center;
-}
-div.account#divider > span{
-    .font-3;
-    display:inline-block;
-    background-color: rgba(220,220,220,1);
-    text-align:center;
-    width:100px;
-    color:gray;
-}
-*/
-/*########### NAMETAG ################*/
-
-div.account.alert{
+/*div.account.alert{
     .font-s1;
     position:absolute;
     top:0px;
     width:100%;
     display:none;
     text-align:center;
-    /*line-height:50px;*/
     height:50px;
-}
+}*/
 
 div.account.nametag {
+    display:none;
     position: relative;
     background-color:red;
     border-radius:30px;
@@ -453,14 +427,14 @@ div.account.nametag > b {
     font-size:60px;
     line-height:60px;
 }
-div.account.nametag > div {
+div.account.nametag > form {
     position:absolute;
     bottom:8%;
     top:40%;
     width:inherit;
     background-color:white;
 }
-div.account.nametag > div > input {
+div.account.nametag > form > input {
     font-size:40px;
     line-height:40px;
     height:50%;
@@ -475,10 +449,10 @@ div.account.nametag > div > input {
     -webkit-box-shadow:0;
     -moz-box-shadow:0;
     border:0px;
-    text-transform: capitalize;
-    font-variant: small-caps;
+    /*text-transform: capitalize;*/
+    /*font-variant: small-caps;*/
 }
-div.account.nametag > div > input:focus {
+div.account.nametag > form > input:focus {
     outline: none;
     outline-color:white ! important;
     border-color:white ! important;
@@ -488,6 +462,14 @@ div.account.nametag > div > input:focus {
     border:0px;
 }
 
+a.account {
+    display:block;
+    width:500px;
+    margin:auto;
+    text-align:center;
+    font-size:@height-3;
+    line-height:@height-2;
+}
 
 .introTag {
     position:absolute;
@@ -514,42 +496,6 @@ div.account.nametag > div > input:focus {
     -o-transform: scaleX(-1);
     transform: scaleX(-1);
     filter: fliph; /*IE*/
-}
-
-
-/*############# NAMETAG welcome #################*/
-
-div.welcome#nametag {
-    position: absolute;
-    background-color:red;
-    border-radius:30px;
-    margin:auto;
-    width:500px;
-    height:300px;
-    color:white;
-    text-align:center;
-    font-size:40px;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-weight: bold;
-    line-height:50px;
-}
-div.welcome#nametag > b {
-    display: block;
-    font-size:60px;
-    line-height:60px;
-}
-div.welcome#nametag > span {
-    color:yellow;
-}
-div.welcome#nametag > div {
-    position:absolute;
-    bottom:8%;
-    top:40%;
-    width:inherit;
-    background-color:white;
-    color:rgba(0,0,0,0.8);
-    line-height:150px;
-    font-size:60px;
 }
 
 
@@ -631,6 +577,51 @@ newattribute > div > form > div > input {
     width:400px;
 }
 
+
+/*############# FRONT PAGE #############*/
+
+div#welcome {
+    
+}
+div#welcome > a {
+    display: block;
+    font-size:40px;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: bold;
+    line-height:50px;
+    margin:10px;
+    width:300px;
+    border-radius:5px;
+}
+div#welcome > a:hover {
+    text-decoration:none;
+    /*border:1px solid gray;*/
+}
+
+
+/*############# FOOTER #############*/
+footer {
+    position: absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    height:@height-1;
+    
+    padding: 0 1px 1px 1px;
+    background-color:rgba(0,0,0,0.2);
+    box-shadow: 0 -3px 5px 0 rgba(0,0,0,0.5);
+}
+footer > div  {
+    padding: 1px 0 0 0;
+    height:85px;
+}
+footer > div > a {
+    width:31.3333%;
+    height:90%;
+    font-size:35px ! important;
+    line-height:85px ! important;
+    text-shadow: rgba(255, 255, 255, 0.45) 0px 1px 0px;
+}
 
 
 

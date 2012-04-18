@@ -37,6 +37,14 @@ class DB:
             
         return created, secret
     
+    def usernames_by_email(self, email):
+        result = []
+        for username in self.get_agents():
+            if self.get_email(username) == email:
+                secret = self.r.hget('options:user:%s' % username, 'secret')
+                result.append((username, secret))
+        return result
+
     def authenticate_user(self, user, secret):
         stored_secret = self.r.hget('options:user:%s' % user, 'secret')
         if not stored_secret:

@@ -73,7 +73,7 @@ define([
         this.$('.controlFilters').show();
         this.$('.secondOrder').hide();
         this.$('div#profileinfo').hide();
-        if (this.state.isLoggedin())
+        if (this.state.isLoggedin({redirect:false}))
             this.$('#newBtn').show();
         else
             this.$('#startBtn').show();
@@ -94,7 +94,8 @@ define([
         $(this.el).show();
         this.$('.controlFilters').hide();
         this.$('.secondOrder').hide();
-        this.$('#loginBtn').show();
+        // this.$('#loginBtn').show();
+        this.$('#okBtn').show();
         this.$('div#profileinfo').hide();
     },
     doMessage: function() {
