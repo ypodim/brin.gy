@@ -7,7 +7,7 @@ import tornado.web
 import tornado.escape
 import tornado.httpclient
 
-import sys, os, time
+import sys, os, time, urlparse
 from datetime import datetime
 from optparse import OptionParser
 from threading import Thread
@@ -170,12 +170,14 @@ class serve_user(bringy_handler):
         dic = self.finilize_call(dic)
         self.write(dic)
     def delete(self):
+        dic = urlparse.parse_qs(self.request.body)
         deleted = ''
         error = ''
-        secret = ''
-        #print self.request.body
-        if self.request.body:
-            secret = self.request.body.split('=')[1]
+        secret = dic.get('secret',[''])[0]
+        
+        # if self.request.body:
+            # secret = self.request.body.split('=')[1]
+        
         passed = db.authenticate_user(self.username, secret)
         if passed:
             deleted = db.delete_user(self.username)
@@ -472,7 +474,8 @@ class api_call(tornado.web.RequestHandler):
         user = self.get_argument('user')
         secret = self.get_argument('secret')
         res = (db.r.hget('options:user:%s' % user, 'secret') == secret)
-        self.write(dict(result=res))
+        email = db.r.hget('options:user:%s' % user, 'email')
+        self.write(dict(result=res, email=email))
     
     def api_authenticate_admin_secret(self):
         error = ''

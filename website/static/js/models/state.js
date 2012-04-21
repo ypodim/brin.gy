@@ -1,8 +1,8 @@
 
-define(['underscore', 'backbone',
+define(['underscore', 'backbone', 'common/ego_website',
     // 'collections/attributes',
     // 'collections/persons',
-    ], function(_, Backbone) {
+    ], function(_, Backbone, common) {
     var stateModel = Backbone.Model.extend({
 
     filters: null,
@@ -38,7 +38,6 @@ define(['underscore', 'backbone',
 
     getMatches: function(clb) {
         var cap = 'profile';
-        var context = 'all';
         var query = [];
         var selectedlist = this.attrCollection.filter(function(attr){
             return attr.get('selected');
@@ -47,9 +46,11 @@ define(['underscore', 'backbone',
             query.push([cap, model.get('key'), model.get('val')]);
         });
         
-        var data = JSON.stringify(query);
+        var querystr = JSON.stringify(query);
         var that = this;
-        $.post(this.satellite.url+"/multimatch", {data:data, context:context}, function(json){
+        var data = {data:querystr, context:this.context.name};
+        console.log(data);
+        $.post(this.satellite.url+"/multimatch", data, function(json){
             if (json.error) {
                 console.log('getMatches: error:', json.error);
                 return false;
@@ -144,6 +145,32 @@ define(['underscore', 'backbone',
         // $('#container').show();
         // $('#controls').show();
         $('#loader').fadeOut();
+    },
+
+    deleteAccount: function() {
+        var url = this.agent.baseurl+'/'+this.user.name;
+        var that = this;
+        $.ajax({
+            type:'DELETE',
+            dataType:'json',
+            data: {username:this.user.name, secret:this.user.pwd},
+            success: function(json) {
+                if (json.error.length) {
+                    $('div.alert')
+                        .html(json.error)
+                        .slideDown();
+                    setTimeout(function(){
+                        $('div.alert').fadeOut();
+                    }, 3000);
+                    return false;
+                } else {
+                    common.cookies.del_cookie(that.user.name);
+                    that.user = {};
+                    that.router.navigate('#/all', {trigger: true});
+                }
+            },
+            url:url,
+        })
     },
     });
     return stateModel;

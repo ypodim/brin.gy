@@ -19,17 +19,12 @@ define([
     template: _.template(controlsViewTemplate),
     events: {
         
-        'click #resultsBtn': 'showResults',
+        'click #messageBtn': 'sendMessageModal',
         'click #backBtn': 'goBack',
         'click #newBtn': 'newAttribute',
-        'click #saveAttrBtn': 'saveNewAttribute',
-        'click #homeBtn': 'goHome',
-        
+        'click #saveAttrBtn': 'saveNewAttribute',        
     },
 
-    goHome: function(){
-        this.state.router.navigate('#', {trigger:true});
-    },
     saveNewAttribute: function(){
 
     },
@@ -50,7 +45,7 @@ define([
     },
     
     // when you press the button on the right-hand side
-    showResults: function() {
+    sendMessageModal: function() {
         if (this.state.personCollection.included().length > 5)
             this.state.showMessage('You can only contact up to 5 people at a time. Please choose 5 among your matches, or add more filters.');
         else
@@ -74,7 +69,7 @@ define([
     doFilters: function() {
         $(this.el).show();
         this.$('.secondOrder').hide();
-        this.$('#resultsBtn').show();
+        this.$('#messageBtn').show();
     },
     doLogin: function() {
         $(this.el).show();
@@ -113,6 +108,14 @@ define([
     setTitle: function(title) {
         this.$('#title').html(title);
     },
+    toggleContext: function(ctx) {
+        if (ctx.length) {
+            this.$('#contextTitle').html('#'+ctx);
+            this.$('#context').show();
+        } else {
+            this.$('#context').hide();
+        }
+    },
     // toggleModal: function(options){
     //     if (options==undefined) var options = {switch:false};
     //     $('#footer').toggle(options.switch);
@@ -121,7 +124,7 @@ define([
     //     $(this.el).hide();
     // },
     initialize: function(options) {
-        _.bindAll(this, 'animateMatchesTo', 'showResults', 'doNewAttr');
+        _.bindAll(this, 'animateMatchesTo', 'sendMessageModal', 'doNewAttr');
         this.state = options.state;
 
         $(this.el).append(this.template());

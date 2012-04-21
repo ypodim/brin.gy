@@ -33,7 +33,6 @@ define([
         'signup': 'login',
         'reminder': 'login',
         
-        // 'matches': 'matches',
         'sendmessage': 'sendmessage',
 
         'filters': 'showFilters',
@@ -69,18 +68,18 @@ define([
 
         if (frag in {all:1, me:1, filters:1}) {
             $('#footer > a[href="#/all"]').addClass('active');
+            options.title = '';
+            options.context = 'MIT Media Lab';
+            this.state.attrCollection.trigger('value:change');
         } else {
             this.contents_view._isRendered = false;
+            options.context = '';
         }
         
         this.controlsView.setTitle(options.title);
-        // this.state.hideSplash();
-
+        this.controlsView.toggleContext(options.context);
         
-        // if (options.footer) {
-        //     a = $('#footer > a[href="#/'+Backbone.history.fragment+'"]');
-        //     console.log(a);
-        // }
+        // this.state.hideSplash();
     },
     
     initialize: function(options){
@@ -91,7 +90,8 @@ define([
         var pseudonyms = common.cookies.get_cookie().pseudonyms;
         for (username in pseudonyms) {
             this.state.user.name = username;
-            this.state.user.pwd = pseudonyms[username];
+            this.state.user.pwd = pseudonyms[username].secret;
+            this.state.user.email = pseudonyms[username].email;
         }
 
         this.contents_view = new mobileManagerView({
@@ -173,12 +173,6 @@ define([
         aview.render();
         this.controlsView.doNewAttr();
     },
-    // matches: function(){
-    //     this.matchesView = new matchesManagerView({
-    //         state: this.state,
-    //     });
-    //     this.matchesView.render();
-    // },
     sendmessage: function(){
         this.setUIstate({footer:false, title:'Chat'});
         this.state.stats('message');
@@ -220,7 +214,7 @@ define([
     },
 
     defaultRoute: function( cntx ){
-        this.setUIstate();
+        this.setUIstate({title:'Brin.gy'});
         
         this.state.stats('home');
         var wview = new welcomeView({

@@ -16,8 +16,8 @@ define([
     'views/valueDetailed',
     'views/person',
 
-    'collections/keys',
-    'collections/values',
+    // 'collections/keys',
+    // 'collections/values',
     
     'models/key',
     'models/value',
@@ -29,7 +29,7 @@ define([
         manageViewTemplate, 
 
         keyView, valueDetailedView, personView,
-        Keys, Values,
+        // Keys, Values,
         kModel, vModel, attrModel, personModel){
   var managerView = Backbone.View.extend({
     el: $("#container"),
@@ -154,13 +154,34 @@ define([
         this.$('#resultsTitle').html('Results ('+this.state.matches.length+')');
     },
 
+    valueModelChanged: function() {
+        var selectedlist = this.state.attrCollection.filter(function(attr){
+            return attr.get('selected');
+        });
+        var melist = this.state.attrCollection.filter(function(attr){
+            return attr.get('haveit');
+        });
+
+        var count = selectedlist.length;
+        var html = (count > 0) ? count : '';
+        var badge = this.$('#searchBadge').html(html);
+        (count)? badge.show() : badge.hide();
+        this.state.filterCount = count;
+
+        count = melist.length;
+        html = (count > 0) ? count : '';
+        badge = this.$('#meBadge').html(html);
+        (count)? badge.show() : badge.hide();
+    },
+
     initialize: function(options) {
-        _.bindAll(this, 'addOneAttribute', 'addOnePerson', 'render', 'matchesClb', 'resetCollections', 'newAttribute');
+        _.bindAll(this, 'addOneAttribute', 'addOnePerson', 'render', 'matchesClb', 'resetCollections', 'newAttribute', 'valueModelChanged');
         this.state = options.state;
         this.controls = options.controls;
-        // _.extend(this, Backbone.Events);
 
         this.state.attrCollection.bind('add', this.addOneAttribute);
+        this.state.attrCollection.bind('value:change', this.valueModelChanged);
+
         this.state.bind('matchesChanged', this.matchesClb);
         this.state.personCollection.bind('add', this.addOnePerson);
     },
@@ -189,9 +210,10 @@ define([
 
         $(this.el).html(this.template());
         this._keysInserted = {};
-        console.log('render: attrs:', this.state.attrCollection.length)
+        // console.log('render: attrs:', this.state.attrCollection.length)
         this.state.attrCollection.each(this.addOneAttribute);
         this.state.personCollection.each(this.addOnePerson);
+        this.state.attrCollection.trigger('value:change');
         this._isRendered = true;
         return this;
     },

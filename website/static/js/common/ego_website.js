@@ -23,7 +23,7 @@ var common = {
             return cookie;
         },
 
-        set_cookie: function(name, secret)
+        set_cookie: function(name, secret, email)
         {
             if (secret == undefined)
                 secret = 0
@@ -35,7 +35,7 @@ var common = {
             cookie = JSON.parse(cookie_str);
             if (cookie.pseudonyms == undefined)
                 cookie.pseudonyms = {};
-            cookie.pseudonyms[name] = secret;    
+            cookie.pseudonyms[name] = {secret:secret, email:email};    
             cookie_str = JSON.stringify(cookie);
         //     console.log("set_cookie other_names2", cookie_str, secret);
             $.cookie('bringy', cookie_str, {expires:7, path:"/"});

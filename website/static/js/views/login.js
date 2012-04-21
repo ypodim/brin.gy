@@ -30,7 +30,8 @@ define([
             if (json.result) {
                 that.state.user.name = username;
                 that.state.user.pwd = password;
-                common.cookies.set_cookie(username, password);
+                that.state.user.email = json.email;
+                common.cookies.set_cookie(username, password, json.email);
                 that.state.router.navigate('#/all', {trigger: true});
             } else {
                 $('div.alert')
@@ -73,7 +74,7 @@ define([
                 that.state.user.name = username;
                 that.state.user.email = email;
                 that.state.user.pwd = json.secret;
-                common.cookies.set_cookie(username, json.secret);
+                common.cookies.set_cookie(username, json.secret, email);
                 that.state.router.navigate('#/all', {trigger: true});
             }
         }, 'json');

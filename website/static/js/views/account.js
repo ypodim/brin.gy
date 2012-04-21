@@ -15,7 +15,10 @@ define([
         'click button#delete': 'delete',
     },
 
-    delete: function(){},
+    delete: function(){
+        console.log('delete')
+        this.state.deleteAccount();
+    },
     signout: function(){
         console.log('Logging out', this.state.user)
         common.cookies.del_cookie(this.state.user.name);
@@ -25,7 +28,8 @@ define([
 
     render: function(){
         var username = this.state.user.name;
-        var t = this.template( {username:username, email:'ypodim'} );
+        var email = this.state.user.email;
+        var t = this.template( {username:username, email:email} );
         this.el.html(t);
         // this.state.doFullscreen({switch:false});
         return this;

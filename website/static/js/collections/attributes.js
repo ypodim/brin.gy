@@ -17,23 +17,24 @@ define([
     },
 
     modelChange: function(model) {
-        var selectedlist = this.filter(function(attr){
-            return attr.get('selected');
-        });
-        var melist = this.filter(function(attr){
-            return attr.get('haveit');
-        });
+        this.trigger('value:change');
+        // var selectedlist = this.filter(function(attr){
+        //     return attr.get('selected');
+        // });
+        // var melist = this.filter(function(attr){
+        //     return attr.get('haveit');
+        // });
 
-        var count = selectedlist.length;
-        var html = (count > 0) ? count : '';
-        var badge = $('#searchBadge').html(html);
-        (count)? badge.show() : badge.hide();
-        this.state.filterCount = count;
+        // var count = selectedlist.length;
+        // var html = (count > 0) ? count : '';
+        // var badge = $('#searchBadge').html(html);
+        // (count)? badge.show() : badge.hide();
+        // this.state.filterCount = count;
 
-        count = melist.length;
-        html = (count > 0) ? count : '';
-        badge = $('#meBadge').html(html);
-        (count)? badge.show() : badge.hide();
+        // count = melist.length;
+        // html = (count > 0) ? count : '';
+        // badge = $('#meBadge').html(html);
+        // (count)? badge.show() : badge.hide();
     },
 
     ffetch: function() {
@@ -42,7 +43,7 @@ define([
         $('#progressbar').children().width('10%');
 
         var that = this;
-        url = this.state.satellite.url+"/profile/"+this.state.context.context+"/keyvals";
+        url = this.state.satellite.url+"/profile/"+this.state.context.name+"/keyvals";
         $.getJSON(url, {user:this.state.user.name}, function(json){
 
             that.state.progress('fetched '+json.items.length+' attribute groups');
@@ -80,21 +81,17 @@ define([
         });
     },
 
-    added: function(obj) {
-        console.log('added', obj);
+    // added: function(obj) {
+    //     console.log('added', obj);
 
-        dic = [obj.get('key'), obj.get('val')];
-        secret = '';
-        username = 'ypodim';
-        url = this.state.agent.baseurl+'/'+this.state.user.name+'/profile';
-        data = {secret:secret, data:JSON.stringify(dic)};
+    //     dic = [obj.get('key'), obj.get('val')];
+    //     secret = '';
+    //     username = 'ypodim';
+    //     url = this.state.agent.baseurl+'/'+this.state.user.name+'/profile';
+    //     data = {secret:secret, data:JSON.stringify(dic)};
 
-        console.log('posting', url, data, secret);
-
-        // $.post(url, data, function(json){
-        //     console.log('post', json);
-        // }, 'json');
-    },
+    //     console.log('posting', url, data, secret);
+    // },
     removed: function(obj) {
         console.log('removed', obj);
     },

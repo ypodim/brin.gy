@@ -47,7 +47,7 @@ require([
         state.agent.baseurl = config.ego_url_prefix;
         state.agent.url = config.ego_url_prefix+"/"+config.agentid;
         state.website_url = config.website_url_prefix;
-        state.context = {context:"all"};
+        state.context = {name:"all"};
         state.device = config.device;
 
         var attrCollection = new Attributes([], {state:state});
