@@ -26,7 +26,6 @@ define([
     ], function(
         $, _, Backbone, 
         button, alerts, modal, popover, twipsy, 
-        // common, modals, attr_manager, 
         manageViewTemplate, 
 
         keyView, valueDetailedView, personView,
@@ -37,11 +36,24 @@ define([
     template: _.template(manageViewTemplate),
     events: {
         'click button.newattrbtn': 'newAttribute',
+        'click .controlFilters': 'filterBtn',
     },
 
     _keysInserted: {},
     _keyViews: {},
 
+    filterBtn: function(evt) {
+        var btnid = $(evt.target).attr('id');
+        if (btnid == 'all') {
+            this.state.router.navigate('#/all', {trigger:true});
+        }
+        if (btnid == 'me') {
+            this.state.router.navigate('#/me', {trigger:true});
+        }
+        if (btnid == 'filters') {
+            this.state.router.navigate('#/filters', {trigger:true});
+        }
+    },
     newAttribute: function() {
         if (! this.state.isLoggedin())
             return false;
@@ -90,6 +102,7 @@ define([
     },
 
     showMe: function(){
+        this.$('#me').addClass('active');
         this.$('attribute').hide();
         this.$('.valcontainer').hide();
 
@@ -105,6 +118,7 @@ define([
     },
 
     showFilters: function(){
+        this.$('#filters').addClass('active');
         this.$('attribute').hide();
         this.$('.valcontainer').hide();
 
@@ -144,6 +158,7 @@ define([
         _.bindAll(this, 'addOneAttribute', 'addOnePerson', 'render', 'matchesClb', 'resetCollections', 'newAttribute');
         this.state = options.state;
         this.controls = options.controls;
+        // _.extend(this, Backbone.Events);
 
         this.state.attrCollection.bind('add', this.addOneAttribute);
         this.state.bind('matchesChanged', this.matchesClb);
@@ -151,6 +166,7 @@ define([
     },
     
     showAll: function(){
+        this.$('#all').addClass('active');
         this.$('.resultsTitle').hide();
         this.$('#results').hide();
         this.$('.closingpane').show();
@@ -168,6 +184,9 @@ define([
 
     _isRendered: false,
     render: function(){
+        if (this._isRendered)
+            return false;
+
         $(this.el).html(this.template());
         this._keysInserted = {};
         console.log('render: attrs:', this.state.attrCollection.length)

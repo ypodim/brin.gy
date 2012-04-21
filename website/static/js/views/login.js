@@ -137,11 +137,11 @@ define([
         var compiled_template = _.template( loginViewTemplate );
         this.el.html( compiled_template() );
 
-        this.$('div.account.nametag').hide();
+        this.$('div.nametag').hide();
         this.$('a').hide();
         var actions = {signup:1, signin:1, reminder:1};
         if (options.action in actions) {
-            this.$('div.account.nametag.'+options.action).show();
+            this.$('div.nametag.'+options.action).show();
             this.$('.'+options.action).show();
         }
 
@@ -151,11 +151,12 @@ define([
         var password = this.$('div.'+options.action+' input[type=password]');
         
         this.$('input[type=text]').focus().keypress(function(evt){
-            if (evt.keyCode==13)
+            if (evt.keyCode==13) {
                 if (options.action=='signin')
                     password.focus();
                 if (options.action=='signup')
                     email.focus();
+            }
         });
         password.keypress(function(evt){
             if (evt.keyCode==13)

@@ -23,10 +23,14 @@ define(['underscore', 'backbone',
         if (options==undefined) var options = {switch:true};
         $('#container').toggleClass('fullscreen', options.switch);
     },
+    // toggleFooter: function(options){
+    //     if (options==undefined) var options = {switch:true};
+    //     $('#footer').toggle(options.switch);
+    // },
     isLoggedin: function(options) {
         if (options == undefined)
             options = {redirect:true};
-        var loggedin = (this.user.name!='' && this.user.pwd!='');
+        var loggedin = (this.user.name && this.user.pwd);
         if ((!loggedin) && options.redirect)
             this.router.navigate('#signup', {trigger:true});
         return loggedin;

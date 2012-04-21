@@ -18,7 +18,7 @@ define([
     el: $("#controls")[0],
     template: _.template(controlsViewTemplate),
     events: {
-        'click .controlFilters': 'filterBtn',
+        
         'click #resultsBtn': 'showResults',
         'click #backBtn': 'goBack',
         'click #newBtn': 'newAttribute',
@@ -43,18 +43,7 @@ define([
     goBack: function(){
         this.state.router.navigate('#/filters', {trigger:true});
     },
-    filterBtn: function(evt) {
-        var btnid = $(evt.target).attr('id');
-        if (btnid == 'all') {
-            this.state.router.navigate('#/all', {trigger:true});
-        }
-        if (btnid == 'me') {
-            this.state.router.navigate('#me', {trigger:true});
-        }
-        if (btnid == 'filters') {
-            this.state.router.navigate('filters', {trigger:true});
-        }
-    },
+    
     
     animateMatchesTo: function(target) {
         this.$('#resultsBtn').html('Send Message');
@@ -70,29 +59,25 @@ define([
 
     doAll: function(){
         $(this.el).show();
-        this.$('.controlFilters').show();
         this.$('.secondOrder').hide();
         this.$('div#profileinfo').hide();
         if (this.state.isLoggedin({redirect:false}))
             this.$('#newBtn').show();
-        else
-            this.$('#startBtn').show();
+        // else
+            // this.$('#startBtn').show();
     },
     doMe: function() {
         $(this.el).show();
-        this.$('.controlFilters').show();
         this.$('.secondOrder').hide();
         // this.$('#likemeBtn').show();
     },
     doFilters: function() {
         $(this.el).show();
-        this.$('.controlFilters').show();
         this.$('.secondOrder').hide();
         this.$('#resultsBtn').show();
     },
     doLogin: function() {
         $(this.el).show();
-        this.$('.controlFilters').hide();
         this.$('.secondOrder').hide();
         // this.$('#loginBtn').show();
         this.$('#okBtn').show();
@@ -100,7 +85,6 @@ define([
     },
     doMessage: function() {
         $(this.el).show();
-        this.$('.controlFilters').hide();
         this.$('button.secondOrder').hide();
         this.$('#cancelMessageBtn').show();
         this.$('#sendMessageBtn').show();
@@ -108,7 +92,6 @@ define([
     },
     doProfile: function(username) {
         $(this.el).show();
-        this.$('.controlFilters').hide();
         this.$('button.secondOrder').hide();
         this.$('button#backBtn').show();
         this.$('div#profileinfo').show();
@@ -116,19 +99,31 @@ define([
     },
     doNewAttr: function() {
         $(this.el).show();
-        this.$('.controlFilters').hide();
         this.$('button.secondOrder').hide();
         // this.$('div#profileinfo').show();
         // this.$('div#profileinfo #username').html(username);
         this.$('button#backBtn').show();
         this.$('button#saveAttrBtn').show();
     },
-    hideControls:function() {
-        $(this.el).hide();
+    doAccount: function(){
+        $(this.el).show();
+        this.$('button').hide();
+        // this.$('button.secondOrder').hide();
     },
+    setTitle: function(title) {
+        this.$('#title').html(title);
+    },
+    // toggleModal: function(options){
+    //     if (options==undefined) var options = {switch:false};
+    //     $('#footer').toggle(options.switch);
+    // },
+    // hideControls:function() {
+    //     $(this.el).hide();
+    // },
     initialize: function(options) {
         _.bindAll(this, 'animateMatchesTo', 'showResults', 'doNewAttr');
         this.state = options.state;
+
         $(this.el).append(this.template());
     },
     

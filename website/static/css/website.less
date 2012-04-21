@@ -7,6 +7,7 @@ body {
     font-family:helvetica; 
     margin: 0;
     padding: 0;
+    background-color: rgba(0,0,0,0.1);
 }
 
 #loader {
@@ -17,12 +18,13 @@ body {
     position: absolute;
     z-index:0;
     left: 0;
-    top: 80px;
+    right:0;
+    top:95px;
     bottom: 95px;
-    /*padding: 95px 0 0 0;*/
-    background-color: rgba(0,0,0,0.1);
-    margin: 0 auto;
-    width:100%;
+    padding: 0;
+    
+    /*margin: 0 auto;*/
+    /*width:100%;*/
     text-shadow: rgba(255, 255, 255, 0.45) 0px 1px 0px;
 
     overflow-y: scroll;
@@ -83,6 +85,31 @@ div.mobile {
     text-shadow: 0 1px rgba(255, 255, 255, 0.6);
     background-color:white;
 }
+
+div.controlFilters {
+    /*position:absolute;
+    left:150px;
+    top:0px;
+    left:0;
+    right:0;*/
+    height:@height-2;
+    margin:5px;
+}
+div.controlFilters > button {
+    height: 60px;
+    width:180px;
+    font-size:30px;
+}
+div.controlFilters > button > span.badge {
+    .font-s1;
+    position: absolute;
+    right:5px;
+    top:5px;
+    display: none;
+    /*line-height:30px;*/
+    height:32px;
+}
+
 
 
 .closingpane {
@@ -185,13 +212,11 @@ person > button {
 /* ======== ATTRIBUTE ========= */
 
 attribute {
-    .font-1;
-    /*line-height: @height-1;*/
     display: block;
-    margin: 20px 0 20px 0;
+    margin: 0 0 40px 0;
     background: rgba(25, 25, 25, 0.15);
-    background-image: -moz-linear-gradient(90deg, #aaa, #ddd);
-    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#aaa), to(#ddd));
+    background-image: -moz-linear-gradient(90deg, #999, #ddd);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#999), to(#ddd));
     box-shadow: 0 3px 1px rgba(0, 0, 0, 0.5);
 }
 attribute a { color: black; }
@@ -201,6 +226,7 @@ attribute a:hover {
 }
 
 attribute > a.keypart {
+    .font-1;
     height:@height-01;
     white-space: nowrap;
     overflow: hidden;
@@ -225,6 +251,14 @@ attribute > a.keypart > span.count {
     box-shadow: 0px 3px 1px rgba(0,0,0,0.5);
     border-radius: 3px;
 }
+attribute > button {
+    font-size:@height-3 ! important;
+    /*position:absolute;*/
+    /*right:5px;*/
+    height:@height-2;
+    line-height:@height-2;
+}
+
 attribute > form > input {
     height:70px;
     width:50%;
@@ -285,7 +319,6 @@ attribute > div.valpartdetailed > div.valcontainer > a > span.count {
 /* ========================================= */
 
 div#controls {
-    display:none;
     .font-2;
     line-height:@height-2;
     position: absolute;
@@ -304,21 +337,6 @@ div#controls {
 div#controls button {
     .font-2;
 }
-
-div.controlFilters {
-    position:absolute;
-    left:150px;
-    top:5px;
-}
-div.controlSorters {
-    position:absolute;
-    right:5px;
-    top:5px;
-}
-div#controls > div.btn-group > button {
-    height: 80px;
-    width: 180px;
-}
 div#controls > div.secondOrder {
     position:absolute;
     right:10px;
@@ -332,7 +350,7 @@ div#controls > button {
     top:5px;
     height: 80px;
 }
-div#controls > button#homeBtn {
+/*div#controls > button#homeBtn {
     .font-2;
     position:absolute;
     left:5px;
@@ -344,7 +362,7 @@ div#controls > button#homeBtn {
     background-repeat: no-repeat;
     background-position: center center;
     background-size: 40%;
-}
+}*/
 div#controls > button#cancelMessageBtn {
     .font-3;
     position:absolute;
@@ -363,16 +381,6 @@ div#controls > button#backBtn {
     height: 80px;
     display:none;
 }
-div#controls span.badge {
-    .font-s1;
-    position: absolute;
-    right:5px;
-    top:5px;
-    display: none;
-    /*line-height:30px;*/
-    height:32px;
-}
-
 div#controls > div#profileinfo {
     position: absolute;
     right:15px;
@@ -391,13 +399,17 @@ div#controls > button#okBtn {
     /*background-image: url(/static/images/website/glyphicons_206_ok.png);*/
     /*background-repeat: no-repeat;*/
     /*background-position: 20px center;*/
-    text-shadow: 0 -3px gray;
+    text-shadow: 0 -2px gray;
 }
-
+div#controls > div#title {
+    text-transform:capitalize;
+    line-height:@height-1;
+    text-shadow: #000 0px -1px 1px;
+}
 
 /*############# LOGIN #############*/
 
-/*div.account.alert{
+/*div.login.alert{
     .font-s1;
     position:absolute;
     top:0px;
@@ -407,12 +419,12 @@ div#controls > button#okBtn {
     height:50px;
 }*/
 
-div.account.nametag {
+div.nametag {
     display:none;
     position: relative;
     background-color:red;
     border-radius:30px;
-    margin:auto;
+    margin: 50px auto;
     width:500px;
     height:300px;
     color:white;
@@ -422,19 +434,19 @@ div.account.nametag {
     font-weight: bold;
     line-height:50px;
 }
-div.account.nametag > b {
+div.nametag > b {
     display: block;
     font-size:60px;
     line-height:60px;
 }
-div.account.nametag > form {
+div.nametag > form {
     position:absolute;
     bottom:8%;
     top:40%;
     width:inherit;
     background-color:white;
 }
-div.account.nametag > form > input {
+div.nametag > form > input {
     font-size:40px;
     line-height:40px;
     height:50%;
@@ -452,7 +464,7 @@ div.account.nametag > form > input {
     /*text-transform: capitalize;*/
     /*font-variant: small-caps;*/
 }
-div.account.nametag > form > input:focus {
+div.nametag > form > input:focus {
     outline: none;
     outline-color:white ! important;
     border-color:white ! important;
@@ -462,7 +474,7 @@ div.account.nametag > form > input:focus {
     border:0px;
 }
 
-a.account {
+a.login {
     display:block;
     width:500px;
     margin:auto;
@@ -600,29 +612,49 @@ div#welcome > a:hover {
 
 
 /*############# FOOTER #############*/
-footer {
+
+#footer {
     position: absolute;
     bottom:0;
     left:0;
     right:0;
     height:@height-1;
     
-    padding: 0 1px 1px 1px;
+    padding: 0 0px 1px 0px;
     background-color:rgba(0,0,0,0.2);
     box-shadow: 0 -3px 5px 0 rgba(0,0,0,0.5);
+    width:100%;
+    display:table;
 }
-footer > div  {
-    padding: 1px 0 0 0;
-    height:85px;
-}
-footer > div > a {
-    width:31.3333%;
-    height:90%;
-    font-size:35px ! important;
-    line-height:85px ! important;
+#footer > a {
+    display: table-cell;
+    /*height:90%;*/
+    width:25%;
+    font-size:35px;
+    /*line-height:85px;*/
     text-shadow: rgba(255, 255, 255, 0.45) 0px 1px 0px;
+    float:none;
+}
+#footer > a > img {
+    height: 35px;
 }
 
+/*############# ACCOUNT #############*/
 
+div.account {
+    margin:10px;
+    padding:10px;
+    border-radius:5px;
+    background-color:rgba(220,220,220,1);
+    font-size:@height-s2;
+    line-height:@height-s2;
+
+}
+
+button.account {
+    width:180px;
+    height:50px;
+    font-size:20px;
+}
 
 

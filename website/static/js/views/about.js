@@ -2,9 +2,8 @@ define([
   'jquery',
   'underscore', 
   'backbone',
-  'common/ego_website',
   'text!templates/about.html'
-  ], function($, _, Backbone, common, aboutViewTemplate){
+  ], function($, _, Backbone, aboutViewTemplate){
   var aboutView = Backbone.View.extend({
     el: $("#container"),
     events: {

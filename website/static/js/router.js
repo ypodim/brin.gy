@@ -13,13 +13,16 @@ define([
     'views/newAttribute',
     'views/welcome',
     'views/presentation',
+    'views/account',
 ], function(
     $, _, Backbone, common, 
-    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView, presentationView
+    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView, presentationView, accountView
     ){
   var AppRouter = Backbone.Router.extend({
     routes: {
         "about": "showAbout",
+
+        'context': 'showContext',
         "context/:context": "setContext",
         "user/:user/context/:context": "setUserContext",
         "context/:context/user/:user": "setContextUser",
@@ -38,7 +41,46 @@ define([
         'me': 'showMe',
         'new': 'newAttribute',
 
+        'account': 'account',
+
         "*actions": "defaultRoute",
+    },
+
+    uistate: {
+
+    },
+    setUIstate: function(options){
+        var frag = Backbone.history.fragment;
+
+        if (options==undefined) 
+            options = {fullscreen:false, footer:true};
+        if (options.fullscreen == undefined)
+            options.fullscreen = false;
+        if (options.footer == undefined)
+            options.footer = true;
+        if (options.title == undefined)
+            options.title = frag;
+
+        $('#footer').toggle(options.footer);
+        this.state.doFullscreen({switch:options.fullscreen});
+
+        $('#footer > a').removeClass('active');
+        $('#footer > a[href="#/'+frag+'"]').addClass('active');
+
+        if (frag in {all:1, me:1, filters:1}) {
+            $('#footer > a[href="#/all"]').addClass('active');
+        } else {
+            this.contents_view._isRendered = false;
+        }
+        
+        this.controlsView.setTitle(options.title);
+        // this.state.hideSplash();
+
+        
+        // if (options.footer) {
+        //     a = $('#footer > a[href="#/'+Backbone.history.fragment+'"]');
+        //     console.log(a);
+        // }
     },
     
     initialize: function(options){
@@ -64,6 +106,7 @@ define([
     },
 
     presentation: function(sno){
+        this.setUIstate({fullscreen:true});
         sno = parseInt(sno);
         this.presView.slide = sno;
         this.presView.showSlide(sno);
@@ -71,8 +114,7 @@ define([
     },
 
     showUser: function(username) {
-        
-
+        this.setUIstate({footer:false, title:''});
         this.state.stats('user');
         var pview = new profileView({
             state: this.state,
@@ -80,29 +122,29 @@ define([
         });
         pview.render();
         this.controlsView.doProfile(username);
-        this.state.hideSplash();
     },
     showFilters: function(options){
         if (! this.contents_view._isRendered)
-            this.navigate('#/all', {trigger:true});
-
+            return this.navigate('#/all', {trigger:true});
+            
+        this.setUIstate();
         this.state.stats('filters:filters');
         this.contents_view.render();
         this.contents_view.showFilters();
         this.controlsView.doFilters();
     },
     showAll: function( cntx ){
-        this.state.doFullscreen({switch:false});
-        this.presView.hide();
+        this.setUIstate();
         this.state.stats('filters:all');
         this.contents_view.render();
         this.contents_view.showAll();
         this.controlsView.doAll();
     },
     showMe: function(){
-        if (! this.contents_view._isRendered)
-            this.navigate('#/all', {trigger:true});
-
+        if (! this.contents_view._isRendered) 
+            return this.navigate('#/all', {trigger:true});
+            
+        this.setUIstate();
         this.state.stats('filters:me');
         this.contents_view.render();
         this.contents_view.showMe();
@@ -110,8 +152,7 @@ define([
     },
 
     login: function() {
-        
-        this.state.doFullscreen({switch:false});
+        this.setUIstate({footer:false});
         var lview = new loginView({
             state: this.state,
         });
@@ -122,29 +163,24 @@ define([
 
         this.controlsView.doLogin();
         this.state.stats('login');
-        this.state.hideSplash();
     },
 
     newAttribute: function() {
+        this.setUIstate({footer:false});
         var aview = new newAttrView({
             state: this.state,
         });
         aview.render();
         this.controlsView.doNewAttr();
-        this.state.hideSplash();
     },
     // matches: function(){
     //     this.matchesView = new matchesManagerView({
     //         state: this.state,
     //     });
     //     this.matchesView.render();
-
-    //     this.state.hideSplash();
     // },
     sendmessage: function(){
-        if (! this.contents_view._isRendered)
-            this.navigate('#/all', {trigger:true});
-
+        this.setUIstate({footer:false, title:'Chat'});
         this.state.stats('message');
         this.message = new sendMessageView({
             state: this.state,
@@ -153,8 +189,13 @@ define([
         this.controlsView.doMessage();
     },
     showAbout: function() {
+        this.setUIstate({footer:false});
+
         aboutView.render();
-        this.state.hideSplash();
+    },
+
+    showContext: function() {
+        this.setUIstate();
     },
     setUserContext: function( user, context ) {
         console.log( "**** Set user:", user, "context:", context  );   
@@ -166,21 +207,26 @@ define([
         this.setUserContext(undefined, context);
     },
     
-    
+    account: function(){
+        if (! this.state.isLoggedin())
+            return false;
+
+        this.setUIstate();
+        this.controlsView.doAccount();
+        var account = new accountView({
+            state: this.state,
+        });
+        account.render();
+    },
 
     defaultRoute: function( cntx ){
-        this.presView.hide();
+        this.setUIstate();
         
-        this.state.hideSplash();
         this.state.stats('home');
         var wview = new welcomeView({
             state: this.state,
         });
         wview.render();
-
-
-        this.state.hideSplash();
-        this.controlsView.hideControls();
     },
   });
 

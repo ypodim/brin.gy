@@ -12,6 +12,8 @@ define([
         _.bindAll(this, 'modelChange');
         // this.bind('add', this.added);
         this.bind('remove', this.removed);
+
+        // _.extend(this, Backbone.Events);
     },
 
     modelChange: function(model) {
