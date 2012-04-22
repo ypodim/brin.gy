@@ -1,0 +1,13 @@
+
+<a href="#">
+	<div class="count"><%= userno %></div>
+	<div class="name"><%= name %></div>
+</a>
+<div class="description"><%= description %></div>
+<button id='actionBtn' 
+		class='btn <% if (joined) print('btn-danger'); else print('btn-success'); %>'>
+        <% if (joined) print('Leave'); else print('Join'); %>
+</button>
+
+
+

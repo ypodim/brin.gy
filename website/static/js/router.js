@@ -14,15 +14,18 @@ define([
     'views/welcome',
     'views/presentation',
     'views/account',
+    'views/contexts',
+    'views/newContext',
 ], function(
     $, _, Backbone, common, 
-    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView, presentationView, accountView
+    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView, presentationView, accountView, contextsView, newContextView
     ){
   var AppRouter = Backbone.Router.extend({
     routes: {
         "about": "showAbout",
 
         'context': 'showContext',
+        'newcontext': 'newContext',
         "context/:context": "setContext",
         "user/:user/context/:context": "setUserContext",
         "context/:context/user/:user": "setContextUser",
@@ -166,7 +169,10 @@ define([
     },
 
     newAttribute: function() {
-        this.setUIstate({footer:false});
+        this.setUIstate({
+            footer:false, 
+            title:'New attribute',
+        });
         var aview = new newAttrView({
             state: this.state,
         });
@@ -189,7 +195,21 @@ define([
     },
 
     showContext: function() {
+        this.setUIstate({
+            footer:false, 
+            title:'New context',
+        });
+        ncview = new newContextView({
+            state: this.state,
+        });
+        ncview.render();
+    },
+    newContext: function(){
         this.setUIstate();
+        cview = new contextsView({
+            state: this.state,
+        });
+        cview.render();
     },
     setUserContext: function( user, context ) {
         console.log( "**** Set user:", user, "context:", context  );   

@@ -294,7 +294,11 @@ class contexts(tornado.web.RequestHandler):
         contexts=list(r.smembers('contexts'))
         for c in contexts:
             count = r.scard('context:%s' % c)
-            context = dict(name=c, count=count)
+            description = 'This is the top level context that includes everything and everyone.'
+            context = dict(name=c, 
+                           count=count, 
+                           userhasit=0, 
+                           description=description)
             if user:
                 context['userhasit'] = r.sismember('context:%s' % c, user)
             dic['contexts'].append(context)    
