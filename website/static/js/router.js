@@ -42,47 +42,11 @@ define([
         'all': 'showAll',
         'me': 'showMe',
         'new': 'newAttribute',
+        'new/incontext/:context': 'newAttribute',
 
         'account': 'account',
 
         "*actions": "defaultRoute",
-    },
-
-    uistate: {
-
-    },
-    setUIstate: function(options){
-        var frag = Backbone.history.fragment;
-
-        if (options==undefined) 
-            options = {fullscreen:false, footer:true};
-        if (options.fullscreen == undefined)
-            options.fullscreen = false;
-        if (options.footer == undefined)
-            options.footer = true;
-        if (options.title == undefined)
-            options.title = frag;
-
-        $('#footer').toggle(options.footer);
-        this.state.doFullscreen({switch:options.fullscreen});
-
-        $('#footer > a').removeClass('active');
-        $('#footer > a[href="#/'+frag+'"]').addClass('active');
-
-        if (frag in {all:1, me:1, filters:1}) {
-            $('#footer > a[href="#/all"]').addClass('active');
-            options.title = '';
-            options.context = 'MIT Media Lab';
-            this.state.attrCollection.trigger('value:change');
-        } else {
-            this.contents_view._isRendered = false;
-            options.context = '';
-        }
-        
-        this.controlsView.setTitle(options.title);
-        this.controlsView.toggleContext(options.context);
-        
-        // this.state.hideSplash();
     },
     
     initialize: function(options){
@@ -109,7 +73,9 @@ define([
     },
 
     presentation: function(sno){
-        this.setUIstate({fullscreen:true});
+        this.controlsView.setUIstate({
+            fullscreen:true,
+        });
         sno = parseInt(sno);
         this.presView.slide = sno;
         this.presView.showSlide(sno);
@@ -117,45 +83,70 @@ define([
     },
 
     showUser: function(username) {
-        this.setUIstate({footer:false, title:''});
         this.state.stats('user');
         var pview = new profileView({
             state: this.state,
             username:username,
         });
         pview.render();
-        this.controlsView.doProfile(username);
+
+        this.controlsView.setUIstate({
+            footer:false, 
+            title:'',
+            profile: username,
+        });
     },
     showFilters: function(options){
         if (! this.contents_view._isRendered)
             return this.navigate('#/all', {trigger:true});
-            
-        this.setUIstate();
+        
         this.state.stats('filters:filters');
         this.contents_view.render();
         this.contents_view.showFilters();
-        this.controlsView.doFilters();
+
+        var that = this;
+        this.controlsView.setUIstate({
+            rightTitle: 'Send Message',
+            rightClb: function() {
+                if (that.state.personCollection.included().length > 5)
+                    that.state.showMessage('You can only contact up to 5 people at a time. Please choose 5 among your matches, or add more filters.');
+                else
+                    that.state.router.navigate('sendmessage', {trigger:true});
+            },
+        });
+    },
+    startNewAttribute: function(state){
+        if (! state.isLoggedin()) return false;
+        state.stats('newattr:btnTop');
+        state.router.navigate('#/new', {trigger:true});
     },
     showAll: function( cntx ){
-        this.setUIstate();
         this.state.stats('filters:all');
         this.contents_view.render();
         this.contents_view.showAll();
-        this.controlsView.doAll();
+
+        var that = this;
+        this.controlsView.setUIstate({
+            rightTitle: 'Start New Attribute',
+            rightClb: function(){that.startNewAttribute(that.state)},
+        });
     },
     showMe: function(){
         if (! this.contents_view._isRendered) 
             return this.navigate('#/all', {trigger:true});
             
-        this.setUIstate();
         this.state.stats('filters:me');
         this.contents_view.render();
         this.contents_view.showMe();
-        this.controlsView.doMe();
+        
+        var that = this;
+        this.controlsView.setUIstate({
+            rightTitle: 'Start New Attribute',
+            rightClb: function(){that.startNewAttribute(that.state)},
+        });
     },
 
     login: function() {
-        this.setUIstate({footer:false});
         var lview = new loginView({
             state: this.state,
         });
@@ -164,52 +155,76 @@ define([
         if (Backbone.history.fragment in actions)
             lview.render({action:Backbone.history.fragment});
 
-        this.controlsView.doLogin();
         this.state.stats('login');
+
+        var that = this;
+        this.controlsView.setUIstate({
+            footer:false,
+            rightClb: lview.loginBtn,
+            leftClb: function(){that.navigate('#/all');},
+        });
     },
 
-    newAttribute: function() {
-        this.setUIstate({
-            footer:false, 
-            title:'New attribute',
-        });
+    newAttribute: function(context) {
         var aview = new newAttrView({
             state: this.state,
+            context: context,
         });
         aview.render();
-        this.controlsView.doNewAttr();
+        
+        this.controlsView.setUIstate({
+            footer:false, 
+            title:'New attribute',
+            rightClb: aview.save,
+            rightTitle: 'Save',
+        });
     },
     sendmessage: function(){
-        this.setUIstate({footer:false, title:'Chat'});
         this.state.stats('message');
         this.message = new sendMessageView({
             state: this.state,
         });
         this.message.render();
-        this.controlsView.doMessage();
+
+        this.controlsView.setUIstate({
+            footer:false, 
+            title:'Chat',
+            rightTitle: 'Send',
+            rightClb: this.message.send,
+        });
     },
     showAbout: function() {
-        this.setUIstate({footer:false});
+        this.controlsView.setUIstate({
+            footer:false,
+        });
 
         aboutView.render();
     },
 
-    showContext: function() {
-        this.setUIstate({
-            footer:false, 
-            title:'New context',
-        });
+    newContext: function() {
         ncview = new newContextView({
             state: this.state,
         });
         ncview.render();
+
+        this.controlsView.setUIstate({
+            footer:false, 
+            title:'New context',
+            rightClb: function(){ncview.getLocation()},
+            rightTitle: 'Next',
+        });
     },
-    newContext: function(){
-        this.setUIstate();
+    showContext: function(){
         cview = new contextsView({
             state: this.state,
         });
         cview.render();
+        var that = this;
+        this.controlsView.setUIstate({
+            rightClb: function(){that.navigate('#/newcontext', {trigger:true});},
+            rightTitle: 'New Context',
+            title: 'Contexts',
+        });
     },
     setUserContext: function( user, context ) {
         console.log( "**** Set user:", user, "context:", context  );   
@@ -225,8 +240,7 @@ define([
         if (! this.state.isLoggedin())
             return false;
 
-        this.setUIstate();
-        this.controlsView.doAccount();
+        this.controlsView.setUIstate();
         var account = new accountView({
             state: this.state,
         });
@@ -234,7 +248,7 @@ define([
     },
 
     defaultRoute: function( cntx ){
-        this.setUIstate({title:'Brin.gy'});
+        this.controlsView.setUIstate({title:'Brin.gy'});
         
         this.state.stats('home');
         var wview = new welcomeView({

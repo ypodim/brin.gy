@@ -55,7 +55,7 @@ define([
         var val = this.model.get('val');
         var type = (added) ? 'POST' : 'DELETE';
 
-        this.state.mutateKeyValue(key, val, type, function(json){
+        this.state.mutateKeyValue('all', key, val, type, function(json){
             // console.log(json);
         });
 

@@ -51,7 +51,7 @@ define([
         var type = 'POST';
         var that = this;
         console.log('posting', key, val, type);
-        this.state.mutateKeyValue(key, val, type, function(json){
+        this.state.mutateKeyValue('all', key, val, type, function(json){
             console.log(json);
             this.$('input').val('');
 

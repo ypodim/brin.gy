@@ -16,12 +16,9 @@ define([
     var newAttrView = Backbone.View.extend({
 
     tagName: 'newattribute',
-    // el: $("#container"),
     template: _.template(profileTemplate),
 
     events: {
-        // 'click #includeBtn': 'includeBtn',
-        // 'click #moreBtn': 'moreBtn',
         'keypress input': 'valueKey',
     },
 
@@ -38,7 +35,7 @@ define([
                 var val = $(obj).val();
                 // console.log('adding', i, key, val);
 
-                that.state.mutateKeyValue(key, val, 'POST', function(json){
+                that.state.mutateKeyValue(that.context, key, val, 'POST', function(json){
                     var attr = new attrModel({
                         key:key,
                         val:val,
@@ -62,7 +59,9 @@ define([
     initialize: function(options) {
         _.bindAll(this, 'render', 'save');
         this.state = options.state;
-        $('button#saveAttrBtn').one('click', this.save);
+        this.context = options.context;
+        if (this.context == undefined)
+            this.context = 'all';
     },
 
     valueKey: function(evt){

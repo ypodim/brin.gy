@@ -337,50 +337,21 @@ div#controls {
 div#controls button {
     .font-2;
 }
-div#controls > div.secondOrder {
-    position:absolute;
-    right:10px;
-    top:30px;
-    height: @height-1;
-}
 div#controls > button {
     .font-3;
     position:absolute;
+    top:5px;
+    height: 80px;
+    min-width:180px;
+    text-shadow: 0 -2px gray;
+}
+div#controls > button#leftModalBtn {
+    left:5px;
+}
+div#controls > button#rightModalBtn {
     right:5px;
-    top:5px;
-    height: 80px;
 }
-/*div#controls > button#homeBtn {
-    .font-2;
-    position:absolute;
-    left:5px;
-    top:5px;
-    width:140px;
-    height: 80px;
-    
-    background-image: url('/static/images/website/glyphicons_020_home.png?d');
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: 40%;
-}*/
-div#controls > button#cancelMessageBtn {
-    .font-3;
-    position:absolute;
-    left:5px;
-    right:inherit;
-    top:5px;
-    height: 80px;
-    display:none;
-}
-div#controls > button#backBtn {
-    .font-3;
-    position:absolute;
-    left:5px;
-    right:inherit;
-    top:5px;
-    height: 80px;
-    display:none;
-}
+
 div#controls > div#profileinfo {
     position: absolute;
     right:15px;
@@ -388,19 +359,12 @@ div#controls > div#profileinfo {
     display:none;
     text-shadow: #000 0px -1px 1px;
     height:80px;
-    /*line-height:80px;*/
 }
 div#controls > div#profileinfo > img{
     width: 80px;
     padding-bottom:30px;
 }
-div#controls > button#okBtn {
-    width:180px;
-    /*background-image: url(/static/images/website/glyphicons_206_ok.png);*/
-    /*background-repeat: no-repeat;*/
-    /*background-position: 20px center;*/
-    text-shadow: 0 -2px gray;
-}
+
 div#controls > div#title {
     text-transform:capitalize;
     line-height:@height-1;
@@ -690,6 +654,7 @@ div#contexts > div#contextEntry {
     min-height:@height-2;
     /*background-color:gray;*/
     border: 1px solid gray;
+    position:relative;
 }
 div#contexts > div#contextEntry > a {
     position: absolute;

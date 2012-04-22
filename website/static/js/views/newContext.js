@@ -9,20 +9,35 @@ define([
     'views/key',
     'views/valueDetailed',
 
-    'text!templates/newAttribute.html',
+    'text!templates/newContext.html',
 ], function($, _, Backbone, scroll, 
     kModel, attrModel, keyView, valueDetailedView,
-    profileTemplate){
+    newContextTemplate){
     var newAttrView = Backbone.View.extend({
 
     tagName: 'newattribute',
-    // el: $("#container"),
-    template: _.template(profileTemplate),
+    template: _.template(newContextTemplate),
 
     events: {
-        // 'click #includeBtn': 'includeBtn',
-        // 'click #moreBtn': 'moreBtn',
         'keypress input': 'valueKey',
+    },
+
+    getLocation: function() {
+        var context = this.$('input#contextName').val();
+        $(this.el).html('get location');
+        var that = this;
+
+        this.state.router.controlsView.setUIstate({
+            footer:false,
+            rightClb: function(){
+                that.state.router.navigate('#/new/incontext/'+context, {trigger:true});
+            },
+            rightTitle: 'Next',
+            title: 'Choose Location',
+        });
+    },
+    getAttribute: function() {
+
     },
 
     save: function(){
@@ -62,7 +77,6 @@ define([
     initialize: function(options) {
         _.bindAll(this, 'render', 'save');
         this.state = options.state;
-        $('button#saveAttrBtn').one('click', this.save);
     },
 
     valueKey: function(evt){
@@ -80,7 +94,7 @@ define([
         html = this.template({username:this.username});
         $(this.el).html(html);
         $("#container").html(this.el);
-        this.$('input#title').focus();
+        this.$('input#contextName').focus();
         return this;
     },
 

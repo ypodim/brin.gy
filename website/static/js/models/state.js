@@ -88,7 +88,7 @@ define(['underscore', 'backbone', 'common/ego_website',
         }, 5000);
     },
 
-    mutateKeyValue: function(key, val, type, clb) {
+    mutateKeyValue: function(context, key, val, type, clb) {
         var url = this.agent.baseurl+'/'+this.user.name+'/profile';
         var data = JSON.stringify([[key, val]]);
         if (type != 'POST' && type != 'DELETE')
@@ -97,7 +97,7 @@ define(['underscore', 'backbone', 'common/ego_website',
         $.ajax({
             type: type,
             url: url,
-            data: {data:data, secret:this.user.pwd},
+            data: {data:data, context:context, secret:this.user.pwd},
             success: function(json){ 
                 if (clb != undefined)
                     clb(json);

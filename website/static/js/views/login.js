@@ -15,7 +15,6 @@ define([
     initialize: function(options) {
         _.bindAll(this, 'loginBtn', 'render');
         this.state = options.state;
-        $('#okBtn').click('click', this.loginBtn);
     },
     isValidEmail: function(username) {
         var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;

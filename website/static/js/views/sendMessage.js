@@ -12,9 +12,6 @@ define([
     initialize: function(options) {
         _.bindAll(this, 'render', 'send', 'cancel');
         this.state = options.state;
-        $('#cancelMessageBtn').click(this.cancel);
-        // $('#sendMessageBtn').click(this.send);
-        $('#sendMessageBtn').one('click', this.send);
     },
     send: function() {
         

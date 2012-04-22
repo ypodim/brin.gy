@@ -17,93 +17,40 @@ define([
   var controlsView = Backbone.View.extend({
     el: $("#controls")[0],
     template: _.template(controlsViewTemplate),
-    events: {
+
+    setUIstate: function(options){
+        var frag = Backbone.history.fragment;
+
+        if (options==undefined) 
+            options = {fullscreen:false, footer:true};
+        if (options.fullscreen == undefined)
+            options.fullscreen = false;
+        if (options.footer == undefined)
+            options.footer = true;
+        if (options.title == undefined)
+            options.title = frag;
+
+        this.doModal(options);
+
+        this.state.doFullscreen({switch:options.fullscreen});
+
+        $('#footer > a').removeClass('active');
+        $('#footer > a[href="#/'+frag+'"]').addClass('active');
+
+        if (frag in {all:1, me:1, filters:1}) {
+            $('#footer > a[href="#/all"]').addClass('active');
+            options.title = '';
+            options.context = 'MIT Media Lab';
+            this.state.attrCollection.trigger('value:change');
+        } else {
+            this.state.router.contents_view._isRendered = false;
+            options.context = '';
+        }
         
-        'click #messageBtn': 'sendMessageModal',
-        'click #backBtn': 'goBack',
-        'click #newBtn': 'newAttribute',
-        'click #saveAttrBtn': 'saveNewAttribute',        
-    },
-
-    saveNewAttribute: function(){
-
-    },
-    newAttribute: function(){
-        if (! this.state.isLoggedin())
-            return false;
-
-        this.state.stats('newattr:btnTop');
-        this.state.router.navigate('#/new', {trigger:true});
-    },
-    goBack: function(){
-        this.state.router.navigate('#/filters', {trigger:true});
-    },
-    
-    
-    animateMatchesTo: function(target) {
-        this.$('#resultsBtn').html('Send Message');
-    },
-    
-    // when you press the button on the right-hand side
-    sendMessageModal: function() {
-        if (this.state.personCollection.included().length > 5)
-            this.state.showMessage('You can only contact up to 5 people at a time. Please choose 5 among your matches, or add more filters.');
-        else
-            this.state.router.navigate('sendmessage', {trigger:true});
-    },
-
-    doAll: function(){
-        $(this.el).show();
-        this.$('.secondOrder').hide();
-        this.$('div#profileinfo').hide();
-        if (this.state.isLoggedin({redirect:false}))
-            this.$('#newBtn').show();
-        // else
-            // this.$('#startBtn').show();
-    },
-    doMe: function() {
-        $(this.el).show();
-        this.$('.secondOrder').hide();
-        // this.$('#likemeBtn').show();
-    },
-    doFilters: function() {
-        $(this.el).show();
-        this.$('.secondOrder').hide();
-        this.$('#messageBtn').show();
-    },
-    doLogin: function() {
-        $(this.el).show();
-        this.$('.secondOrder').hide();
-        // this.$('#loginBtn').show();
-        this.$('#okBtn').show();
-        this.$('div#profileinfo').hide();
-    },
-    doMessage: function() {
-        $(this.el).show();
-        this.$('button.secondOrder').hide();
-        this.$('#cancelMessageBtn').show();
-        this.$('#sendMessageBtn').show();
-        this.$('div#profileinfo').hide();
-    },
-    doProfile: function(username) {
-        $(this.el).show();
-        this.$('button.secondOrder').hide();
-        this.$('button#backBtn').show();
-        this.$('div#profileinfo').show();
-        this.$('div#profileinfo #username').html(username);
-    },
-    doNewAttr: function() {
-        $(this.el).show();
-        this.$('button.secondOrder').hide();
-        // this.$('div#profileinfo').show();
-        // this.$('div#profileinfo #username').html(username);
-        this.$('button#backBtn').show();
-        this.$('button#saveAttrBtn').show();
-    },
-    doAccount: function(){
-        $(this.el).show();
-        this.$('button').hide();
-        // this.$('button.secondOrder').hide();
+        this.setTitle(options.title);
+        this.toggleContext(options.context);
+        
+        // this.state.hideSplash();
     },
     setTitle: function(title) {
         this.$('#title').html(title);
@@ -116,15 +63,48 @@ define([
             this.$('#context').hide();
         }
     },
-    // toggleModal: function(options){
-    //     if (options==undefined) var options = {switch:false};
-    //     $('#footer').toggle(options.switch);
-    // },
-    // hideControls:function() {
-    //     $(this.el).hide();
-    // },
+
+    doModal: function(options){
+        this.$('button').hide();
+        this.$('button.modalBtn').show();
+        this.$('#context').hide();
+
+        $('#footer').toggle(options.footer);
+
+        // RIGHT BUTTON
+        this.$('button#rightModalBtn').unbind();
+        if (options.rightClb == undefined) {
+            this.$('button#rightModalBtn').hide();
+        } else {
+            this.$('button#rightModalBtn').click(options.rightClb);
+        }
+        if (options.rightTitle == undefined)
+            options.rightTitle = 'OK';
+        this.$('button#rightModalBtn').html(options.rightTitle);
+
+
+        // LEFT BUTTON
+        this.$('button#leftModalBtn').unbind();
+        if (options.leftClb != undefined)
+            this.$('button#leftModalBtn').click(options.leftClb);
+        else
+            if (options.footer)
+                this.$('button#leftModalBtn').hide();
+            else
+                this.$('button#leftModalBtn').click(function(){history.go(-1);});
+        if (options.leftTitle == undefined)
+            options.leftTitle = 'Back';
+        this.$('button#leftModalBtn').html(options.leftTitle);
+
+
+        this.$('div#profileinfo').hide();
+        if (options.profile != undefined) {
+            this.$('div#profileinfo').show();
+            this.$('div#profileinfo #username').html(username);
+        }
+    },
     initialize: function(options) {
-        _.bindAll(this, 'animateMatchesTo', 'sendMessageModal', 'doNewAttr');
+        // _.bindAll(this, '');
         this.state = options.state;
 
         $(this.el).append(this.template());

@@ -142,7 +142,6 @@ define([
 
     matchesClb: function(arg){
         var that = this;
-        this.controls.animateMatchesTo(this.state.matches.length);
         that.state.personCollection.reset();
         this.$('#results').empty();
         _.each(this.state.matches, function(username){
