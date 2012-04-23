@@ -39,7 +39,8 @@ class profile():
     
     'contexts' # set of all contexts available
     'USER:contexts' # set of contexts to which USER participates in
-    'context:CONTEXT' # set of users participating in CONTEXT
+    'context:users:CONTEXT' # set of users participating in CONTEXT
+    'context:description:CONTEXT' # a description of CONTEXT
     
     
     def add_reverse(self, context, key, val):
@@ -83,7 +84,7 @@ class profile():
     def set_val(self, context, key, val):
         self.db.sadd('contexts', context)
         self.db.sadd('%s:contexts' % self.usr, context)
-        self.db.sadd('context:%s' % context, self.usr)
+        self.db.sadd('context:users:%s' % context, self.usr)
         
         self.set_key(key)
         self.add_reverse(context, key, val)
@@ -106,9 +107,9 @@ class profile():
                 if user_left_context:
                     print 'also removing from context', self.usr, context
                     self.db.srem('%s:contexts' % self.usr, context)
-                    self.db.srem('context:%s' % context, self.usr)
+                    self.db.srem('context:users:%s' % context, self.usr)
                     
-                    if self.db.scard('context:%s' % context) == 0 and context != 'all':
+                    if self.db.scard('context:users:%s' % context) == 0 and context != 'all':
                         print 'also removing context', context
                         self.db.srem('contexts', context)
                             
@@ -194,8 +195,8 @@ class profile():
                 self.del_val(context, key, val)
 
         self.db.srem('%s:contexts' % self.usr, context)
-        self.db.srem('context:%s' % context, self.usr)
+        self.db.srem('context:users:%s' % context, self.usr)
         
-        if self.db.scard('context:%s' % context) == 0 and context != 'all':
+        if self.db.scard('context:users:%s' % context) == 0 and context != 'all':
             print 'also removing context', context
             self.db.srem('contexts', context)

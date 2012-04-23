@@ -75,6 +75,10 @@ class DB:
         #print '****res (%s): %s' % (self.dbtype, res)
         return res
         
+    def set_context_description(self, context, contextDescr):
+        if contextDescr:
+            self.r.setnx('context:description:%s' % context, contextDescr)
+
     def join_context(self, context, user):
         print 'joining context', context, user
         for key in self.r.smembers('%s:profile:keys' % user):

@@ -15,11 +15,12 @@ define([
     newContextTemplate){
     var newAttrView = Backbone.View.extend({
 
-    tagName: 'newattribute',
+    tagName: 'newcontext',
     template: _.template(newContextTemplate),
 
     events: {
         'keypress input': 'valueKey',
+        'keyup input': 'autocomplete',
     },
 
     getLocation: function() {
@@ -38,6 +39,38 @@ define([
     },
     getAttribute: function() {
 
+    },
+
+    autocomplete: function(evt) {
+        var text = $(evt.target).val();
+        var regex = new RegExp(text, 'i');
+        var matches = [];
+        this.$('#autocomplete').empty();
+
+        var url = this.state.satellite.url+'/contexts';
+
+        var that = this;
+        $.getJSON(url, function(json){
+            for (var i in json.contexts) {
+                cntx = json.contexts[i].name;
+                if (cntx.match(regex))
+                    matches.push(cntx);
+            }
+            that.$('#suggestions > label').hide();
+            _.each(matches, function(entry){
+                that.$('#suggestions > label').show();
+
+                var html = $('<a></a>').addClass('suggestion');
+                html.html(entry);
+                html.click(function(){
+                    that.$('.suggestion').css('background-color','inherit');
+                    $(this).css('background-color','#aaa');
+                    $(evt.target).val($(this).html()).focus();
+                    return false;
+                });
+                this.$('#autocomplete').append(html);
+            });
+        });
     },
 
     save: function(){

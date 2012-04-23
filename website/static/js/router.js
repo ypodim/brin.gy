@@ -41,8 +41,12 @@ define([
         'filters': 'showFilters',
         'all': 'showAll',
         'me': 'showMe',
+
         'new': 'newAttribute',
-        'new/incontext/:context': 'newAttribute',
+        // 'new/incontext/:context': 'newAttribute',
+        'new/:context': 'newAttribute',
+        'new/:context/:key': 'newAttribute',
+        'new/:context/:key/:val': 'newAttribute',
 
         'account': 'account',
 
@@ -118,7 +122,7 @@ define([
     startNewAttribute: function(state){
         if (! state.isLoggedin()) return false;
         state.stats('newattr:btnTop');
-        state.router.navigate('#/new', {trigger:true});
+        state.router.navigate('#/new/'+state.context.name, {trigger:true});
     },
     showAll: function( cntx ){
         this.state.stats('filters:all');
@@ -165,18 +169,34 @@ define([
         });
     },
 
-    newAttribute: function(context) {
+    newAttribute: function(context, key, val) {
+        if (!context) {
+            // context = this.state.context.name;
+            // this.navigate('#/new/'+context, {trigger:true});
+            this.navigate('#/all', {trigger:true});
+            return;
+        }
         var aview = new newAttrView({
             state: this.state,
             context: context,
+            key: key,
+            val: val,
         });
         aview.render();
         
+        
+        btnTitle = 'Next';
+        title = 'New attribute';
+        if (key) {
+            btnTitle = 'Save';
+            title = 'New value';
+        }
+
         this.controlsView.setUIstate({
-            footer:false, 
-            title:'New attribute',
-            rightClb: aview.save,
-            rightTitle: 'Save',
+            footer: false, 
+            title: title,
+            rightClb: function(){aview.next()},
+            rightTitle: btnTitle,
         });
     },
     sendmessage: function(){

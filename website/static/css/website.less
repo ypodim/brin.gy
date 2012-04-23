@@ -376,21 +376,23 @@ div#controls > div#context {
     left:5px;
     top:5px;
     bottom:5px;
-    /*display:none;*/
-    text-shadow: #ccc 0px 1px 0px;
+    /*text-shadow: #ccc 0px 1px 0px;*/
+    text-shadow: #111 0px -1px 1px;
     font-size:16px;
+    font-weight:bold;
     line-height:16px;
     /*box-shadow: inset 0 1px 2px rgba(0,0,0,1);*/
     border: 1px solid rgba(255,255,255,0.5);
-    /*background-color:#ccc;*/
+    background-color:#333;
     border-radius:5px;
     padding: 10px 10px 5px 10px;
     text-align:left;
-    color:black;
+    color:white;
 }
 div#controls > div#context > div#contextTitle{
     padding-top:5px;
     .font-3;
+    text-shadow: #111 0px -2px 1px;
 }
 
 /*############# LOGIN #############*/
@@ -552,27 +554,51 @@ profile > div#header {
 
 /*############# NEW ATTRIBUTE #############*/
 
-newattribute > div {
+newattribute {
     margin: auto;
     width: 700px;
+    display: block;
 }
-newattribute > div > form > div.title {
-    background-color: rgba(0,0,0,0.2);
+newattribute > form {
+    display: none;
 }
-newattribute > div > form > div.value {
-    background-color: rgba(0,0,0,0.2);
-}
-newattribute > div > form > div > label {
+newattribute > form > div > div#forkey {
     .font-3;
-    /*line-height:40px;*/
+    line-height:@height-1;
+}
+newattribute > form > div.title {
+    background-color: rgba(0,0,0,0.2);
+}
+newattribute > form > div.value {
+    background-color: rgba(0,0,0,0.2);
+}
+newattribute > form > div > label {
+    .font-3;
     text-shadow: 0 1px rgba(255, 255, 255, 0.9);
 }
-newattribute > div > form > div > input {
+newattribute > form > div > label.small {
+    font-size:20px;
+    line-height:20px;
+}
+newattribute > form > div > input {
     .font-3;
     display:block;
     /*line-height:40px;*/
     height:50px;
     width:400px;
+}
+
+div#suggestions > label {
+    display:none;
+}
+div#suggestions > div#autocomplete > a.suggestion {
+    color:#555;
+    display:block;
+    padding:5px;
+    .font-3;
+}
+div#suggestions > div#autocomplete > a.suggestion:hover {
+    text-decoration:none;
 }
 
 
@@ -698,17 +724,25 @@ div#contexts > div#contextEntry > button#actionBtn {
     top:5px;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+newcontext {
+    margin: auto;
+    width: 620px;
+    display: block;
+}
+newcontext > form > * {
+    .font-s1;
+    line-height:@height-2;
+    height:@height-2;
+    width: 620px;
+    
+}
+newcontext > form > textarea {
+    .font-s2;
+    height:100px;
+}
+newcontext > form > label {
+    line-height:@height-3;
+    padding: 20px 0 0 0;
+    height:@height-3;
+}
 

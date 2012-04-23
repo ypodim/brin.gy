@@ -1,14 +1,27 @@
-<div id='attributes'>
-    <form class=''>
-        <div class='well title'>
-            <label>The title should be as descriptive as possible (eg. "I would like to talk about")</label>
-            <input id='title' type='text' placeholder='type title...' />
-        </div>
-        <div class='well value'>
-            <label>Please type at least one value:</label>
-            <input class='value' type='text' placeholder='type value...' />
-            <input class='value' type='text' placeholder='type value (optional)...' />
-            <input class='value' type='text' placeholder='type value (optional)...' />
-        </div>
-    </form>
+
+<form class='key'>
+    <div class='well title'>
+        <label>What is this attribute about?</label>
+        <input id='title' type='text' placeholder='type title...' maxlength=22 />
+        <label class='small'>eg. "skills", "talk to me about", "affiliation", etc</label>
+    </div>
+</form>
+
+
+<form class='val'>
+    <div class='well value'>
+        <label class='small'>Entering new value for:</label>
+        <div id='forkey'>"<%= key %>"</div>
+        <input class='value' type='text' placeholder='type value...' />
+        <!-- <input class='value' type='text' placeholder='type value (optional)...' /> -->
+        <!-- <input class='value' type='text' placeholder='type value (optional)...' /> -->
+    </div>
+</form>
+
+
+<div id='suggestions'>
+    <label>suggestions:</label>
+    <div id='autocomplete'></div>
 </div>
+
+

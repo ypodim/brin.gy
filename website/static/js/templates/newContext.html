@@ -1,8 +1,11 @@
 <form>
-    <input type='text' id='contextName' placeholder='context name...' />
-    <textarea id='contextDescr' placeholder='context description...'></textarea>
+    <label class='small'>Context name</label>
+    <input type='text' id='contextName' placeholder='eg. "MIT Media Lab", "Logan Intl Airport", etc.' />
+    <label class='small'>Context description</label>
+    <textarea id='contextDescr' placeholder='eg. People waiting or heading to the Logan Intl. Airport.'></textarea>
 </form>
 
-<div id='attributes'>
-    
+<div id='suggestions'>
+    <label>suggestions:</label>
+    <div id='autocomplete'></div>
 </div>

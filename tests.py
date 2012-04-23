@@ -23,6 +23,12 @@ def post(dic, path='', method='POST', url='http://localhost:10007'):
 r = redis.Redis(host='localhost', port=6379, db=0)
 #r.flushall()
 
+for c in r.smembers('contexts'):
+    for u in r.smembers('context:%s' % c):
+        print r.sadd('context:users:%s' % c, u)
+
+sys.exit()
+
 class State:
         #def setUp(self):
     print 'setup'

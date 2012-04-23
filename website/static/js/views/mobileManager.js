@@ -59,7 +59,7 @@ define([
             return false;
 
         this.state.stats('newattr:btnBottom');
-        this.state.router.navigate('#/new', {trigger:true});
+        this.state.router.navigate('#/new/'+this.state.context.name, {trigger:true});
     },
     addOneAttribute: function(model) {
         var key = model.get('key');

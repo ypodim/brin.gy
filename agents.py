@@ -256,12 +256,15 @@ class serve_capability(bringy_handler):
     def post(self):
         secret = self.get_argument('secret', None)
         context = self.get_argument('context','all')
+        contextDescr = self.get_argument('contextDescription','')
         passed = db.authenticate_user(self.username, secret)
         if passed:
             res = self.execute(context=context)
             if type(passed) == str:
                 res['secret'] = passed
             if res: self.write(res)
+
+            db.set_context_description(context, contextDescr)
         else:
             res = dict(error='authentication failed for user:%s secret:%s' % (self.username, secret))
             self.write(res)

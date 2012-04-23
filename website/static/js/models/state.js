@@ -94,10 +94,14 @@ define(['underscore', 'backbone', 'common/ego_website',
         if (type != 'POST' && type != 'DELETE')
             return false;
 
+        var that = this;
         $.ajax({
             type: type,
             url: url,
-            data: {data:data, context:context, secret:this.user.pwd},
+            data: {data:data, 
+                    context:context, 
+                    secret:this.user.pwd,
+                    contextDescription:that.tempContextDescr},
             success: function(json){ 
                 if (clb != undefined)
                     clb(json);

@@ -152,7 +152,7 @@ class profile:
     
     def get(self, params, arguments):
         params = [x for x in params if x]
-        #print 'satellite profile get', params, arguments
+        print 'satellite profile get', params, arguments
         #arguments = json.loads(arguments or '{}')
         
         error = ''
@@ -172,6 +172,7 @@ class profile:
         context = str(params[0])
         kparam = params[1]
         print 'context', context
+        print 'kparam', kparam
         
         #print params
         

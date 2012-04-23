@@ -210,7 +210,6 @@ class multimatch(tornado.web.RequestHandler):
         
         arguments = self.get_argument('data', '')
         context = self.get_argument('context', 'all')
-        print context
         #print
         #print self.request
         #print escaped_data
@@ -293,39 +292,17 @@ class contexts(tornado.web.RequestHandler):
         dic = dict(contexts=[])
         contexts=list(r.smembers('contexts'))
         for c in contexts:
-            count = r.scard('context:%s' % c)
+            count = r.scard('context:users:%s' % c)
             description = 'This is the top level context that includes everything and everyone.'
             context = dict(name=c, 
                            count=count, 
                            userhasit=0, 
                            description=description)
             if user:
-                context['userhasit'] = r.sismember('context:%s' % c, user)
+                context['userhasit'] = r.sismember('context:users:%s' % c, user)
             dic['contexts'].append(context)    
         self.write(dic)
-        
-        
-class GarbageC():
-    def __init__(self):
-        self.last_post = dict(location=0, profile=0, buysell=0)
-        self.timeouts = dict(location=5, profile=5, buysell=2)
-    def execute(self):
-        now = time.time()
-        #if now - self.last_post['location'] > self.timeouts['location']:
-            #location.lat.cleanup(self.timeouts['location'])
-            #location.lon.cleanup(self.timeouts['location'])
-            #self.last_post['location'] = now
-        
-        #if now - self.last_post['profile'] > self.timeouts['profile']:
-            #profile.props.cleanup(self.timeouts['profile'])
-            #self.last_post['profile'] = now
-            
-        
-        #if now - self.last_post['buysell'] > self.timeouts['buysell']:
-            #buysell.action.cleanup(self.timeouts['buysell'])
-            #buysell.product.cleanup(self.timeouts['buysell'])
-            #buysell.price.cleanup(self.timeouts['buysell'])
-            #self.last_post['buysell'] = now
+
             
             
 #########################################
@@ -350,12 +327,6 @@ if __name__ == "__main__":
     
     r = redis.Redis(host='localhost', port=6379, db=0)
     
-    #profile = Profile(r)
-    #location = Location(r)
-    #buysell = Buysell(r)
-    
-    #gc = GarbageC()
-    
     parser = OptionParser(add_help_option=False)
     parser.add_option("-h", "--host", dest="host", default='')
     parser.add_option("-p", "--port", dest="port", default='22222')
@@ -373,9 +344,6 @@ if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(PORT, address=HOST)
     ioloop = tornado.ioloop.IOLoop.instance()
-    
-    #gccaller = tornado.ioloop.PeriodicCallback(gc.execute, 1000, ioloop)
-    #gccaller.start()
     
     try:
         ioloop.start()
