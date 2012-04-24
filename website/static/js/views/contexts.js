@@ -61,7 +61,7 @@ define([
         $.getJSON(url, {user:this.state.user.name}, function(json){
             for (var i in json.contexts) {
                 var c = json.contexts[i];
-                console.log(c);
+                // console.log(c);
 
                 var cm = new contextModel({
                     name: c.name,

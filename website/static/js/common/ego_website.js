@@ -23,6 +23,18 @@ var common = {
             return cookie;
         },
 
+        set_context_in_cookie: function(context)
+        {
+            cookie_str = $.cookie('bringy', {path:"/"});
+            if (typeof(cookie_str) != "string") 
+                cookie_str = "{}";
+            
+            cookie = JSON.parse(cookie_str);
+            cookie.last_context = context;
+            cookie_str = JSON.stringify(cookie);
+            $.cookie('bringy', cookie_str, {expires:7, path:"/"});
+        },
+
         set_cookie: function(name, secret, email)
         {
             if (secret == undefined)

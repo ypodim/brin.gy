@@ -35,14 +35,23 @@ define([
     },
 
     expandName: function(){
+        context = {
+            name: this.model.get('name'),
+            descr: this.model.get('description'),
+        };
+        this.state.setContext(context)
+        this.state.router.navigate('#/all', {trigger:true});
+        return false;
+
         this.$('.description').slideToggle(100);
         return false;
     },
     toggleMembership: function(e) {
-        // if (! this.state.isLoggedin())
-            // return false;
+        if (! this.state.isLoggedin())
+            return false;
 
         this.model.set({joined: !this.model.get('joined')});
+        this.state.toggleContext(this.model.get('name'), this.model.get('joined'));
     },
   });
   return ValueView;

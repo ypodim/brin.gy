@@ -18,7 +18,8 @@ define([
     events: {
         'click a.keypart': 'sink',
         'keypress input': 'valueKey',
-        'submit form': 'submitNewValue',
+        // 'submit form': 'submitNewValue',
+        'click div.valpartfooter > button': 'addBtn',
     },
 
     initialize: function(options) {
@@ -41,6 +42,11 @@ define([
         return false;
     },
 
+    addBtn: function(){
+        frag = '#/new/'+this.state.context.name+'/'+this.model.get('key');
+        console.log(frag);
+        this.state.router.navigate(frag, {trigger:true});
+    },
     submitNewValue: function() {
         
         var key = this.model.get('key');
@@ -51,7 +57,7 @@ define([
         var type = 'POST';
         var that = this;
         console.log('posting', key, val, type);
-        this.state.mutateKeyValue('all', key, val, type, function(json){
+        this.state.mutateKeyValue({key:key, val:val, type:type, clb:function(json){
             console.log(json);
             this.$('input').val('');
 
@@ -68,7 +74,7 @@ define([
             });
             attr.bind('change', that.state.attrCollection.modelChange)
             that.state.attrCollection.add(attr);
-        });
+        }});
         
         return false;
     },

@@ -251,12 +251,21 @@ attribute > a.keypart > span.count {
     box-shadow: 0px 3px 1px rgba(0,0,0,0.5);
     border-radius: 3px;
 }
-attribute > button {
+attribute > div.valpartfooter {
+    height:@height-12;
+}
+attribute > div.valpartfooter > span {
+    font-size:@height-s2;
+    line-height:@height-12;
+    float:right;
+    margin: 0 10px 0 0;
+}
+attribute > div.valpartfooter > button {
     font-size:@height-3 ! important;
-    /*position:absolute;*/
-    /*right:5px;*/
     height:@height-2;
-    line-height:@height-2;
+    line-height:@height-3;
+    float:right;
+    margin: 10px 115px 10px 0;
 }
 
 attribute > form > input {
@@ -276,7 +285,7 @@ attribute > div.valpartdetailed {
 attribute > div.valpartdetailed > div.valcontainer {
     .font-2;
     height:@height-12;
-    line-height:@height-12;
+    line-height:@height-1;
     border-radius:2px;
     /*background-color: rgba(250,250,250,0.4);*/
     padding: 5px 5px 5px 5px;
@@ -285,6 +294,7 @@ attribute > div.valpartdetailed > div.valcontainer {
 }
 attribute > div.valpartdetailed > div.valcontainer > button {
     .font-2;
+    height:@height-12;
     line-height:@height-2;
     float:right;
     width:150px;
@@ -306,6 +316,8 @@ attribute > div.valpartdetailed > div.valcontainer > a > div.value {
     max-width:560px;
 }
 attribute > div.valpartdetailed > div.valcontainer > a > span.count {
+    height:@height-2;
+    line-height:65px;
     display:inline-block;
     color: white;
     background-color:#ff2244;
@@ -576,7 +588,7 @@ newattribute > form > div > label {
     .font-3;
     text-shadow: 0 1px rgba(255, 255, 255, 0.9);
 }
-newattribute > form > div > label.small {
+label.small {
     font-size:20px;
     line-height:20px;
 }
@@ -745,4 +757,56 @@ newcontext > form > label {
     padding: 20px 0 0 0;
     height:@height-3;
 }
+newcontext > div#attributes {
+    padding: 20px 0 0 0;
+    display:none;
+    overflow: scroll;
+}
+newcontext > div#attributes > div#buttons {
+    position: relative;
+    height:@height-3;
+}
+newcontext > div#attributes > div#buttons > span.counter {
+    float:right;
+}
+newcontext > div#attributes > div#buttons > button {
+    display:inline-block;
+}
+newcontext > div#attributes > div#attrList {
+    border: 1px solid #ccc;
+    border-radius:5px;
+    padding:10px;
+}
+newcontext > div#attributes > div#attrList > a {
+    margin: 10px 0 5px 0;
+    display: block;
+    position:relative;
+    height:@height-s1;
+    .font-s2;
+    color:gray;
+}
+newcontext > div#attributes > div#attrList > a:hover {
+    text-decoration:none;
+}
+newcontext > div#attributes > div#attrList > a > i {
+    position:absolute;
+    left:5px;
+    top:10px;
+}
+newcontext > div#attributes > div#attrList > a > div.value {
+    position:absolute;
+    left:10px;
+    top:5px;
+
+    margin: 0 0 0 20px;
+    float:left;
+}
+newcontext > div#attributes > div#attrList > a > div.value > b {
+    margin-left:20px;
+}
+.borderSelection {
+    outline: 1px solid gray;
+    box-shadow: 0px 0px 2px 2px gray;
+}
+
 

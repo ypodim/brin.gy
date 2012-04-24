@@ -275,9 +275,9 @@ class serve_capability(bringy_handler):
         params = dict(args)
         arguments = tornado.escape.url_unescape(params['data'])
         arguments = tornado.escape.json_decode(arguments)
-        #print 'delete:', arguments, type(arguments)
+        # print 'delete:', arguments, params
         secret = params.get('secret')
-        context = params.get('context', 'all')
+        context = tornado.escape.url_unescape(params.get('context','all'))
         passed = db.authenticate_user(self.username, secret)
         if passed:
             res = self.execute(context=context, arguments=arguments)
@@ -549,7 +549,7 @@ class stats(tornado.web.RequestHandler):
         db.r.sadd('stat:etypes', dic['type'])
         db.r.lpush('stat:type:%s' % dic['type'], tornado.escape.json_encode(dic))
         
-        print dic
+        # print dic
         self.write(dict(error=''))
     def get(self):
         if (self.get_argument('clear','')):

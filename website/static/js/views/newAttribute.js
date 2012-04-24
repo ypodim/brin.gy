@@ -36,7 +36,7 @@ define([
                 var val = $(obj).val();
                 console.log('adding', i, context, key, val);
 
-                that.state.mutateKeyValue(context, key, val, 'POST', function(json){
+                that.state.mutateKeyValue({key:key, val:val, clb:function(json){
                     var attr = new attrModel({
                         key:key,
                         val:val,
@@ -50,7 +50,7 @@ define([
                     });
                     attr.bind('change', that.state.attrCollection.modelChange)
                     that.state.attrCollection.add(attr);
-                });
+                }});
                 saved = true;
                 that.state.router.navigate('#/all', {trigger:true});
             }

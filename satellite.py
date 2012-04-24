@@ -293,7 +293,10 @@ class contexts(tornado.web.RequestHandler):
         contexts=list(r.smembers('contexts'))
         for c in contexts:
             count = r.scard('context:users:%s' % c)
-            description = 'This is the top level context that includes everything and everyone.'
+            
+            description = r.get('context:description:%s' % c)
+            if c == 'all':
+                description = 'This is the top level context that includes everything and everyone.'
             context = dict(name=c, 
                            count=count, 
                            userhasit=0, 

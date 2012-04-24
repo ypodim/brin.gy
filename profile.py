@@ -38,7 +38,7 @@ class profile():
     'profile:CONTEXT:key:KEY:val:VAL:agents' # set of agents using this key/val pair
     
     'contexts' # set of all contexts available
-    'USER:contexts' # set of contexts to which USER participates in
+    'USER:contexts' # set of contexts in which USER participates
     'context:users:CONTEXT' # set of users participating in CONTEXT
     'context:description:CONTEXT' # a description of CONTEXT
     
@@ -67,6 +67,20 @@ class profile():
                     self.db.zrem(getK(context), key)
                     self.db.delete(getKA(context, key))
         
+        user_left_context = True
+        for k in self.db.zrevrangebyscore(getK(context), '+inf', '-inf'):
+            if self.db.sismember(getKA(context, k), self.usr):
+                user_left_context = False
+            
+        if user_left_context:
+            print 'also removing from context', self.usr, context
+            self.db.srem('%s:contexts' % self.usr, context)
+            self.db.srem('context:users:%s' % context, self.usr)
+            
+            if self.db.scard('context:users:%s' % context) == 0 and context != 'all':
+                print 'also removing context', context
+                self.db.srem('contexts', context)
+
     def get_keys(self):
         return self.db.smembers('%s:profile:keys' % self.usr)
     
@@ -82,9 +96,9 @@ class profile():
         return self.db.smembers('%s:profile:key:%s' % (self.usr, key))
     
     def set_val(self, context, key, val):
-        self.db.sadd('contexts', context)
-        self.db.sadd('%s:contexts' % self.usr, context)
-        self.db.sadd('context:users:%s' % context, self.usr)
+        print 'add context', self.db.sadd('contexts', context)
+        print 'add context for user', self.db.sadd('%s:contexts' % self.usr, context)
+        print 'add context reverse', self.db.sadd('context:users:%s' % context, self.usr)
         
         self.set_key(key)
         self.add_reverse(context, key, val)
@@ -92,26 +106,30 @@ class profile():
     
     def del_val(self, context, key, val):
         self.del_reverse(context, key, val)
-        res = self.db.srem('%s:profile:key:%s' % (self.usr, key), val)
+
+        kv_exists_in_other_contexts = ''
+        if self.db.sismember('%s:profile:key:%s' % (self.usr, key), val):
+            for cntx in self.db.smembers('%s:contexts' % self.usr):
+                print 'looking in', cntx, (cntx != context), self.usr, getKVA(cntx, key, val)
+
+                ismember = self.db.sismember(getKVA(cntx, key, val), self.usr)
+                if cntx != context and ismember:
+                    kv_exists_in_other_contexts = cntx
+
+        res = 0
+        if kv_exists_in_other_contexts:
+            print 'kv', key, val, 'also exists in', kv_exists_in_other_contexts
+        else:
+            print 'kv', key, val, 'DOES NOT exist in other contexts'
+            res = self.db.srem('%s:profile:key:%s' % (self.usr, key), val)
+
         if res:
             if not self.get_vals(key):
                 print 'also deleting key', key
                 self.db.delete('%s:profile:key:%s' % (self.usr, key))
                 self.del_key(key)
             
-                user_left_context = True
-                for k in self.db.zrevrangebyscore(getK(context), '+inf', '-inf'):
-                    if self.db.sismember(getKA(context, k), self.usr):
-                        user_left_context = False
-                    
-                if user_left_context:
-                    print 'also removing from context', self.usr, context
-                    self.db.srem('%s:contexts' % self.usr, context)
-                    self.db.srem('context:users:%s' % context, self.usr)
-                    
-                    if self.db.scard('context:users:%s' % context) == 0 and context != 'all':
-                        print 'also removing context', context
-                        self.db.srem('contexts', context)
+                
                             
         return res
     
@@ -156,9 +174,10 @@ class profile():
             return res
             
         res = ''
-        #print 'arguments', self.arguments
+        # print 'arguments', self.arguments
+
         for key, val in self.arguments:
-            #print 'saving', key, val
+            print 'saving', context, key, val
             
             self.db.sadd('churn:%s:keys' % self.cap, key)
             self.db.sadd('churn:%s:%s:vals' % (self.cap, key), val)

@@ -3,8 +3,6 @@ define([
     'underscore',
     'backbone',
 
-    'common/ego_website',
-
     'views/about',
     'views/login',
     'views/mobileManager',
@@ -17,7 +15,7 @@ define([
     'views/contexts',
     'views/newContext',
 ], function(
-    $, _, Backbone, common, 
+    $, _, Backbone, 
     aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView, presentationView, accountView, contextsView, newContextView
     ){
   var AppRouter = Backbone.Router.extend({
@@ -43,7 +41,6 @@ define([
         'me': 'showMe',
 
         'new': 'newAttribute',
-        // 'new/incontext/:context': 'newAttribute',
         'new/:context': 'newAttribute',
         'new/:context/:key': 'newAttribute',
         'new/:context/:key/:val': 'newAttribute',
@@ -58,18 +55,11 @@ define([
         this.state = options.state;
         this.controlsView = options.controlsView;
 
-        var pseudonyms = common.cookies.get_cookie().pseudonyms;
-        for (username in pseudonyms) {
-            this.state.user.name = username;
-            this.state.user.pwd = pseudonyms[username].secret;
-            this.state.user.email = pseudonyms[username].email;
-        }
-
         this.contents_view = new mobileManagerView({
             state: this.state,
             controls: this.controlsView,
         });
-        this.contents_view.resetCollections();
+        // this.contents_view.resetCollections();
 
         this.presView = new presentationView({
             router:this,
@@ -230,7 +220,8 @@ define([
         this.controlsView.setUIstate({
             footer:false, 
             title:'New context',
-            rightClb: function(){ncview.getLocation()},
+            leftClb: function(){ncview.previous()},
+            rightClb: function(){ncview.next()},
             rightTitle: 'Next',
         });
     },

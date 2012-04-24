@@ -203,7 +203,13 @@ define([
     },
 
     _isRendered: false,
+    _lastContext: '',
     render: function(){
+        if (this._lastContext != this.state.context.name) {
+            this.resetCollections();
+            this._lastContext = this.state.context.name;
+            this._isRendered = false;
+        }
         if (this._isRendered)
             return false;
 

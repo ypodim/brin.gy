@@ -23,8 +23,10 @@ require.config({
 });
 
 require([
+    'jquery',
     'underscore',
-    
+    'common/ego_website',
+
     'router',
     'backbone',
     'models/state',
@@ -32,7 +34,7 @@ require([
     'collections/persons',
 
     'views/controls',
-], function(_, Router, Backbone, appState, Attributes, Persons,
+], function($, _, common, Router, Backbone, appState, Attributes, Persons,
     controlsView
     ){
 
@@ -47,8 +49,23 @@ require([
         state.agent.baseurl = config.ego_url_prefix;
         state.agent.url = config.ego_url_prefix+"/"+config.agentid;
         state.website_url = config.website_url_prefix;
-        state.context = {name:"all"};
         state.device = config.device;
+
+        var cookie = common.cookies.get_cookie();
+        var pseudonyms = cookie.pseudonyms;
+        for (username in pseudonyms) {
+            state.user.name = username;
+            state.user.pwd = pseudonyms[username].secret;
+            state.user.email = pseudonyms[username].email;
+        }
+
+        console.log('context in cookie', cookie.last_context);
+        if (!cookie.last_context) {
+            cookie.last_context = 'all';
+            common.cookies.set_context_in_cookie(cookie.last_context);
+        }
+        state.context = {name:cookie.last_context};
+        console.log('now context in cookie', common.cookies.get_cookie().last_context);
 
         var attrCollection = new Attributes([], {state:state});
         attrCollection.state = state;

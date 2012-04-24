@@ -10,9 +10,10 @@ define([
     'views/valueDetailed',
 
     'text!templates/newContext.html',
+    'text!templates/attributeChoice.html',
 ], function($, _, Backbone, scroll, 
     kModel, attrModel, keyView, valueDetailedView,
-    newContextTemplate){
+    newContextTemplate, attrChoiceTemplate){
     var newAttrView = Backbone.View.extend({
 
     tagName: 'newcontext',
@@ -21,6 +22,7 @@ define([
     events: {
         'keypress input': 'valueKey',
         'keyup input': 'autocomplete',
+        'click #attributes > #buttons > button': 'useBtn',
     },
 
     getLocation: function() {
@@ -28,17 +30,125 @@ define([
         $(this.el).html('get location');
         var that = this;
 
-        this.state.router.controlsView.setUIstate({
-            footer:false,
-            rightClb: function(){
-                that.state.router.navigate('#/new/incontext/'+context, {trigger:true});
-            },
-            rightTitle: 'Next',
-            title: 'Choose Location',
+        this.state.router.controlsView.setTitle('Choose Location');
+    },
+    
+    selectedAttrs: {},
+    useBtn: function(evt){
+        var flag = undefined;
+        if ($(evt.target).attr('id') == 'select') 
+            flag = true;
+        if ($(evt.target).attr('id') == 'deselect') 
+            flag = false;
+
+        this.$('i').toggle(flag);
+        this.$('#attrList').children().toggleClass('borderSelection', flag);
+
+        
+        for (k in this.selectedAttrs)
+            for (v in this.selectedAttrs[k])
+                if (flag == undefined)
+                    this.selectedAttrs[k][v] = !this.selectedAttrs[k][v];
+                else
+                    this.selectedAttrs[k][v] = flag;
+        this.$('span.counter').html(this.countSelected());
+    },
+    countSelected:function(){
+        res = 0;
+        for (k in this.selectedAttrs)
+            for (v in this.selectedAttrs[k])
+                if (this.selectedAttrs[k][v])
+                    res++;
+        return res;
+    },
+    chooseAttributes: function(){
+        this.state.router.controlsView.setTitle('Choose Attributes');
+        
+
+        this.$('form').hide();
+        this.$('#suggestions').hide();
+        this.$('#attributes').show();
+
+        var that = this;
+        that.$('#attrList').empty();
+        var url = this.state.agent.baseurl+'/'+this.state.user.name+'/profile';
+        $.getJSON(url, function(json){
+            for (var i in json.data){
+                var attr = json.data[i];
+
+                if (that.selectedAttrs[attr.key] == undefined)
+                    that.selectedAttrs[attr.key] = {};
+                that.selectedAttrs[attr.key][attr.val] = 1;
+
+                var t = _.template(attrChoiceTemplate);
+                html = $(t({key:attr.key, val:attr.val}));
+                html.click(function(evt){
+                    $(this).children('i').toggle();
+                    $(this).toggleClass('borderSelection');
+
+                    var key = $(this).attr('key');
+                    var val = $(this).attr('val');
+                    that.selectedAttrs[key][val] = !that.selectedAttrs[key][val];
+
+                    that.$('span.counter').html(that.countSelected());
+                    return false;
+                });
+                
+                that.$('#attrList').append(html);
+                that.$('span.counter').html(that.countSelected());
+            }
         });
     },
-    getAttribute: function() {
 
+    step: 0,
+    context: {},
+    next: function(){
+        last = 0;
+        if (this.step > last) {
+            var kvlist = [];
+            for (k in this.selectedAttrs)
+                for (v in this.selectedAttrs[k])
+                    if (this.selectedAttrs[k][v])
+                        kvlist.push([k,v]);
+
+            if (kvlist.length)
+                this.state.setContext(this.context);
+            this.state.postMultiKeyVals(this.context, kvlist, function(json){
+                console.log(json);
+            });
+
+            var frag = '#/all';
+            this.state.router.navigate(frag, {trigger:true});
+            return;
+        }
+
+        if (this.step == 0) {
+            this.context.name = this.$('input#contextName').val();
+            this.context.descr = this.$('textarea#contextDescr').val();
+            if (this.context.name && this.context.descr)
+                this.chooseAttributes();
+            else {
+                this.$('textarea#contextDescr').focus();
+                if (!this.context.name)
+                    this.$('input#contextName').focus();
+                return false;
+            }
+        }
+        if (this.step == 1)
+            this.getLocation();
+
+        if (this.step == last)
+            this.state.router.controlsView.setRightTitle('Done');
+
+        this.step++;
+    },
+    previous: function(){
+        if (this.step <= 0) {
+            this.state.router.navigate('#/context', {trigger:true});
+            return;
+        }
+        this.step -= 2;
+        this.next();
     },
 
     autocomplete: function(evt) {
@@ -73,43 +183,10 @@ define([
         });
     },
 
-    save: function(){
-        var key = this.$('input#title').val();
-        if (key.length == 0)
-            return false;
-
-        var that = this;
-        var saved = false;
-        this.$('input.value').each(function(i, obj){
-
-            if ($(obj).val().length > 0) {
-                var val = $(obj).val();
-                // console.log('adding', i, key, val);
-
-                that.state.mutateKeyValue(key, val, 'POST', function(json){
-                    var attr = new attrModel({
-                        key:key,
-                        val:val,
-                        kcnt:1, 
-                        vcnt:1, 
-                        selected:false,
-                        display:true,
-                        haveit:true, 
-                        matches:{},
-                        new:false,
-                    });
-                    attr.bind('change', that.state.attrCollection.modelChange)
-                    that.state.attrCollection.add(attr);
-                });
-                saved = true;
-            }
-            if (saved && i > 1)
-                that.state.router.navigate('#/all', {trigger:true});
-        });
-    },
     initialize: function(options) {
-        _.bindAll(this, 'render', 'save');
+        _.bindAll(this, 'render');
         this.state = options.state;
+        this.steps = []
     },
 
     valueKey: function(evt){

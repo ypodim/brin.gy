@@ -40,7 +40,7 @@ define([
         if (frag in {all:1, me:1, filters:1}) {
             $('#footer > a[href="#/all"]').addClass('active');
             options.title = '';
-            options.context = 'MIT Media Lab';
+            options.context = this.state.context.name;
             this.state.attrCollection.trigger('value:change');
         } else {
             this.state.router.contents_view._isRendered = false;
@@ -64,6 +64,10 @@ define([
         }
     },
 
+    setRightTitle: function(title){
+        this.$('button#rightModalBtn').html(title);
+    },
+
     doModal: function(options){
         this.$('button').hide();
         this.$('button.modalBtn').show();
@@ -80,8 +84,8 @@ define([
         }
         if (options.rightTitle == undefined)
             options.rightTitle = 'OK';
-        this.$('button#rightModalBtn').html(options.rightTitle);
-
+        
+        this.setRightTitle(options.rightTitle);
 
         // LEFT BUTTON
         this.$('button#leftModalBtn').unbind();

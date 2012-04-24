@@ -171,8 +171,8 @@ class profile:
             
         context = str(params[0])
         kparam = params[1]
-        print 'context', context
-        print 'kparam', kparam
+        # print 'context', context
+        # print 'kparam', kparam
         
         #print params
         

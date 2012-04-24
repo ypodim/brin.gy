@@ -75,6 +75,8 @@ class DB:
         #print '****res (%s): %s' % (self.dbtype, res)
         return res
         
+    def get_context_description(self, context):
+        return self.r.get('context:description:%s' % context)
     def set_context_description(self, context, contextDescr):
         if contextDescr:
             self.r.setnx('context:description:%s' % context, contextDescr)

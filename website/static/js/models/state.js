@@ -88,26 +88,65 @@ define(['underscore', 'backbone', 'common/ego_website',
         }, 5000);
     },
 
-    mutateKeyValue: function(context, key, val, type, clb) {
+    mutateKeyValue: function(options) {
+        if (options.type == undefined)
+            options.type = 'POST';
+        if (options.context == undefined)
+            options.context = this.context.name;
+
+        console.log(options);
+
         var url = this.agent.baseurl+'/'+this.user.name+'/profile';
-        var data = JSON.stringify([[key, val]]);
-        if (type != 'POST' && type != 'DELETE')
+        var data = JSON.stringify([[options.key, options.val]]);
+        if (options.type != 'POST' && options.type != 'DELETE')
             return false;
 
         var that = this;
         $.ajax({
-            type: type,
+            type: options.type,
             url: url,
             data: {data:data, 
-                    context:context, 
+                    context:options.context, 
                     secret:this.user.pwd,
-                    contextDescription:that.tempContextDescr},
+                    contextDescription:that.context.descr},
+            success: function(json){ 
+                if (options.clb != undefined)
+                    options.clb(json);
+            },
+            dataType: "json",
+        });
+    },
+    postMultiKeyVals: function(context, kvlist, clb){
+        if (kvlist.length == 0)
+            return false;
+        var url = this.agent.baseurl+'/'+this.user.name+'/profile';
+        var data = JSON.stringify(kvlist);
+        var that = this;
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: {data:data, 
+                    context:context.name, 
+                    secret:this.user.pwd,
+                    contextDescription:that.context.descr},
             success: function(json){ 
                 if (clb != undefined)
                     clb(json);
             },
             dataType: "json",
         });
+    },
+
+    toggleContext: function(context, flag){
+        var url = this.agent.baseurl+'/'+this.user.name;
+        var data = {
+            secret: this.user.pwd, 
+            context: context, 
+            action: (flag)?'join':'leave',
+        };
+        $.post(url, data, function(json){
+            console.log(json);
+        }, 'json');
     },
 
     stats: function(type, arg) {
@@ -149,6 +188,12 @@ define(['underscore', 'backbone', 'common/ego_website',
         // $('#container').show();
         // $('#controls').show();
         $('#loader').fadeOut();
+    },
+
+    setContext: function(context){
+        this.context.name = context.name;
+        this.context.descr = context.descr;
+        common.cookies.set_context_in_cookie(context.name);
     },
 
     deleteAccount: function() {
