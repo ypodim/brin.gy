@@ -32,7 +32,9 @@ define([
 
         this.doModal(options);
 
-        this.state.doFullscreen({switch:options.fullscreen});
+        // this.state.doFullscreen({switch:options.fullscreen});
+        // $('#container').toggleClass('fullscreen', options.fullscreen);
+        this.$('#title').toggleClass('noTitleTransform', options.fullscreen);
 
         $('#footer > a').removeClass('active');
         $('#footer > a[href="#/'+frag+'"]').addClass('active');

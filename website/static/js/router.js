@@ -25,8 +25,7 @@ define([
         'context': 'showContext',
         'newcontext': 'newContext',
         "context/:context": "setContext",
-        "user/:user/context/:context": "setUserContext",
-        "context/:context/user/:user": "setContextUser",
+        "c/:context": "setContext",
 
         'presentation/:sno': 'presentation',
         "u/:user": "showUser",
@@ -237,14 +236,9 @@ define([
             title: 'Contexts',
         });
     },
-    setUserContext: function( user, context ) {
-        console.log( "**** Set user:", user, "context:", context  );   
-    },
-    setContextUser: function( context, user ) {
-        this.setUserContext(user, context);
-    },
     setContext: function( context ) {
-        this.setUserContext(undefined, context);
+        this.state.setContext({name:context});
+        this.navigate('#/all', {trigger:true});
     },
     
     account: function(){
@@ -259,7 +253,10 @@ define([
     },
 
     defaultRoute: function( cntx ){
-        this.controlsView.setUIstate({title:'Brin.gy'});
+        this.controlsView.setUIstate({
+            title: 'Brin.gy',
+            fullscreen: true,
+        });
         
         this.state.stats('home');
         var wview = new welcomeView({

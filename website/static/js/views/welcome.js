@@ -13,7 +13,6 @@ define([
     render: function(){
         var compiled_template = _.template( welcomeViewTemplate );
         this.el.html( compiled_template() );
-        // this.state.doFullscreen();
     },
 
     initialize: function(options){

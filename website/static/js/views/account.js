@@ -31,7 +31,6 @@ define([
         var email = this.state.user.email;
         var t = this.template( {username:username, email:email} );
         this.el.html(t);
-        // this.state.doFullscreen({switch:false});
         return this;
     },
 

@@ -23,10 +23,7 @@ define(['underscore', 'backbone', 'common/ego_website',
         if (options==undefined) var options = {switch:true};
         $('#container').toggleClass('fullscreen', options.switch);
     },
-    // toggleFooter: function(options){
-    //     if (options==undefined) var options = {switch:true};
-    //     $('#footer').toggle(options.switch);
-    // },
+    
     isLoggedin: function(options) {
         if (options == undefined)
             options = {redirect:true};
