@@ -99,6 +99,7 @@ class profile():
         print 'add context', self.db.sadd('contexts', context)
         print 'add context for user', self.db.sadd('%s:contexts' % self.usr, context)
         print 'add context reverse', self.db.sadd('context:users:%s' % context, self.usr)
+        print 'for context', context
         
         self.set_key(key)
         self.add_reverse(context, key, val)

@@ -200,11 +200,15 @@ define([
         return false;
     },
 
-    render: function() {
+    render: function(context) {
         html = this.template({username:this.username});
         $(this.el).html(html);
         $("#container").html(this.el);
         this.$('input#contextName').focus();
+        if (context) {
+            this.$('input#contextName').val(context);
+            this.$('textarea#contextDescr').focus();
+        }
         return this;
     },
 

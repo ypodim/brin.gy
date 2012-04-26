@@ -50,8 +50,14 @@ define([
         if (! this.state.isLoggedin())
             return false;
 
-        this.model.set({joined: !this.model.get('joined')});
-        this.state.toggleContext(this.model.get('name'), this.model.get('joined'));
+        if (this.model.get('joined')) {
+            var answer = confirm('Leave #'+this.model.get('name')+'?')
+            if (answer) {
+                this.model.set({joined: !this.model.get('joined')});
+                this.state.toggleContext(this.model.get('name'), this.model.get('joined'));
+                this.state.setContext({name:'all'});
+            }
+        }
     },
   });
   return ValueView;

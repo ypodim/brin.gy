@@ -210,11 +210,11 @@ define([
         aboutView.render();
     },
 
-    newContext: function() {
+    newContext: function(contextName) {
         ncview = new newContextView({
             state: this.state,
         });
-        ncview.render();
+        ncview.render(contextName);
 
         this.controlsView.setUIstate({
             footer:false, 
@@ -237,8 +237,19 @@ define([
         });
     },
     setContext: function( context ) {
-        this.state.setContext({name:context});
-        this.navigate('#/all', {trigger:true});
+        var that = this;
+        var url = this.state.satellite.url+'/contexts';
+        $.getJSON(url, function(json){
+            for (var i in json.contexts) {
+                var cntx = json.contexts[i];
+                if (cntx.name == context) {
+                    that.state.setContext({name:context});
+                    that.navigate('#/all', {trigger:true});
+                    return;
+                }
+            }
+            that.newContext(context);
+        })
     },
     
     account: function(){
