@@ -16,13 +16,14 @@ define([
     },
 
     delete: function(){
-        console.log('delete')
+        this.state.router.contents_view._lastContext = '';
         this.state.deleteAccount();
     },
     signout: function(){
         console.log('Logging out', this.state.user)
         common.cookies.del_cookie(this.state.user.name);
         this.state.user = {};
+        this.state.router.contents_view._lastContext = '';
         this.state.router.navigate('#/', {trigger:true});
     },
 

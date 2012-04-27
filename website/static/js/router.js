@@ -145,14 +145,21 @@ define([
             state: this.state,
         });
 
+        var frag = Backbone.history.fragment;
         var actions = {signup:1, signin:1, reminder:1};
-        if (Backbone.history.fragment in actions)
-            lview.render({action:Backbone.history.fragment});
+        if (frag in actions)
+            lview.render({action:frag});
 
         this.state.stats('login');
+        var title = frag;
+        if (frag == 'signup')
+            title = 'Sign Up';
+        if (frag == 'signin')
+            title = 'Sign In';
 
         var that = this;
         this.controlsView.setUIstate({
+            title: title,
             footer:false,
             rightClb: lview.loginBtn,
             leftClb: function(){that.navigate('#/all');},

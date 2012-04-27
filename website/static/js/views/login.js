@@ -15,6 +15,7 @@ define([
     initialize: function(options) {
         _.bindAll(this, 'loginBtn', 'render');
         this.state = options.state;
+        this.$('form').bind('submit', this.loginBtn);
     },
     isValidEmail: function(username) {
         var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -81,6 +82,7 @@ define([
         return false;
     },
     doReminder: function(email) {
+        console.log('doReminder');
         var that = this;
         var data = {email:email};
         var url = this.state.agent.baseurl+'/email_reminder';
@@ -96,17 +98,20 @@ define([
                     $('div.alert').fadeOut();
                 }, 3000);
             } else {
-                $('div.alert')
-                    .addClass('alert-success')
-                    .removeClass('alert-error')
-                    .html('Email reminder sent successfully.')
-                    .slideDown();
-                setTimeout(function(){
-                    $('div.alert').fadeOut();
-                    that.state.router.navigate('#/all', {trigger: true});
-                }, 3000);
+                
             }
         }, 'json');
+        
+        $('div.alert')
+            .addClass('alert-success')
+            .removeClass('alert-error')
+            .html('Email reminder sent successfully.')
+            .slideDown();
+        setTimeout(function(){
+            $('div.alert').fadeOut();
+            that.state.router.navigate('#/all', {trigger: true});
+        }, 3000);
+
         return false;
     },
     loginBtn: function(){
@@ -160,19 +165,15 @@ define([
         });
         password.keypress(function(evt){
             if (evt.keyCode==13)
-                that.loginBtn();
+                that.$('form').submit();
         });
         email.keypress(function(evt){
             if (evt.keyCode==13)
-                that.loginBtn();
+                that.$('form').submit();
         });
 
         if (options.action=='reminder')
             email.focus();
-        
-        this.$('form').bind('submit', this.loginBtn);
-
-        // setTimeout(function(){this.$('#nametag input').focus();}, 100);
     },
   });
   return loginView;
