@@ -10,9 +10,9 @@ define([
     template: _.template(valuesTemplate),
 
     events: {
-        "click a"            : "sink",
-        'click #searchBtn'   : 'filterBtn',
-        'click #addBtn'      : 'addBtn',
+        "click a.valpart"    : "toggleUsers",
+        'click button#searchBtn'   : 'filterBtn',
+        'click button#addBtn'      : 'addBtn',
     },
 
     initialize: function(options) {
@@ -24,23 +24,33 @@ define([
     },
 
     render: function() {
-        $(this.el).html(this.template(this.model.toJSON()));
+        var json = this.model.toJSON();
+        $(this.el).html(this.template(json))
+                  .addClass('slideValueUp')
+                  .removeClass('slideValueDown');
         if (this.model.get('haveit'))
             $(this.el).addClass('haveitTag');
         if (this.model.get('selected'))
             $(this.el).addClass('filterTag');
         if (! this.model.get('showControls'))
             $(this.el).css('margin-left', '100px');
+        for (var i in json.matches) {
+            utoken = $('<a></a>').addClass('userToken').html(json.matches[i]);
+            utoken.attr('href','#/u/'+json.matches[i]);
+            this.$('div#matches').append(utoken);
+        }
+        
         return this;
     },
 
     filterBtn: function(e) {
-        // var added = $(e.target).toggleClass('btn-primary').hasClass('btn-primary');
         this.model.set({selected: !this.model.get('selected')});
         $(this.el).toggleClass('filterTag');
-        e.stopPropagation();
+        
 
         this.state.getMatches(this.matchesClb);
+        e.stopPropagation();
+        return false;
     },
 
     addBtn: function(e) {
@@ -58,9 +68,15 @@ define([
         this.state.mutateKeyValue({key:key, val:val, type:type});
 
         e.stopPropagation();
+        return false;
     },
 
-    sink: function(){ return false; },
+    toggleUsers: function(e){
+        $(this.el).toggleClass('slideValueDown');
+        $(this.el).toggleClass('slideValueUp');
+        e.stopPropagation();
+        return false; 
+    },
   });
   return ValueView;
 });

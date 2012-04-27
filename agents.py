@@ -486,7 +486,9 @@ class api_call(tornado.web.RequestHandler):
         user = db.r.get('options:reverse-secret:%s' % secret)
         if not user:
             error = 'user not found'
-        self.write(dict(secret=secret, user=user, error=error))
+        else:
+            email = db.r.hget('options:user:%s' % user, 'email')
+        self.write(dict(secret=secret, user=user, email=email, error=error))
         
     def api_cleanup(self):
         #for user in db.r.smembers('users'):
@@ -635,6 +637,15 @@ class stats(tornado.web.RequestHandler):
         print db.r.smembers('statbag')
         self.write(dict(res=res))
 
+class debug(tornado.web.RequestHandler):
+    def get(self):
+        res = {}
+        for u in db.r.smembers('users'):
+            db.r.smembers('users')
+            res[u] = db.r.hgetall('options:user:%s' % u)
+        self.write(res)
+
+
 
 #########################################
 
@@ -655,7 +666,7 @@ application = tornado.web.Application([
     (r"/clear_context", api_call),
     (r"/stats", stats),
 
-    
+    (r"/users", debug),    
     
     # (r"/a/[a-zA-Z0-9]+/?$", serve_user),
     (r"/[a-zA-Z0-9]+/?$", serve_user),

@@ -1,12 +1,13 @@
 
 
-  <a href="#" data-original-title="">
-    <span class="count"<% if (! showControls) print('style="display:none"') %> >
-        <%= vcnt %>
-    </span>
-    <div class="value"><%= val %></div>
-  </a>
-  <button id='searchBtn' class='btn <% if (selected) print("btn-primary") %>' <% if (! showControls) print('style="display:none";') %>></button>
-  <button id='addBtn' class='btn <% if (haveit) print("btn-success"); %>' <% if (! showControls) print('style="display:none";') %>>+</button>
+<a href="#" class='valpart'>
+	<span class="count"<% if (! showControls) print('style="display:none"') %> >
+	    <%= vcnt %>
+	</span>
+	<div class="value"><%= val %></div>
+</a>
 
+<button id='searchBtn' class='btn <% if (selected) print("btn-primary") %>' <% if (! showControls) print('style="display:none";') %>></button>
+<button id='addBtn' class='btn <% if (haveit) print("btn-success"); %>' <% if (! showControls) print('style="display:none";') %>>+</button>
 
+<div id='matches'></div>

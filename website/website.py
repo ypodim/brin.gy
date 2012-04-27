@@ -71,8 +71,7 @@ class serve_authuser(tornado.web.RequestHandler):
             print dic['error']
             self.redirect('/')
         else:
-            cookie = dict(pseudonyms={dic['user']:dic['secret']})
-            print cookie
+            cookie = dict(pseudonyms={dic['user']:dic})
             cookiestr = tornado.escape.json_encode(cookie).replace(' ','')
             self.set_cookie('bringy', str(cookiestr))
             self.redirect("/#/all")

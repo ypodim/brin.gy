@@ -9,6 +9,7 @@ import urllib
 import json
 
 from keys import *
+import profile
 
 h = httplib2.Http()
 
@@ -23,9 +24,33 @@ def post(dic, path='', method='POST', url='http://localhost:10007'):
 r = redis.Redis(host='localhost', port=6379, db=0)
 #r.flushall()
 
-for c in r.smembers('contexts'):
-    for u in r.smembers('context:%s' % c):
-        print r.sadd('context:users:%s' % c, u)
+# for c in r.smembers('contexts'):
+#     for u in r.smembers('context:%s' % c):
+#         print r.sadd('context:users:%s' % c, u), c, u
+
+def users():
+    return r.smembers('users')
+def ukeys(username):
+    return r.smembers('%s:profile:keys' % username)
+def uvals(username, key):
+    return r.smembers('%s:profile:key:%s' % (username,key))
+
+
+def clb(arg):
+    print arg['data']
+
+for cntx in r.smembers('contexts'):
+    for u in users():
+        for k in ukeys(u):
+            for v in uvals(u,k):
+                if not k:
+                    print cntx, u, v, 'but no KEY', len(k)
+                if not v:
+                    print cntx, u, k, 'but no VAL', len(v)
+
+
+                    p = profile.profile(u, [k,v], [''], r, clb)
+                    # p.del_val(cntx, k, v)
 
 sys.exit()
 

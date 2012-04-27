@@ -90,6 +90,8 @@ define([
             parentView: this._keyViews[key],
             state : this.state,
         });
+        model.bind('change', vvdetailed.render);
+
         this._keyViews[key].$('.valpartdetailed').append(vvdetailed.render().el);
     },
 
@@ -102,6 +104,7 @@ define([
     },
 
     showMe: function(){
+        this.$('div.scrollableContainer').show();
         this.$('#me').addClass('active');
         this.$('attribute').hide();
         this.$('.valcontainer').hide();
@@ -118,6 +121,7 @@ define([
     },
 
     showFilters: function(){
+        this.$('div.scrollableContainer').hide();
         this.$('#filters').addClass('active');
         this.$('attribute').hide();
         this.$('.valcontainer').hide();
@@ -131,10 +135,10 @@ define([
         this.$('#results').show();
 
         if (this.$('.filterTag').length > 0) {
-            this.$('.resultsTitle').show();
+            // this.$('.resultsTitle').show();
             this.$('#noFilters').hide();
         } else {
-            this.$('.resultsTitle').hide();
+            // this.$('.resultsTitle').hide();
             this.$('#noFilters').show();
         }
         this.matchesClb();
@@ -186,6 +190,7 @@ define([
     },
     
     showAll: function(){
+        this.$('div.scrollableContainer').show();
         this.$('#all').addClass('active');
         this.$('.resultsTitle').hide();
         this.$('#results').hide();
@@ -229,11 +234,11 @@ define([
 
 TODO:
 - CONTEXT with event branding
-- logged in user indication!
+ok- logged in user indication!
 - loading icons when sending message, creating user
-- account management: pwd reminders, direct url
+ok- account management: pwd reminders, direct url
 - return to the same entry in the long list when returning to it.
-- don't re-render when switching tabs
+ok- don't re-render when switching tabs
 - realtime updates
 - login with twitter
 

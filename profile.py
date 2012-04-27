@@ -58,6 +58,7 @@ class profile():
         
         key_is_stale = True
         for v in self.db.zrevrangebyscore(getKV(context, key), '+inf', '-inf'):
+            v = unicode(v, errors='replace')
             if self.db.sismember(getKVA(context, key, v), self.usr): # if user has no more vals in this key
                 key_is_stale = False
             
@@ -69,6 +70,7 @@ class profile():
         
         user_left_context = True
         for k in self.db.zrevrangebyscore(getK(context), '+inf', '-inf'):
+            k = unicode(k, errors='replace')
             if self.db.sismember(getKA(context, k), self.usr):
                 user_left_context = False
             
@@ -166,6 +168,8 @@ class profile():
         if self.path[-1] == 'visited':
             res = 0
             for key in self.arguments:
+                key = unicode(key, errors='replace')
+                
                 lst = self.arguments[key]
                 print 'profile to add', lst, '-', key
                 self.db.sadd('%s:profile:visited:keys' % self.usr, key)
@@ -178,7 +182,10 @@ class profile():
         # print 'arguments', self.arguments
 
         for key, val in self.arguments:
-            print 'saving', context, key, val
+            if type(key) == str:
+                key = unicode(key, errors='replace')
+            if type(val) == str:
+                val = unicode(val, errors='replace')
             
             self.db.sadd('churn:%s:keys' % self.cap, key)
             self.db.sadd('churn:%s:%s:vals' % (self.cap, key), val)
@@ -196,7 +203,11 @@ class profile():
         for key, val in self.arguments:
             #key = unicode(key, errors='replace')
             #print 'deleting', key, val
-            
+            if type(key) == str:
+                key = unicode(key, errors='replace')
+            if type(val) == str:
+                val = unicode(val, errors='replace')
+
             self.db.sadd('churn:%s:keys' % self.cap, key)
             self.db.sadd('churn:%s:%s:vals' % (self.cap, key), val)
             self.db.incr('churn:%s:%s:%s:rem' % (self.cap, key, val))

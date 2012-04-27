@@ -16,14 +16,14 @@ define([
     detailViewRendered: false,
 
     events: {
-        'click a.keypart': 'sink',
+        'click a.keypart': 'toggleValpart',
         'keypress input': 'valueKey',
         // 'submit form': 'submitNewValue',
         'click div.valpartfooter > button': 'addBtn',
     },
 
     initialize: function(options) {
-      _.bindAll(this, 'render', 'valueKey', 'submitNewValue');
+      _.bindAll(this, 'render', 'valueKey');
       this.model.bind('change', this.render);
       this.state = options.state;
       // this.model.bind('destroy', this.remove);
@@ -43,43 +43,51 @@ define([
     },
 
     addBtn: function(){
+        if (! this.state.isLoggedin())
+            return false;
+        
         frag = '#/new/'+this.state.context.name+'/'+this.model.get('key');
         console.log(frag);
         this.state.router.navigate(frag, {trigger:true});
     },
-    submitNewValue: function() {
+    // submitNewValue: function() {
         
-        var key = this.model.get('key');
-        var val = this.$('input').val();
-        if (val.length == 0)
-            return false;
+    //     var key = this.model.get('key');
+    //     var val = this.$('input').val();
+    //     if (val.length == 0)
+    //         return false;
 
-        var type = 'POST';
-        var that = this;
-        console.log('posting', key, val, type);
-        this.state.mutateKeyValue({key:key, val:val, type:type, clb:function(json){
-            console.log(json);
-            this.$('input').val('');
+    //     var type = 'POST';
+    //     var that = this;
+    //     console.log('posting', key, val, type);
+    //     this.state.mutateKeyValue({key:key, val:val, type:type, clb:function(json){
+    //         console.log(json);
+    //         this.$('input').val('');
 
-            var attr = new Attr({
-                key:key,
-                val:val,
-                kcnt:0, 
-                vcnt:1, 
-                selected:false,
-                display:true,
-                haveit:true, 
-                matches:{},
-                new:false,
-            });
-            attr.bind('change', that.state.attrCollection.modelChange)
-            that.state.attrCollection.add(attr);
-        }});
+    //         var attr = new Attr({
+    //             key:key,
+    //             val:val,
+    //             kcnt:0, 
+    //             vcnt:1, 
+    //             selected:false,
+    //             display:true,
+    //             haveit:true, 
+    //             matches:{},
+    //             new:false,
+    //         });
+    //         attr.bind('change', that.state.attrCollection.modelChange)
+    //         that.state.attrCollection.add(attr);
+    //     }});
         
-        return false;
+    //     return false;
+    // },
+
+    toggleValpart: function(){ 
+        this.$('div.valpartdetailed').toggle();
+        this.$('div.valpartfooter').toggle();
+        
+        return false; 
     },
-
-    sink: function(){ return false; },
     });
     return KeyView;
 });

@@ -187,10 +187,16 @@ class profile:
             for key, kscore in keyscores:
                 item = dict(key=key, values=[], score=kscore)
                 #start = self.r.zrevrank(self.getKV(key), start_from) or 0
+
                 for val, vscore in self.r.zrevrangebyscore(getKV(context, key), '+inf', '-inf', withscores=True):
                     userhasit = int(self.r.sismember(getKVA(context, key, val), aid))
                     #print key, val, aid, userhasit
-                    vitem = dict(val=val, userhasit=userhasit, score=vscore)
+                    vitem = dict(val=val, 
+                                 userhasit=userhasit, 
+                                 score=vscore, 
+                                 matches=[])
+                    matches = self.r.smembers(getKVA(context, key, val))
+                    vitem['matches'] = list(matches)
                     item['values'].append(vitem)
                 items.append(item)
                 

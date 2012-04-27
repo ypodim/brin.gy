@@ -5,10 +5,10 @@
     </span>
     <span><%= key %></span>
 </a>
-<div class="valpart"></div>
+<!-- <div class="valpart"></div> -->
 <div class="valpartdetailed"></div>
 
-<div class='valpartfooter'>
+<div class='valpartfooter' style='<% if (! showControls) print('display:none;') %>'>
     <button class='btn btn-success'>new value</button>
     <span>looking for something else?</span>
 </div>

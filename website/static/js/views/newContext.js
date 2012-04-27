@@ -102,9 +102,10 @@ define([
 
     step: 0,
     context: {},
+    last: 0,
     next: function(){
-        last = 0;
-        if (this.step > last) {
+        console.log(this.step, this.last);
+        if (this.step > this.last) {
             var kvlist = [];
             for (k in this.selectedAttrs)
                 for (v in this.selectedAttrs[k])
@@ -125,6 +126,7 @@ define([
         if (this.step == 0) {
             this.context.name = this.$('input#contextName').val();
             this.context.descr = this.$('textarea#contextDescr').val();
+            
             if (this.context.name && this.context.descr)
                 this.chooseAttributes();
             else {
@@ -137,7 +139,7 @@ define([
         if (this.step == 1)
             this.getLocation();
 
-        if (this.step == last)
+        if (this.step == this.last)
             this.state.router.controlsView.setRightTitle('Done');
 
         this.step++;
@@ -183,12 +185,6 @@ define([
         });
     },
 
-    initialize: function(options) {
-        _.bindAll(this, 'render');
-        this.state = options.state;
-        this.steps = []
-    },
-
     valueKey: function(evt){
         if ($(evt.target).hasClass('value') && $(evt.target).val().length > 19)
             return false;
@@ -200,14 +196,35 @@ define([
         return false;
     },
 
-    render: function(context) {
-        html = this.template({username:this.username});
+    initialize: function(options) {
+        _.bindAll(this, 'render');
+        this.state = options.state;
+        this.context.name = options.context;
+        this.steps = [];
+    },
+    render: function() {
+        html = this.template();
         $(this.el).html(html);
         $("#container").html(this.el);
         this.$('input#contextName').focus();
-        if (context) {
-            this.$('input#contextName').val(context);
-            this.$('textarea#contextDescr').focus();
+        if (this.context.name) {
+            
+            var that = this;
+            url = this.state.satellite.url+'/contexts';
+            $.getJSON(url, function(json){
+                contextExists = false;
+                for (var i in json.contexts)
+                    if (that.context.name == json.contexts[i].name)
+                        contextExists = true;
+                
+                if (contextExists) {
+                    that.step = 1;
+                    that.chooseAttributes();
+                } else {
+                    that.$('input#contextName').val(that.context.name);
+                    that.$('textarea#contextDescr').focus();        
+                }
+            });
         }
         return this;
     },

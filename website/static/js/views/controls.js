@@ -30,11 +30,18 @@ define([
         if (options.title == undefined)
             options.title = frag;
 
+        if (options.footer)
+            $('div#container').css('bottom','95px');
+        else
+            $('div#container').css('bottom','0px');
         this.doModal(options);
 
-        // this.state.doFullscreen({switch:options.fullscreen});
-        // $('#container').toggleClass('fullscreen', options.fullscreen);
         this.$('#title').toggleClass('noTitleTransform', options.fullscreen);
+        $(this.el).toggle(!options.fullscreen);
+        if (options.fullscreen)
+            $('div#container').css('top','0px');
+        else
+            $('div#container').css('top','95px');
 
         $('#footer > a').removeClass('active');
         $('#footer > a[href="#/'+frag+'"]').addClass('active');
@@ -59,7 +66,16 @@ define([
     },
     toggleContext: function(ctx) {
         if (ctx.length) {
-            this.$('#contextTitle').html('#'+ctx);
+            
+
+            if (ctx=='ROFLcon') {
+                roflcon = 'http://i.imgur.com/235QK.png';
+                var img = $('<img src="'+roflcon+'" />')
+                this.$('#contextTitle').html(img);    
+            } else
+                this.$('#contextTitle').html('#'+ctx);
+            
+            
             this.$('#context').show();
         } else {
             this.$('#context').hide();
@@ -106,7 +122,7 @@ define([
         this.$('div#profileinfo').hide();
         if (options.profile != undefined) {
             this.$('div#profileinfo').show();
-            this.$('div#profileinfo #username').html(username);
+            this.$('div#profileinfo #username').html(options.profile);
         }
     },
     initialize: function(options) {

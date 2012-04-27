@@ -19,11 +19,6 @@ define(['underscore', 'backbone', 'common/ego_website',
         console.log('step', step);
     },
 
-    doFullscreen: function(options){
-        if (options==undefined) var options = {switch:true};
-        $('#container').toggleClass('fullscreen', options.switch);
-    },
-    
     isLoggedin: function(options) {
         if (options == undefined)
             options = {redirect:true};
@@ -46,7 +41,7 @@ define(['underscore', 'backbone', 'common/ego_website',
         var querystr = JSON.stringify(query);
         var that = this;
         var data = {data:querystr, context:this.context.name};
-        console.log(data);
+        // console.log(data);
         $.post(this.satellite.url+"/multimatch", data, function(json){
             if (json.error) {
                 console.log('getMatches: error:', json.error);
@@ -91,7 +86,7 @@ define(['underscore', 'backbone', 'common/ego_website',
         if (options.context == undefined)
             options.context = this.context.name;
 
-        console.log(options);
+        // console.log(options);
 
         var url = this.agent.baseurl+'/'+this.user.name+'/profile';
         var data = JSON.stringify([[options.key, options.val]]);

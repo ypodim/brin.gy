@@ -56,7 +56,8 @@ define([
                     cnt = json.items[i].values[j].score;
                     haveit = (json.items[i].values[j].userhasit==1);
                     newval = true;
-
+                    matches = json.items[i].values[j].matches;
+                    
                     var attr = new Attr({
                         key:key,
                         val:val,
@@ -65,7 +66,7 @@ define([
                         selected:false,
                         display:true,
                         haveit:haveit, 
-                        matches:{},
+                        matches:matches,
                         new:newval,
                     });
                     attr.bind('change', that.modelChange)

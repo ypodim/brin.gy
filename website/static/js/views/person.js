@@ -13,8 +13,8 @@ define([
     template: _.template(personTemplate),
 
     events: {
-        'click #includeBtn': 'includeBtn',
-        'click #moreBtn': 'moreBtn',
+        'click button#includeBtn': 'includeBtn',
+        'click button#moreBtn': 'moreBtn',
     },
 
     initialize: function(options) {

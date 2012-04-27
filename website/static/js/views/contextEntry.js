@@ -57,6 +57,8 @@ define([
                 this.state.toggleContext(this.model.get('name'), this.model.get('joined'));
                 this.state.setContext({name:'all'});
             }
+        } else {
+            this.state.router.navigate('#/newcontext/'+this.model.get('name'), {trigger:true});
         }
     },
   });

@@ -24,6 +24,7 @@ define([
 
         'context': 'showContext',
         'newcontext': 'newContext',
+        'newcontext/:context': 'newContext',
         "context/:context": "setContext",
         "c/:context": "setContext",
 
@@ -213,6 +214,7 @@ define([
     newContext: function(contextName) {
         ncview = new newContextView({
             state: this.state,
+            context: contextName,
         });
         ncview.render(contextName);
 
