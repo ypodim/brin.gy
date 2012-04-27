@@ -24,7 +24,7 @@ define([
 
     initialize: function(options) {
       _.bindAll(this, 'render', 'valueKey');
-      this.model.bind('change', this.render);
+      
       this.state = options.state;
       // this.model.bind('destroy', this.remove);
       this.model.view = this;

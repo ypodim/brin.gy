@@ -65,13 +65,9 @@ define([
         var key = model.get('key');
         var val = model.get('val');
         var kcnt = model.get('kcnt');
-        // var vcnt = model.get('vcnt');
-        // var haveit = model.get('haveit');
-        // var newval = model.get('newval');
 
         if (!(key in this._keysInserted)) {
             this._keysInserted[key] = {};
-            // console.log('inserted', key);
 
             kmodel = new kModel({
                 key:key,
@@ -90,8 +86,7 @@ define([
             parentView: this._keyViews[key],
             state : this.state,
         });
-        model.bind('change', vvdetailed.render);
-
+        
         this._keyViews[key].$('.valpartdetailed').append(vvdetailed.render().el);
     },
 
@@ -220,13 +215,27 @@ define([
 
         $(this.el).html(this.template());
         this._keysInserted = {};
-        // console.log('render: attrs:', this.state.attrCollection.length)
-        this.state.attrCollection.each(this.addOneAttribute);
-        this.state.personCollection.each(this.addOnePerson);
-        this.state.attrCollection.trigger('value:change');
-        this._isRendered = true;
+        
+        // this.state.attrCollection.each(this.addOneAttribute);
+        var models = this.state.attrCollection.models;
+        this.doOneAttribute(0, models);
+        
         return this;
     },
+
+    doOneAttribute: function(mno, models){
+        if (mno < models.length) {
+            var model = models[mno];
+            this.addOneAttribute(model);
+            var that = this;
+            setTimeout(function(){that.doOneAttribute(mno+1, models)}, 10);
+        } else {
+            this.state.personCollection.each(this.addOnePerson);
+            this.state.attrCollection.trigger('value:change');
+            this._isRendered = true;
+        }
+    },
+
   });
   return managerView;
 });

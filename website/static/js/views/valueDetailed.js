@@ -28,18 +28,25 @@ define([
         $(this.el).html(this.template(json))
                   .addClass('slideValueUp')
                   .removeClass('slideValueDown');
-        if (this.model.get('haveit'))
-            $(this.el).addClass('haveitTag');
+
         if (this.model.get('selected'))
             $(this.el).addClass('filterTag');
-        if (! this.model.get('showControls'))
-            $(this.el).css('margin-left', '100px');
-        for (var i in json.matches) {
-            utoken = $('<a></a>').addClass('userToken').html(json.matches[i]);
-            utoken.attr('href','#/u/'+json.matches[i]);
-            this.$('div#matches').append(utoken);
-        }
         
+        // if (! this.model.get('showControls'))
+            // $(this.el).css('margin-left', '100px');
+
+        // for (var i in json.matches) {
+        //     utoken = $('<a></a>').addClass('userToken').html(json.matches[i]);
+        //     utoken.attr('href','#/u/'+json.matches[i]);
+        //     this.$('div#matches').append(utoken);
+        // }
+
+        var haveit = this.model.get('haveit');
+        this.$('button#addBtn').toggleClass('btn-success', haveit);
+        $(this.el).toggleClass('haveitTag', haveit);
+
+        this.$('span.count').html(this.model.get('vcnt'));
+
         return this;
     },
 
@@ -47,7 +54,6 @@ define([
         this.model.set({selected: !this.model.get('selected')});
         $(this.el).toggleClass('filterTag');
         
-
         this.state.getMatches(this.matchesClb);
         e.stopPropagation();
         return false;
@@ -57,13 +63,21 @@ define([
         if (! this.state.isLoggedin())
             return false;
 
-        var added = $(e.target).toggleClass('btn-success').hasClass('btn-success');
-        this.model.set({haveit: added});
+        haveit = this.model.get('haveit');
+
+        var oldcount = this.model.get('vcnt');
+        console.log(oldcount);
+        if (haveit) 
+            this.model.set({vcnt: oldcount-1});
+        else
+            this.model.set({vcnt: oldcount+1});
+
+        this.model.set({haveit: !haveit});
         $(this.el).toggleClass('haveitTag');
 
         var key = this.model.get('key');
         var val = this.model.get('val');
-        var type = (added) ? 'POST' : 'DELETE';
+        var type = (haveit) ? 'DELETE' : 'POST';
 
         this.state.mutateKeyValue({key:key, val:val, type:type});
 
@@ -72,8 +86,33 @@ define([
     },
 
     toggleUsers: function(e){
-        $(this.el).toggleClass('slideValueDown');
-        $(this.el).toggleClass('slideValueUp');
+        var key = this.model.get('key');
+        var val = this.model.get('val');
+
+        var url = this.state.satellite.url;
+        url += '/profile/'+this.state.context.name;
+        url += '/key/'+key+'/val/'+val+'/agents';
+
+        if ($(this.el).hasClass('slideValueDown')) {
+            // $(this.el).removeClass('slideValueDown');
+            $(this.el).toggleClass('slideValueDown');
+            $(this.el).toggleClass('slideValueUp');
+            this.$('#matches').empty();
+            return false;
+        }
+
+        var that = this;
+        $.getJSON(url, function(json){
+            that.$('#matches').empty();
+            for (var i in json.items) {
+                utoken = $('<a></a>').addClass('userToken').html(json.items[i]);
+                utoken.attr('href','#/u/'+json.items[i]);
+                that.$('div#matches').append(utoken);
+            }
+            $(that.el).toggleClass('slideValueDown');
+            $(that.el).toggleClass('slideValueUp');
+        })
+        
         e.stopPropagation();
         return false; 
     },

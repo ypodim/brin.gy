@@ -68,6 +68,7 @@ div.noTitleTransform {
 @height-s2: 20px;
 
 .font-1  { font-size:@height-1; line-height:@height-1;}
+.font-12 { font-size:@height-12; line-height:@height-12;}
 .font-2  { font-size:@height-2; line-height:@height-2; }
 .font-3  { font-size:@height-3; line-height:@height-3; }
 .font-s1 { font-size:@height-s1; line-height:@height-s1; }
@@ -198,6 +199,8 @@ attribute {
     background-image: -moz-linear-gradient(90deg, #ddd, #999);
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#999), to(#ddd));
     box-shadow: 0 3px 1px rgba(0, 0, 0, 0.5);
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
 }
 attribute a { color: black; }
 attribute a:hover { 
@@ -206,7 +209,7 @@ attribute a:hover {
 }
 
 attribute > a.keypart {
-    .font-1;
+    .font-12;
     height:@height-01;
     white-space: nowrap;
     overflow: hidden;
@@ -219,6 +222,7 @@ attribute > a.keypart {
     padding: 5px 0px 0px 0px;
     margin: 0 0 0 5px;
     /*background-color: rgba(255,255,255,0.01);*/
+    overflow: hidden;
 }
 attribute > a.keypart > span.count {
     display:inline-block;
@@ -272,7 +276,6 @@ attribute > div.valpartdetailed > div.valcontainer {
     padding: 5px 5px 5px 5px;
     margin: 5px 5px 0px 0;
     box-shadow:0px -1px 2px #333333;
-    
 
     overflow: hidden;
 }
@@ -287,6 +290,7 @@ attribute > div.valpartdetailed > div.valcontainer > div#matches {
     padding: 15px 0 0 0;
     font-size:@height-s2;
     line-height:@height-s2;
+    /*display: none;*/
 }
 attribute > div.valpartdetailed > div.valcontainer > div#matches > a.userToken {
     padding: 5px;
@@ -809,6 +813,7 @@ newcontext > div#attributes {
     padding: 20px 0 0 0;
     display:none;
     overflow: scroll;
+    -webkit-overflow-scrolling: touch;
 }
 newcontext > div#attributes > div#buttons {
     position: relative;

@@ -10,34 +10,15 @@ define([
     model: Attr,
     initialize: function(models, options) {
         _.bindAll(this, 'modelChange');
-        // this.bind('add', this.added);
         this.bind('remove', this.removed);
-
-        // _.extend(this, Backbone.Events);
     },
 
     modelChange: function(model) {
         this.trigger('value:change');
-        // var selectedlist = this.filter(function(attr){
-        //     return attr.get('selected');
-        // });
-        // var melist = this.filter(function(attr){
-        //     return attr.get('haveit');
-        // });
-
-        // var count = selectedlist.length;
-        // var html = (count > 0) ? count : '';
-        // var badge = $('#searchBadge').html(html);
-        // (count)? badge.show() : badge.hide();
-        // this.state.filterCount = count;
-
-        // count = melist.length;
-        // html = (count > 0) ? count : '';
-        // badge = $('#meBadge').html(html);
-        // (count)? badge.show() : badge.hide();
     },
 
     ffetch: function() {
+        console.log('ffetch');
         this.reset();
         this.state.progress('fetching attributes');
         $('#progressbar').children().width('10%');
@@ -45,54 +26,48 @@ define([
         var that = this;
         url = this.state.satellite.url+"/profile/"+this.state.context.name+"/keyvals";
         $.getJSON(url, {user:this.state.user.name}, function(json){
-
             that.state.progress('fetched '+json.items.length+' attribute groups');
-            for (i in json.items) {
-                var key = json.items[i].key;
-                var score = json.items[i].score;
-
-                for (j in json.items[i].values) {
-                    val = json.items[i].values[j].val;
-                    cnt = json.items[i].values[j].score;
-                    haveit = (json.items[i].values[j].userhasit==1);
-                    newval = true;
-                    matches = json.items[i].values[j].matches;
-                    
-                    var attr = new Attr({
-                        key:key,
-                        val:val,
-                        kcnt:parseInt(score), 
-                        vcnt:parseInt(cnt), 
-                        selected:false,
-                        display:true,
-                        haveit:haveit, 
-                        matches:matches,
-                        new:newval,
-                    });
-                    attr.bind('change', that.modelChange)
-                    that.add(attr);
-                }
-
-                progress = parseInt(100*i/json.items.length)+'%';
-                $('#progressbar').children().width(progress);
-            }
-            
+            that.processNextKey(0, json.items);
             that.state.hideSplash();
-            that.modelChange();
         });
     },
+    processNextKey: function(kno, keys){
+        if (kno < keys.length) {
+            var key = keys[kno].key;
+            var score = keys[kno].score;
+            var values = keys[kno].values;
+            this.renderValues(key, score, values);
 
-    // added: function(obj) {
-    //     console.log('added', obj);
+            var that = this;
+            setTimeout(function(){that.processNextKey(kno+1, keys)}, 100);
+        } else {
+            console.log('ffetch done.');
+        }
+        this.modelChange();
+    },
+    renderValues: function(key, kscore, values){
+        for (j in values) {
+            val = values[j].val;
+            cnt = values[j].score;
+            haveit = (values[j].userhasit==1);
+            // matches = json.items[i].values[j].matches;
 
-    //     dic = [obj.get('key'), obj.get('val')];
-    //     secret = '';
-    //     username = 'ypodim';
-    //     url = this.state.agent.baseurl+'/'+this.state.user.name+'/profile';
-    //     data = {secret:secret, data:JSON.stringify(dic)};
+            var attr = new Attr({
+                key:key,
+                val:val,
+                kcnt:parseInt(kscore), 
+                vcnt:parseInt(cnt), 
+                selected:false,
+                display:true,
+                haveit:haveit, 
+                matches:{},
+                new:true,
+            });
+            attr.bind('change', this.modelChange);
+            this.add(attr);
+        }
+    },
 
-    //     console.log('posting', url, data, secret);
-    // },
     removed: function(obj) {
         console.log('removed', obj);
     },

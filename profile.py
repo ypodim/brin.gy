@@ -98,10 +98,9 @@ class profile():
         return self.db.smembers('%s:profile:key:%s' % (self.usr, key))
     
     def set_val(self, context, key, val):
-        print 'add context', self.db.sadd('contexts', context)
-        print 'add context for user', self.db.sadd('%s:contexts' % self.usr, context)
-        print 'add context reverse', self.db.sadd('context:users:%s' % context, self.usr)
-        print 'for context', context
+        self.db.sadd('contexts', context)
+        self.db.sadd('%s:contexts' % self.usr, context)
+        self.db.sadd('context:users:%s' % context, self.usr)
         
         self.set_key(key)
         self.add_reverse(context, key, val)
