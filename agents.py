@@ -28,6 +28,9 @@ class sendEmail:
         if not to or not fromuser:
             return
         
+        print message, to
+        print
+
         msg = MIMEText(message)
         msg['Subject'] = subject
         msg['From'] = 'Brin.gy <%s>' % fromuser
@@ -148,6 +151,7 @@ class serve_index(bringy_handler):
         message+= 'You can use the above URL to manage your pseudonym.\n\n'
         message+= 'Cheers\nBrin.gy\n\nPS: IP address that was used: %s' % ip
         sendEmail(email, 'info@brin.gy', subject, message)
+        
 
         error = ''
         if not created: error = 'user already exists'
