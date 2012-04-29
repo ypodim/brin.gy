@@ -681,7 +681,7 @@ application = tornado.web.Application([
     (r"/clear_context", api_call),
     (r"/stats", stats),
 
-    # (r"/users", debug),    
+    (r"/users", debug),    
     
     # (r"/a/[a-zA-Z0-9]+/?$", serve_user),
     (r"/[a-zA-Z0-9]+/?$", serve_user),
