@@ -222,9 +222,9 @@ class serve_user(bringy_handler):
             to = tornado.escape.json_decode(to)
             selectedAttrs = tornado.escape.json_decode(selectedAttrs)
             replyTo = db.get_email(self.username)
-            sendTo = [db.get_email(x) for x in to]
+            sendTo = [dict(email=db.get_email(x), username=x) for x in to]
 
-            body = 'User %s (%s) sent you a message based on your attributes:\n\n' % (self.username, replyTo)
+            body = 'User %s (%s) sent you (%%s) a message based on your attributes:\n\n' % (self.username, replyTo, )
             for attr in selectedAttrs:
                 body += '%s:%s\n' % (attr['key'], attr['val'])
             body += '\nATTENTION: Please reply to the user\'s email, NOT to this message directly!\n'
@@ -234,8 +234,9 @@ class serve_user(bringy_handler):
 
             
             for destination in sendTo:
+                body = body % destination['username']
                 print destination, subject, body
-                sendEmail(destination, 'info@brin.gy', subject, body)
+                sendEmail(destination['email'], 'info@brin.gy', subject, body)
 
         res = {'error':error, 'username':self.username}
         self.write(res)
@@ -514,7 +515,7 @@ class api_call(tornado.web.RequestHandler):
         result = db.usernames_by_email(email)
         if not result:
             error = 'invalid email address'
-        
+
         subject = 'Brin.gy password reminder'
         ip = self.request.headers.get('X-Real-Ip')
         message = 'Hello,\n\n'
