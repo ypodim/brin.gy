@@ -135,6 +135,8 @@ define([
 
         if (email && email.length>0)
             return this.doReminder(email)
+
+        return false;
     },
     
     render: function(options){

@@ -146,7 +146,7 @@ define(['underscore', 'backbone', 'common/ego_website',
         var stat = {
             type:type,
             user:this.user.name,
-            body:'',
+            body:arg,
         };
 
         if (type == 'filters:filters') {
