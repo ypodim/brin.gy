@@ -21,7 +21,7 @@ define([
         this.el.empty();
         var that = this;
         var url = this.state.agent.baseurl+'/stats';
-        $.getJSON(url, function(json){
+        $.getJSON(url, {last:0}, function(json){
             for (var i in json.timeline) {
                 var entry = JSON.parse(json.timeline[i]);
                 var u = entry.user;
