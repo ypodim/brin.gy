@@ -14,6 +14,8 @@ define([
         this.state = options.state;
     },
     send: function() {
+        if (! this.state.isLoggedin())
+            return false;
         
         var models = this.state.personCollection.included();
         var targets = [];
