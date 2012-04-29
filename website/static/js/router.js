@@ -265,6 +265,7 @@ define([
         $.getJSON(url, function(json){
             for (var i in json.contexts) {
                 var cntx = json.contexts[i];
+                console.log('comparing ', cntx.name, context)
                 if (cntx.name == context) {
                     that.state.setContext({name:context});
                     that.navigate('#/all', {trigger:true});

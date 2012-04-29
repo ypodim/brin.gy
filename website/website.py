@@ -82,6 +82,8 @@ class presentation(tornado.web.RequestHandler):
 
 class context(tornado.web.RequestHandler):
     def get(self, cname):
+        print tornado.escape.url_escape('/#/c/'+cname)
+        print cname, '/#/c/'+cname
         self.redirect('/#/c/'+cname)
 
 debug = os.environ.get("SERVER_SOFTWARE", "").startswith("Development/")

@@ -39,18 +39,30 @@ def uvals(username, key):
 def clb(arg):
     print arg['data']
 
-for cntx in r.smembers('contexts'):
-    for u in users():
-        for k in ukeys(u):
-            for v in uvals(u,k):
-                if not k:
-                    print cntx, u, v, 'but no KEY', len(k)
-                if not v:
-                    print cntx, u, k, 'but no VAL', len(v)
+cntx = 'Ignite Boston 9'
 
+print r.smembers('context:users:%s' % cntx)
+for u in users():
+    if u in ['ValenciaTrujillo', 'julie.valastyan', 'Bettina', 'appnik']:
+        continue
 
-                    p = profile.profile(u, [k,v], [''], r, clb)
-                    # p.del_val(cntx, k, v)
+    # p = profile.profile(u, [], [''], r, clb)
+    # p.leave_context(cntx)
+
+    kvlist = []
+    for k in ukeys(u):
+        for v in uvals(u,k):
+            if not k:
+                print cntx, u, v, 'but no KEY', len(k)
+            if not v:
+                print cntx, u, k, 'but no VAL', len(v)
+
+            kvlist.append([k,v])
+
+    p = profile.profile(u, kvlist, [''], r, clb)
+    print 'post', u, len(kvlist)
+    if kvlist:
+        p.post(cntx)
 
 sys.exit()
 

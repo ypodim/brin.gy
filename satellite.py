@@ -303,7 +303,15 @@ class contexts(tornado.web.RequestHandler):
                            description=description)
             if user:
                 context['userhasit'] = r.sismember('context:users:%s' % c, user)
-            dic['contexts'].append(context)    
+            dic['contexts'].append(context) 
+
+        tempc = sorted(dic['contexts'], key=lambda cntx: cntx['count'], reverse=True)
+        for i in xrange(len(tempc)):
+            if tempc[i]['name'] == 'all':
+                allc = tempc[i]
+                tempc = tempc[:i]+tempc[i+1:]+[allc]
+        
+        dic['contexts'] = tempc
         self.write(dic)
 
             
