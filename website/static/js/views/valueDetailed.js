@@ -81,6 +81,13 @@ define([
 
         this.state.mutateKeyValue({key:key, val:val, type:type});
 
+        var body = {key:key, val:val, context:this.state.context.name};
+        if (haveit)
+            this.state.stats('attribute:removed', body)
+        else
+            this.state.stats('attribute:added', body)
+        
+
         e.stopPropagation();
         return false;
     },

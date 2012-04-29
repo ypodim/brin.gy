@@ -169,6 +169,10 @@ define(['underscore', 'backbone', 'common/ego_website',
             stat.body = JSON.stringify(arg);
         }
 
+        if (type == 'attribute:added') {
+            // stat.body = JSON.stringify(arg);
+        }
+
         if (type in {signup:1, signin:1, reminder:1, profile:1}) {
             stat.body = JSON.stringify(arg);
         }
