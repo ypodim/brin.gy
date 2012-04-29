@@ -29,13 +29,13 @@ define([
 
                 var d = new Date().getTime()/1000;
                 var diff = d - body.tstamp;
-                var diffstr = diff+' seconds ago';
+                var diffstr = Math.floor(diff)+' seconds ago';
                 if (diff >= 60 && diff < 3600)
-                    diffstr = Math.ceil(diff/60)+' mins ago';
+                    diffstr = Math.floor(diff/60)+' mins ago';
                 if (diff >= 3600 && diff < 86400)
-                    diffstr = Math.ceil(diff/3600)+' hours ago';
+                    diffstr = Math.floor(diff/3600)+' hours ago';
                 if (diff >= 86400)
-                    diffstr = Math.ceil(diff/86400)+' days ago';
+                    diffstr = Math.floor(diff/86400)+' days ago';
 
                 var stat = that.template({
                     user: u,
