@@ -165,11 +165,11 @@ define(['underscore', 'backbone', 'common/ego_website',
 
         }
 
-        if (type == 'profile') {
+        if (type == 'message:send') {
             stat.body = JSON.stringify(arg);
         }
 
-        if (type == 'message:send') {
+        if (type in {signup:1, signin:1, reminder:1, profile:1}) {
             stat.body = JSON.stringify(arg);
         }
 

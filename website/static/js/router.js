@@ -14,9 +14,10 @@ define([
     'views/account',
     'views/contexts',
     'views/newContext',
+    'views/stats',
 ], function(
     $, _, Backbone, 
-    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView, presentationView, accountView, contextsView, newContextView
+    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView, presentationView, accountView, contextsView, newContextView, statsView
     ){
   var AppRouter = Backbone.Router.extend({
     routes: {
@@ -46,6 +47,7 @@ define([
         'new/:context/:key/:val': 'newAttribute',
 
         'account': 'account',
+        'stats': 'stats',
 
         "*actions": "defaultRoute",
     },
@@ -63,6 +65,18 @@ define([
 
         this.presView = new presentationView({
             router:this,
+        });
+    },
+
+    stats: function(){
+        var sview = new statsView({
+            state: this.state,
+        });
+        sview.render();
+
+        this.controlsView.setUIstate({
+            title: 'stats',
+            footer:false,
         });
     },
 

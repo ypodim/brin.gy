@@ -554,6 +554,7 @@ class stats(tornado.web.RequestHandler):
 
         db.r.sadd('stat:etypes', dic['type'])
         db.r.lpush('stat:type:%s' % dic['type'], tornado.escape.json_encode(dic))
+        db.r.lpush('stat:timeline', tornado.escape.json_encode(dic))
         
         # print dic
         self.write(dict(error=''))
@@ -582,6 +583,9 @@ class stats(tornado.web.RequestHandler):
                     res['summary']['filtersbyuser'][evt['user']] += 1
                     
 
+        elen = db.r.llen('stat:timeline')
+        res['timeline'] = db.r.lrange('stat:timeline', 0, elen)
+
         db.r.llen('stat:type:filters')
         
         self.write(res)
@@ -589,6 +593,7 @@ class stats(tornado.web.RequestHandler):
         for etype in db.r.smembers('stat:etypes'):
             db.r.delete('stat:type:%s'%etype)
         db.r.delete('stat:etypes')
+        db.r.delete('stat:timeline')
         self.write(dict(error=''))
         return 
     def trans(self):

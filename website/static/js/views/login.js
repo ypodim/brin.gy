@@ -33,6 +33,7 @@ define([
                 that.state.user.email = json.email;
                 common.cookies.set_cookie(username, password, json.email);
                 that.state.router.navigate('#/all', {trigger: true});
+                that.state.stats('signin', username);
             } else {
                 $('div.alert')
                     .removeClass('alert-success')
@@ -76,6 +77,7 @@ define([
                 that.state.user.pwd = json.secret;
                 common.cookies.set_cookie(username, json.secret, email);
                 that.state.router.navigate('#/all', {trigger: true});
+                that.state.stats('signup', username);
             }
         }, 'json');
         
@@ -98,7 +100,7 @@ define([
                     $('div.alert').fadeOut();
                 }, 3000);
             } else {
-                
+                that.state.stats('reminder', email);
             }
         }, 'json');
         
