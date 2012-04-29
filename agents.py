@@ -144,7 +144,6 @@ class serve_index(bringy_handler):
         ip = self.request.headers.get('X-Real-Ip')
         message = 'Hello,\n\n'
         message+= 'You received this message because someone (probably you) created user "%s" on Brin.gy:\n\n' % user_name
-        # message+= 'Account access: http://brin.gy/a/%s\n\n' % secret
         message+= 'Username: %s\n' % user_name
         message+= 'Password: %s\n' % secret
         message+= 'Login: http://brin.gy/a/%s\n\n' % secret
@@ -512,11 +511,10 @@ class api_call(tornado.web.RequestHandler):
         error = ''
         result = []
         email = self.get_argument('email','')
-        if not email:
+        result = db.usernames_by_email(email)
+        if not result:
             error = 'invalid email address'
-        else:
-            result = db.usernames_by_email(email)
-
+        
         subject = 'Brin.gy password reminder'
         ip = self.request.headers.get('X-Real-Ip')
         message = 'Hello,\n\n'
@@ -565,6 +563,15 @@ class stats(tornado.web.RequestHandler):
             return self.trans()
 
         res = dict(summary={'emptyfilters':0, 'filtersbyuser':{}})
+
+        last = self.get_argument('last','10')
+        try:
+            last = int(last)
+        except:
+            last = 10
+        if last == 0:
+            last = db.r.llen('stat:timeline')
+
         for etype in db.r.smembers('stat:etypes'):
             res[etype] = []
             elen = db.r.llen('stat:type:%s'%etype)
@@ -582,9 +589,7 @@ class stats(tornado.web.RequestHandler):
                         res['summary']['filtersbyuser'][evt['user']] = 0    
                     res['summary']['filtersbyuser'][evt['user']] += 1
                     
-
-        elen = db.r.llen('stat:timeline')
-        res['timeline'] = db.r.lrange('stat:timeline', 0, elen)
+        res['timeline'] = db.r.lrange('stat:timeline', 0, last-1)
 
         db.r.llen('stat:type:filters')
         

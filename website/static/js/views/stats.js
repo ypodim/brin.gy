@@ -18,6 +18,7 @@ define([
     },
 
     render: function() {
+        this.el.empty();
         var that = this;
         var url = this.state.agent.baseurl+'/stats';
         $.getJSON(url, function(json){
