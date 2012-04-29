@@ -40,6 +40,10 @@ def clb(arg):
     print arg['data']
 
 cntx = 'Ignite Boston 9'
+dscr = 'O\'Reilly Ignite Boston 9 event, at MIT Media Lab, 03/29/2012'
+r.set('context:description:%s' % cntx, dscr)
+
+sys.exit()
 
 print r.smembers('context:users:%s' % cntx)
 for u in users():
