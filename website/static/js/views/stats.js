@@ -27,6 +27,9 @@ define([
                 if (!body.user)
                     u = 'anonymous';
 
+                if (u in {ypodim:1})
+                    continue;
+
                 var d = new Date().getTime()/1000;
                 var diff = d - body.tstamp;
                 var diffstr = Math.floor(diff)+' seconds ago';
