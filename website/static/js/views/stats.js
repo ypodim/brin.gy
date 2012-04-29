@@ -22,16 +22,16 @@ define([
         var url = this.state.agent.baseurl+'/stats';
         $.getJSON(url, function(json){
             for (var i in json.timeline) {
-                var body = JSON.parse(json.timeline[i]);
-                var u = body.user;
-                if (!body.user)
+                var entry = JSON.parse(json.timeline[i]);
+                var u = entry.user;
+                if (!entry.user)
                     u = 'anonymous';
 
                 if (u in {ypodim:1})
                     continue;
 
                 var d = new Date().getTime()/1000;
-                var diff = d - body.tstamp;
+                var diff = d - entry.tstamp;
                 var diffstr = Math.floor(diff)+' seconds ago';
                 if (diff >= 60 && diff < 3600)
                     diffstr = Math.floor(diff/60)+' mins ago';
@@ -40,10 +40,18 @@ define([
                 if (diff >= 86400)
                     diffstr = Math.floor(diff/86400)+' days ago';
 
+                var obj = entry.body;
+                if (typeof entry.body == 'object')
+                    obj = JSON.stringify(entry.body)
+                
+
+                if (entry.type in {'attribute:added':1, 'attribute:removed':1})
+                    obj = entry.body.key+': '+entry.body.val+' in '+entry.body.context
+
                 var stat = that.template({
                     user: u,
-                    verb: body.type,
-                    object: '',
+                    verb: entry.type,
+                    object: obj,
                     tdiff: diffstr,
                 });
 
