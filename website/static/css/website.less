@@ -63,9 +63,23 @@ div.noTitleTransform {
 @height-1: 90px;
 @height-12: 80px;
 @height-2: 60px;
+@height-23: 50px;
 @height-3: 40px;
+@height-s0: 35px;
 @height-s1: 30px;
 @height-s2: 20px;
+
+/*@height-10: 100px;
+@height-9: 90px;
+@height-8: 80px;
+@height-7: 70px;
+@height-6: 60px;
+@height-5: 50px;
+@height-4: 40px;
+@height-34: 35px;
+@height-3: 30px;
+@height-2: 20px;
+@height-1: 10px;*/
 
 .font-1  { font-size:@height-1; line-height:@height-1;}
 .font-12 { font-size:@height-12; line-height:@height-12;}
@@ -369,8 +383,19 @@ attribute > div.valpartdetailed > div.valcontainer > a > span.count {
     text-shadow: 0px -2px 0px rgba(0,0,0,0.5);
     border-radius: 3px;
     margin: 0 10px 0 5px;
+    height:@height-2;
 
     float:left;
+}
+attribute > div.valpartdetailed > div.valcontainer > a > span.count > span.cno {
+    margin-top: 7px;
+    display:block;
+    line-height:@height-s0;
+}
+attribute > div.valpartdetailed > div.valcontainer > a > span.count > span.caption{
+    display:block;
+    font-size:12px;
+    line-height:12px;
 }
 
 /* ========================================= */
@@ -741,28 +766,26 @@ button.account {
 
 div#contexts > div#contextEntry {
     .font-3;
-    min-height:@height-2;
-    /*background-color:gray;*/
+    min-height:@height-12;
     border: 1px solid gray;
     position:relative;
 }
 div#contexts > div#contextEntry > a {
     position: absolute;
-    top:0;
-    left:0;
+    top:5px;
+    left:5px;
     right:0;
+    color:#333;
+    text-shadow: 0px 1px 0px #fff;
 }
 div#contexts > div#contextEntry > a:hover {
     text-decoration:none;
 }
 div#contexts > div#contextEntry > a > div {
-    /*position:absolute;*/
-    display:inline-block;
-    margin: 5px 0 0 5px;
+    float:left;
+    margin: 0 5px 0 0;
 }
 div#contexts > div#contextEntry > a > div.count {
-    /*left:5px;*/
-    /*top:5px;*/
     color: white;
     background-color:#ff2244;
     padding: 0px 10px 0px 10px;
@@ -770,15 +793,28 @@ div#contexts > div#contextEntry > a > div.count {
     text-shadow: 0px -2px 0px rgba(0,0,0,0.5);
     box-shadow: 0px 3px 1px rgba(0,0,0,0.5);
     border-radius: 3px;
+    height:70px;
+    line-height:50px;
 }
-div#contexts > div#contextEntry > a > div.name {
-    /*top:5px;*/
+div#contexts > div#contextEntry > a > div.count > span.cno {
+    display:block;
+}
+div#contexts > div#contextEntry > a > div.count > span.caption{
+    display:block;
+    font-size:12px;
+    line-height:12px;
+}
 
+div#contexts > div#contextEntry > a > div.details {
+    
 }
-div#contexts > div#contextEntry > div.description {
+div#contexts > div#contextEntry > a > div.details > span.name {
+    display:block;
+}
+div#contexts > div#contextEntry > a > div.details > span.description {
+    padding-top:5px;
     .font-s2;
-    display:inline-block;
-    margin: 55px 5px 5px 85px;
+    display:block;
     color:gray;
 }
 div#contexts > div#contextEntry > button#actionBtn {
