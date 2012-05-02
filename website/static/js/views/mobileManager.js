@@ -205,6 +205,8 @@ define([
     _isRendered: false,
     _lastContext: '',
     render: function(){
+        console.log(this._lastContext, this.state.context.name);
+        console.log(this._isRendered);
         if (this._lastContext != this.state.context.name) {
             this.resetCollections();
             this._lastContext = this.state.context.name;
