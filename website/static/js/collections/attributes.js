@@ -18,7 +18,6 @@ define([
     },
 
     ffetch: function() {
-        console.log('ffetch');
         this.reset();
         this.state.progress('fetching attributes');
         $('#progressbar').children().width('10%');
@@ -39,9 +38,9 @@ define([
             this.renderValues(key, score, values);
 
             var that = this;
-            setTimeout(function(){that.processNextKey(kno+1, keys)}, 100);
+            this.state.attrTimeout = setTimeout(function(){that.processNextKey(kno+1, keys)}, 100);
         } else {
-            console.log('ffetch done.');
+            // console.log('ffetch done.');
         }
         this.modelChange();
     },

@@ -66,6 +66,10 @@ define([
         this.presView = new presentationView({
             router:this,
         });
+
+        this.wview = new welcomeView({
+            state: this.state,
+        });
     },
 
     stats: function(){
@@ -248,7 +252,7 @@ define([
         });
     },
     showContext: function(){
-        cview = new contextsView({
+        var cview = new contextsView({
             state: this.state,
         });
         cview.render();
@@ -265,7 +269,6 @@ define([
         $.getJSON(url, function(json){
             for (var i in json.contexts) {
                 var cntx = json.contexts[i];
-                console.log('comparing ', cntx.name, context)
                 if (cntx.name == context) {
                     that.state.setContext({name:context});
                     that.navigate('#/all', {trigger:true});
@@ -291,13 +294,11 @@ define([
         this.controlsView.setUIstate({
             title: 'Brin.gy',
             fullscreen: true,
+            footer: false,
         });
         
         this.state.stats('home');
-        var wview = new welcomeView({
-            state: this.state,
-        });
-        wview.render();
+        this.wview.render();
     },
   });
 

@@ -218,23 +218,25 @@ define([
         
         // this.state.attrCollection.each(this.addOneAttribute);
         var models = this.state.attrCollection.models;
-        this.doOneAttribute(0, models);
+        // this.doOneAttribute(0, models);
         
         return this;
     },
 
-    doOneAttribute: function(mno, models){
-        if (mno < models.length) {
-            var model = models[mno];
-            this.addOneAttribute(model);
-            var that = this;
-            setTimeout(function(){that.doOneAttribute(mno+1, models)}, 10);
-        } else {
-            this.state.personCollection.each(this.addOnePerson);
-            this.state.attrCollection.trigger('value:change');
-            this._isRendered = true;
-        }
-    },
+    // doOneAttribute: function(mno, models){
+    //     if (mno < models.length) {
+    //         var model = models[mno];
+    //         this.addOneAttribute(model);
+    //         var that = this;
+    //         attrTimeout = setTimeout(function(){that.doOneAttribute(mno+1, models)}, 10);
+
+    //         console.log(attrTimeout);
+    //     } else {
+    //         this.state.personCollection.each(this.addOnePerson);
+    //         this.state.attrCollection.trigger('value:change');
+    //         this._isRendered = true;
+    //     }
+    // },
 
   });
   return managerView;

@@ -55,13 +55,12 @@ define([
             return false;
         var that = this;
 
-        $(this.el).html(this.template());
+        $(this.el).empty().html(this.template());
 
         var url = this.state.satellite.url+'/contexts';
         $.getJSON(url, {user:this.state.user.name}, function(json){
             for (var i in json.contexts) {
                 var c = json.contexts[i];
-                // console.log(c);
 
                 var cm = new contextModel({
                     name: c.name,

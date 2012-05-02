@@ -510,6 +510,7 @@ div.nametag {
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-weight: bold;
     line-height:50px;
+    text-shadow: 0px -1px 1px #555, 0px 1px 1px #fff;
 }
 div.nametag > b {
     display: block;
@@ -693,7 +694,7 @@ div#suggestions > div#autocomplete > a.suggestion:hover {
 
 /*############# FRONT PAGE #############*/
 
-div#welcome {
+/*div#welcome {
     
 }
 div#welcome > a {
@@ -708,9 +709,8 @@ div#welcome > a {
 }
 div#welcome > a:hover {
     text-decoration:none;
-    /*border:1px solid gray;*/
 }
-
+*/
 
 /*############# FOOTER #############*/
 
@@ -910,7 +910,7 @@ div.welcome {
     
     font-weight:bold;
     color:#aaa;
-    width:500px;
+    width:700px;
     margin:auto;
     /*background-color:gray;*/
 }
@@ -924,10 +924,12 @@ div.welcome > div#menu {
     padding: 40px 0 20px 15px;
 }
 div.welcome > div#menu > a {
-    padding:5px;
+    padding: 5px;
+    margin-right:5px;
     border:1px solid #aaa;
     border-radius:5px;
     color:gray;
+    .font-s2;
 }
 div.welcome > div#menu > a:hover {
     text-decoration:none;
@@ -939,4 +941,35 @@ div.welcome > div#activity {
     border-top: 1px solid #ccc;
     box-shadow: 0 -1px #aaa, inset 0 1px white;
     padding: 20px 0 20px 15px;
+    color:gray;
+    .font-s2;
+    text-shadow: 0 1px #fff;
 }
+div.welcome > div#activity > div#activityEntry {
+    padding: 10px 0 5px 0;
+}
+div.welcome > div#activity > div#activityEntry > span {
+    color: #222;
+}
+div.welcome > div#buttons {
+    border-top: 1px solid #ccc;
+    box-shadow: 0 -1px #aaa, inset 0 1px white;
+    padding: 20px 0 20px 0;
+    height:100px;
+}
+div.welcome > div#buttons > button {
+    margin: 0 15px 0 15px;
+    width:40%;
+    height:100%;
+    .font-3;
+    font-weight:bold;
+    text-shadow: 0 1px #fff;
+    color:gray;
+    float:left;
+}
+div.welcome > div#buttons > button:last-child {
+    float:right;
+}
+
+
+
