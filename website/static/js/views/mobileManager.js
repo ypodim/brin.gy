@@ -44,14 +44,48 @@ define([
 
     filterBtn: function(evt) {
         var btnid = $(evt.target).attr('id');
+        
         if (btnid == 'all') {
-            this.state.router.navigate('#/all', {trigger:true});
+            // this.state.router.navigate('/all', {trigger:true});
+            console.log('filter1', btnid)
+
+            this.$('attribute').show();
+            this.$('.valcontainer').show();
         }
         if (btnid == 'me') {
-            this.state.router.navigate('#/me', {trigger:true});
+            // this.state.router.navigate('/me', {trigger:true});
+            console.log('filter2', btnid)
+
+            this.state.stats('filters:me');
+            // this.showMe();
+            // this.$('div.scrollableContainer').show();
+            this.$('#me').addClass('active');
+            this.$('attribute').hide();
+            this.$('.valcontainer').hide();
+
+            this.$('.haveitTag').show();
+            _.each(this.$('attribute'), function(attr){
+                if ($(attr).children('.valpartdetailed').children('.haveitTag').length)
+                    $(attr).show();
+            });
+
+            this.$('.resultsTitle').hide();
+            this.$('#results').hide();
+            this.$('.closingpane').show();
+
+
+
+
+            var that = this;
+            this.state.router.controlsView.setUIstate({
+                rightTitle: 'Start New Attribute',
+                rightClb: function(){that.startNewAttribute(that.state)},
+            });
+
         }
         if (btnid == 'filters') {
-            this.state.router.navigate('#/filters', {trigger:true});
+            this.state.router.navigate('/filters', {trigger:true});
+            console.log('filter3', btnid)
         }
     },
     newAttribute: function() {
@@ -99,7 +133,7 @@ define([
     },
 
     showMe: function(){
-        this.$('div.scrollableContainer').show();
+        // this.$('div.scrollableContainer').show();
         this.$('#me').addClass('active');
         this.$('attribute').hide();
         this.$('.valcontainer').hide();
@@ -205,8 +239,9 @@ define([
     _isRendered: false,
     _lastContext: '',
     render: function(){
-        console.log(this._lastContext, this.state.context.name);
-        console.log(this._isRendered);
+        // console.log(this._lastContext, this.state.context.name);
+        // console.log(this._isRendered);
+
         if (this._lastContext != this.state.context.name) {
             this.resetCollections();
             this._lastContext = this.state.context.name;

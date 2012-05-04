@@ -140,7 +140,7 @@ define([
     },
     
     render: function(options){
-        this.state.router.contents_view._lastContext = '';
+        // this.state.router.contents_view._lastContext = '';
 
         if (options==undefined)
             options = {action:'signup'};

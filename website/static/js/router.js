@@ -144,7 +144,7 @@ define([
         });
     },
     showMe: function(){
-        if (! this.contents_view._isRendered) 
+        if (! this.contents_view._isRendered)
             return this.navigate('#/all', {trigger:true});
             
         this.state.stats('filters:me');
