@@ -35,7 +35,7 @@ define([
             descr: this.model.get('description'),
         };
         this.state.setContext(context)
-        this.state.router.navigate('#/all', {trigger:true});
+        this.state.router.navigate('#/c/'+context.name, {trigger:true});
         return false;
 
         this.$('.description').slideToggle(100);

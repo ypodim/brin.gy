@@ -61,7 +61,7 @@ define([
     },
     cancel: function() {
         this.state.renderManager = true;
-        this.state.router.navigate('#/all', {trigger:true});
+        this.state.router.navigate('#/attributes', {trigger:true});
     },
 
     selectedAttrs: [],

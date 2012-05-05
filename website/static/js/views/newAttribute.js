@@ -50,9 +50,10 @@ define([
                     });
                     attr.bind('change', that.state.attrCollection.modelChange)
                     that.state.attrCollection.add(attr);
+                    that.state.router.navigate('#/c/'+that.state.context.name, {trigger:true});
                 }});
                 saved = true;
-                that.state.router.navigate('#/all', {trigger:true});
+                
             }
             // if (saved) {
                 // that.state.router.navigate('#/all', {trigger:true});

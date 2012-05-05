@@ -16,9 +16,6 @@ define([
     'views/valueDetailed',
     'views/person',
 
-    // 'collections/keys',
-    // 'collections/values',
-    
     'models/key',
     'models/value',
     'models/attribute',
@@ -29,7 +26,6 @@ define([
         manageViewTemplate, 
 
         keyView, valueDetailedView, personView,
-        // Keys, Values,
         kModel, vModel, attrModel, personModel){
   var managerView = Backbone.View.extend({
     el: $("#container"),
@@ -45,21 +41,39 @@ define([
     filterBtn: function(evt) {
         var btnid = $(evt.target).attr('id');
         
+        this.$('div.scrollableContainer').show();
+        this.$('.resultsTitle').hide();
+        this.$('#results').hide();
+        this.$('#noFilters').hide();
+        
+        var that = this;
+        this.state.router.controlsView.setUIstate({
+            rightTitle: 'Start New Attribute',
+            rightClb: function(){that.startNewAttribute(that.state)},
+        });
+
         if (btnid == 'all') {
             // this.state.router.navigate('/all', {trigger:true});
             console.log('filter1', btnid)
 
             this.$('attribute').show();
             this.$('.valcontainer').show();
+
+            // this.state.stats('filters:all');
+            // this.render();
+            // this.showAll();
+
+            // var that = this;
+            // this.controlsView.setUIstate({
+            //     rightTitle: 'Start New Attribute',
+            //     rightClb: function(){that.startNewAttribute(that.state)},
+            // });
         }
         if (btnid == 'me') {
-            // this.state.router.navigate('/me', {trigger:true});
-            console.log('filter2', btnid)
-
             this.state.stats('filters:me');
-            // this.showMe();
-            // this.$('div.scrollableContainer').show();
+
             this.$('#me').addClass('active');
+
             this.$('attribute').hide();
             this.$('.valcontainer').hide();
 
@@ -68,24 +82,42 @@ define([
                 if ($(attr).children('.valpartdetailed').children('.haveitTag').length)
                     $(attr).show();
             });
-
-            this.$('.resultsTitle').hide();
-            this.$('#results').hide();
+            
             this.$('.closingpane').show();
 
-
-
-
-            var that = this;
-            this.state.router.controlsView.setUIstate({
-                rightTitle: 'Start New Attribute',
-                rightClb: function(){that.startNewAttribute(that.state)},
-            });
+            
 
         }
         if (btnid == 'filters') {
-            this.state.router.navigate('/filters', {trigger:true});
             console.log('filter3', btnid)
+
+            this.state.stats('filters:filters');
+            this.$('div.scrollableContainer').hide();
+            this.$('#filters').addClass('active');
+
+            this.$('.filterTag').show();
+            _.each(this.$('attribute'), function(attr){
+                if ($(attr).children('.valpartdetailed').children('.filterTag').length)
+                    $(attr).show();
+            });
+            this.$('.closingpane').hide();
+            this.$('#results').show();
+
+            if (this.$('.filterTag').length == 0) {
+                this.$('#noFilters').show();
+            }
+            this.matchesClb();
+
+            var that = this;
+            this.state.router.controlsView.setUIstate({
+                rightTitle: 'Send Message',
+                rightClb: function() {
+                    if (that.state.personCollection.included().length > 5)
+                        that.state.showMessage('You can only contact up to 5 people at a time. Please choose 5 among your matches, or add more filters.');
+                    else
+                        that.state.router.navigate('sendmessage', {trigger:true});
+                },
+            });
         }
     },
     newAttribute: function() {
@@ -130,47 +162,6 @@ define([
             state: state,
         });
         this.$('#results').append($(pv.render().el));
-    },
-
-    showMe: function(){
-        // this.$('div.scrollableContainer').show();
-        this.$('#me').addClass('active');
-        this.$('attribute').hide();
-        this.$('.valcontainer').hide();
-
-        this.$('.haveitTag').show();
-        _.each(this.$('attribute'), function(attr){
-            if ($(attr).children('.valpartdetailed').children('.haveitTag').length)
-                $(attr).show();
-        });
-
-        this.$('.resultsTitle').hide();
-        this.$('#results').hide();
-        this.$('.closingpane').show();
-    },
-
-    showFilters: function(){
-        this.$('div.scrollableContainer').hide();
-        this.$('#filters').addClass('active');
-        this.$('attribute').hide();
-        this.$('.valcontainer').hide();
-
-        this.$('.filterTag').show();
-        _.each(this.$('attribute'), function(attr){
-            if ($(attr).children('.valpartdetailed').children('.filterTag').length)
-                $(attr).show();
-        });
-        this.$('.closingpane').hide();
-        this.$('#results').show();
-
-        if (this.$('.filterTag').length > 0) {
-            // this.$('.resultsTitle').show();
-            this.$('#noFilters').hide();
-        } else {
-            // this.$('.resultsTitle').hide();
-            this.$('#noFilters').show();
-        }
-        this.matchesClb();
     },
 
     matchesClb: function(arg){
@@ -218,16 +209,16 @@ define([
         this.state.personCollection.bind('add', this.addOnePerson);
     },
     
-    showAll: function(){
-        this.$('div.scrollableContainer').show();
-        this.$('#all').addClass('active');
-        this.$('.resultsTitle').hide();
-        this.$('#results').hide();
-        this.$('.closingpane').show();
+    // showAll: function(){
+    //     this.$('div.scrollableContainer').show();
+    //     this.$('#all').addClass('active');
+    //     this.$('.resultsTitle').hide();
+    //     this.$('#results').hide();
+    //     this.$('.closingpane').show();
 
-        this.$('attribute').show();
-        this.$('.valcontainer').show();
-    },
+    //     this.$('attribute').show();
+    //     this.$('.valcontainer').show();
+    // },
 
     resetCollections: function() {
         this._isRendered = false;
@@ -239,16 +230,27 @@ define([
     _isRendered: false,
     _lastContext: '',
     render: function(){
+        var that = this;
+        this.state.router.controlsView.setUIstate({
+            rightTitle: 'Start New Attribute',
+            rightClb: function(){
+                that.state.router.navigate('#/new/'+that.state.context.name, {trigger:true});
+            },
+        });
+        
+
+
         // console.log(this._lastContext, this.state.context.name);
         // console.log(this._isRendered);
 
-        if (this._lastContext != this.state.context.name) {
+        // if (this._lastContext != this.state.context.name) {
+        if (true) {
             this.resetCollections();
             this._lastContext = this.state.context.name;
             this._isRendered = false;
         }
-        if (this._isRendered)
-            return false;
+        // if (this._isRendered)
+            // return false;
 
         $(this.el).html(this.template());
         this._keysInserted = {};

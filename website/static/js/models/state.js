@@ -211,7 +211,7 @@ define(['underscore', 'backbone', 'common/ego_website',
                 } else {
                     common.cookies.del_cookie(that.user.name);
                     that.user = {};
-                    that.router.navigate('#/all', {trigger: true});
+                    that.router.navigate('#/context', {trigger: true});
                 }
             },
             url:url,

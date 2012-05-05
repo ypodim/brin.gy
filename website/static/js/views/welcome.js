@@ -47,7 +47,7 @@ define([
         return false;
     },
     attributesBtn: function(){
-        this.state.router.navigate('/all', {trigger:true});
+        this.state.router.navigate('/c/'+this.state.context.name, {trigger:true});
         return false;
     },
 

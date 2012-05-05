@@ -118,7 +118,7 @@ define([
                 console.log(json);
             });
 
-            var frag = '#/all';
+            var frag = '#/attributes';
             this.state.router.navigate(frag, {trigger:true});
             return;
         }

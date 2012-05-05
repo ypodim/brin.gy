@@ -37,15 +37,12 @@ define([
         
         'sendmessage': 'sendmessage',
 
-        'filters': 'showFilters',
-        'all': 'showAll',
-        'me': 'showMe',
-
         'new': 'newAttribute',
         'new/:context': 'newAttribute',
         'new/:context/:key': 'newAttribute',
         'new/:context/:key/:val': 'newAttribute',
 
+        'attributes': 'attributes',
         'account': 'account',
         'stats': 'stats',
 
@@ -108,56 +105,11 @@ define([
             profile: username,
         });
     },
-    showFilters: function(options){
-        if (! this.contents_view._isRendered)
-            return this.navigate('#/all', {trigger:true});
-        
-        this.state.stats('filters:filters');
-        this.contents_view.render();
-        this.contents_view.showFilters();
-
-        var that = this;
-        this.controlsView.setUIstate({
-            rightTitle: 'Send Message',
-            rightClb: function() {
-                if (that.state.personCollection.included().length > 5)
-                    that.state.showMessage('You can only contact up to 5 people at a time. Please choose 5 among your matches, or add more filters.');
-                else
-                    that.state.router.navigate('sendmessage', {trigger:true});
-            },
-        });
-    },
     startNewAttribute: function(state){
         if (! state.isLoggedin()) return false;
         state.stats('newattr:btnTop');
         state.router.navigate('#/new/'+state.context.name, {trigger:true});
     },
-    showAll: function( cntx ){
-        this.state.stats('filters:all');
-        this.contents_view.render();
-        this.contents_view.showAll();
-
-        var that = this;
-        this.controlsView.setUIstate({
-            rightTitle: 'Start New Attribute',
-            rightClb: function(){that.startNewAttribute(that.state)},
-        });
-    },
-    showMe: function(){
-        if (! this.contents_view._isRendered)
-            return this.navigate('#/all', {trigger:true});
-            
-        this.state.stats('filters:me');
-        this.contents_view.render();
-        this.contents_view.showMe();
-        
-        var that = this;
-        this.controlsView.setUIstate({
-            rightTitle: 'Start New Attribute',
-            rightClb: function(){that.startNewAttribute(that.state)},
-        });
-    },
-
     login: function() {
         var lview = new loginView({
             state: this.state,
@@ -180,7 +132,7 @@ define([
             title: title,
             footer:false,
             rightClb: lview.loginBtn,
-            leftClb: function(){that.navigate('#/all');},
+            leftClb: function(){that.navigate('#/attributes');},
         });
     },
 
@@ -188,7 +140,7 @@ define([
         if (!context) {
             // context = this.state.context.name;
             // this.navigate('#/new/'+context, {trigger:true});
-            this.navigate('#/all', {trigger:true});
+            this.navigate('#/attributes', {trigger:true});
             return;
         }
         var aview = new newAttrView({
@@ -270,8 +222,16 @@ define([
             for (var i in json.contexts) {
                 var cntx = json.contexts[i];
                 if (cntx.name == context) {
-                    that.state.setContext({name:context});
-                    that.navigate('#/all', {trigger:true});
+                    that.state.setContext({name:context, descr:cntx.description});
+                    that.state.stats('filters:all');
+                    that.contents_view.render();
+                    // that.contents_view.showAll();
+
+                    // that.controlsView.setUIstate({
+                    //     rightTitle: 'Start New Attribute',
+                    //     rightClb: function(){that.startNewAttribute(that.state)},
+                    // });
+
                     return;
                 }
             }
@@ -279,6 +239,10 @@ define([
         })
     },
     
+    attributes: function() {
+        this.navigate('#/c/'+this.state.context.name, {trigger:true});
+    },
+
     account: function(){
         if (! this.state.isLoggedin())
             return false;

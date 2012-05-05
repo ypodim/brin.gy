@@ -44,10 +44,11 @@ define([
             $('div#container').css('top','95px');
 
         $('#footer > a').removeClass('active');
-        $('#footer > a[href="#/'+frag+'"]').addClass('active');
+        // $('#footer > a[href="#/'+frag+'"]').addClass('active');
 
-        if (frag in {all:1, me:1, filters:1}) {
-            $('#footer > a[href="#/all"]').addClass('active');
+        // if (frag in {all:1, me:1, filters:1}) {
+        if (frag.slice(0, 2) == 'c/') {
+            // $('#footer > a[href="#/all"]').addClass('active');
             options.title = '';
             options.context = this.state.context.name;
             this.state.attrCollection.trigger('value:change');
