@@ -36,6 +36,16 @@ def uvals(username, key):
     return r.smembers('%s:profile:key:%s' % (username,key))
 
 
+def keys():
+    return r.zrevrangebyscore('profile:all:keys', '+inf', '-inf')
+def vals(key):
+    return r.zrevrangebyscore('profile:all:key:%s:values' % key, '+inf', '-inf', withscores=True)
+def revkey(key):
+    return r.smembers('profile:all:key:%s:agents' % key)
+def revkeyval(key, val):
+    return r.smembers('profile:all:key:%s:val:%s:agents' % (key, val))
+
+
 def clb(arg):
     print arg['data']
 
@@ -49,6 +59,7 @@ vBuckets = {}
 actualUsers = {}
 nonUniqueVals = 0
 uniqueVals = {}
+revkvBuckets = {}
 
 for u in users():
     if ukeys(u):
@@ -90,6 +101,14 @@ for b in kvratioBuckets:
     data += simpleFormat[kvratioBuckets[b]*scale]
 
 
+for k in keys():
+    for v, score in vals(k):
+        score = int(score)
+        # revkv = len(revkeyval(k, v))
+        if score not in revkvBuckets:
+            revkvBuckets[score] = 0
+        revkvBuckets[score] += 1
+
 
 
 from GChartWrapper import *
@@ -106,16 +125,20 @@ G.show()
 
 data1 = []
 data2 = []
+data3 = []
 scale = 4
 maxkeys = max(kBuckets.keys())
 maxvals = max(vBuckets.keys())
-print maxkeys+1, maxvals+1
+maxrevkv = max(revkvBuckets.keys())
+print maxkeys+1, maxvals+1, maxrevkv+1
 
 for i in xrange(1, maxkeys+1):
     data1.append(kBuckets.get(i,0)*scale)
 for i in xrange(1, maxvals+1):
-    data2.append(vBuckets.get(i,0)*scale)   
-print vBuckets
+    data2.append(vBuckets.get(i,0)*scale)
+for i in xrange(1, maxrevkv+1):
+    data3.append(revkvBuckets.get(i,0)*scale)
+
 
 data = [data1, data2]
 
@@ -134,6 +157,17 @@ G.axes.label(0, '0',maxvals/5,2*maxvals/5,3*maxvals/5,4*maxvals/5,5*maxvals/5)
 G.axes.range(1, 0, 100/scale)
 G.grid(20,20)
 G.show()
+
+scale=1
+G = Line(data3)
+G.size(600,300)
+G.axes('xy')
+G.axes.label(0, '0',maxrevkv/5,2*maxrevkv/5,3*maxrevkv/5,4*maxrevkv/5,5*maxrevkv/5)
+G.axes.range(1, 0, 100/scale)
+G.grid(20,20)
+G.show()
+
+
 
 
 sys.exit()
