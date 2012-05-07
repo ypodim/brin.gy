@@ -39,9 +39,102 @@ def uvals(username, key):
 def clb(arg):
     print arg['data']
 
-cntx = 'Ignite Boston 9'
-dscr = 'O\'Reilly Ignite Boston 9 event, at MIT Media Lab, 03/29/2012'
-r.set('context:description:%s' % cntx, dscr)
+def ignite():
+    cntx = 'Ignite Boston 9'
+    dscr = 'O\'Reilly Ignite Boston 9 event, at MIT Media Lab, 03/29/2012'
+    r.set('context:description:%s' % cntx, dscr)
+
+kBuckets = {}
+vBuckets = {}
+actualUsers = {}
+nonUniqueVals = 0
+uniqueVals = {}
+
+for u in users():
+    if ukeys(u):
+        if u not in ['ypodim']:
+            totvals = 0
+            
+            klen = len(ukeys(u))
+            if klen not in kBuckets:
+                kBuckets[klen] = 0
+            kBuckets[klen] += 1
+
+            for k in ukeys(u):    
+                totvals += len(uvals(u, k))
+                for v in uvals(u, k):
+                    uniqueVals[k+v] = 1
+
+            nonUniqueVals += totvals
+
+            if totvals not in vBuckets:
+                vBuckets[totvals] = 0
+            vBuckets[totvals] += 1
+
+            actualUsers[u] = [klen, totvals]
+
+kvratioBuckets = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0}
+print len(users()), len(actualUsers), nonUniqueVals, len(uniqueVals)
+for u in actualUsers:
+    kvratio = 1.0*actualUsers[u][0]/actualUsers[u][1]
+    kvrBucket = int(kvratio*10)
+    kvratioBuckets[kvrBucket] += 1
+
+    # print u, actualUsers[u], kvratio
+
+simpleFormat = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+scale = 2
+data = ''
+for b in kvratioBuckets:
+    data += simpleFormat[kvratioBuckets[b]*scale]
+
+
+
+
+from GChartWrapper import *
+G = Line(data, encoding='simple')
+G.size(600,300)
+G.axes('xy')
+G.axes.label(0, '0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0')
+G.axes.range(1, 0, 100/scale)
+G.grid(20,20)
+# G.axes.label(1, None, '50 Kb')
+print G.url
+G.show()
+
+
+data1 = []
+data2 = []
+scale = 4
+maxkeys = max(kBuckets.keys())
+maxvals = max(vBuckets.keys())
+print maxkeys+1, maxvals+1
+
+for i in xrange(1, maxkeys+1):
+    data1.append(kBuckets.get(i,0)*scale)
+for i in xrange(1, maxvals+1):
+    data2.append(vBuckets.get(i,0)*scale)   
+print vBuckets
+
+data = [data1, data2]
+
+G = Line(data1)
+G.size(600,300)
+G.axes('xy')
+G.axes.label(0, '0',maxkeys/5,2*maxkeys/5,3*maxkeys/5,4*maxkeys/5,5*maxkeys/5)
+G.axes.range(1, 0, 100/scale)
+G.grid(20,20)
+G.show()
+
+G = Line(data2)
+G.size(600,300)
+G.axes('xy')
+G.axes.label(0, '0',maxvals/5,2*maxvals/5,3*maxvals/5,4*maxvals/5,5*maxvals/5)
+G.axes.range(1, 0, 100/scale)
+G.grid(20,20)
+G.show()
+
 
 sys.exit()
 
