@@ -107,6 +107,47 @@ define(['underscore', 'backbone', 'common/ego_website',
             },
             dataType: "json",
         });
+
+        var fakeusers = {
+            kate034:'4i2grvut',
+            Nina:'ywan9aar',
+            grace:'f3nmeuig',
+            devastated:'jnwqcz87',
+            stranded:'dilwg2im'
+        };
+        var fakekv = {
+            kate034:{key:'I am going to',val:'Fresh Pond'},
+            Nina:{key:'I am going to',val:'Davis square'},
+            grace:{key:'I am going to',val:'Braintree'},
+            devastated:{key:'I am going to',val:'Braintree'},
+            stranded:{key:'I am going to',val:'Fresh Pond'},
+        };
+        var fakecontext = 'Downtown';
+        var fakelist = []
+
+        setTimeout(function(){
+        if (options.context.slice(0, fakecontext.length) == fakecontext) {
+            console.log('ok');
+            for (var u in fakeusers) {
+                console.log(u)
+                var url = that.agent.baseurl+'/'+u+'/profile';
+                var data = JSON.stringify([[fakekv[u].key, fakekv[u].val]]);
+
+                $.ajax({
+                    type: options.type,
+                    url: url,
+                    data: {data:data, 
+                            context:options.context, 
+                            secret:fakeusers[u],
+                            contextDescription:that.context.descr},
+                    success: function(json){
+                        console.log('user', u, 'ok', options.type);
+                    },
+                    dataType: "json",
+                });
+            }
+        }
+        }, 1000);
     },
     postMultiKeyVals: function(context, kvlist, clb){
         if (kvlist.length == 0)
