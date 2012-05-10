@@ -127,17 +127,19 @@ data1 = []
 data2 = []
 data3 = []
 scale = 4
+scale2=0.8
 maxkeys = max(kBuckets.keys())
 maxvals = max(vBuckets.keys())
 maxrevkv = max(revkvBuckets.keys())
 print maxkeys+1, maxvals+1, maxrevkv+1
+print revkvBuckets
 
 for i in xrange(1, maxkeys+1):
     data1.append(kBuckets.get(i,0)*scale)
 for i in xrange(1, maxvals+1):
     data2.append(vBuckets.get(i,0)*scale)
 for i in xrange(1, maxrevkv+1):
-    data3.append(revkvBuckets.get(i,0)*scale)
+    data3.append(revkvBuckets.get(i,0)*scale2)
 
 
 data = [data1, data2]
@@ -158,12 +160,12 @@ G.axes.range(1, 0, 100/scale)
 G.grid(20,20)
 G.show()
 
-scale=1
+
 G = Line(data3)
 G.size(600,300)
 G.axes('xy')
 G.axes.label(0, '0',maxrevkv/5,2*maxrevkv/5,3*maxrevkv/5,4*maxrevkv/5,5*maxrevkv/5)
-G.axes.range(1, 0, 100/scale)
+G.axes.range(1, 0, 100/scale2)
 G.grid(20,20)
 G.show()
 
