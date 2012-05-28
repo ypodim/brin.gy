@@ -490,6 +490,7 @@ class api_call(tornado.web.RequestHandler):
         user = db.r.get('options:reverse-secret:%s' % secret)
         if not user:
             error = 'user not found'
+            email = ''
         else:
             email = db.r.hget('options:user:%s' % user, 'email')
         self.write(dict(secret=secret, user=user, email=email, error=error))

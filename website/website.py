@@ -86,6 +86,11 @@ class context(tornado.web.RequestHandler):
         print cname, '/#/c/'+cname
         self.redirect('/#/c/'+cname)
 
+class oauth(tornado.web.RequestHandler):
+    def get(self):
+        print self.request
+        self.write('ok')
+
 debug = os.environ.get("SERVER_SOFTWARE", "").startswith("Development/")
 
 settings = {
@@ -101,7 +106,8 @@ application = tornado.web.Application([
     (r"/config", config_handler),
     (r"/presentation", presentation),
     (r"/c/(.*)", context),
-    
+    (r"/oauth", oauth),
+
     (r"/a/[a-zA-Z0-9]+/?$", serve_authuser),
     (r"/[a-zA-Z0-9]+/?$", serve_user),
     (r"/", serve_index),
