@@ -14,46 +14,16 @@
 
 
 <div id="fb-root"></div>
-<script>
-window.fbAsyncInit = function() {
-	FB.init({
-		appId      : '175782962471804',
-		status     : true, 
-		cookie     : true,
-		xfbml      : true,
-		oauth      : true,
-	});
-
-	FB.getLoginStatus(function(response) {
-		console.log(response)
-		if (response.status === 'connected') {
-			// the user is logged in and has authenticated your
-			// app, and response.authResponse supplies
-			// the user's ID, a valid access token, a signed
-			// request, and the time the access token 
-			// and signed request each expire
-			var uid = response.authResponse.userID;
-			var accessToken = response.authResponse.accessToken;
-
-			var url = 'https://graph.facebook.com/me';
-			$.getJSON(url, {access_token:accessToken}, function(json){
-				console.log(json)
-			});
-
-		} else if (response.status === 'not_authorized') {
-			console.log("the user has not authenticated your app");
-		} else {
-			console.log("the user isn't logged in to Facebook.");
-		}
-	});
-};
-(function(d){
-	var js, id = 'facebook-jssdk'; 
-	if (d.getElementById(id)) {return;}
-	js = d.createElement('script'); 
-	js.id = id; js.async = true;
-	js.src = "//connect.facebook.net/en_US/all.js";
-	d.getElementsByTagName('head')[0].appendChild(js);
-}(document));
-</script>
-<div class="fb-login-button" scope="email,user_checkins">Login with Facebook</div>
+<div class="fb-login-button" scope="
+	user_about_me,
+	user_activities,
+	user_birthday,
+	user_education_history,
+	user_groups,
+	user_hometown,
+	user_interests,
+	user_relationship_details,
+	user_religion_politics,
+	user_work_history,
+	user_status,
+">Login with Facebook</div>

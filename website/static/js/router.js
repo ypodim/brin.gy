@@ -15,9 +15,10 @@ define([
     'views/contexts',
     'views/newContext',
     'views/stats',
+    'views/world',
 ], function(
     $, _, Backbone, 
-    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView, presentationView, accountView, contextsView, newContextView, statsView
+    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView, presentationView, accountView, contextsView, newContextView, statsView, worldView
     ){
   var AppRouter = Backbone.Router.extend({
     routes: {
@@ -46,6 +47,8 @@ define([
         'account': 'account',
         'stats': 'stats',
 
+        'world': 'world',
+
         "*actions": "defaultRoute",
     },
     
@@ -67,6 +70,9 @@ define([
         this.wview = new welcomeView({
             state: this.state,
         });
+
+
+        
     },
 
     stats: function(){
@@ -263,6 +269,19 @@ define([
         
         this.state.stats('home');
         this.wview.render();
+    },
+
+    world: function( cntx ){
+        this.controlsView.setUIstate({
+            title: 'Brin.gy',
+            fullscreen: true,
+            footer: false,
+        });
+        
+        var wldView = new worldView({
+            state: this.state,
+        });
+        wldView.render();
     },
   });
 

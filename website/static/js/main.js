@@ -18,6 +18,8 @@ require.config({
     twipsy: 'libs/bootstrap/bootstrap-twipsy',
     popover: 'libs/bootstrap/bootstrap-popover',
     button: 'libs/bootstrap/bootstrap-button',
+
+    maps: 'libs/gmaps/gmaps',
   },
   urlArgs: "bust=" +  (new Date()).getTime(),
 });

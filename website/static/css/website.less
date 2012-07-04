@@ -59,34 +59,27 @@ div.noTitleTransform {
  }
 
 
-@height-01: 100px;
-@height-1: 90px;
-@height-12: 80px;
-@height-2: 60px;
-@height-23: 50px;
-@height-3: 40px;
-@height-s0: 35px;
-@height-s1: 30px;
-@height-s2: 20px;
-
-/*@height-10: 100px;
-@height-9: 90px;
-@height-8: 80px;
-@height-7: 70px;
+@height-9: 100px;
+@height-8: 90px;
+@height-7: 80px;
 @height-6: 60px;
 @height-5: 50px;
 @height-4: 40px;
-@height-34: 35px;
-@height-3: 30px;
-@height-2: 20px;
-@height-1: 10px;*/
+@height-3: 35px;
+@height-2: 30px;
+@height-1: 20px;
 
-.font-1  { font-size:@height-1; line-height:@height-1;}
-.font-12 { font-size:@height-12; line-height:@height-12;}
-.font-2  { font-size:@height-2; line-height:@height-2; }
-.font-3  { font-size:@height-3; line-height:@height-3; }
-.font-s1 { font-size:@height-s1; line-height:@height-s1; }
-.font-s2 { font-size:@height-s2; line-height:@height-s2; }
+
+
+.height (@h: 60px) {height: @h/2;}
+
+
+.font-1  { font-size:@height-8; line-height:@height-8; }
+.font-12 { font-size:@height-7; line-height:@height-7; }
+.font-2  { font-size:@height-6; line-height:@height-6; }
+.font-3  { font-size:@height-4; line-height:@height-4; }
+.font-s1 { font-size:@height-2; line-height:@height-2; }
+.font-s2 { font-size:@height-1; line-height:@height-1; }
 
 
 /*############# PARAMS end #############*/
@@ -102,7 +95,7 @@ div.mobile {
 }
 
 div.controlFilters {
-    height:@height-2;
+    height:@height-6;
     margin:5px;
 }
 div.controlFilters > button {
@@ -163,7 +156,7 @@ div#noFilters {
 }
 div#noFilters > button {
     width:150px;
-    height:@height-1;
+    height:@height-8;
     margin: 0 0 0 5px;
     background-image: url('http://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg');
     background-repeat: no-repeat;
@@ -178,7 +171,7 @@ person {
     background: rgba(25, 25, 25, 0.15);
     background-image: -moz-linear-gradient(90deg, #dddddd, #aaaaaa);
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#dddddd), to(#aaaaaa));
-    line-height: @height-1;
+    line-height: @height-8;
 
     border-radius:2px;
     background-color: rgba(250,250,250,0.4);
@@ -196,9 +189,9 @@ person a:hover {
 }
 person > button {
     float:right;
-    height:@height-1;
-    line-height:@height-2;
-    font-size:@height-3 ! important;
+    height:@height-8;
+    line-height:@height-6;
+    font-size:@height-4 ! important;
     width:150px;
     margin: 0 0 0 5px;
 }
@@ -224,7 +217,7 @@ attribute a:hover {
 
 attribute > a.keypart {
     .font-12;
-    height:@height-01;
+    height:@height-9;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -242,7 +235,7 @@ attribute > a.keypart > span.count {
     display:inline-block;
     color: white;
     background-color:#ff2244;
-    line-height:@height-1;
+    line-height:@height-8;
     padding: 0px 10px 0px 10px;
     text-align:center;
     text-shadow: 0px -2px 0px rgba(0,0,0,0.5);
@@ -250,18 +243,18 @@ attribute > a.keypart > span.count {
     border-radius: 3px;
 }
 attribute > div.valpartfooter {
-    height:@height-12;
+    height:@height-7;
 }
 attribute > div.valpartfooter > span {
-    font-size:@height-s2;
-    line-height:@height-12;
+    font-size:@height-1;
+    line-height:@height-7;
     float:right;
     margin: 0 10px 0 0;
 }
 attribute > div.valpartfooter > button {
-    font-size:@height-3 ! important;
-    height:@height-2;
-    line-height:@height-3;
+    font-size:@height-4 ! important;
+    height:@height-6;
+    line-height:@height-4;
     float:right;
     margin: 10px 115px 10px 0;
 }
@@ -282,9 +275,9 @@ attribute > div.valpartdetailed {
 }
 attribute > div.valpartdetailed > div.valcontainer {
     position:relative;
-    font-size:@height-3;
-    min-height:@height-2;
-    line-height:@height-2;
+    font-size:@height-4;
+    min-height:@height-6;
+    line-height:@height-6;
     border-radius:2px;
     
     padding: 5px 5px 5px 5px;
@@ -298,12 +291,12 @@ attribute > div.valpartdetailed > div.valcontainer:last-child {
 }
 attribute > div.valpartdetailed > div.valcontainer > div#matches {
     position: absolute;
-    top:@height-2;
+    top:@height-6;
     left:5px;
     z-index:0;
     padding: 15px 0 0 0;
-    font-size:@height-s2;
-    line-height:@height-s2;
+    font-size:@height-1;
+    line-height:@height-1;
     /*display: none;*/
 }
 attribute > div.valpartdetailed > div.valcontainer > div#matches > a.userToken {
@@ -312,7 +305,7 @@ attribute > div.valpartdetailed > div.valcontainer > div#matches > a.userToken {
     border-radius:5px;
     display:inline-block;
     margin: 0 5px 5px 0;
-    height:@height-s2;
+    height:@height-1;
     background-color:rgba(0,0,0,0.1);
 }
 .slideValueDown {
@@ -337,9 +330,9 @@ attribute > div.valpartdetailed > div.valcontainer > button {
     top:5px;
     z-index:1;
 
-    font-size:@height-3;
-    height:@height-2;
-    line-height:@height-3;
+    font-size:@height-4;
+    height:@height-6;
+    line-height:@height-4;
     width:150px;
     margin: 0 0 0 5px;
 }
@@ -359,7 +352,7 @@ attribute > div.valpartdetailed > div.valcontainer > a {
     z-index:0;
     left:0;
     right:0;
-    height:@height-2;
+    height:@height-6;
     display: block;
     /*background-color:yellow;*/
 }
@@ -383,14 +376,14 @@ attribute > div.valpartdetailed > div.valcontainer > a > span.count {
     text-shadow: 0px -2px 0px rgba(0,0,0,0.5);
     border-radius: 3px;
     margin: 0 10px 0 5px;
-    height:@height-2;
+    height:@height-6;
 
     float:left;
 }
 attribute > div.valpartdetailed > div.valcontainer > a > span.count > span.cno {
     margin-top: 7px;
     display:block;
-    line-height:@height-s0;
+    line-height:@height-3;
 }
 attribute > div.valpartdetailed > div.valcontainer > a > span.count > span.caption{
     display:block;
@@ -402,12 +395,12 @@ attribute > div.valpartdetailed > div.valcontainer > a > span.count > span.capti
 
 div#controls {
     .font-2;
-    line-height:@height-2;
+    line-height:@height-6;
     position: absolute;
     z-index:100;
     top:0;
     width:100%;
-    height:@height-1;
+    height:@height-8;
     background-color:gray;
 
     box-shadow: 0 5px 5px 0 rgba(0,0,0,0.5);
@@ -449,7 +442,7 @@ div#controls > div#profileinfo > img{
 
 div#controls > div#title {
     text-transform:capitalize;
-    line-height:@height-1;
+    line-height:@height-8;
     text-shadow: #000 0px -1px 1px;
 }
 
@@ -477,12 +470,12 @@ div#controls > a#context:hover {
 }
 div#controls > a#context > div#contextTitle{
     padding-top:5px;
-    max-height:@height-3;
+    max-height:@height-4;
     .font-3;
     text-shadow: #111 0px -2px 1px;
 }
 div#controls > a#context > div#contextTitle > img {
-    max-height:@height-3;
+    max-height:@height-4;
 }
 /*############# LOGIN #############*/
 
@@ -557,8 +550,8 @@ a.login {
     width:500px;
     margin:auto;
     text-align:center;
-    font-size:@height-3;
-    line-height:@height-2;
+    font-size:@height-4;
+    line-height:@height-6;
 }
 
 .introTag {
@@ -654,7 +647,7 @@ newattribute > form {
 }
 newattribute > form > div > div#forkey {
     .font-3;
-    line-height:@height-1;
+    line-height:@height-8;
 }
 newattribute > form > div.title {
     background-color: rgba(0,0,0,0.2);
@@ -719,7 +712,7 @@ div#welcome > a:hover {
     bottom:0;
     left:0;
     right:0;
-    height:@height-1;
+    height:@height-8;
     
     padding: 0 0px 1px 0px;
     background-color:rgba(0,0,0,0.2);
@@ -747,8 +740,8 @@ div.accountentry {
     padding:10px;
     border-radius:5px;
     background-color:rgba(220,220,220,1);
-    font-size:@height-s2;
-    line-height:@height-s2;
+    font-size:@height-1;
+    line-height:@height-1;
 
 }
 div.account.buttons {
@@ -766,7 +759,7 @@ button.account {
 
 div#contexts > div#contextEntry {
     .font-3;
-    min-height:@height-12;
+    min-height:@height-7;
     border: 1px solid gray;
     position:relative;
 }
@@ -831,8 +824,8 @@ newcontext {
 }
 newcontext > form > * {
     .font-s1;
-    line-height:@height-2;
-    height:@height-2;
+    line-height:@height-6;
+    height:@height-6;
     width: 620px;
     
 }
@@ -841,9 +834,9 @@ newcontext > form > textarea {
     height:100px;
 }
 newcontext > form > label {
-    line-height:@height-3;
+    line-height:@height-4;
     padding: 20px 0 0 0;
-    height:@height-3;
+    height:@height-4;
 }
 newcontext > div#attributes {
     padding: 20px 0 0 0;
@@ -853,7 +846,7 @@ newcontext > div#attributes {
 }
 newcontext > div#attributes > div#buttons {
     position: relative;
-    height:@height-3;
+    height:@height-4;
 }
 newcontext > div#attributes > div#buttons > span.counter {
     float:right;
@@ -870,7 +863,7 @@ newcontext > div#attributes > div#attrList > a {
     margin: 10px 0 5px 0;
     display: block;
     position:relative;
-    height:@height-s1;
+    height:@height-2;
     .font-s2;
     color:gray;
 }
@@ -970,6 +963,110 @@ div.welcome > div#buttons > button {
 div.welcome > div#buttons > button:last-child {
     float:right;
 }
+
+
+
+
+
+@wizardWidth: 380px;
+div.pickLocation {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    height:600px;
+    width:@wizardWidth;
+
+    left:50%;
+    margin-left: -@wizardWidth/2;
+    
+    text-align: center;
+    pointer-events: none;
+    color: rgba(0,0,0,0.8);
+
+    background-color: rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.15);
+}
+
+div.pickLocation > div.wizardPage {
+    height:440px;
+    width: @wizardWidth - 10;
+    margin:auto;
+}
+
+div.pickLocation div.caption {
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 30px;
+    width: @wizardWidth - 20;
+    margin: 20px auto 5px auto;
+    padding:5px;
+
+    background-color: rgba(255,255,255,0.9);
+    box-shadow: 0 0 100px black;
+
+    border-radius:5px;
+}
+div.pickLocation > div.buttons {
+    pointer-events: all;
+}
+div.pickLocation > div.buttons > button {
+    box-shadow: 0 0 100px black ! important;
+    width: 120px;
+}
+
+div.pickLocation div.box {
+    background-color: rgba(255,255,255,0.9);
+    border-radius: 5px;
+    padding: 5px;
+}
+
+div.pickLocation > div.wizardPage { display:none; }
+div.pickLocation > div#page1 { display:block; }
+
+div.pickLocation > div#page1 > div#crosshair {
+    margin: 20px auto ;
+    width: 20px;
+    
+    padding: 150px;
+    border: 5px dotted rgba(255,0,0,0.5);
+    border-radius: 300px;
+
+    text-align:center;
+    color: rgba(255,0,0,0.5);
+    font-size: 40px;
+    box-shadow: 0 0 100px black;
+}
+div.pickLocation > div#page1 > div#tip {
+    width: @wizardWidth - 20;
+    padding:5px;
+
+    background-color: rgba(255,255,255,0.9);
+    box-shadow: 0 0 50px black;
+    font-weight: bold;
+    text-align: center;
+    border-radius:5px;
+}
+
+div.pickLocation > div#page2 input,textarea,select {
+    width: @wizardWidth - 30;
+    margin: 0 50px 0 0;
+    
+    font-size:20px;
+    line-height: 20px;
+    pointer-events: all;
+}
+div.pickLocation > div#page2 input{
+    height:24px;
+}
+div.pickLocation > div#page2 input[type=number],select {
+    width:40%;
+    margin:0;
+}
+
+
 
 
 

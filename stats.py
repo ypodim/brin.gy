@@ -7,6 +7,7 @@ import unittest
 import httplib2
 import urllib
 import json
+import csv
 
 from keys import *
 import profile
@@ -37,7 +38,7 @@ def uvals(username, key):
 
 
 def keys():
-    return r.zrevrangebyscore('profile:all:keys', '+inf', '-inf')
+    return r.zrevrangebyscore('profile:all:keys', '+inf', '-inf', withscores=True)
 def vals(key):
     return r.zrevrangebyscore('profile:all:key:%s:values' % key, '+inf', '-inf', withscores=True)
 def revkey(key):
@@ -60,117 +61,110 @@ actualUsers = {}
 nonUniqueVals = 0
 uniqueVals = {}
 revkvBuckets = {}
+revkBuckets = {}
 
+
+csvkvratio = csv.writer(open('kvratio.csv', 'w'))
+csvrevuserk = csv.writer(open('revuserk.csv', 'w'))
+csvrevuserkv = csv.writer(open('revuserkv.csv', 'w'))
+
+csvuserk = csv.writer(open('userk.csv', 'w'))
+csvuserkv = csv.writer(open('userkv.csv', 'w'))
+
+klen6 = {}
 for u in users():
-    if ukeys(u):
-        if u not in ['ypodim']:
-            totvals = 0
-            
-            klen = len(ukeys(u))
-            if klen not in kBuckets:
-                kBuckets[klen] = 0
-            kBuckets[klen] += 1
+    if u in ['ypodim']:
+        continue
 
-            for k in ukeys(u):    
-                totvals += len(uvals(u, k))
-                for v in uvals(u, k):
-                    uniqueVals[k+v] = 1
+    if not ukeys(u):
+        continue
 
-            nonUniqueVals += totvals
+    klen = len(ukeys(u))
+    if klen not in kBuckets:
+        kBuckets[klen] = 0
+    kBuckets[klen] += 1
 
-            if totvals not in vBuckets:
-                vBuckets[totvals] = 0
-            vBuckets[totvals] += 1
+    totvals = 0
+    for k in ukeys(u):    
+        totvals += len(uvals(u, k))
+        for v in uvals(u, k):
+            uniqueVals[k+v] = 1
 
-            actualUsers[u] = [klen, totvals]
+    nonUniqueVals += totvals
 
-kvratioBuckets = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0}
-print len(users()), len(actualUsers), nonUniqueVals, len(uniqueVals)
-for u in actualUsers:
-    kvratio = 1.0*actualUsers[u][0]/actualUsers[u][1]
-    kvrBucket = int(kvratio*10)
+    if totvals not in vBuckets:
+        vBuckets[totvals] = 0
+    vBuckets[totvals] += 1
+
+    actualUsers[u] = [klen, totvals]
+
+    if klen == 10:
+        for k in ukeys(u):
+            if k not in klen6:
+                klen6[k] = 0
+            klen6[k] += 1
+
+for k, freq in klen6.items():
+    if freq > -1:
+        print k, freq
+
+
+
+revuserk = {}
+revuserkv = {}
+
+kvratioBuckets = {}
+print len(users()), len(actualUsers), nonUniqueVals, len(uniqueVals), len(keys())
+for u, (klen, vlen) in actualUsers.items():
+    # if vlen == 1:
+        # continue
+
+    if klen not in revuserk:
+        revuserk[klen] = 0
+    revuserk[klen] += 1
+    if vlen not in revuserkv:
+        revuserkv[vlen] = 0
+    revuserkv[vlen] += 1
+
+    kvratio = 1.0*klen/vlen
+    kvrBucket = int(kvratio*10)*1.0/10
+    if kvrBucket not in kvratioBuckets:
+        kvratioBuckets[kvrBucket] = 0
     kvratioBuckets[kvrBucket] += 1
 
-    # print u, actualUsers[u], kvratio
+for bucket, quant in kvratioBuckets.items():
+    csvkvratio.writerow([bucket, quant])
 
-simpleFormat = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+for bucket, quant in revuserk.items():
+    csvrevuserk.writerow([bucket, quant])
 
-scale = 2
-data = ''
-for b in kvratioBuckets:
-    data += simpleFormat[kvratioBuckets[b]*scale]
+for bucket, quant in revuserkv.items():
+    csvrevuserkv.writerow([bucket, quant])
 
+print kvratioBuckets
 
-for k in keys():
-    for v, score in vals(k):
-        score = int(score)
-        # revkv = len(revkeyval(k, v))
-        if score not in revkvBuckets:
-            revkvBuckets[score] = 0
-        revkvBuckets[score] += 1
+for k, kscore in keys():
+    kscore = int(kscore)
+    for v, vscore in vals(k):
+        vscore = int(vscore)
+        if vscore not in revkvBuckets:
+            revkvBuckets[vscore] = 0
+        revkvBuckets[vscore] += 1
 
+    if kscore not in revkBuckets:
+        revkBuckets[kscore] = 0
+    revkBuckets[kscore] += 1
 
+print 'revkBuckets', revkBuckets
+print 'revkvBuckets', revkvBuckets
 
-from GChartWrapper import *
-G = Line(data, encoding='simple')
-G.size(600,300)
-G.axes('xy')
-G.axes.label(0, '0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0')
-G.axes.range(1, 0, 100/scale)
-G.grid(20,20)
-# G.axes.label(1, None, '50 Kb')
-print G.url
-G.show()
+for bucket, quant in revkBuckets.items():
+    csvuserk.writerow([bucket, quant])
 
+for bucket, quant in revkvBuckets.items():
+    csvuserkv.writerow([bucket, quant])
 
-data1 = []
-data2 = []
-data3 = []
-scale = 4
-scale2=0.8
-maxkeys = max(kBuckets.keys())
-maxvals = max(vBuckets.keys())
-maxrevkv = max(revkvBuckets.keys())
-print maxkeys+1, maxvals+1, maxrevkv+1
 print revkvBuckets
-
-for i in xrange(1, maxkeys+1):
-    data1.append(kBuckets.get(i,0)*scale)
-for i in xrange(1, maxvals+1):
-    data2.append(vBuckets.get(i,0)*scale)
-for i in xrange(1, maxrevkv+1):
-    data3.append(revkvBuckets.get(i,0)*scale2)
-
-
-data = [data1, data2]
-
-G = Line(data1)
-G.size(600,300)
-G.axes('xy')
-G.axes.label(0, '0',maxkeys/5,2*maxkeys/5,3*maxkeys/5,4*maxkeys/5,5*maxkeys/5)
-G.axes.range(1, 0, 100/scale)
-G.grid(20,20)
-G.show()
-
-G = Line(data2)
-G.size(600,300)
-G.axes('xy')
-G.axes.label(0, '0',maxvals/5,2*maxvals/5,3*maxvals/5,4*maxvals/5,5*maxvals/5)
-G.axes.range(1, 0, 100/scale)
-G.grid(20,20)
-G.show()
-
-
-G = Line(data3)
-G.size(600,300)
-G.axes('xy')
-G.axes.label(0, '0',maxrevkv/5,2*maxrevkv/5,3*maxrevkv/5,4*maxrevkv/5,5*maxrevkv/5)
-G.axes.range(1, 0, 100/scale2)
-G.grid(20,20)
-G.show()
-
-
-
 
 sys.exit()
 
