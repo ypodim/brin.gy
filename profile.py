@@ -41,8 +41,10 @@ class profile():
     'USER:contexts' # set of contexts in which USER participates
     'context:users:CONTEXT' # set of users participating in CONTEXT
     'context:description:CONTEXT' # a description of CONTEXT
+    'context:CONTEXT:location' # a hash of location associated with CONTEXT
+    'context:CONTEXT:expiration' # a sorted set of expiration dates associated with CONTEXT
     
-    
+
     def add_reverse(self, context, key, val):
         if self.db.sadd(getKA(context, key), self.usr):   # add agent to set for this key
             self.db.zincrby(getK(context), key, 1)     # add key and increase its score
@@ -82,6 +84,8 @@ class profile():
             if self.db.scard('context:users:%s' % context) == 0 and context != 'all':
                 print 'also removing context', context
                 self.db.srem('contexts', context)
+                self.db.delete('context:%s:location' % context)
+                self.db.delete('context:%s:expiration' % context)
 
     def get_keys(self):
         return self.db.smembers('%s:profile:keys' % self.usr)
@@ -98,12 +102,31 @@ class profile():
         return self.db.smembers('%s:profile:key:%s' % (self.usr, key))
     
     def set_val(self, context, key, val):
-        self.db.sadd('contexts', context)
-        self.db.sadd('%s:contexts' % self.usr, context)
-        self.db.sadd('context:users:%s' % context, self.usr)
+        # context is dictionary
+        print 'set_val'
+        print context, type(context)
+        print key, val
+
+        if self.db.sadd('contexts', context['title']):
+            # only set context properties the first time a kv is posted
+            if context.get('expiration'):
+                self.db.hmset(
+                    'context:%s:location' % context['title'], 
+                    context.get('location')
+                )
+            if context.get('expiration'):
+                self.db.zadd(
+                    'context:%s:expiration' % context['title'], 
+                    context['title'], 
+                    context.get('expiration')
+                )
+            pass
+
+        self.db.sadd('%s:contexts' % self.usr, context['title'])
+        self.db.sadd('context:users:%s' % context['title'], self.usr)
         
         self.set_key(key)
-        self.add_reverse(context, key, val)
+        self.add_reverse(context['title'], key, val)
         return self.db.sadd('%s:profile:key:%s' % (self.usr, key), val)
     
     def del_val(self, context, key, val):
@@ -163,7 +186,7 @@ class profile():
         res = {'data':saved_items, 'user':self.usr}
         self.finish( res )
         
-    def post(self, context):        
+    def post(self, context):
         if self.path[-1] == 'visited':
             res = 0
             for key in self.arguments:
@@ -178,7 +201,6 @@ class profile():
             return res
             
         res = ''
-        # print 'arguments', self.arguments
 
         for key, val in self.arguments:
             if type(key) == str:
@@ -191,8 +213,8 @@ class profile():
             self.db.incr('churn:%s:%s:%s:add' % (self.cap, key, val))
             
             self.set_val(context, key, val)
-            if context != 'all':
-                self.set_val('all', key, val)
+            if context['title'] != 'all':
+                self.set_val(dict(title='all'), key, val)
         
         return {'result':res, 'data':self.arguments, 'error':''}
     
@@ -230,3 +252,7 @@ class profile():
         if self.db.scard('context:users:%s' % context) == 0 and context != 'all':
             print 'also removing context', context
             self.db.srem('contexts', context)
+            self.db.delete('context:%s:location' % context)
+            self.db.delete('context:%s:expiration' % context)
+
+

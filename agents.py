@@ -258,17 +258,27 @@ class serve_capability(bringy_handler):
         self.execute()
         
     def post(self):
+        error = ''
         secret = self.get_argument('secret', None)
         context = self.get_argument('context','all')
-        contextDescr = self.get_argument('contextDescription','')
+        context_details = self.get_argument('context_details','{}')
+        try:
+            context_details = tornado.escape.json_decode(context_details)
+        except:
+            context_details = {}
+            error = 'Bad format for context_details param'
+
+        context_details['title'] = context
+
         passed = db.authenticate_user(self.username, secret)
         if passed:
-            res = self.execute(context=context)
+            res = self.execute(context=context_details)
+            res['error'] = error
             if type(passed) == str:
                 res['secret'] = passed
             if res: self.write(res)
 
-            db.set_context_description(context, contextDescr)
+            db.set_context_description(context, context_details.get('description'))
         else:
             res = dict(error='authentication failed for user:%s secret:%s' % (self.username, secret))
             self.write(res)

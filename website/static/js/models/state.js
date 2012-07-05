@@ -94,13 +94,25 @@ define(['underscore', 'backbone', 'common/ego_website',
             return false;
 
         var that = this;
+        // var context_details = {
+        //     description: that.context.descr, 
+        //     location: {
+        //         lat: 0,
+        //         lon: 0,
+        //         radius: 0,
+        //     },
+        //     expiration: 123,
+        // };
+
         $.ajax({
             type: options.type,
             url: url,
             data: {data:data, 
                     context:options.context, 
+                    // context_details: JSON.stringify(context_details),
                     secret:this.user.pwd,
-                    contextDescription:that.context.descr},
+                    // contextDescription:that.context.descr
+                },
             success: function(json){ 
                 if (options.clb != undefined)
                     options.clb(json);
@@ -155,13 +167,25 @@ define(['underscore', 'backbone', 'common/ego_website',
         var url = this.agent.baseurl+'/'+this.user.name+'/profile';
         var data = JSON.stringify(kvlist);
         var that = this;
+        var context_details = {
+            description: that.context.descr, 
+            location: {
+                lat: 0,
+                lon: 0,
+                radius: 0,
+            },
+            expiration: 123,
+        };
+
         $.ajax({
             type: 'POST',
             url: url,
             data: {data:data, 
                     context:context.name, 
                     secret:this.user.pwd,
-                    contextDescription:that.context.descr},
+                    // contextDescription: that.context.descr,
+                    context_details: JSON.stringify(context_details),
+                },
             success: function(json){ 
                 if (clb != undefined)
                     clb(json);
