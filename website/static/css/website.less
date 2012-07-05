@@ -967,20 +967,20 @@ div.welcome > div#buttons > button:last-child {
 
 
 
-
-@wizardWidth: 380px;
+@wizardWidth: 400px;
 div.pickLocation {
     position: absolute;
     left: 0;
-    top: 0;
+    top: 0px;
     right: 0;
     bottom: 0;
 
-    height:600px;
+    height:530px;
     width:@wizardWidth;
 
     left:50%;
-    margin-left: -@wizardWidth/2;
+    margin: 10px 0 0 -@wizardWidth/2;
+    padding:10px;
     
     text-align: center;
     pointer-events: none;
@@ -992,7 +992,6 @@ div.pickLocation {
 
 div.pickLocation > div.wizardPage {
     height:440px;
-    width: @wizardWidth - 10;
     margin:auto;
 }
 
@@ -1000,8 +999,7 @@ div.pickLocation div.caption {
     font-size: 22px;
     font-weight: bold;
     line-height: 30px;
-    width: @wizardWidth - 20;
-    margin: 20px auto 5px auto;
+    margin: 0px auto 5px auto;
     padding:5px;
 
     background-color: rgba(255,255,255,0.9);
@@ -1010,6 +1008,11 @@ div.pickLocation div.caption {
     border-radius:5px;
 }
 div.pickLocation > div.buttons {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 0 10px 0;
     pointer-events: all;
 }
 div.pickLocation > div.buttons > button {
@@ -1040,7 +1043,6 @@ div.pickLocation > div#page1 > div#crosshair {
     box-shadow: 0 0 100px black;
 }
 div.pickLocation > div#page1 > div#tip {
-    width: @wizardWidth - 20;
     padding:5px;
 
     background-color: rgba(255,255,255,0.9);
@@ -1050,6 +1052,9 @@ div.pickLocation > div#page1 > div#tip {
     border-radius:5px;
 }
 
+div.pickLocation > div#page2 > div.caption {
+    margin-top: 20px;
+}
 div.pickLocation > div#page2 input,textarea,select {
     width: @wizardWidth - 30;
     margin: 0 50px 0 0;

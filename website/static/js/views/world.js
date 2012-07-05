@@ -33,7 +33,7 @@ define([
     useBtn: function() {
         if (this.page == 2) {
             this.page = 1;
-            this.$('div.pickLocation > div.caption').html('Choose the area in which your application is relevant');
+            this.$('div.pickLocation > div.caption').html('Choose the area in which your application is relevant (optional)');
             this.$('button#useloc').html('Use this area');
             this.$('button#next').html('Next >');
 
@@ -43,12 +43,13 @@ define([
             return;
         }
 
+        var header = 0;
         var padding = parseInt(this.$('#crosshair').css('padding-top').replace(/[^-\d\.]/g, ''));
         var top = this.$('#crosshair').offset().top;
         var borderwidth = parseInt(this.$('#crosshair').css('border-width'));
 
-        var x = this.$('#map_canvas').width()/2;
-        var y = top + padding + 2*borderwidth + 5;
+        var x = this.$('#map_canvas').width()/2 + 10;
+        var y = top - header + padding + 2*borderwidth + 5;
         var scale = Math.pow(2, 21-this.map.getZoom());
 
         var center = this.latLngControl.xy2latlng(x,y);
