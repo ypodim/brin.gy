@@ -707,30 +707,19 @@ div#welcome > a:hover {
 
 /*############# FOOTER #############*/
 
-#footer {
+footer {
     position: absolute;
     bottom:0;
-    left:0;
     right:0;
-    height:@height-8;
-    
-    padding: 0 0px 1px 0px;
-    background-color:rgba(0,0,0,0.2);
-    box-shadow: 0 -3px 5px 0 rgba(0,0,0,0.5);
-    width:100%;
-    display:table;
+    padding: 1px 5px 0px 5px;
+    background-color:rgba(60,60,60,0.9);
+    color: rgba(255,255,255,0.5);
+    text-shadow: rgba(0,0,0, 0.8) 0px -1px 0px;
 }
-#footer > a {
-    display: table-cell;
-    /*height:90%;*/
-    width:25%;
-    font-size:35px;
-    /*line-height:85px;*/
-    text-shadow: rgba(255, 255, 255, 0.45) 0px 1px 0px;
-    float:none;
-}
-#footer > a > img {
-    height: 35px;
+footer > a { color: rgba(255,255,255,0.8); }
+footer > a:hover {
+    text-decoration: none;
+    color: white;
 }
 
 /*############# ACCOUNT #############*/
@@ -971,7 +960,7 @@ div.welcome > div#buttons > button:last-child {
 div.pickLocation {
     position: absolute;
     left: 0;
-    top: 0px;
+    top: 40px;
     right: 0;
     bottom: 0;
 
@@ -1075,3 +1064,21 @@ div.pickLocation > div#page2 input[type=number],select {
 
 
 
+.navbar-fixed-top .brand {
+    font-weight: bold;
+    color: rgba(220,220,220,0.9);
+    text-shadow: 0 -1px 0 black;
+    float: left;
+}
+div#map_canvas {
+    margin-top: 40px;
+}
+
+
+div.navbar {
+    position: absolute;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    right: 0;
+}

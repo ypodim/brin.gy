@@ -6,6 +6,7 @@ require.config({
   paths: {
     jquery: 'libs/jquery/jquery-min',
     cookie: 'libs/jquery/jquery.cookie',
+
     underscore: 'libs/underscore/underscore-min',
     backbone: 'libs/backbone/backbone-optamd3-min',
     text: 'libs/require/text',
@@ -13,6 +14,7 @@ require.config({
 
     scroll: 'libs/scroller/jquery.scrollIntoView',
 
+    bootstrap: 'libs/bootstrap/bootstrap',
     alerts: 'libs/bootstrap/bootstrap-alerts',
     modal: 'libs/bootstrap/bootstrap-modal',
     twipsy: 'libs/bootstrap/bootstrap-twipsy',
@@ -26,6 +28,7 @@ require.config({
 
 require([
     'jquery',
+    'bootstrap',
     'underscore',
     'common/ego_website',
 
@@ -36,7 +39,7 @@ require([
     'collections/persons',
 
     'views/controls',
-], function($, _, common, Router, Backbone, appState, Attributes, Persons,
+], function($, bootstrap, _, common, Router, Backbone, appState, Attributes, Persons,
     controlsView
     ){
 
