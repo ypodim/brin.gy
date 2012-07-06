@@ -18,6 +18,8 @@ define([
     contextCircle: null,
     page: 1,
 
+    tempc: 0,
+
     nextBtn: function() {
         if (this.page == 1) {
             this.page = 2;
@@ -43,7 +45,7 @@ define([
             return;
         }
 
-        var header = 0;
+        var header = 40;
         var padding = parseInt(this.$('#crosshair').css('padding-top').replace(/[^-\d\.]/g, ''));
         var top = this.$('#crosshair').offset().top;
         var borderwidth = parseInt(this.$('#crosshair').css('border-width'));
@@ -62,7 +64,7 @@ define([
         var city = 'chicago';
 
         var populationOptions = {
-            strokeColor: "#FF0000",
+            strokeColor: "pink",
             strokeOpacity: 0.8,
             strokeWeight: 2,
             fillColor: "#FF0000",
@@ -72,11 +74,26 @@ define([
             radius: this.contexts[city].radius,
         };
 
-        if (this.contextCircle != null)
-            this.contextCircle.setMap(null)
+        // if (this.contextCircle != null)
+            // this.contextCircle.setMap(null)
         this.contextCircle = new google.maps.Circle(populationOptions);
+        this.contextCircle.cntx = this.tempc++;
+
+        google.maps.event.addListener(this.contextCircle, 'click', this.areaClick);
+        google.maps.event.addListener(this.contextCircle, 'mouseover', this.areaMouseOver);
+        google.maps.event.addListener(this.contextCircle, 'mouseout', this.areaMouseOut);
 
         this.$('button#next').removeClass('disabled').html('Next >');
+    },
+    areaClick: function(event) {
+        console.log('area', this.cntx)
+    },
+    areaMouseOver: function(event) {
+        this.setOptions({strokeColor:'red'});
+    },
+    areaMouseOut: function(event) {
+        this.setOptions({strokeColor:'pink'});
+        this.setOptions({zIndex:0});
     },
 
     map: null,
