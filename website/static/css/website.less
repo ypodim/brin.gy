@@ -18,14 +18,16 @@ body {
     position: absolute;
     z-index:0;
     left: 0;
-    right:0;
-    top:95px;
-    bottom: 95px;
+    right: 0;
+    top: 0;
+    bottom: 0;
     padding: 0;
     text-shadow: rgba(255, 255, 255, 0.45) 0px 1px 0px;
 
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
+
+    pointer-events: none;
 }
 
 /*div.fullscreen {
@@ -407,6 +409,7 @@ div#controls {
 
     text-align:center;
     color:white;
+    display: none;
 }
 
 div#controls button {
@@ -996,6 +999,13 @@ div.pickLocation div.caption {
 
     border-radius:5px;
 }
+div.pickLocation div.caption > div#tip {
+    padding:5px;
+    font-size: 13px;
+    line-height: 13px;
+}
+
+
 div.pickLocation > div.buttons {
     position: absolute;
     bottom: 0;
@@ -1040,6 +1050,18 @@ div.pickLocation > div#page1 > div#tip {
     text-align: center;
     border-radius:5px;
 }
+div.pickLocation > div#page1 > input#location {
+    padding:5px;
+
+    /*background-color: rgba(255,255,255,0.9);*/
+    box-shadow: 0 0 50px black;
+    font-weight: bold;
+    border-radius:5px;
+    pointer-events: all;
+}
+
+
+
 
 div.pickLocation > div#page2 > div.caption {
     margin-top: 20px;
@@ -1062,6 +1084,85 @@ div.pickLocation > div#page2 input[type=number],select {
 
 
 
+/************ LOCATION PICKER **************/
+
+div.locationPicker {
+    position: absolute;
+    left: 0;
+    top: 40px;
+    right: 0;
+    bottom: 0;
+
+    height:530px;
+    width:@wizardWidth;
+
+    left:50%;
+    margin: 10px 0 0 -@wizardWidth/2;
+    padding:10px;
+    
+    text-align: center;
+    pointer-events: none;
+    color: rgba(0,0,0,0.8);
+
+    background-color: rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.15);
+}
+div.locationPicker > div.wizardPage {
+    height:440px;
+    margin:auto;
+}
+div.locationPicker div.caption {
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 30px;
+    margin: 0px auto 5px auto;
+    padding:5px;
+
+    background-color: rgba(255,255,255,0.9);
+    box-shadow: 0 0 100px black;
+
+    border-radius:5px;
+}
+div.locationPicker div.caption > div#tip {
+    padding:5px;
+    font-size: 13px;
+    line-height: 13px;
+}
+div.locationPicker > div.buttons {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 0 10px 0;
+    pointer-events: all;
+}
+div.locationPicker > div.buttons > button {
+    box-shadow: 0 0 100px black ! important;
+    width: 120px;
+}
+div.locationPicker > div.wizardPage > div#crosshair {
+    margin: 20px auto ;
+    width: 20px;
+    
+    padding: 150px;
+    border: 5px dotted rgba(255,0,0,0.5);
+    border-radius: 300px;
+
+    text-align:center;
+    color: rgba(255,0,0,0.5);
+    font-size: 40px;
+    box-shadow: 0 0 100px black;
+}
+div.locationPicker > div.wizardPage > input#locationinput {
+    width: @wizardWidth - 10;
+    padding:5px;
+    box-shadow: 0 0 50px black;
+    font-weight: bold;
+    border-radius:5px;
+    pointer-events: all;
+}
+
+
 
 
 .navbar-fixed-top .brand {
@@ -1070,8 +1171,12 @@ div.pickLocation > div#page2 input[type=number],select {
     text-shadow: 0 -1px 0 black;
     float: left;
 }
+
 div#map_canvas {
-    margin-top: 40px;
+    position: absolute;
+    top: 40px;
+    left: 0;
+    right: 0;
 }
 
 
