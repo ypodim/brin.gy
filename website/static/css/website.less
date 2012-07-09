@@ -1180,23 +1180,26 @@ aside {
     width: 230px;
     padding: 5px;
 }
-aside > a {
+aside > div > a {
     display: block;
     font-size: 22px;
     line-height: 22px;
     padding: 5px;
     border-radius: 5px;
 }
-aside > a:hover {
+aside > div > a:hover {
     text-decoration: none;
     cursor: pointer;
 }
-aside > a.highlighted {
+aside > div > a.highlighted {
     background-color: gray;
+    color: white;
+    text-shadow: 0 -1px rgba(0,0,0,0.8);
 }
 div#map_canvas {
     position: absolute;
-    top: 40px;
+    /*top: 40px;*/
+    bottom: 0;
     left: 0;
     right: 240px;
 }

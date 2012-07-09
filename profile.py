@@ -32,11 +32,18 @@ class profile():
     'USER:profile:keys' # set of keys
     'USER:profile:key:KEY' # val
     
+    'global:nextvid' # holds next key id to be assigned to a complex key
+    'profile:keytypes' # set of key types (string, location, time, user)
+    'profile:key:KEY:type' # hash of key type fields (eg. loc:lat, lon, radius)
+    'profile:key:KEY:vid:VID' # populated hash of key fields for value VIDdd
+
     'profile:CONTEXT:keys' # ordered set of all keys in use
     'profile:CONTEXT:key:KEY:agents' # set of agents using this key
     'profile:CONTEXT:key:KEY:values' # ordered set of values for this key
     'profile:CONTEXT:key:KEY:val:VAL:agents' # set of agents using this key/val pair
     
+    
+
     'contexts' # set of all contexts available
     'USER:contexts' # set of contexts in which USER participates
     'context:users:CONTEXT' # set of users participating in CONTEXT

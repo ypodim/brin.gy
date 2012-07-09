@@ -5,8 +5,9 @@ define([
   'router',
 
   // 'maps',
+  'views/key',
   'views/mapInfoAttribute',
-  ], function($, _, Backbone, router, mapInfoAttrView){
+  ], function($, _, Backbone, router, keyView, mapInfoAttrView){
   var welcomeView = Backbone.View.extend({
     el: $('aside'),
     events: {
@@ -15,12 +16,6 @@ define([
 
     chooseLocation: function() {
 
-        return false;
-    },
-
-    asideClick: function() {
-        $('aside > a').removeClass('highlighted');
-        $(this).addClass('highlighted');
         return false;
     },
 
@@ -36,8 +31,9 @@ define([
                 attr.key;
                 attr.score;
 
-                var entry = $('<a></a>').html(attr.key).click(that.asideClick);
-                that.el.append(entry)
+                var kview = new keyView();
+                kview.render({title: attr.key});
+                that.el.append(kview.el);
 
                 for (var v in attr.values) {
                     var val = attr.values[v];

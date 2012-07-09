@@ -68,6 +68,7 @@ define([
         var scale = Math.pow(2, 21-this.map.getZoom());
 
         var center = this.latLngControl.xy2latlng(x,y);
+        console.log(center, scale)
         this.contexts['chicago'] = {
             center: center,
             radius: 10*scale,

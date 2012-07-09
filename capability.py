@@ -185,7 +185,8 @@ class profile:
             start = self.r.zrevrank(getK(context), start_from) or 0
             keyscores = self.r.zrevrangebyscore(getK(context), '+inf', '-inf', withscores=True, num=bucket, start=start)
             for key, kscore in keyscores:
-                item = dict(key=key, values=[], score=kscore)
+                ktype = self.r.get('profile:key:%s:type' % key) or 'string'
+                item = dict(key=key, values=[], score=kscore, type=ktype)
                 #start = self.r.zrevrank(self.getKV(key), start_from) or 0
 
                 for val, vscore in self.r.zrevrangebyscore(getKV(context, key), '+inf', '-inf', withscores=True):
