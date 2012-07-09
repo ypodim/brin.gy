@@ -8,19 +8,43 @@ define([
   'views/mapInfoAttribute',
   ], function($, _, Backbone, router, mapInfoAttrView){
   var welcomeView = Backbone.View.extend({
-    el: $("#container"),
+    el: $('aside'),
     events: {
+        'click li > a#location': 'chooseLocation',
+    },
 
+    chooseLocation: function() {
+
+        return false;
+    },
+
+    asideClick: function() {
+        $('aside > a').removeClass('highlighted');
+        $(this).addClass('highlighted');
+        return false;
     },
 
     render: function(){
+        this.el.empty();
         var that = this;
         url = APP.satellite.url+"/profile/"+APP.context.name+"/keyvals";
         $.getJSON(url, {user:APP.user}, function(json){
             // that.processNextKey(0, json.items);
             console.log(json);
             for (var i in json.items) {
-                json.items[i]
+                var attr = json.items[i];
+                attr.key;
+                attr.score;
+
+                var entry = $('<a></a>').html(attr.key).click(that.asideClick);
+                that.el.append(entry)
+
+                for (var v in attr.values) {
+                    var val = attr.values[v];
+                    val.matches;
+                    val.score;
+                    val.val;
+                }
             }
         });
 
