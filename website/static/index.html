@@ -5,20 +5,14 @@
     <title>Brin.gy</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-
     <!-- <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap-responsive.min.css"> -->
     <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.min.css">
     
-    <!-- <link rel="stylesheet" type="text/css" href="/static/css/docs.css"> -->
-    
-
     <link rel="stylesheet/less" type="text/css" href="/static/css/website.less">
     <link href='//fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css' />
 
 </head>
 <body>
-
-
 
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
@@ -29,7 +23,13 @@
       <div class="nav-collapse">
         <!-- .nav, .navbar-search, .navbar-form, etc -->
       </div>
-        <ul class="nav">
+        <ul class="nav pull-right">
+            <li>
+                <a href="#world">Home</a>
+            </li>
+            <li>
+                <a id='location' href="#location">Location</a>
+            </li>
           <li class="dropdown">
             <a href="#"
                   class="dropdown-toggle"
@@ -47,35 +47,21 @@
 </div>
 
 
-<!-- <div id='loader'>
-    <span>Brin.gy is aligning human satellites...</span>
-    <div class="circle1"></div>
-    <div class="circle2"></div>
-
-    <div id='progressbar' class="progress progress-danger progress-striped active">
-        <div class="bar" style='width:0'></div>
-    </div>
-</div> -->
 
 <!-- <div id="cover">
     <div id='coverContent'></div>
     <div id='caption'></div>
 </div> -->
 
+
 <div id="map_canvas" style="height:100%"></div>
-
-<div id="controls"></div>
-<div id='message' class="alert"></div>
 <div id="container"></div>
+
+
+<!-- <div id="controls"></div> -->
+<div id='message' class="alert"></div>
+
 <!-- <aside></aside> -->
-
-
-<!-- <div id='footer' class="btn-group" data-toggle="buttons-radio">
-    <a href='#/' class="btn btn-primary"><img src='/static/images/website/glyphicons_020_home.png' /></a>
-    <a href='#/context' class="btn btn-primary">Contexts</a>
-    <a href='#/attributes' class="btn btn-primary">Attributes</a>
-    <a href='#/account' class="btn btn-primary">Account</a>
-</div> -->
 
 <footer>Made In <a href='http://media.mit.edu'>MIT Media Lab</a></footer>
 

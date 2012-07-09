@@ -26,6 +26,10 @@ require.config({
   urlArgs: "bust=" +  (new Date()).getTime(),
 });
 
+var APP = {
+    usernames: {},
+};
+
 require([
     'jquery',
     'bootstrap',
@@ -47,8 +51,9 @@ require([
     this.state.progress('static files loaded, getting config');
 
     $.getJSON('/config', function(config){
-        state.satellite = {};
-        state.satellite.url = config.discov_url;
+        APP.config = config;
+        APP.satellite = {};
+        APP.satellite.url = config.discov_url;
         state.agent = {};
         state.agent.id = config.agentid;
         state.agent.baseurl = config.ego_url_prefix;
@@ -59,9 +64,15 @@ require([
         var cookie = common.cookies.get_cookie();
         var pseudonyms = cookie.pseudonyms;
         for (username in pseudonyms) {
-            state.user.name = username;
-            state.user.pwd = pseudonyms[username].secret;
-            state.user.email = pseudonyms[username].email;
+            // state.user.name = username;
+            // state.user.pwd = pseudonyms[username].secret;
+            // state.user.email = pseudonyms[username].email;
+            APP.usernames[username] = {
+                name: username,
+                pwd: pseudonyms[username].secret,
+                email: pseudonyms[username].email,
+            };
+            APP.user = username;
         }
 
         console.log('context in cookie', cookie.last_context);
@@ -69,7 +80,7 @@ require([
             cookie.last_context = 'all';
             common.cookies.set_context_in_cookie(cookie.last_context);
         }
-        state.context = {name:cookie.last_context};
+        APP.context = {name:cookie.last_context};
         console.log('now context in cookie', common.cookies.get_cookie().last_context);
 
         var attrCollection = new Attributes([], {state:state});

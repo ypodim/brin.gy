@@ -16,6 +16,7 @@ define([
         'click button#next': 'nextBtn',
     },
 
+    map: null,
     contexts: {},
     contextCircle: null,
     tempc: 0,
@@ -107,8 +108,6 @@ define([
         this.setOptions({strokeColor:'pink'});
         this.setOptions({zIndex:0});
     },
-
-    map: null,
 
     LatLngControl: function (map) {
         /**
