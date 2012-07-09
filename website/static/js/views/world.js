@@ -191,6 +191,15 @@ define([
         this.latLngControl = new this.LatLngControl(this.map);
         var that = this;
 
+
+        var infowindow = new google.maps.InfoWindow({
+            content: 'contentString'
+        });
+        google.maps.event.addListener(marker, 'click', function() {
+            infowindow.open(map,marker);
+        });
+
+
         // Register event listeners
         // google.maps.event.addListener(this.map, 'mouseover', function(mEvent) {
         //   that.latLngControl.set('visible', true);

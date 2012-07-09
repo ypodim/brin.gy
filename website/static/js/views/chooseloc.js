@@ -6,7 +6,8 @@ define([
 
   // 'maps',
   'text!templates/chooseloc.html',
-  ], function($, _, Backbone, router, mapTemplate){
+  'views/mapInfoAttribute',
+  ], function($, _, Backbone, router, mapTemplate, mapInfoAttrView){
   var welcomeView = Backbone.View.extend({
     el: $("#container"),
     events: {
@@ -18,12 +19,41 @@ define([
     contexts: {},
     contextCircle: null,
     tempc: 0,
+    locationInput: 'locationinput',
 
     cancelBtn: function() {
         this.el.empty();
         this.contextCircle && this.contextCircle.setMap(null);
     },
     nextBtn: function() {
+        var locationTitle = this.$('#'+this.locationInput).val();
+        if (locationTitle == '')
+            return;
+
+        var that = this;
+
+        var marker = new google.maps.Marker({
+            position: this.contexts['chicago'].center,
+            // map: this.map,
+            title: locationTitle,
+        });
+
+        
+        var el = $('<div></div>');
+        var attrView = new mapInfoAttrView();
+        attrView.el = el;
+        attrView.render({title: locationTitle});
+
+        var infowindow = new google.maps.InfoWindow({
+            content: el.html(),
+        });
+        google.maps.event.addListener(marker, 'click', function() {
+            infowindow.open(that.map, marker);
+        });
+        google.maps.event.addListener(this.contextCircle, 'click', function() {
+            infowindow.open(that.map, marker);
+        });
+
         this.el.empty();
     },
     useBtn: function() {
@@ -45,7 +75,7 @@ define([
 
         var city = 'chicago';
 
-        var populationOptions = {
+        var contextOptions = {
             strokeColor: "pink",
             strokeOpacity: 0.8,
             strokeWeight: 2,
@@ -58,7 +88,7 @@ define([
 
         if (this.contextCircle != null)
             this.contextCircle.setMap(null)
-        this.contextCircle = new google.maps.Circle(populationOptions);
+        this.contextCircle = new google.maps.Circle(contextOptions);
         this.contextCircle.cntx = this.tempc++;
 
         google.maps.event.addListener(this.contextCircle, 'click', this.areaClick);
@@ -173,6 +203,7 @@ define([
         this.latLngControl = new this.LatLngControl(this.map);
         var that = this;
 
+
         // Register event listeners
         // google.maps.event.addListener(this.map, 'mouseover', function(mEvent) {
         //   that.latLngControl.set('visible', true);
@@ -193,7 +224,7 @@ define([
     },
 
     autocomplete: function() {
-        var input = document.getElementById('locationinput');
+        var input = document.getElementById(this.locationInput);
         var autocomplete = new google.maps.places.Autocomplete(input);
         var that = this;
 
