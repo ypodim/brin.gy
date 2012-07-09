@@ -256,7 +256,7 @@ define([
         this._keysInserted = {};
         
         // this.state.attrCollection.each(this.addOneAttribute);
-        var models = this.state.attrCollection.models;
+        // var models = this.state.attrCollection.models;
         // this.doOneAttribute(0, models);
         
         return this;

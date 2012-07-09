@@ -207,6 +207,9 @@ define([
         google.maps.event.addListener(autocomplete, 'place_changed', function() {
             console.log('ok')
             var place = autocomplete.getPlace();
+            if (place.geometry == undefined)
+                return;
+
             if (place.geometry.viewport) {
                 that.map.fitBounds(place.geometry.viewport);
             } else {
@@ -225,15 +228,15 @@ define([
 
             var address = '';
             if (place.address_components) {
-            address = [(place.address_components[0] &&
-                        place.address_components[0].short_name || ''),
-                       (place.address_components[1] &&
-                        place.address_components[1].short_name || ''),
-                       (place.address_components[2] &&
-                        place.address_components[2].short_name || '')
-                      ].join(' ');
+                address = [(place.address_components[0] &&
+                            place.address_components[0].short_name || ''),
+                            (place.address_components[1] &&
+                            place.address_components[1].short_name || ''),
+                            (place.address_components[2] &&
+                            place.address_components[2].short_name || '')
+                        ].join(' ');
             }
-            console.log(place.name, address);
+            console.log(place.name, address, place);
         });
 
         // Sets a listener on a radio button to change the filter type on Places
