@@ -14,12 +14,13 @@ body {
     display:none;
 }
 
+@asideWidth: 230px;
 #container {
     position: absolute;
     z-index:0;
     left: 0;
-    right: 0;
-    top: 0;
+    right: @asideWidth;
+    top: 40px;
     bottom: 0;
     padding: 0;
     text-shadow: rgba(255, 255, 255, 0.45) 0px 1px 0px;
@@ -28,7 +29,57 @@ body {
     -webkit-overflow-scrolling: touch;
 
     pointer-events: none;
+    
 }
+aside {
+    position: absolute;
+    right: 0;
+    top: 40px;
+    width: @asideWidth;
+    padding: 5px;
+}
+aside > div.asideEntry {
+    width: @asideWidth;
+}
+aside > div.asideEntry > a.asideKey {
+    color: black;
+    display: block;
+    position: relative;
+    height: 25px;
+    
+    padding: 5px;
+    font-size: 22px;
+    line-height: 22px;
+    border-radius: 5px;
+}
+aside > div.asideEntry > a.asideKey:hover {
+    text-decoration: none;
+    cursor: pointer;
+    color: rgba(0,0,0,0.5);
+}
+aside > div > a.highlighted {
+    background-color: rgba(0,0,0,0.2);
+    color: black ! important;
+    text-shadow: 0 1px rgba(255,255,255,0.5);
+}
+aside > div.asideEntry > a.asideKey > div.title {
+    position: absolute;
+    left:5px;
+}
+aside > div.asideEntry > a.asideKey > i {
+    position: absolute;
+    top: 10px;
+    right:5px;
+}
+#popup {
+    width: 300px;
+    margin: 50px auto;
+    background-color: yellow;
+}
+
+
+
+
 
 /*div.fullscreen {
     padding:0 ! important;
@@ -1173,29 +1224,7 @@ div.locationPicker > div.wizardPage > input#locationinput {
 }
 
 
-aside {
-    position: absolute;
-    right: 0;
-    top: 40px;
-    width: 230px;
-    padding: 5px;
-}
-aside > div > a {
-    display: block;
-    font-size: 22px;
-    line-height: 22px;
-    padding: 5px;
-    border-radius: 5px;
-}
-aside > div > a:hover {
-    text-decoration: none;
-    cursor: pointer;
-}
-aside > div > a.highlighted {
-    background-color: gray;
-    color: white;
-    text-shadow: 0 -1px rgba(0,0,0,0.8);
-}
+
 div#map_canvas {
     position: absolute;
     /*top: 40px;*/

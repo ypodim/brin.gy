@@ -8,6 +8,7 @@ define([
 ], function($, _, Backbone, scroll, keyTemplate){
     var KeyView = Backbone.View.extend({
 
+    className: 'asideEntry',
     // tagName: 'attribute',
     template: _.template(keyTemplate),
 
@@ -19,19 +20,25 @@ define([
     keyClick: function(){
         $('aside > div > a').removeClass('highlighted');
         this.$('a').addClass('highlighted');
+        this.keyClickClb && this.keyClickClb(this.model)
         return false;
     },
 
     initialize: function(options) {
       _.bindAll(this, 'render');
-      
+      this.keyClickClb = options.keyClickClb;
       // this.model.bind('destroy', this.remove);
       // this.model.view = this;
     },
 
     render: function(model) {
         // html = this.template(this.model.toJSON());
-        html = this.template(model);
+        this.model = model;
+        var icon = 'icon-font';
+        if (model.type == 'location')
+            icon = 'icon-map-marker';
+
+        html = this.template({title: model.key, icon:icon});
         $(this.el).html(html);
         return this;
     },

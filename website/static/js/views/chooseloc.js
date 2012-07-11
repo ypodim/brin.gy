@@ -9,7 +9,7 @@ define([
   'views/mapInfoAttribute',
   ], function($, _, Backbone, router, mapTemplate, mapInfoAttrView){
   var welcomeView = Backbone.View.extend({
-    el: $("#container"),
+    el: $("#popup"),
     events: {
         'click button#cancel': 'cancelBtn',
         'click button#useloc': 'useBtn',

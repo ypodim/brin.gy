@@ -263,22 +263,22 @@ define([
     },
 
     defaultRoute: function( cntx ){
-        this.controlsView.setUIstate({
-            title: 'Brin.gy',
-            fullscreen: true,
-            footer: false,
-        });
+    //     this.controlsView.setUIstate({
+    //         title: 'Brin.gy',
+    //         fullscreen: true,
+    //         footer: false,
+    //     });
         
-        this.state.stats('home');
-        this.wview.render();
-    },
+    //     this.state.stats('home');
+    //     this.wview.render();
+    // },
 
-    world: function( cntx ){
-        this.controlsView.setUIstate({
-            title: 'Brin.gy',
-            fullscreen: true,
-            footer: false,
-        });
+    // world: function( cntx ){
+        // this.controlsView.setUIstate({
+        //     title: 'Brin.gy',
+        //     fullscreen: true,
+        //     footer: false,
+        // });
         
         var wldView = new worldView({
             state: this.state,

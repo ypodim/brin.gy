@@ -53,7 +53,8 @@ print r.smembers('profile:keytypes')
 r.set('global:nextvid', 1000)
 # print r.incr('global:nextkid')
 
-for c in r.smembers('contexts'):
+
+for c in []:#r.smembers('contexts'):
     # print c
     for k in r.zrange('profile:%s:keys' % c, 0, -1):
         # reset
@@ -66,7 +67,7 @@ for c in r.smembers('contexts'):
 
             for v,score in vals(k, c=c):
 
-                
+                r.srem('profile:%s:key:%s:val:%s:agents' % (c, k, vid), u)
 
 
                 vid = r.get('profile:composite:key:%s:val:%s' % (k, v))
@@ -96,7 +97,7 @@ for c in r.smembers('contexts'):
                     r.hmset('profile:vid:%s' % vid, dic)
 
                     # set the pointer from a complex kv pair to the vid that represents it
-                    r.set('profile::composite:key:%s:val:%s' % (k, v), vid)
+                    r.set('profile:composite:key:%s:val:%s' % (k, v), vid)
 
                 # create new value entry with vid as value
                 r.zadd('profile:%s:key:%s:values' % (c, k), vid, score)
@@ -110,6 +111,24 @@ for c in r.smembers('contexts'):
 
         # r.hset('profile:key:%s:type' % k, 
 
+
+for c in []:#r.smembers('contexts'):
+    for k in r.zrange('profile:%s:keys' % c, 0, -1):
+        r.delete('profile:key:%s:type' % k, 'string')
+        if k in ['physical location']:
+            for v,score in vals(k, c=c):
+                # print v
+                if v not in ['Arlington MA', 'Cambridge MA']:
+                    for u in r.smembers('profile:%s:key:%s:val:%s:agents' % (c, k, v)):
+                        print c, k, v, u
+                        print r.srem('%s:profile:key:%s' % (u,k), v)
+                        print r.srem('profile:%s:key:%s:val:%s:agents' % (c, k, v), u)
+
+                    print r.zrem('profile:%s:key:%s:values' % (c, k), v)
+
+                    print r.delete('profile:composite:key:%s:val:%s' % (k, v))
+
+                    print r.delete('profile:vid:%s' % v)
 
 k = 'physical location'
 nextvid = int(r.get('global:nextvid'))

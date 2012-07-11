@@ -15,46 +15,128 @@ define([
     },
 
     chooseLocation: function() {
-
+        console.log(this);
         return false;
     },
 
-    render: function(){
-        this.el.empty();
-        var that = this;
-        url = APP.satellite.url+"/profile/"+APP.context.name+"/keyvals";
-        $.getJSON(url, {user:APP.user}, function(json){
-            // that.processNextKey(0, json.items);
-            console.log(json);
-            for (var i in json.items) {
-                var attr = json.items[i];
-                attr.key;
-                attr.score;
+    circles: [],
 
-                var kview = new keyView();
-                kview.render({title: attr.key});
-                that.el.append(kview.el);
+    keyClickClb: function(model){
+        for (var i in this.circles) {
+            this.circles[i].circle.setMap(null);
+            this.circles[i].marker.setMap(null);
+        }
+        this.circles = [];
 
-                for (var v in attr.values) {
-                    var val = attr.values[v];
-                    val.matches;
-                    val.score;
-                    val.val;
-                }
-            }
+        if (model.type != 'location')
+            return;
+
+        var bounds = new google.maps.LatLngBounds();
+        for (var i in model.values) {
+            var val = model.values[i].xdata;
+            var lat = parseFloat(val.lat);
+            var lng = parseFloat(val.lon);
+            var center = new google.maps.LatLng(lat, lng);
+            var radius = parseInt(val.radius);
+            bounds.extend(center);
+            this.addMapCircle({center:center, radius:radius, title:val.title});
+        }
+        
+        if (!bounds.isEmpty()) {
+            APP.map.fitBounds(bounds);
+        }
+    },
+
+    addMapCircle: function(options){
+        var contextOptions = {
+            strokeColor: "pink",
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: "#FF0000",
+            fillOpacity: 0.1,
+            map: APP.map,
+            center: options.center,
+            radius: options.radius,
+        };
+
+        var mapCircle = new google.maps.Circle(contextOptions);
+        // this.contextCircle.cntx = this.tempc++;
+        
+        // google.maps.event.addListener(this.contextCircle, 'click', this.areaClick);
+        google.maps.event.addListener(mapCircle, 'mouseover', function(event) {
+            this.setOptions({strokeColor:'red'});
+        });
+        google.maps.event.addListener(mapCircle, 'mouseout', function(event) {
+            this.setOptions({strokeColor:'pink'});
+            this.setOptions({zIndex:0});
         });
 
 
+        var marker = new google.maps.Marker({
+            position: options.center,
+            map: APP.map,
+            title: options.title,
+        });
+
+        var el = $('<div></div>');
+        var attrView = new mapInfoAttrView();
+        attrView.el = el;
+        attrView.render({title: options.title});
+
+        var infowindow = new google.maps.InfoWindow({
+            content: el.html(),
+        });
+        google.maps.event.addListener(marker, 'click', function() {
+            infowindow.open(APP.map, marker);
+        });
+        google.maps.event.addListener(mapCircle, 'click', function() {
+            infowindow.open(APP.map, marker);
+        });
+
+        this.circles.push({circle:mapCircle, marker:marker});
+    },
+
+    render: function(){
         var centerLatLng = new google.maps.LatLng(37.748582,-122.418411);
         APP.map = new google.maps.Map(document.getElementById('map_canvas'), {
-            'zoom': 10,
+            'zoom': 7,
             'center': centerLatLng,
             'mapTypeId': google.maps.MapTypeId.ROADMAP,
             'zoomControl': false,
             'streetViewControl': false,
             'panControl': false,
         });
-        
+
+        this.el.empty();
+        var that = this;
+        url = APP.satellite.url+"/profile/"+APP.context.name+"/keyvals";
+        $.getJSON(url, {user:APP.user}, function(json){
+            // that.processNextKey(0, json.items);
+            for (var i in json.items) {
+                var attr = json.items[i];
+                attr.key;
+                attr.score;
+
+                var kview = new keyView({keyClickClb:that.keyClickClb});
+                kview.render(attr);
+                that.el.append(kview.el);
+                for (var v in attr.values) {
+                    var val = attr.values[v];
+                    val.matches;
+                    val.score;
+                    val.val;
+
+                    if (attr.type == 'location') {
+                        var lat = parseFloat(val.xdata.lat);
+                        var lng = parseFloat(val.xdata.lon);
+                        var center = new google.maps.LatLng(lat, lng);
+                        var radius = parseInt(val.xdata.radius);
+                        that.addMapCircle({center:center, radius:radius, title:val.xdata.title});
+                    }
+                }
+            }
+        });
+
 
         // Register event listeners
         // google.maps.event.addListener(this.map, 'mouseover', function(mEvent) {
@@ -72,7 +154,7 @@ define([
     },
 
     initialize: function(options){
-        _.bindAll(this, 'render');
+        _.bindAll(this, 'render', 'keyClickClb');
         this.router = options.router;
     },
   });

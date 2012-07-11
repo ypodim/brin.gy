@@ -44,7 +44,6 @@ class profile():
     'profile:CONTEXT:key:KEY:values' # ordered set of values for this key
     'profile:CONTEXT:key:KEY:val:VAL:agents' # set of agents using this key/val pair
     
-    
 
     'contexts' # set of all contexts available
     'USER:contexts' # set of contexts in which USER participates

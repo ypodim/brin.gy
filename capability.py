@@ -192,8 +192,14 @@ class profile:
                 for val, vscore in self.r.zrevrangebyscore(getKV(context, key), '+inf', '-inf', withscores=True):
                     userhasit = int(self.r.sismember(getKVA(context, key, val), aid))
                     #print key, val, aid, userhasit
+
+                    xdata = {}
+                    if ktype != 'string':
+                        xdata = getfullkv(self.r, context, key, val)
+
                     vitem = dict(val=val, 
                                  userhasit=userhasit, 
+                                 xdata=xdata,
                                  score=vscore, 
                                  matches=[])
                     matches = self.r.smembers(getKVA(context, key, val))
