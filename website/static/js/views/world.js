@@ -8,19 +8,26 @@ define([
   'views/key',
   'views/mapInfoAttribute',
   'views/valueDetailed',
-  ], function($, _, Backbone, router, keyView, mapInfoAttrView, valueView){
+  'views/chooseloc',
+  ], function($, _, Backbone, router, keyView, mapInfoAttrView, valueView, chooselocView){
   var welcomeView = Backbone.View.extend({
-    el: $('aside'),
+    el: $('#container'),
     events: {
-        'click li > a#location': 'chooseLocation',
+        'click button': 'addLocation',
     },
 
-    chooseLocation: function() {
-        console.log(this);
-        return false;
-    },
-
+    
     circles: [],
+
+    addLocation: function() {
+        this.$('#popup').empty().addClass('transparent').show();
+        var locView = new chooselocView({
+            // state: this.state,
+        });
+        locView.render();
+
+        
+    },
 
     keyClickClb: function(model){
         for (var i in this.circles) {
@@ -30,6 +37,7 @@ define([
         this.circles = [];
 
         if (model.type == 'location') {
+            this.$('button').show();
             $('#popup').hide();
             var bounds = new google.maps.LatLngBounds();
             for (var i in model.values) {
@@ -48,6 +56,7 @@ define([
         }
 
         if (model.type == 'string') {
+            this.$('button').hide();
             var header = $('<div></div>').addClass('header').html(model.key);
             var expandBtn = $('<button class="btn"></button>').html('<i class="icon-chevron-down"></i>');
             expandBtn.css({float:'right'}).click(function(){
@@ -58,7 +67,7 @@ define([
             });
             header.append(expandBtn);
 
-            $('#popup').show().html(header);
+            $('#popup').empty().show().removeClass('transparent').html(header);
             for (var i in model.values) {
                 var val = model.values[i];
                 
@@ -102,22 +111,20 @@ define([
         });
 
         var that = this;
-        var el = $('<div></div>');
-        var attrView = new mapInfoAttrView();
-        attrView.el = el;
-        attrView.render({title: options.title});
+        var attrView = new mapInfoAttrView(options);
+        attrView.render();
 
         var infowindow = new google.maps.InfoWindow({
-            content: el.html(),
+            content: attrView.el,
         });
         google.maps.event.addListener(marker, 'click', function() {
             _.each(that.circles, function(circle){ circle.infowindow.close(); })
             infowindow.open(APP.map, marker);
         });
-        google.maps.event.addListener(mapCircle, 'click', function() {
-            _.each(that.circles, function(circle){ circle.infowindow.close(); })
-            infowindow.open(APP.map, marker);
-        });
+        // google.maps.event.addListener(mapCircle, 'click', function() {
+        //     _.each(that.circles, function(circle){ circle.infowindow.close(); })
+        //     infowindow.open(APP.map, marker);
+        // });
 
         this.circles.push({circle:mapCircle, marker:marker, infowindow:infowindow});
     },
@@ -135,7 +142,7 @@ define([
             'panControl': false,
         });
 
-        this.el.empty();
+        this.$('aside').empty();
         var that = this;
         url = APP.satellite.url+"/profile/"+APP.context.name+"/keyvals";
         $.getJSON(url, {user:APP.user}, function(json){
@@ -147,7 +154,7 @@ define([
 
                 var kview = new keyView({keyClickClb:that.keyClickClb});
                 kview.render(attr);
-                that.el.append(kview.el);
+                that.$('aside').append(kview.el);
                 for (var v in attr.values) {
                     var val = attr.values[v];
                     val.matches;

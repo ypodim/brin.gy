@@ -16,10 +16,9 @@ define([
     'views/newContext',
     'views/stats',
     'views/world',
-    'views/chooseloc',
 ], function(
     $, _, Backbone, 
-    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView, presentationView, accountView, contextsView, newContextView, statsView, worldView, locationView
+    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView, presentationView, accountView, contextsView, newContextView, statsView, worldView
     ){
   var AppRouter = Backbone.Router.extend({
     routes: {
@@ -49,7 +48,6 @@ define([
         'stats': 'stats',
 
         'world': 'world',
-        'location': 'location',
 
         "*actions": "defaultRoute",
     },
@@ -284,18 +282,6 @@ define([
             state: this.state,
         });
         wldView.render();
-    },
-    location: function( cntx ){
-        // this.controlsView.setUIstate({
-        //     title: 'Brin.gy',
-        //     fullscreen: true,
-        //     footer: false,
-        // });
-        
-        var locView = new locationView({
-            state: this.state,
-        });
-        locView.render();
     },
   });
 

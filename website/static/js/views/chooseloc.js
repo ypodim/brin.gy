@@ -49,10 +49,10 @@ define([
             content: el.html(),
         });
         google.maps.event.addListener(marker, 'click', function() {
-            infowindow.open(that.map, marker);
+            infowindow.open(APP.map, marker);
         });
         google.maps.event.addListener(this.contextCircle, 'click', function() {
-            infowindow.open(that.map, marker);
+            infowindow.open(APP.map, marker);
         });
 
         this.el.empty();
@@ -63,9 +63,9 @@ define([
         var top = this.$('#crosshair').offset().top;
         var borderwidth = parseInt(this.$('#crosshair').css('border-width'));
 
-        var x = $(this.map.getDiv()).width()/2 + 10;
+        var x = $(APP.map.getDiv()).width()/2 + 10;
         var y = top - header + padding + 2*borderwidth + 5;
-        var scale = Math.pow(2, 21-this.map.getZoom());
+        var scale = Math.pow(2, 21-APP.map.getZoom());
 
         var center = this.latLngControl.xy2latlng(x,y);
         console.log(center, scale)
@@ -83,7 +83,7 @@ define([
             strokeWeight: 2,
             fillColor: "#FF0000",
             fillOpacity: 0.1,
-            map: this.map,
+            map: APP.map,
             center: this.contexts[city].center,
             radius: this.contexts[city].radius,
         };
@@ -189,19 +189,10 @@ define([
             return latlng;
         };
 
-        var centerLatLng = new google.maps.LatLng(37.748582,-122.418411);
-        this.map = new google.maps.Map(document.getElementById('map_canvas'), {
-            'zoom': 10,
-            'center': centerLatLng,
-            'mapTypeId': google.maps.MapTypeId.ROADMAP,
-            'zoomControl': false,
-            'streetViewControl': false,
-            'panControl': false,
-        });
         
         // Create new control to display latlng and coordinates under mouse.
-        this.latLngControl = new this.LatLngControl(this.map);
-        var that = this;
+        this.latLngControl = new this.LatLngControl(APP.map);
+        // var that = this;
 
 
         // Register event listeners
@@ -220,7 +211,7 @@ define([
 
         this.$('input#locationinput').focus();
 
-        this.autocomplete();
+        // this.autocomplete();
     },
 
     autocomplete: function() {
@@ -228,10 +219,10 @@ define([
         var autocomplete = new google.maps.places.Autocomplete(input);
         var that = this;
 
-        autocomplete.bindTo('bounds', this.map);
+        autocomplete.bindTo('bounds', APP.map);
 
         var marker = new google.maps.Marker({
-          map: this.map
+          map: APP.map
         });
 
         
@@ -242,10 +233,10 @@ define([
                 return;
 
             if (place.geometry.viewport) {
-                that.map.fitBounds(place.geometry.viewport);
+                APP.map.fitBounds(place.geometry.viewport);
             } else {
-                that.map.setCenter(place.geometry.location);
-                that.map.setZoom(17);  // Why 17? Because it looks good.
+                APP.map.setCenter(place.geometry.location);
+                APP.map.setZoom(17);  // Why 17? Because it looks good.
             }
 
             var image = new google.maps.MarkerImage(

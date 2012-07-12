@@ -7,19 +7,30 @@ define([
   'text!templates/mapInfoAttribute.html',
   ], function($, _, Backbone, router, mapInfoAttrTemplate){
   var welcomeView = Backbone.View.extend({
-    // el: $("#container"),
+    // el: $('div'),
+    className: 'infobox',
     events: {
-        
+        'click a': 'zoomHere',
     },
 
     template: _.template( mapInfoAttrTemplate ),
 
-    render: function(options){
-        this.el.html( this.template(options) );
+    zoomHere: function() {
+        var contextOptions = {
+            center: this.options.center,
+            radius: this.options.radius,
+        };
+        var circle = new google.maps.Circle(contextOptions);
+        APP.map.fitBounds(circle.getBounds());
+    },
+
+    render: function(){
+        $(this.el).html( this.template(this.options) );
     },
 
     initialize: function(options){
         _.bindAll(this, 'render');
+        this.options = options;
     },
   });
   return welcomeView;

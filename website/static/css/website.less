@@ -10,16 +10,12 @@ body {
     background-color: rgba(0,0,0,0.1);
 }
 
-#loader {
-    display:none;
-}
-
 @asideWidth: 230px;
 #container {
     position: absolute;
     z-index:0;
     left: 0;
-    right: @asideWidth;
+    right: 0;
     top: 40px;
     bottom: 0;
     padding: 0;
@@ -30,14 +26,55 @@ body {
 
     pointer-events: none;
 }
+#container > div#mapOverlay {
+    padding-right: @asideWidth;
+}
+#container > div#mapOverlay > button {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    font-size: 24px;
+    line-height: 24px;
+    font-weight: bold;
+    padding: 10px;
+    pointer-events: all;
+    box-shadow: 0 0 100px black;
+}
+
+
+@popupWidth: 400px;
+div#popup {
+    /*position: absolute;*/
+    /*left: 50%;*/
+    width: @popupWidth;
+    margin: 60px auto;
+    background-color: rgba(60,60,60,0.8);
+    pointer-events: all;
+    padding: 5px;
+    display: none;
+}
+.transparent {
+    background-color: rgba(60,60,60,0) ! important;
+    pointer-events: none ! important;
+}
+div#popup > div.header {
+    font-weight: bold;
+    font-size: 28px;
+    line-height: 28px;
+    color: white;
+    padding: 5px;
+    text-shadow: 0 -1px black;
+}
+
 aside {
     position: absolute;
     right: 0;
-    top: 40px;
+    top: 0;
     bottom: 0;
     width: @asideWidth;
     padding: 5px;
     
+    pointer-events: all;
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
 }
@@ -75,22 +112,6 @@ aside > div.asideEntry > a.asideKey > i {
     right:5px;
 }
 
-div#popup {
-    width: 400px;
-    margin: 10px auto;
-    background-color: rgba(60,60,60,0.8);
-    pointer-events: all;
-    padding: 5px;
-    display: none;
-}
-div#popup > div.header {
-    font-weight: bold;
-    font-size: 28px;
-    line-height: 28px;
-    color: white;
-    padding: 5px;
-    text-shadow: 0 -1px black;
-}
 
 
 
@@ -264,287 +285,6 @@ person > button {
 }
 
 
-/* ======== ATTRIBUTE ========= */
-
-attribute {
-    display: block;
-    margin: 0 0 40px 0;
-    background: rgba(25, 25, 25, 0.15);
-    background-image: -moz-linear-gradient(90deg, #ddd, #999);
-    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#999), to(#ddd));
-    box-shadow: 0 3px 1px rgba(0, 0, 0, 0.5);
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-}
-attribute a { color: black; }
-attribute a:hover { 
-    text-decoration: none; 
-    color:black;
-}
-
-attribute > a.keypart {
-    .font-12;
-    height:@height-9;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    -o-text-overflow: ellipsis;
-    -webkit-text-overflow: ellipsis;
-
-    display: block;
-    text-shadow: 0 1px rgba(255, 255, 255, .7);
-    padding: 5px 0px 0px 0px;
-    margin: 0 0 0 5px;
-    /*background-color: rgba(255,255,255,0.01);*/
-    overflow: hidden;
-}
-attribute > a.keypart > span.count {
-    display:inline-block;
-    color: white;
-    background-color:#ff2244;
-    line-height:@height-8;
-    padding: 0px 10px 0px 10px;
-    text-align:center;
-    text-shadow: 0px -2px 0px rgba(0,0,0,0.5);
-    box-shadow: 0px 3px 1px rgba(0,0,0,0.5);
-    border-radius: 3px;
-}
-attribute > div.valpartfooter {
-    height:@height-7;
-}
-attribute > div.valpartfooter > span {
-    font-size:@height-1;
-    line-height:@height-7;
-    float:right;
-    margin: 0 10px 0 0;
-}
-attribute > div.valpartfooter > button {
-    font-size:@height-4 ! important;
-    height:@height-6;
-    line-height:@height-4;
-    float:right;
-    margin: 10px 115px 10px 0;
-}
-
-attribute > form > input {
-    height:70px;
-    width:50%;
-    .font-2;
-    /*line-height:60px;*/
-    margin: 0 0 10px 10px;
-}
-
-/* ======== VALPART DETAILED ========= */
-
-attribute > div.valpartdetailed {
-    margin: 0 0 0 5px;
-    padding: 0 0 5px 0;
-}
-attribute > div.valpartdetailed > div.valcontainer {
-    position:relative;
-    font-size:@height-4;
-    min-height:@height-6;
-    line-height:@height-6;
-    border-radius:2px;
-    
-    padding: 5px 5px 5px 5px;
-    margin: 5px 5px 0px 0;
-    box-shadow:0px -1px 2px #333333;
-
-    overflow: hidden;
-}
-attribute > div.valpartdetailed > div.valcontainer:last-child {
-    border: 2px solid #aaa;
-}
-attribute > div.valpartdetailed > div.valcontainer > div#matches {
-    position: absolute;
-    top:@height-6;
-    left:5px;
-    z-index:0;
-    padding: 15px 0 0 0;
-    font-size:@height-1;
-    line-height:@height-1;
-    /*display: none;*/
-}
-attribute > div.valpartdetailed > div.valcontainer > div#matches > a.userToken {
-    padding: 5px;
-    border: 1px solid gray;
-    border-radius:5px;
-    display:inline-block;
-    margin: 0 5px 5px 0;
-    height:@height-1;
-    background-color:rgba(0,0,0,0.1);
-}
-.slideValueDown {
-    -webkit-transform: height;
-    -webkit-transition:all 0.3s ease-in-out;
-    -moz-transition:all 0.4s ease-in-out;
-    -o-transition:all 0.4s ease-in-out;
-    -ms-transition:all 0.4s ease-in-out;
-    height:140px;
-}
-.slideValueUp {
-    -webkit-transform: height;
-    -webkit-transition:all 0.3s ease-in-out;
-    -moz-transition:all 0.4s ease-in-out;
-    -o-transition:all 0.4s ease-in-out;
-    -ms-transition:all 0.4s ease-in-out;
-    height:0px;
-}
-
-attribute > div.valpartdetailed > div.valcontainer > button {
-    position:absolute;
-    top:5px;
-    z-index:1;
-
-    font-size:@height-4;
-    height:@height-6;
-    line-height:@height-4;
-    width:150px;
-    margin: 0 0 0 5px;
-}
-attribute > div.valpartdetailed > div.valcontainer > button#addBtn {
-    right:160px;
-}
-attribute > div.valpartdetailed > div.valcontainer > button#searchBtn {
-    right:5px;
-
-    background-image: url('http://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg');
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: 40px;
-}
-attribute > div.valpartdetailed > div.valcontainer > a {
-    position: absolute;
-    z-index:0;
-    left:0;
-    right:0;
-    height:@height-6;
-    display: block;
-    /*background-color:yellow;*/
-}
-attribute > div.valpartdetailed > div.valcontainer > a > div.value {
-    display:inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    -o-text-overflow: ellipsis;
-    -webkit-text-overflow: ellipsis;
-
-    float:left;
-}
-attribute > div.valpartdetailed > div.valcontainer > a > span.count {
-    display:inline-block;
-    color: white;
-    background-color:#ff2244;
-    box-shadow: 0px 3px 1px rgba(0,0,0,0.5);
-    padding: 0px 10px 0px 10px;
-    text-align:center;
-    text-shadow: 0px -2px 0px rgba(0,0,0,0.5);
-    border-radius: 3px;
-    margin: 0 10px 0 5px;
-    height:@height-6;
-
-    float:left;
-}
-attribute > div.valpartdetailed > div.valcontainer > a > span.count > span.cno {
-    margin-top: 7px;
-    display:block;
-    line-height:@height-3;
-}
-attribute > div.valpartdetailed > div.valcontainer > a > span.count > span.caption{
-    display:block;
-    font-size:12px;
-    line-height:12px;
-}
-
-/* ========================================= */
-
-div#controls {
-    .font-2;
-    line-height:@height-6;
-    position: absolute;
-    z-index:100;
-    top:0;
-    width:100%;
-    height:@height-8;
-    background-color:gray;
-
-    box-shadow: 0 5px 5px 0 rgba(0,0,0,0.5);
-
-    text-align:center;
-    color:white;
-    display: none;
-}
-
-div#controls button {
-    .font-2;
-}
-div#controls > button {
-    .font-3;
-    position:absolute;
-    top:5px;
-    height: 80px;
-    min-width:180px;
-    text-shadow: 0 -2px gray;
-}
-div#controls > button#leftModalBtn {
-    left:5px;
-}
-div#controls > button#rightModalBtn {
-    right:5px;
-}
-
-div#controls > div#profileinfo {
-    position: absolute;
-    right:15px;
-    top:15px;
-    display:none;
-    text-shadow: #000 0px -1px 1px;
-    height:80px;
-}
-div#controls > div#profileinfo > img{
-    width: 80px;
-    padding-bottom:30px;
-}
-
-div#controls > div#title {
-    text-transform:capitalize;
-    line-height:@height-8;
-    text-shadow: #000 0px -1px 1px;
-}
-
-div#controls > a#context {
-    display:block;
-    position: absolute;
-    left:5px;
-    top:5px;
-    bottom:5px;
-    
-    text-shadow: #111 0px -1px 1px;
-    font-size:16px;
-    font-weight:bold;
-    line-height:16px;
-    
-    border: 1px solid rgba(255,255,255,0.5);
-    background-color:#333;
-    border-radius:5px;
-    padding: 10px 10px 5px 10px;
-    text-align:left;
-    color:white;
-}
-div#controls > a#context:hover {
-    text-decoration:none;
-}
-div#controls > a#context > div#contextTitle{
-    padding-top:5px;
-    max-height:@height-4;
-    .font-3;
-    text-shadow: #111 0px -2px 1px;
-}
-div#controls > a#context > div#contextTitle > img {
-    max-height:@height-4;
-}
 /*############# LOGIN #############*/
 
 /*div.login.alert{
@@ -557,74 +297,6 @@ div#controls > a#context > div#contextTitle > img {
     height:50px;
 }*/
 
-div.nametag {
-    display:none;
-    position: relative;
-    background-color:red;
-    border-radius:30px;
-    margin: 50px auto;
-    width:500px;
-    height:300px;
-    color:white;
-    text-align:center;
-    font-size:40px;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-weight: bold;
-    line-height:50px;
-    text-shadow: 0px -1px 1px #555, 0px 1px 1px #fff;
-}
-div.nametag > b {
-    display: block;
-    font-size:60px;
-    line-height:60px;
-}
-div.nametag > form {
-    position:absolute;
-    bottom:8%;
-    top:40%;
-    width:inherit;
-    background-color:white;
-}
-div.nametag > form > input {
-    font-size:40px;
-    line-height:40px;
-    height:50%;
-    text-align:center;
-    width:inherit;
-    padding:0;
-    margin:0;
-    outline: none;
-    outline-color:white ! important;
-    border-color:white ! important;
-    box-shadow:0 ! important;
-    -webkit-box-shadow:0;
-    -moz-box-shadow:0;
-    border:0px;
-    /*text-transform: capitalize;*/
-    /*font-variant: small-caps;*/
-}
-div.nametag > form > input:focus {
-    outline: none;
-    outline-color:white ! important;
-    border-color:white ! important;
-    box-shadow:0 ! important;
-    -webkit-box-shadow:0;
-    -moz-box-shadow:0;
-    border:0px;
-}
-
-a.login {
-    display:block;
-    width:500px;
-    margin:auto;
-    text-align:center;
-    font-size:@height-4;
-    line-height:@height-6;
-}
-
-.introTag {
-    position:absolute;
-}
 
 .anime {
     -webkit-transform: scale(2);
@@ -949,77 +621,20 @@ newcontext > div#attributes > div#attrList > a > div.value > b {
 }
 
 
-/*############# WELCOME #############*/
 
-div.welcome {
-    /*position: absolute;*/
-    /*top:0px;*/
-    /*left:0px;*/
-    /*right:0;*/
-    /*bottom:0;*/
-    
-    font-weight:bold;
-    color:#aaa;
-    width:700px;
-    margin:auto;
-    /*background-color:gray;*/
-}
-div.welcome > div#logo {
-    font-size:140px;
-    line-height:140px;
-    text-align:center;
-    text-shadow: 0 -2px 1px gray, 0 1px 0 white;
-}
-div.welcome > div#menu {
-    padding: 40px 0 20px 15px;
-}
-div.welcome > div#menu > a {
-    padding: 5px;
-    margin-right:5px;
-    border:1px solid #aaa;
-    border-radius:5px;
-    color:gray;
-    .font-s2;
-}
-div.welcome > div#menu > a:hover {
-    text-decoration:none;
-    background-color:gray;
-    color:white;
-    text-shadow: 0 1px gray;
-}
-div.welcome > div#activity {
-    border-top: 1px solid #ccc;
-    box-shadow: 0 -1px #aaa, inset 0 1px white;
-    padding: 20px 0 20px 15px;
-    color:gray;
-    .font-s2;
-    text-shadow: 0 1px #fff;
-}
-div.welcome > div#activity > div#activityEntry {
-    padding: 10px 0 5px 0;
-}
-div.welcome > div#activity > div#activityEntry > span {
-    color: #222;
-}
-div.welcome > div#buttons {
-    border-top: 1px solid #ccc;
-    box-shadow: 0 -1px #aaa, inset 0 1px white;
-    padding: 20px 0 20px 0;
-    height:100px;
-}
-div.welcome > div#buttons > button {
-    margin: 0 15px 0 15px;
-    width:40%;
-    height:100%;
-    .font-3;
-    font-weight:bold;
-    text-shadow: 0 1px #fff;
-    color:gray;
-    float:left;
-}
-div.welcome > div#buttons > button:last-child {
-    float:right;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1152,24 +767,25 @@ div.pickLocation > div#page2 input[type=number],select {
 /************ LOCATION PICKER **************/
 
 div.locationPicker {
-    position: absolute;
-    left: 0;
-    top: 40px;
-    right: 0;
-    bottom: 0;
+    position: relative;
+    /*position: absolute;*/
+    /*left: 0;*/
+    /*top: 0;*/
+    /*right: 0;*/
+    /*bottom: 0;*/
 
-    height:530px;
+    /*height:530px;*/
     width:@wizardWidth;
 
-    left:50%;
-    margin: 10px 0 0 -@wizardWidth/2;
+    /*left:50%;*/
+    /*margin: 10px 0 0 -@wizardWidth/2;*/
     padding:10px;
     
     text-align: center;
     pointer-events: none;
     color: rgba(0,0,0,0.8);
-
-    background-color: rgba(0,0,0,0.1);
+    background: 10px 10px url(/static/images/hole.png?2); 
+    /*background-color: rgba(0,0,0,0.1);*/
     border: 1px solid rgba(0,0,0,0.15);
 }
 div.locationPicker > div.wizardPage {
@@ -1230,7 +846,8 @@ div.locationPicker > div.wizardPage > input#locationinput {
 
 
 
-/*******   VALCONTAINER  ***********/
+/*************   VALCONTAINER  ***************/
+
 @valueHeight: 36px;
 div.valcontainer {
     position: relative;
