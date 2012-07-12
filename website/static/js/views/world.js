@@ -7,7 +7,8 @@ define([
   // 'maps',
   'views/key',
   'views/mapInfoAttribute',
-  ], function($, _, Backbone, router, keyView, mapInfoAttrView){
+  'views/valueDetailed',
+  ], function($, _, Backbone, router, keyView, mapInfoAttrView, valueView){
   var welcomeView = Backbone.View.extend({
     el: $('aside'),
     events: {
@@ -28,22 +29,44 @@ define([
         }
         this.circles = [];
 
-        if (model.type != 'location')
-            return;
-
-        var bounds = new google.maps.LatLngBounds();
-        for (var i in model.values) {
-            var val = model.values[i].xdata;
-            var lat = parseFloat(val.lat);
-            var lng = parseFloat(val.lon);
-            var center = new google.maps.LatLng(lat, lng);
-            var radius = parseInt(val.radius);
-            bounds.extend(center);
-            this.addMapCircle({center:center, radius:radius, title:val.title});
+        if (model.type == 'location') {
+            $('#popup').hide();
+            var bounds = new google.maps.LatLngBounds();
+            for (var i in model.values) {
+                var val = model.values[i].xdata;
+                var lat = parseFloat(val.lat);
+                var lng = parseFloat(val.lon);
+                var center = new google.maps.LatLng(lat, lng);
+                var radius = parseInt(val.radius);
+                bounds.extend(center);
+                this.addMapCircle({center:center, radius:radius, title:val.title});
+            }
+            
+            if (!bounds.isEmpty()) {
+                APP.map.fitBounds(bounds);
+            }
         }
-        
-        if (!bounds.isEmpty()) {
-            APP.map.fitBounds(bounds);
+
+        if (model.type == 'string') {
+            var header = $('<div></div>').addClass('header').html(model.key);
+            var expandBtn = $('<button class="btn"></button>').html('<i class="icon-chevron-down"></i>');
+            expandBtn.css({float:'right'}).click(function(){
+                var flag = $(this).children().hasClass('icon-chevron-down');
+                $('div.valcontainer').toggleClass('expand', flag);
+                $(this).children().toggleClass('icon-chevron-down', !flag);
+                $(this).children().toggleClass('icon-chevron-up', flag);
+            });
+            header.append(expandBtn);
+
+            $('#popup').show().html(header);
+            for (var i in model.values) {
+                var val = model.values[i];
+                
+                var vview = new valueView();
+                vview.render(val);
+                $('#popup').append(vview.el);
+            }
+            
         }
     },
 
@@ -78,6 +101,7 @@ define([
             title: options.title,
         });
 
+        var that = this;
         var el = $('<div></div>');
         var attrView = new mapInfoAttrView();
         attrView.el = el;
@@ -87,16 +111,20 @@ define([
             content: el.html(),
         });
         google.maps.event.addListener(marker, 'click', function() {
+            _.each(that.circles, function(circle){ circle.infowindow.close(); })
             infowindow.open(APP.map, marker);
         });
         google.maps.event.addListener(mapCircle, 'click', function() {
+            _.each(that.circles, function(circle){ circle.infowindow.close(); })
             infowindow.open(APP.map, marker);
         });
 
-        this.circles.push({circle:mapCircle, marker:marker});
+        this.circles.push({circle:mapCircle, marker:marker, infowindow:infowindow});
     },
 
     render: function(){
+        $('.navbar a.context').show().html('#'+APP.context.name);
+
         var centerLatLng = new google.maps.LatLng(37.748582,-122.418411);
         APP.map = new google.maps.Map(document.getElementById('map_canvas'), {
             'zoom': 7,
@@ -149,7 +177,7 @@ define([
         //   that.latLngControl.updatePosition(mEvent.latLng);
         // });
         google.maps.event.addListener(APP.map, 'click', function(event) {
-            console.log('map', event)
+            _.each(that.circles, function(circle){ circle.infowindow.close(); })
         });
     },
 

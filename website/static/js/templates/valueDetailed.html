@@ -1,14 +1,13 @@
 
 
 <a href="#" class='valpart'>
-	<span class="count"<% if (! showControls) print('style="display:none"') %> >
-	    <span class='cno'><%= vcnt %></span>
-        <span class='caption'>people</span>
+	<span class="count">
+	    <div class='cno'><%= score %></div>
+        <div class='caption'><% if (score==1) print('person'); else print('people'); %></div>
 	</span>
-	<div class="value"><%= val %></div>
+	<span class="value"><%= val %></span>
 </a>
 
-<button id='searchBtn' class='btn <% if (selected) print("btn-primary") %>' <% if (! showControls) print('style="display:none";') %>></button>
-<button id='addBtn' class='btn <% if (haveit) print("btn-success"); %>' <% if (! showControls) print('style="display:none";') %>>+</button>
+<button id='addBtn' class='btn <% if (userhasit) print("btn-success"); %>'>+ me too</button>
 
 <div id='matches'></div>

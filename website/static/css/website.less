@@ -29,14 +29,17 @@ body {
     -webkit-overflow-scrolling: touch;
 
     pointer-events: none;
-    
 }
 aside {
     position: absolute;
     right: 0;
     top: 40px;
+    bottom: 0;
     width: @asideWidth;
     padding: 5px;
+    
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
 }
 aside > div.asideEntry {
     width: @asideWidth;
@@ -71,12 +74,23 @@ aside > div.asideEntry > a.asideKey > i {
     top: 10px;
     right:5px;
 }
-#popup {
-    width: 300px;
-    margin: 50px auto;
-    background-color: yellow;
-}
 
+div#popup {
+    width: 400px;
+    margin: 10px auto;
+    background-color: rgba(60,60,60,0.8);
+    pointer-events: all;
+    padding: 5px;
+    display: none;
+}
+div#popup > div.header {
+    font-weight: bold;
+    font-size: 28px;
+    line-height: 28px;
+    color: white;
+    padding: 5px;
+    text-shadow: 0 -1px black;
+}
 
 
 
@@ -1216,11 +1230,111 @@ div.locationPicker > div.wizardPage > input#locationinput {
 
 
 
+/*******   VALCONTAINER  ***********/
+@valueHeight: 36px;
+div.valcontainer {
+    position: relative;
+    max-height: @valueHeight;
+    background-color: rgba(0,0,0,0.7);
+    margin-top: 10px;
+    border: 1px solid rgba(200,200,200,0.6);
+    border-radius: 5px;
+    padding: 5px;
+    overflow: hidden;
+    -webkit-transition: max-height 0.4s ease-in-out;
+    -o-transition: max-height 0.4s ease-in-out;
+    -moz-transition: max-height 0.4s ease-in-out;
+    transition: max-height 0.4s ease-in-out;
+}
+div.expand {
+    max-height: 2000px;
+    -webkit-transition: max-height 0.4s ease-in-out;
+    -o-transition: max-height 0.4s ease-in-out;
+    -moz-transition: max-height 0.4s ease-in-out;
+    transition: max-height 0.4s ease-in-out;
+}
+/*div.valcontainer:last-child { margin-bottom: 0; }*/
+div.valcontainer > a {
+    display: block;
+}
+div.valcontainer > a:hover { text-decoration: none; }
+div.valcontainer > a > span.count {
+    display:inline-block;
+    color: white;
+    background-color:#ff2244;
+    box-shadow: 0px 3px 1px rgba(0,0,0,0.5);
+    padding: 5px;
+    text-align:center;
+    text-shadow: 0px -1px 0px rgba(0,0,0,0.6);
+    border-radius: 3px;
+}
+div.valcontainer > a > span.count > div.cno {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 16px;
+}
+div.valcontainer > a > span.count > div.caption{
+    font-size: 10px;
+    line-height: 10px;
+}
+div.valcontainer > a > span.value {
+    display: inline-block;
+    font-size: 20px;
+    line-height: 36px;
+    height: 36px;
+    color: white;
+    text-shadow: 0 -1px rgba(0,0,0,0.8);
+}
+div.valcontainer > button {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    height: 36px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+
+
+div#matches {
+    border-top: 1px solid rgba(200,200,200,0.3);
+}
+a.userMatch {
+    display: inline-block;
+    color: white;
+    text-shadow: 0 -1px black;
+    text-align: center;
+    background-color: rgba(200,200,200,0.6);
+    border-radius: 2px;
+    padding: 5px;
+    width: 50px;
+    height: 40px;
+    margin-top: 5px;
+}
+a.userMatch:hover { 
+    text-decoration: none;
+    background-color: rgba(200,200,200,0.8);
+}
+a.userMatch > div.username { 
+    display: block;
+    text-overflow: clip;
+    /*-o-text-overflow: ellipsis;*/
+    /*-webkit-text-overflow: ellipsis;*/
+    overflow: hidden;
+}
+
+
+
 .navbar-fixed-top .brand {
     font-weight: bold;
     color: rgba(220,220,220,0.9);
     text-shadow: 0 -1px 0 black;
-    float: left;
+    /*float: left;*/
+    font-size: 24px;
+    line-height: 40px;
+    margin: 0;
+    padding-top: 0 ! important;
+    padding-bottom: 0 ! important;
 }
 
 
@@ -1250,3 +1364,21 @@ div.navbar {
     left: 0;
     right: 0;
 }
+div.navbar a.context {
+    display: none;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 20px;
+    border: 1px solid rgba(200,200,200,0.6);
+    border-radius: 5px;
+    padding: 5px 10px 5px 10px;
+    margin: 5px 0 5px 0;
+    background-color: rgba(20,20,20,0.5);
+}
+div.navbar a.context:hover { 
+    text-decoration: none; 
+    background-color: rgba(20,20,20,0.3);   
+}
+
+
