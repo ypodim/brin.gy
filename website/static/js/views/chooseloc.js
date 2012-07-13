@@ -23,8 +23,9 @@ define([
     locationInput: 'locationinput',
 
     cancelBtn: function() {
-        this.el.empty();
         this.contextCircle && this.contextCircle.setMap(null);
+        this.undelegateEvents();
+        this.$('.locationPicker').remove();
     },
     nextBtn: function() {
         var locationTitle = this.$('#'+this.locationInput).val();

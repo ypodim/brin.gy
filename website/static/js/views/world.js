@@ -13,7 +13,7 @@ define([
   var welcomeView = Backbone.View.extend({
     el: $('#container'),
     events: {
-        'click button': 'addLocation',
+        'click button#addLocation': 'addLocation',
     },
 
     
@@ -25,8 +25,6 @@ define([
             // state: this.state,
         });
         locView.render();
-
-        
     },
 
     keyClickClb: function(model){
