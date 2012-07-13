@@ -19,12 +19,13 @@ define([
     
     circles: [],
 
-    addLocation: function() {
+    addLocation: function(e) {
         this.$('#popup').empty().addClass('transparent').show();
-        var locView = new chooselocView({
-            // state: this.state,
+        var locView = new chooselocView();
+        locView.render(function(){
+            $(e.target).removeClass('disabled');    
         });
-        locView.render();
+        $(e.target).addClass('disabled');
     },
 
     keyClickClb: function(model){
@@ -39,13 +40,18 @@ define([
             $('#popup').hide();
             var bounds = new google.maps.LatLngBounds();
             for (var i in model.values) {
-                var val = model.values[i].xdata;
-                var lat = parseFloat(val.lat);
-                var lng = parseFloat(val.lon);
+                var xdata = model.values[i].xdata;
+                var lat = parseFloat(xdata.lat);
+                var lng = parseFloat(xdata.lon);
                 var center = new google.maps.LatLng(lat, lng);
-                var radius = parseInt(val.radius);
+                var radius = parseInt(xdata.radius);
                 bounds.extend(center);
-                this.addMapCircle({center:center, radius:radius, title:val.title});
+                this.addMapCircle({
+                    center:center, 
+                    radius:radius, 
+                    val: model.values[i],
+                    key: model.key,
+                });
             }
             
             if (!bounds.isEmpty()) {
@@ -164,7 +170,12 @@ define([
                         var lng = parseFloat(val.xdata.lon);
                         var center = new google.maps.LatLng(lat, lng);
                         var radius = parseInt(val.xdata.radius);
-                        that.addMapCircle({center:center, radius:radius, title:val.xdata.title});
+                        that.addMapCircle({
+                            center:center, 
+                            radius:radius, 
+                            val: val,
+                            key: attr.key,
+                        });
                     }
                 }
             }

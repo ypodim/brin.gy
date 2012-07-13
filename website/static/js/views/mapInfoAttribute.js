@@ -5,7 +5,8 @@ define([
   'router',
 
   'text!templates/mapInfoAttribute.html',
-  ], function($, _, Backbone, router, mapInfoAttrTemplate){
+  'text!templates/userMatch.html'
+  ], function($, _, Backbone, router, mapInfoAttrTemplate, userMatchTemplate){
   var welcomeView = Backbone.View.extend({
     // el: $('div'),
     className: 'infobox',
@@ -25,7 +26,16 @@ define([
     },
 
     render: function(){
+        console.log(this.options);
         $(this.el).html( this.template(this.options) );
+        var utemplate = _.template(userMatchTemplate);
+        for (var m in this.options.val.matches) {
+            var username = this.options.val.matches[m];
+            var uhtml = utemplate({username:username});
+            this.$('div#matches').append(uhtml);
+        }
+
+        
     },
 
     initialize: function(options){

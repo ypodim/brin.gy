@@ -1,3 +1,10 @@
 
-<div class='title'><%= title %></div>
-<a href='#'>zoom here</a>
+<div class='title'>
+	<div class='titleKey'><%= key %></div>
+	<div class='titleVal'><%= val.val %></div>
+</div>
+<div class='body'>
+	<a href='#'>zoom here</a>
+	<button id='addBtn' class='btn <% if (val.userhasit) print("btn-success"); %>'>+ me too</button>
+	<div id='matches'></div>
+</div>

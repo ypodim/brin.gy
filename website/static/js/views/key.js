@@ -19,7 +19,10 @@ define([
 
     keyClick: function(){
         $('aside > div > a').removeClass('highlighted');
+        $('aside > div > a > i').removeClass('icon-white');
         this.$('a').addClass('highlighted');
+        this.$('i').addClass('icon-white');
+        
         this.keyClickClb && this.keyClickClb(this.model)
         return false;
     },

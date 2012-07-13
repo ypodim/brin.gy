@@ -13,41 +13,54 @@ define([
     events: {
         'click button#cancel': 'cancelBtn',
         'click button#useloc': 'useBtn',
-        'click button#next': 'nextBtn',
+        'click button#next': 'okBtn',
     },
 
     map: null,
-    contexts: {},
+    // contexts: {},
     contextCircle: null,
     tempc: 0,
     locationInput: 'locationinput',
 
-    cancelBtn: function() {
-        this.contextCircle && this.contextCircle.setMap(null);
+    close: function() {
         this.undelegateEvents();
         this.$('.locationPicker').remove();
+        this.onCloseClb && this.onCloseClb();
     },
-    nextBtn: function() {
+    cancelBtn: function() {
+        this.contextCircle && this.contextCircle.setMap(null);
+        this.close();
+    },
+    okBtn: function() {
         var locationTitle = this.$('#'+this.locationInput).val();
         if (locationTitle == '')
             return;
 
         var that = this;
 
+
+        var label = 'xxx';
+        var icon = 'http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bb|';
+        icon += label+'|FF8080|000000';
+        var shadow = 'http://chart.googleapis.com/chart?chst=d_bubble_text_small_shadow&chld=bb|'+label;
         var marker = new google.maps.Marker({
-            position: this.contexts['chicago'].center,
-            // map: this.map,
+            position: this.contextCircle.getCenter(),
+            map: APP.map,
             title: locationTitle,
+            // icon: new google.maps.MarkerImage(icon,null, null, new google.maps.Point(0, 42)),
+            // shadow: new google.maps.MarkerImage(shadow,null, null, new google.maps.Point(0, 45))
         });
 
         
-        var el = $('<div></div>');
-        var attrView = new mapInfoAttrView();
-        attrView.el = el;
-        attrView.render({title: locationTitle});
+        var attrView = new mapInfoAttrView({
+            title: locationTitle,
+            center: this.contextCircle.getCenter(),
+            radius: this.contextCircle.getRadius(),
+        });
+        attrView.render();
 
         var infowindow = new google.maps.InfoWindow({
-            content: el.html(),
+            content: attrView.el,
         });
         google.maps.event.addListener(marker, 'click', function() {
             infowindow.open(APP.map, marker);
@@ -56,7 +69,7 @@ define([
             infowindow.open(APP.map, marker);
         });
 
-        this.el.empty();
+        this.close();
     },
     useBtn: function() {
         var header = 40;
@@ -69,11 +82,11 @@ define([
         var scale = Math.pow(2, 21-APP.map.getZoom());
 
         var center = this.latLngControl.xy2latlng(x,y);
-        console.log(center, scale)
-        this.contexts['chicago'] = {
-            center: center,
-            radius: 10*scale,
-        };
+        
+        // this.contexts['chicago'] = {
+        //     center: center,
+        //     radius: 10*scale,
+        // };
 
 
         var city = 'chicago';
@@ -85,14 +98,13 @@ define([
             fillColor: "#FF0000",
             fillOpacity: 0.1,
             map: APP.map,
-            center: this.contexts[city].center,
-            radius: this.contexts[city].radius,
+            center: center,
+            radius: 10*scale,
         };
 
-        if (this.contextCircle != null)
-            this.contextCircle.setMap(null)
+        this.contextCircle && this.contextCircle.setMap(null)
         this.contextCircle = new google.maps.Circle(contextOptions);
-        this.contextCircle.cntx = this.tempc++;
+        // this.contextCircle.cntx = this.tempc++;
 
         google.maps.event.addListener(this.contextCircle, 'click', this.areaClick);
         google.maps.event.addListener(this.contextCircle, 'mouseover', this.areaMouseOver);
@@ -101,7 +113,7 @@ define([
         this.$('button#next').removeClass('disabled');
     },
     areaClick: function(event) {
-        console.log('area', this.cntx)
+        // console.log('area', this.cntx)
     },
     areaMouseOver: function(event) {
         this.setOptions({strokeColor:'red'});
@@ -134,7 +146,9 @@ define([
         this.set('visible', false);
     },
 
-    render: function(){
+    render: function(onCloseClb){
+        this.onCloseClb = onCloseClb;
+
         // Extend OverlayView so we can access MapCanvasProjection.
         this.LatLngControl.prototype = new google.maps.OverlayView();
         this.LatLngControl.prototype.draw = function() {};
@@ -278,7 +292,6 @@ define([
 
     initialize: function(options){
         _.bindAll(this, 'render');
-        this.router = options.router;
 
         var compiled_template = _.template( mapTemplate );
         var that = this;

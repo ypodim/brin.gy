@@ -10,7 +10,7 @@ body {
     background-color: rgba(0,0,0,0.1);
 }
 
-@asideWidth: 230px;
+@asideWidth: 260px;
 #container {
     position: absolute;
     z-index:0;
@@ -72,7 +72,7 @@ aside {
     top: 0;
     bottom: 0;
     width: @asideWidth;
-    padding: 5px;
+    padding: 10px 5px 5px 5px;
     
     pointer-events: all;
     overflow-y: scroll;
@@ -82,7 +82,7 @@ aside > div.asideEntry {
     width: @asideWidth;
 }
 aside > div.asideEntry > a.asideKey {
-    color: black;
+    color: rgba(50,50,50,0.8);
     display: block;
     position: relative;
     height: 25px;
@@ -99,8 +99,13 @@ aside > div.asideEntry > a.asideKey:hover {
 }
 aside > div > a.highlighted {
     background-color: rgba(0,0,0,0.2);
-    color: black ! important;
+    background-color: rgba(255, 207, 121,0.8);
+    background-color: rgba(153, 204, 255, 0.9);
+    
+    background-color: rgba(0, 51, 102, 0.9);
+    color: white ! important;
     text-shadow: 0 1px rgba(255,255,255,0.5);
+    text-shadow: 0 -1px rgba(150,150,150,0.5);
 }
 aside > div.asideEntry > a.asideKey > div.title {
     position: absolute;
@@ -172,7 +177,7 @@ div.noTitleTransform {
 
 /*############# PARAMS end #############*/
 
-
+/*
 div.mobile {
     padding:10px 0 20px 0;
     height: 15px;
@@ -221,7 +226,7 @@ div.scrollableContainer > div.closingpane > button {
     height:100px;
     margin: 195px 0 0 180px;
 }
-
+*/
 
 
 
@@ -252,37 +257,6 @@ div#noFilters > button {
     background-size: 40%;
 }
 
-/* ======== PERSON ========= */
-person {
-    display: block;
-    .font-2;
-    background: rgba(25, 25, 25, 0.15);
-    background-image: -moz-linear-gradient(90deg, #dddddd, #aaaaaa);
-    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#dddddd), to(#aaaaaa));
-    line-height: @height-8;
-
-    border-radius:2px;
-    background-color: rgba(250,250,250,0.4);
-    padding: 5px 5px 5px 5px;
-    margin: 5px 5px 5px 5px;
-    box-shadow:0px -1px 2px #333333;
-}
-person a { 
-    margin: 0 0 0 5px;
-    color: black; 
-}
-person a:hover { 
-    text-decoration: none; 
-    color:black;
-}
-person > button {
-    float:right;
-    height:@height-8;
-    line-height:@height-6;
-    font-size:@height-4 ! important;
-    width:150px;
-    margin: 0 0 0 5px;
-}
 
 
 /*############# LOGIN #############*/
@@ -921,7 +895,7 @@ a.userMatch {
     color: white;
     text-shadow: 0 -1px black;
     text-align: center;
-    background-color: rgba(200,200,200,0.6);
+    background-color: rgba(150,150,150,1);
     border-radius: 2px;
     padding: 5px;
     width: 50px;
@@ -930,7 +904,7 @@ a.userMatch {
 }
 a.userMatch:hover { 
     text-decoration: none;
-    background-color: rgba(200,200,200,0.8);
+    background-color: rgba(150,150,150,0.8);
 }
 a.userMatch > div.username { 
     display: block;
@@ -958,21 +932,37 @@ a.userMatch > div.username {
 
 div#map_canvas {
     position: absolute;
-    /*top: 40px;*/
+    top: 40px;
     bottom: 0;
     left: 0;
-    right: 240px;
+    right: @asideWidth + 10;
 }
 div.infobox {
-    width:200px;
-    height:100px;
+    width:400px;
+    /*height:100px;*/
+    /*background-color: rgba(60,60,60,0.8);*/
 }
-div.infobox > div.title {
+div.infobox > div {
+    height: 26;
+}
+div.infobox > div > div.titleKey {
+    float: right;
     font-weight: bold;
     font-size: 22px;
-    padding: 5px;
+    line-height: 22px;
+    padding: 5px 0 5px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    color: gray;
+}
+div.infobox > div > div.titleVal {
+    float: left;
+    font-weight: bold;
+    font-size: 22px;
+    line-height: 22px;
+    padding: 5px 0 5px 0;
     border-bottom: 1px solid rgba(0,0,0,0.1);
 }
+
 
 div.navbar {
     position: absolute;
