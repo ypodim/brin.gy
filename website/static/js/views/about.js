@@ -5,7 +5,7 @@ define([
   'text!templates/about.html'
   ], function($, _, Backbone, aboutViewTemplate){
   var aboutView = Backbone.View.extend({
-    el: $("#container"),
+    el: $("#full"),
     events: {
         
     },

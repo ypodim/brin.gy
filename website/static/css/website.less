@@ -11,7 +11,7 @@ body {
 }
 
 @asideWidth: 260px;
-#container {
+#full, #container {
     position: absolute;
     z-index:0;
     left: 0;
@@ -23,7 +23,11 @@ body {
 
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
-
+}
+#full {
+    background-color: #eee;
+}
+#container {
     pointer-events: none;
 }
 #container > div#mapOverlay {
@@ -916,17 +920,7 @@ a.userMatch > div.username {
 
 
 
-.navbar-fixed-top .brand {
-    font-weight: bold;
-    color: rgba(220,220,220,0.9);
-    text-shadow: 0 -1px 0 black;
-    /*float: left;*/
-    font-size: 24px;
-    line-height: 40px;
-    margin: 0;
-    padding-top: 0 ! important;
-    padding-bottom: 0 ! important;
-}
+
 
 
 
@@ -964,12 +958,48 @@ div.infobox > div > div.titleVal {
 }
 
 
-div.navbar {
+
+.navbar-fixed-top .brand {
+    font-weight: bold;
+    color: rgba(220,220,220,0.9);
+    text-shadow: 0 -1px 0 black;
+    /*float: left;*/
+    font-size: 24px;
+    line-height: 40px;
+    margin: 0;
+    padding-top: 0 ! important;
+    padding-bottom: 0 ! important;
+}
+/*div.navbar {
     position: absolute;
     z-index: 1000;
     top: 0;
     left: 0;
     right: 0;
+}*/
+
+div.navbar ul > li.authed {
+    display: none;
+}
+div.navbar ul > li.noauth {
+    display: none;
+}
+div.navbar .nav > li > a {
+    color: rgba(255,255,255,0.9) ! important;
+    text-shadow: 0 -1px black;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 5px;
+}
+div.navbar .nav > li > a.highlighted- {
+    border: 1px solid rgba(255,255,255,0.3);
+    background-color: rgba(255,255,255,0.5);
+    color: black ! important;
+    text-shadow: 0 1px white;
+}
+div.navbar .nav > li > a:hover {
+    /*color: rgba(255,255,255,0.9) ! important;*/
+    background-color: rgba(255,255,255,0.2);
 }
 div.navbar a.context {
     display: none;

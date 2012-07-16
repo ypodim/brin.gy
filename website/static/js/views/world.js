@@ -19,6 +19,14 @@ define([
     
     circles: [],
 
+    doSignin: function(e){
+        console.log('in')
+    },
+    doSignup: function(e){
+        console.log('up')
+        this.$('#popup').html('asdf').show();
+    },
+
     addLocation: function(e) {
         this.$('#popup').empty().addClass('transparent').show();
         var locView = new chooselocView();
@@ -134,7 +142,7 @@ define([
     },
 
     render: function(){
-        $('.navbar a.context').show().html('#'+APP.context.name);
+        
 
         var centerLatLng = new google.maps.LatLng(37.748582,-122.418411);
         APP.map = new google.maps.Map(document.getElementById('map_canvas'), {
@@ -181,7 +189,6 @@ define([
             }
         });
 
-
         // Register event listeners
         // google.maps.event.addListener(this.map, 'mouseover', function(mEvent) {
         //   that.latLngControl.set('visible', true);
@@ -198,7 +205,8 @@ define([
     },
 
     initialize: function(options){
-        _.bindAll(this, 'render', 'keyClickClb');
+        _.bindAll(this, 'render', 'keyClickClb', 'doSignup');
+        this.navbar = options.navbar;
         this.router = options.router;
     },
   });

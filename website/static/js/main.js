@@ -42,9 +42,10 @@ require([
     'collections/attributes',
     'collections/persons',
 
-    'views/controls',
+    'views/world',
+    'views/navbar'
 ], function($, bootstrap, _, common, Router, Backbone, appState, Attributes, Persons,
-    controlsView
+    worldView, navbarView
     ){
 
     state = new appState();
@@ -91,13 +92,22 @@ require([
         personCollection.state = state;
         state.personCollection = personCollection;
 
-        var cview = new controlsView({
-            state:state,
+        var navview = new navbarView({});
+        navview.render();
+
+        var wldView = new worldView({
+            navbar: navview,
         });
+        wldView.render();
+
+
+        navview.bind('signin', wldView.doSignin);
+        navview.bind('signup', wldView.doSignup);
+
 
         var app_router = new Router({
-            controlsView: cview,
-            state: state,
+            // controlsView: cview,
+            // state: state,
         });
         state.router = app_router;
         Backbone.history.start();

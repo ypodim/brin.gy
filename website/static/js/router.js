@@ -54,22 +54,22 @@ define([
     
     initialize: function(options){
         _.bindAll(this, 'login');
-        this.state = options.state;
-        this.controlsView = options.controlsView;
+        // this.state = options.state;
+        // this.controlsView = options.controlsView;
 
-        this.contents_view = new mobileManagerView({
-            state: this.state,
-            controls: this.controlsView,
-        });
+        // this.contents_view = new mobileManagerView({
+        //     state: this.state,
+        //     controls: this.controlsView,
+        // });
         // this.contents_view.resetCollections();
 
-        this.presView = new presentationView({
-            router:this,
-        });
+        // this.presView = new presentationView({
+        //     router:this,
+        // });
 
-        this.wview = new welcomeView({
-            state: this.state,
-        });
+        // this.wview = new welcomeView({
+        //     state: this.state,
+        // });
 
 
         
@@ -187,9 +187,9 @@ define([
         });
     },
     showAbout: function() {
-        this.controlsView.setUIstate({
-            footer:false,
-        });
+        // this.controlsView.setUIstate({
+            // footer:false,
+        // });
 
         aboutView.render();
     },
@@ -278,10 +278,7 @@ define([
         //     footer: false,
         // });
         
-        var wldView = new worldView({
-            state: this.state,
-        });
-        wldView.render();
+        
     },
   });
 
