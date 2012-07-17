@@ -26,6 +26,7 @@ body {
 }
 #full {
     background-color: #eee;
+    display: none;
 }
 #container {
     pointer-events: none;
@@ -45,6 +46,41 @@ body {
     box-shadow: 0 0 100px black;
 }
 
+div#login {
+    position: absolute;
+    z-index: 1050;
+    top: 39px;
+    right: 0;
+    display: none;
+    padding: 10px;
+    width: 200px;
+    background-color: rgba(80,80,80,1);
+    border-radius: 5px 0 5px 5px;
+    color: white;
+}
+div#login > div.title {
+    font-weight: bold;
+    font-size: 18px;
+    text-shadow: 0 -1px black;
+    margin: 0 0 10px 0;
+}
+div#login > form {
+    margin: 0;
+}
+div#login > form > input {
+    display: block;
+    width: 190px;
+    margin: 5px auto;
+}
+div#login > div.footer {
+    line-height: 28px;
+}
+div#login > div.footer > a {
+    color: inherit;
+}
+div#login > div.footer > button {
+    float: right;
+}
 
 @popupWidth: 400px;
 div#popup {
@@ -991,15 +1027,16 @@ div.navbar .nav > li > a {
     font-size: 14px;
     border-radius: 5px;
 }
-div.navbar .nav > li > a.highlighted- {
-    border: 1px solid rgba(255,255,255,0.3);
-    background-color: rgba(255,255,255,0.5);
-    color: black ! important;
-    text-shadow: 0 1px white;
+div.navbar .nav > li > a.highlighted {
+    background-color: rgba(80,80,80,1);
+    border-radius: 0;
 }
 div.navbar .nav > li > a:hover {
     /*color: rgba(255,255,255,0.9) ! important;*/
     background-color: rgba(255,255,255,0.2);
+}
+div.navbar .nav > li > a.highlighted:hover {
+    background-color: rgba(80,80,80,1);
 }
 div.navbar a.context {
     display: none;

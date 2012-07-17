@@ -101,8 +101,8 @@ require([
         wldView.render();
 
 
-        navview.bind('signin', wldView.doSignin);
-        navview.bind('signup', wldView.doSignup);
+        navview.bind('signin', wldView.doLogin);
+        navview.bind('signup', wldView.doLogin);
 
 
         var app_router = new Router({

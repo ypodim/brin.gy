@@ -9,7 +9,8 @@ define([
   'views/mapInfoAttribute',
   'views/valueDetailed',
   'views/chooseloc',
-  ], function($, _, Backbone, router, keyView, mapInfoAttrView, valueView, chooselocView){
+  'views/login',
+  ], function($, _, Backbone, router, keyView, mapInfoAttrView, valueView, chooselocView, loginView){
   var welcomeView = Backbone.View.extend({
     el: $('#container'),
     events: {
@@ -19,12 +20,22 @@ define([
     
     circles: [],
 
-    doSignin: function(e){
-        console.log('in')
-    },
-    doSignup: function(e){
-        console.log('up')
-        this.$('#popup').html('asdf').show();
+    doLogin: function(action){
+        if (action == 'signin')
+            $('#login').css({right:'249px'});
+        if (action == 'signup')
+            $('#login').css({right:'114px'});
+
+        login = new loginView();
+        login.render({action:action});
+        
+        var that = this;
+        $('body').one('click', function(){
+            login.undelegateEvents();
+            // login.remove();
+            $('#login').hide();
+            that.navbar.render();
+        });
     },
 
     addLocation: function(e) {
@@ -205,9 +216,9 @@ define([
     },
 
     initialize: function(options){
-        _.bindAll(this, 'render', 'keyClickClb', 'doSignup');
+        _.bindAll(this, 'render', 'keyClickClb', 'doLogin');
         this.navbar = options.navbar;
-        this.router = options.router;
+        // this.router = options.router;
     },
   });
   return welcomeView;

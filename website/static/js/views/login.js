@@ -3,20 +3,28 @@ define([
   'underscore', 
   'backbone',
   'common/ego_website',
-  'text!templates/login.html',
-
-  'views/nametag',
-  ], function($, _, Backbone, common, loginViewTemplate, nametag){
+  'text!templates/signin.html',
+  'text!templates/signup.html',
+  ], function($, _, Backbone, common, signinTemplate, signupTemplate){
   var loginView = Backbone.View.extend({
-    el: $("#container"),
+    el: $('#login'),
     events: {
-        
+        'click *': 'defaultClick',
+        'click button': 'okBtn',
+        'submit form': 'submit',
     },
-    initialize: function(options) {
-        _.bindAll(this, 'loginBtn', 'render');
-        this.state = options.state;
-        this.$('form').bind('submit', this.loginBtn);
+
+    submit: function(){
+        console.log('submit');
+        return false;
     },
+    okBtn: function(e) {
+        this.$('form').submit();
+    },
+    defaultClick: function(e){
+        e.stopPropagation();
+    },
+    
     isValidEmail: function(username) {
         var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
         return filter.test(username);
@@ -141,20 +149,21 @@ define([
     
     render: function(options){
         // this.state.router.contents_view._lastContext = '';
+        var compiled_template;
 
         if (options==undefined)
             options = {action:'signup'};
 
-        var compiled_template = _.template( loginViewTemplate );
-        this.el.html( compiled_template() );
+        if (options.action == 'signup')
+            compiled_template = _.template( signupTemplate );
+        if (options.action == 'signin')
+            compiled_template = _.template( signinTemplate );
+        if (options.action=='reminder')
+            email.focus();
 
-        this.$('div.nametag').hide();
-        this.$('a').hide();
-        var actions = {signup:1, signin:1, reminder:1};
-        if (options.action in actions) {
-            this.$('div.nametag.'+options.action).show();
-            this.$('.'+options.action).show();
-        }
+        this.el.html( compiled_template() ).show();
+        // this.$('input:first-child').focus();
+        return;
 
         var that = this;
 
@@ -169,17 +178,21 @@ define([
                     email.focus();
             }
         });
-        password.keypress(function(evt){
-            if (evt.keyCode==13)
-                that.$('form').submit();
-        });
-        email.keypress(function(evt){
-            if (evt.keyCode==13)
-                that.$('form').submit();
-        });
+        // password.keypress(function(evt){
+        //     if (evt.keyCode==13)
+        //         that.$('form').submit();
+        // });
+        // email.keypress(function(evt){
+        //     if (evt.keyCode==13)
+        //         that.$('form').submit();
+        // });
 
-        if (options.action=='reminder')
-            email.focus();
+        
+    },
+
+    initialize: function(options) {
+        _.bindAll(this, 'loginBtn', 'render');
+        // this.$('form').bind('submit', this.loginBtn);
     },
   });
   return loginView;

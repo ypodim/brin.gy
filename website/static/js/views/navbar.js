@@ -11,17 +11,28 @@ define([
     events: {
         // 'click button#addLocation': 'addLocation',
         // 'click a#about': 'about',
-        'click a#signin': 'signin',
-        'click a#signup': 'signup',
+        'click a#signin': 'login',
+        'click a#signup': 'login',
 
     },
     template: _.template(navbarTemplate),
 
-    signin: function(){ this.trigger('signin') },
-    signup: function(){ this.trigger('signup') },
+    login: function(e){ 
+        if ($(e.target).hasClass('highlighted')) {
+            $(e.target).removeClass('highlighted');
+            return;
+        }
+        $('a').removeClass('highlighted');
+        $(e.target).addClass('highlighted')
+
+        var action = $(e.target).attr('id');
+        this.trigger(action, action);
+        e.stopPropagation(); 
+    },
 
     render: function(){
         // $('.navbar a.context').show().html('#'+APP.context.name);
+        this.$('a').removeClass('highlighted');
 
         this.$('a.context').show().html('#'+APP.context.name);
         // this.$('.authed').hide();
