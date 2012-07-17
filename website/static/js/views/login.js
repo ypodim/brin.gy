@@ -2,10 +2,11 @@ define([
   'jquery',
   'underscore', 
   'backbone',
+  'tooltip',
   'common/ego_website',
   'text!templates/signin.html',
   'text!templates/signup.html',
-  ], function($, _, Backbone, common, signinTemplate, signupTemplate){
+  ], function($, _, Backbone, tooltip, common, signinTemplate, signupTemplate){
   var loginView = Backbone.View.extend({
     el: $('#login'),
     events: {
@@ -14,11 +15,26 @@ define([
         'submit form': 'submit',
     },
 
-    submit: function(){
-        console.log('submit');
+    submit: function(e){
+        if (this.options.action == 'signin') {
+            username = this.$('input#username').val();
+            password = this.$('input#password').val();
+            this.doLogin(username, password);
+            this.el.hide();
+        }
+        if (this.options.action == 'signup') {
+            username = this.$('input#username').val();
+            email = this.$('input#email').val();
+            console.log(this.$('img.loader'))
+            console.log(this.$('img'))
+
+            this.$('img.loader').show();
+            this.doCreate(username, email);
+        }
         return false;
     },
     okBtn: function(e) {
+        console.log('okbtn')
         this.$('form').submit();
     },
     defaultClick: function(e){
@@ -33,15 +49,18 @@ define([
     doLogin: function(username, password) {
         var that = this;
         var data = {user:username, secret:password};
-        var url = this.state.agent.baseurl+'/authenticate_user';
+        var url = APP.agent.baseurl+'/authenticate_user';
         $.getJSON(url, data, function(json){
             if (json.result) {
-                that.state.user.name = username;
-                that.state.user.pwd = password;
-                that.state.user.email = json.email;
+                APP.usernames[username] = {
+                    name: username,
+                    pwd: password,
+                    email: json.email,
+                };
+                APP.user = username;
                 common.cookies.set_cookie(username, password, json.email);
-                that.state.router.navigate('#/attributes', {trigger: true});
-                that.state.stats('signin', username);
+                // APP.stats('signin', username);
+                that.trigger('login');
             } else {
                 $('div.alert')
                     .removeClass('alert-success')
@@ -69,7 +88,7 @@ define([
             return false;
         }
 
-        var url = this.state.agent.baseurl;
+        var url = APP.agent.baseurl;
         $.post(url, {username:username, email:email}, function(json){
             if (json.error.length>0) {
                 that.$('div.alert')
@@ -80,12 +99,16 @@ define([
                 }, 3000);
                 return false;
             } else {
-                that.state.user.name = username;
-                that.state.user.email = email;
-                that.state.user.pwd = json.secret;
+                APP.user = username;
+                APP.usernames[username] = {
+                    name: username,
+                    pwd: json.secret,
+                    email: email,
+                };
                 common.cookies.set_cookie(username, json.secret, email);
-                that.state.router.navigate('#/attributes', {trigger: true});
-                that.state.stats('signup', username);
+                // that.state.stats('signup', username);
+                that.el.hide();
+                that.trigger('signedup');
             }
         }, 'json');
         
@@ -124,45 +147,28 @@ define([
 
         return false;
     },
-    loginBtn: function(){
-        // var deg = Math.floor(Math.random()*60) - 30;
-        // console.log(deg);
-        // this.$('#nametag').addClass('anime').css('-webkit-transform', 'rotate('+deg+'deg)');
-
-        var username = this.$('div.'+Backbone.history.fragment+' input[type=text]').val();
-        var password = this.$('div.'+Backbone.history.fragment+' input[type=password]').val();
-        var email = this.$('div.'+Backbone.history.fragment+' input[type=email]').val();
-
-        console.log('upe', username, password, email);
-
-        if (username && password && username.length>0 && password.length>0)
-            return this.doLogin(username, password);
-
-        if (username && email && username.length>0 && email.length>0)
-            return this.doCreate(username, email);
-
-        if (email && email.length>0)
-            return this.doReminder(email)
-
-        return false;
-    },
     
     render: function(options){
         // this.state.router.contents_view._lastContext = '';
         var compiled_template;
-
+        this.options = options;
         if (options==undefined)
             options = {action:'signup'};
 
-        if (options.action == 'signup')
+        if (options.action == 'signup') {
             compiled_template = _.template( signupTemplate );
-        if (options.action == 'signin')
+            this.el.html( compiled_template() ).css({right:'50px'}).show();
+            // this.$('input:first-child').tooltip('show');
+            // this.$('button').tooltip('show');
+        }
+        if (options.action == 'signin') {
             compiled_template = _.template( signinTemplate );
-        if (options.action=='reminder')
-            email.focus();
-
-        this.el.html( compiled_template() ).show();
-        // this.$('input:first-child').focus();
+            this.el.html( compiled_template() ).css({right:'185px'}).show();
+        }
+        if (options.action=='reminder') {
+            // this.el.html( compiled_template() ).show();
+        }
+        
         return;
 
         var that = this;
@@ -191,8 +197,7 @@ define([
     },
 
     initialize: function(options) {
-        _.bindAll(this, 'loginBtn', 'render');
-        // this.$('form').bind('submit', this.loginBtn);
+        _.bindAll(this, 'render', 'doLogin', 'doCreate', 'submit');
     },
   });
   return loginView;

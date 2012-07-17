@@ -1,13 +1,18 @@
 
 <div class='title'>SIGN UP</div>
 <form action='#'>
-    <input type='text' autofocus required pattern="[A-Za-z0-9]{3,8}"
-       title="Username consists of 3 to 8 letters and/or digits. No symbols." placeholder='username...' />
-    <input type='email' required placeholder='email...' />
+    <input type='text' 
+    	id='username'
+    	rel="tooltip" title="first tooltip"
+    	autofocus required pattern="[A-Za-z0-9]{3,8}"
+    	title="Username consists of 3 to 8 letters and/or digits. No symbols." 
+    	placeholder='username...' />
+    <input type='email' id='email' required placeholder='email...' />
     <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/>
 </form>
 <div class='footer'>
-    <button class='btn btn-success'>Sign up</button>
+	<img class='loader' src='/static/images/website/ajax-loader.gif?0' />
+    <button rel="tooltip" title="first tooltip" class='btn btn-success'>Sign up</button>
 </div>
 
 

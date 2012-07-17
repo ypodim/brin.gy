@@ -9,11 +9,10 @@ define([
   var navView = Backbone.View.extend({
     el: $('#navbar'),
     events: {
-        // 'click button#addLocation': 'addLocation',
         // 'click a#about': 'about',
         'click a#signin': 'login',
         'click a#signup': 'login',
-
+        'click a#account': 'account',
     },
     template: _.template(navbarTemplate),
 
@@ -30,6 +29,11 @@ define([
         e.stopPropagation(); 
     },
 
+    account: function(){
+        this.trigger('account');
+        return false;
+    },
+
     render: function(){
         // $('.navbar a.context').show().html('#'+APP.context.name);
         this.$('a').removeClass('highlighted');
@@ -40,8 +44,11 @@ define([
 
         if (APP.user) {
             this.$('.authed').show();
+            this.$('.noauth').hide();
+            this.$('#username').html(APP.user);
         } else {
             this.$('.noauth').show();
+            this.$('.authed').hide();
         }
     },
 

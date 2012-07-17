@@ -3,6 +3,9 @@
     padding: 0;
 }
 
+a:hover {
+    text-decoration: none;
+}
 body { 
     font-family:helvetica; 
     margin: 0;
@@ -49,7 +52,7 @@ body {
 div#login {
     position: absolute;
     z-index: 1050;
-    top: 39px;
+    top: 37px;
     right: 0;
     display: none;
     padding: 10px;
@@ -78,8 +81,14 @@ div#login > div.footer {
 div#login > div.footer > a {
     color: inherit;
 }
+div#login > div.footer > a:hover {
+    text-decoration: underline;
+}
 div#login > div.footer > button {
     float: right;
+}
+div#login > div.footer > img {
+    display: none;
 }
 
 @popupWidth: 400px;
@@ -133,7 +142,7 @@ aside > div.asideEntry > a.asideKey {
     border-radius: 5px;
 }
 aside > div.asideEntry > a.asideKey:hover {
-    text-decoration: none;
+    /*text-decoration: none;*/
     cursor: pointer;
     color: rgba(0,0,0,0.5);
 }
@@ -472,7 +481,7 @@ footer {
 }
 footer > a { color: rgba(255,255,255,0.8); }
 footer > a:hover {
-    text-decoration: none;
+    /*text-decoration: none;*/
     color: white;
 }
 
@@ -483,8 +492,8 @@ div.accountentry {
     padding:10px;
     border-radius:5px;
     background-color:rgba(220,220,220,1);
-    font-size:@height-1;
-    line-height:@height-1;
+    /*font-size:@height-1;*/
+    /*line-height:@height-1;*/
 
 }
 div.account.buttons {
@@ -493,8 +502,9 @@ div.account.buttons {
 }
 button.account {
     width:180px;
-    height:50px;
-    font-size:20px;
+    /*height:50px;*/
+    font-size: 14px;
+    font-weight: bold;
 }
 
 
@@ -943,7 +953,7 @@ a.userMatch {
     margin-top: 5px;
 }
 a.userMatch:hover { 
-    text-decoration: none;
+    /*text-decoration: none;*/
     background-color: rgba(150,150,150,0.8);
 }
 a.userMatch > div.username { 
@@ -995,50 +1005,80 @@ div.infobox > div > div.titleVal {
 
 
 
-.navbar-fixed-top .brand {
+
+
+div#navbar {
+    height: 40px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: #717171;
+    background-image: -moz-linear-gradient(top, #828282, #575757);
+    background-image: -ms-linear-gradient(top, #828282, #575757);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#828282), to(#575757));
+    background-image: -webkit-linear-gradient(top, #828282, #575757);
+    background-image: -o-linear-gradient(top, #828282, #575757);
+    background-image: linear-gradient(top, #828282, #575757);
+    background-repeat: repeat-x;
+    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .25), inset 0 -1px 0 rgba(0, 0, 0, .1);
+    -moz-box-shadow: 0 1px 3px rgba(0,0,0,.25), inset 0 -1px 0 rgba(0,0,0,.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .25), inset 0 -1px 0 rgba(0, 0, 0, .1);
+}
+div#navbar .brand {
     font-weight: bold;
     color: rgba(220,220,220,0.9);
     text-shadow: 0 -1px 0 black;
-    /*float: left;*/
+    
     font-size: 24px;
     line-height: 40px;
-    margin: 0;
+    margin: 0 0 0 50px;
     padding-top: 0 ! important;
     padding-bottom: 0 ! important;
 }
-/*div.navbar {
+div#navbar ul {
     position: absolute;
-    z-index: 1000;
-    top: 0;
-    left: 0;
-    right: 0;
-}*/
+    right: 50px;
+    display: inline-block;
+    list-style-type: none;
+}
+div#navbar ul > li {
+    float: right;
+    line-height: 40px;
+    /*margin: 0 10px 0 10px;*/
 
-div.navbar ul > li.authed {
+}
+div#navbar ul > li.authed {
     display: none;
 }
-div.navbar ul > li.noauth {
+div#navbar ul > li.authed > a {
+    background-color: rgba(80,80,80,0.8);
+    border: 1px solid rgba(0,0,0,0.2);
+    padding: 10px 20px 10px 20px;
+}
+div#navbar ul > li.noauth {
     display: none;
 }
-div.navbar .nav > li > a {
+
+div#navbar > ul > li > a {
     color: rgba(255,255,255,0.9) ! important;
     text-shadow: 0 -1px black;
     font-weight: bold;
     font-size: 14px;
     border-radius: 5px;
+    padding: 10px 10px 10px 10px;
 }
-div.navbar .nav > li > a.highlighted {
+div#navbar > ul > li > a.highlighted {
     background-color: rgba(80,80,80,1);
     border-radius: 0;
 }
-div.navbar .nav > li > a:hover {
+div#navbar > ul > li > a:hover {
     /*color: rgba(255,255,255,0.9) ! important;*/
     background-color: rgba(255,255,255,0.2);
+    /*text-decoration: none;*/
 }
-div.navbar .nav > li > a.highlighted:hover {
+div#navbar > ul > li > a.highlighted:hover {
     background-color: rgba(80,80,80,1);
 }
-div.navbar a.context {
+div#navbar a.context {
     display: none;
     color: white;
     font-size: 24px;
@@ -1046,13 +1086,56 @@ div.navbar a.context {
     line-height: 20px;
     border: 1px solid rgba(200,200,200,0.6);
     border-radius: 5px;
-    padding: 5px 10px 5px 10px;
-    margin: 5px 0 5px 0;
+    padding: 4px 10px 4px 10px;
+    margin: 5px 0 5px 20px;
     background-color: rgba(20,20,20,0.5);
 }
-div.navbar a.context:hover { 
-    text-decoration: none; 
+div#navbar a.context:hover { 
+    /*text-decoration: none; */
     background-color: rgba(20,20,20,0.3);   
+}
+
+
+
+div#modal {
+    display: none;
+    position: absolute;
+    z-index: 1200;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    background-color: rgba(20,20,20,0.5);
+}
+div#modal > div.box {
+    border-radius: 5px;
+    padding: 10px;
+    background-color: rgba(255,255,255,1);
+    margin: 50px auto;
+    width: 50%;
+    font-size: 14px;
+    font-weight: bold;
+    color: rgba(20,20,20,1);
+}
+div#modal > div.box > div.header {
+    height: 40px;
+    line-height: 40px;
+    font-size: 18px;
+    font-weight: bold;
+    /*background-color: gray;*/
+}
+div#modal > div.box > div.header > a {
+    padding: 3px 5px 5px 5px;
+    border: 1px solid rgba(0,0,0,0.4);
+    box-shadow: 0 -1px black;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 5px;
+}
+div#modal > div.box > div.header > span#title {
+    text-transform: uppercase;
+}
+div#modal > div.box > div.content {
+    
 }
 
 

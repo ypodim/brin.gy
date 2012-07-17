@@ -7,8 +7,7 @@ define([
     'order!button',
     'alerts',
     'modal',
-    'order!twipsy',
-    'order!popover',
+    
 
     'text!templates/contexts.html',
     'views/contextEntry',
@@ -18,7 +17,7 @@ define([
     'models/context',
     ], function(
         $, _, Backbone, 
-        button, alerts, modal, popover, twipsy, 
+        button, alerts, modal, 
 
         contextsViewTemplate, 
         contextEntryView,

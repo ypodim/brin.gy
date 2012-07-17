@@ -7,12 +7,10 @@ define([
     'order!button',
     'alerts',
     'modal',
-    'order!twipsy',
-    'order!popover',
 
     'text!templates/controls.html',
     ], function($, _, Backbone, 
-        button, alerts, modal, popover, twipsy, 
+        button, alerts, modal, 
         controlsViewTemplate){
   var controlsView = Backbone.View.extend({
     el: $("#controls")[0],

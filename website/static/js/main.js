@@ -17,8 +17,8 @@ require.config({
     bootstrap: 'libs/bootstrap/bootstrap',
     alerts: 'libs/bootstrap/bootstrap-alerts',
     modal: 'libs/bootstrap/bootstrap-modal',
-    twipsy: 'libs/bootstrap/bootstrap-twipsy',
-    popover: 'libs/bootstrap/bootstrap-popover',
+    tooltip: 'libs/bootstrap/bootstrap-tooltip',
+    // popover: 'libs/bootstrap/bootstrap-popover',
     button: 'libs/bootstrap/bootstrap-button',
 
     maps: 'libs/gmaps/gmaps',
@@ -43,9 +43,10 @@ require([
     'collections/persons',
 
     'views/world',
-    'views/navbar'
+    'views/navbar',
+    'views/login'
 ], function($, bootstrap, _, common, Router, Backbone, appState, Attributes, Persons,
-    worldView, navbarView
+    worldView, navbarView, loginView
     ){
 
     state = new appState();
@@ -55,12 +56,12 @@ require([
         APP.config = config;
         APP.satellite = {};
         APP.satellite.url = config.discov_url;
-        state.agent = {};
-        state.agent.id = config.agentid;
-        state.agent.baseurl = config.ego_url_prefix;
-        state.agent.url = config.ego_url_prefix+"/"+config.agentid;
-        state.website_url = config.website_url_prefix;
-        state.device = config.device;
+        APP.agent = {};
+        APP.agent.id = config.agentid;
+        APP.agent.baseurl = config.ego_url_prefix;
+        APP.agent.url = config.ego_url_prefix+"/"+config.agentid;
+        APP.website_url = config.website_url_prefix;
+        APP.device = config.device;
 
         var cookie = common.cookies.get_cookie();
         var pseudonyms = cookie.pseudonyms;
@@ -101,9 +102,14 @@ require([
         wldView.render();
 
 
-        navview.bind('signin', wldView.doLogin);
-        navview.bind('signup', wldView.doLogin);
+        navview.bind('signin', wldView.showLoginBox);
+        navview.bind('signup', wldView.showLoginBox);
+        navview.bind('account', wldView.showAccount);
 
+        wldView.login = new loginView();
+        // wldView.login.bind('login', wldView.onLogin);
+        wldView.login.bind('login', navview.render);
+        wldView.login.bind('signedup', navview.render);
 
         var app_router = new Router({
             // controlsView: cview,

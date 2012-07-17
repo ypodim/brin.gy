@@ -7,8 +7,6 @@ define([
     'order!button',
     'alerts',
     'modal',
-    'order!twipsy',
-    'order!popover',
 
     'text!templates/mobileManage.html',
 
@@ -22,7 +20,7 @@ define([
     'models/person',
     ], function(
         $, _, Backbone, 
-        button, alerts, modal, popover, twipsy, 
+        button, alerts, modal, 
         manageViewTemplate, 
 
         keyView, valueDetailedView, personView,

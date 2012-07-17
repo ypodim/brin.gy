@@ -5,12 +5,15 @@ define([
   'router',
 
   // 'maps',
+  'common/ego_website',
+
   'views/key',
   'views/mapInfoAttribute',
   'views/valueDetailed',
   'views/chooseloc',
   'views/login',
-  ], function($, _, Backbone, router, keyView, mapInfoAttrView, valueView, chooselocView, loginView){
+  'views/modal',
+  ], function($, _, Backbone, router, common, keyView, mapInfoAttrView, valueView, chooselocView, loginView, modalView){
   var welcomeView = Backbone.View.extend({
     el: $('#container'),
     events: {
@@ -19,23 +22,45 @@ define([
 
     
     circles: [],
+    modal: new modalView(),
 
-    doLogin: function(action){
-        if (action == 'signin')
-            $('#login').css({right:'249px'});
-        if (action == 'signup')
-            $('#login').css({right:'114px'});
-
-        login = new loginView();
-        login.render({action:action});
+    showLoginBox: function(action){
+        this.login.render({action:action});
         
         var that = this;
-        $('body').one('click', function(){
-            login.undelegateEvents();
-            // login.remove();
+        $('body').one('click', function(e){
+            // that.login.undelegateEvents();
             $('#login').hide();
             that.navbar.render();
         });
+    },
+
+    showAccount: function(){
+        if (!APP.user) {
+            console.log('Error: no user found while trying to display account info.');
+            return false;
+        }
+
+        var that = this;
+        // var modal = new modalView();
+        this.modal.render();
+    },
+
+    onLogin: function(){
+        console.log('onlogin')
+        this.navbar.render();
+    },
+
+    // onLogout: function(){
+    //     console.log('onLogout')
+    //     var username = APP.user;
+    //     APP.usernames[username] = {};
+    //     APP.user = '';
+    //     common.cookies.del_cookie(username);
+    //     this.navbar.render();
+    // },
+    onDeleteAccount: function(){
+
     },
 
     addLocation: function(e) {
@@ -153,7 +178,6 @@ define([
     },
 
     render: function(){
-        
 
         var centerLatLng = new google.maps.LatLng(37.748582,-122.418411);
         APP.map = new google.maps.Map(document.getElementById('map_canvas'), {
@@ -216,8 +240,21 @@ define([
     },
 
     initialize: function(options){
-        _.bindAll(this, 'render', 'keyClickClb', 'doLogin');
+        _.bindAll(this, 'render', 'keyClickClb', 'showLoginBox', 'showAccount');
         this.navbar = options.navbar;
+        
+        var that = this;
+
+        this.modal.bind('logout', function(){
+            console.log('onLogout')
+            var username = APP.user;
+            APP.usernames[username] = {};
+            APP.user = '';
+            common.cookies.del_cookie(username);
+            that.navbar.render();
+        });
+
+        this.modal.bind('delete', this.onDeleteAccount);
         // this.router = options.router;
     },
   });
