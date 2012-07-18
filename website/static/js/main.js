@@ -105,6 +105,7 @@ require([
         navview.bind('signin', wldView.showLoginBox);
         navview.bind('signup', wldView.showLoginBox);
         navview.bind('account', wldView.showAccount);
+        navview.bind('reminder', wldView.showReminder);
 
         wldView.login = new loginView();
         // wldView.login.bind('login', wldView.onLogin);

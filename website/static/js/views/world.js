@@ -46,6 +46,10 @@ define([
         this.modal.render();
     },
 
+    showReminder: function(argument) {
+        this.modal.render();
+    },
+
     onLogin: function(){
         console.log('onlogin')
         this.navbar.render();

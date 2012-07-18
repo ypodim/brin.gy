@@ -13,6 +13,7 @@ define([
         'click *': 'defaultClick',
         'click button': 'okBtn',
         'submit form': 'submit',
+        'click a.reminder': 'reminder',
     },
 
     submit: function(e){
@@ -34,11 +35,14 @@ define([
         return false;
     },
     okBtn: function(e) {
-        console.log('okbtn')
         this.$('form').submit();
     },
     defaultClick: function(e){
         e.stopPropagation();
+    },
+    reminder: function(){
+        this.trigger('reminder');
+        return false;
     },
     
     isValidEmail: function(username) {
@@ -197,7 +201,7 @@ define([
     },
 
     initialize: function(options) {
-        _.bindAll(this, 'render', 'doLogin', 'doCreate', 'submit');
+        _.bindAll(this, 'render', 'doLogin', 'doCreate', 'submit', 'reminder');
     },
   });
   return loginView;
