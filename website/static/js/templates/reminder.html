@@ -1,10 +1,12 @@
 
-<div class='nametag signin'>
-    <b>SIGN IN</b>
-    <form>
-        <input type='text' placeholder='username...' />
-        <input type='password' placeholder='password...' />
-        <button type='submit'>ok</button>
-    </form>
-</div>
+
+<form class='reminder'>
+    <input type='email' id='email' autofocus required placeholder='your email...' />
+    <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/>
+    <div class='footer'>
+		<img class='loader' src='/static/images/website/ajax-loader-white.gif?0' />
+	    <button id='reminder' class='btn btn-success'>Send reminder</button>
+	</div>
+</form>
+
 

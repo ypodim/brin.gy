@@ -119,10 +119,10 @@ define([
         return false;
     },
     doReminder: function(email) {
-        console.log('doReminder');
+        console.log('reminder:', email);
         var that = this;
         var data = {email:email};
-        var url = this.state.agent.baseurl+'/email_reminder';
+        var url = APP.agent.baseurl+'/email_reminder';
         $.post(url, data, function(json){
             console.log(json);
             if (json.error) {
@@ -135,7 +135,7 @@ define([
                     $('div.alert').fadeOut();
                 }, 3000);
             } else {
-                that.state.stats('reminder', email);
+                // APP.stats('reminder', email);
             }
         }, 'json');
         
@@ -146,7 +146,6 @@ define([
             .slideDown();
         setTimeout(function(){
             $('div.alert').fadeOut();
-            that.state.router.navigate('#/attributes', {trigger: true});
         }, 3000);
 
         return false;

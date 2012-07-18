@@ -47,11 +47,10 @@ define([
     },
 
     showReminder: function(argument) {
-        this.modal.render();
+        this.modal.render({title: 'reminder'});
     },
 
     onLogin: function(){
-        console.log('onlogin')
         this.navbar.render();
     },
 
@@ -63,8 +62,13 @@ define([
     //     common.cookies.del_cookie(username);
     //     this.navbar.render();
     // },
-    onDeleteAccount: function(){
 
+    onDeleteAccount: function(){
+        var username = APP.user;
+        APP.usernames[username] = {};
+        APP.user = '';
+        common.cookies.del_cookie(username);
+        that.navbar.render();
     },
 
     addLocation: function(e) {
@@ -244,13 +248,12 @@ define([
     },
 
     initialize: function(options){
-        _.bindAll(this, 'render', 'keyClickClb', 'showLoginBox', 'showAccount');
+        _.bindAll(this, 'render', 'keyClickClb', 'showLoginBox', 'showAccount', 'showReminder');
         this.navbar = options.navbar;
         
         var that = this;
 
         this.modal.bind('logout', function(){
-            console.log('onLogout')
             var username = APP.user;
             APP.usernames[username] = {};
             APP.user = '';
@@ -258,7 +261,14 @@ define([
             that.navbar.render();
         });
 
+        this.modal.bind('reminder', function(){
+            var email = that.modal.$('input#email').val();
+            that.login.doReminder(email);
+            that.modal.close();
+        });
+
         this.modal.bind('delete', this.onDeleteAccount);
+
         // this.router = options.router;
     },
   });

@@ -105,12 +105,12 @@ require([
         navview.bind('signin', wldView.showLoginBox);
         navview.bind('signup', wldView.showLoginBox);
         navview.bind('account', wldView.showAccount);
-        navview.bind('reminder', wldView.showReminder);
+        
 
         wldView.login = new loginView();
-        // wldView.login.bind('login', wldView.onLogin);
         wldView.login.bind('login', navview.render);
         wldView.login.bind('signedup', navview.render);
+        wldView.login.bind('reminder', wldView.showReminder);
 
         var app_router = new Router({
             // controlsView: cview,
