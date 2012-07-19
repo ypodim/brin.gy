@@ -2,11 +2,12 @@ define([
   'jquery',
   'underscore', 
   'backbone',
+  'app',
   'tooltip',
   'text!templates/modal.html',
   'text!templates/account.html',
   'text!templates/reminder.html',
-  ], function($, _, Backbone, tooltip, modalTemplate, accountTemplate, reminderTemplate){
+  ], function($, _, Backbone, appConfig, tooltip, modalTemplate, accountTemplate, reminderTemplate){
   var modalView = Backbone.View.extend({
     el: $('#modal'),
     events: {
@@ -16,6 +17,7 @@ define([
         // 'click button#reminder': 'reminderBtn',
         'submit form.reminder': 'submitReminder'
     },
+    app: appConfig.getState(),
 
     signoutBtn: function(){
         this.trigger('logout');
@@ -60,8 +62,8 @@ define([
         if (options.title == 'account') {
             inner_template = _.template( accountTemplate );
             data = {
-                username: APP.usernames[APP.user].name, 
-                email: APP.usernames[APP.user].email,
+                username: this.app.usernames[this.app.user].name, 
+                email: this.app.usernames[this.app.user].email,
             }
         }
         if (options.title == 'reminder') {

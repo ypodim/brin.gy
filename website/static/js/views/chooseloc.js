@@ -2,12 +2,13 @@ define([
   'jquery',
   'underscore', 
   'backbone',
+  'app',
   'router',
 
   // 'maps',
   'text!templates/chooseloc.html',
   'views/mapInfoAttribute',
-  ], function($, _, Backbone, router, mapTemplate, mapInfoAttrView){
+  ], function($, _, Backbone, appConfig, router, mapTemplate, mapInfoAttrView){
   var welcomeView = Backbone.View.extend({
     el: $("#popup"),
     events: {
@@ -15,6 +16,7 @@ define([
         'click button#useloc': 'useBtn',
         'click button#next': 'okBtn',
     },
+    app: appConfig.getState(),
 
     map: null,
     // contexts: {},
@@ -45,7 +47,7 @@ define([
         var shadow = 'http://chart.googleapis.com/chart?chst=d_bubble_text_small_shadow&chld=bb|'+label;
         var marker = new google.maps.Marker({
             position: this.contextCircle.getCenter(),
-            map: APP.map,
+            map: this.app.map,
             title: locationTitle,
             // icon: new google.maps.MarkerImage(icon,null, null, new google.maps.Point(0, 42)),
             // shadow: new google.maps.MarkerImage(shadow,null, null, new google.maps.Point(0, 45))
@@ -63,10 +65,10 @@ define([
             content: attrView.el,
         });
         google.maps.event.addListener(marker, 'click', function() {
-            infowindow.open(APP.map, marker);
+            infowindow.open(that.app.map, marker);
         });
         google.maps.event.addListener(this.contextCircle, 'click', function() {
-            infowindow.open(APP.map, marker);
+            infowindow.open(that.app.map, marker);
         });
 
         this.close();
@@ -77,9 +79,9 @@ define([
         var top = this.$('#crosshair').offset().top;
         var borderwidth = parseInt(this.$('#crosshair').css('border-width'));
 
-        var x = $(APP.map.getDiv()).width()/2 + 10;
+        var x = $(this.app.map.getDiv()).width()/2 + 10;
         var y = top - header + padding + 2*borderwidth + 5;
-        var scale = Math.pow(2, 21-APP.map.getZoom());
+        var scale = Math.pow(2, 21-this.app.map.getZoom());
 
         var center = this.latLngControl.xy2latlng(x,y);
         
@@ -97,7 +99,7 @@ define([
             strokeWeight: 2,
             fillColor: "#FF0000",
             fillOpacity: 0.1,
-            map: APP.map,
+            map: this.app.map,
             center: center,
             radius: 10*scale,
         };
@@ -206,7 +208,7 @@ define([
 
         
         // Create new control to display latlng and coordinates under mouse.
-        this.latLngControl = new this.LatLngControl(APP.map);
+        this.latLngControl = new this.LatLngControl(this.app.map);
         // var that = this;
 
 
@@ -234,10 +236,10 @@ define([
         var autocomplete = new google.maps.places.Autocomplete(input);
         var that = this;
 
-        autocomplete.bindTo('bounds', APP.map);
+        autocomplete.bindTo('bounds', this.app.map);
 
         var marker = new google.maps.Marker({
-          map: APP.map
+          map: this.app.map
         });
 
         
@@ -248,10 +250,10 @@ define([
                 return;
 
             if (place.geometry.viewport) {
-                APP.map.fitBounds(place.geometry.viewport);
+                this.app.map.fitBounds(place.geometry.viewport);
             } else {
-                APP.map.setCenter(place.geometry.location);
-                APP.map.setZoom(17);  // Why 17? Because it looks good.
+                this.app.map.setCenter(place.geometry.location);
+                this.app.map.setZoom(17);  // Why 17? Because it looks good.
             }
 
             var image = new google.maps.MarkerImage(

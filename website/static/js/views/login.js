@@ -2,11 +2,12 @@ define([
   'jquery',
   'underscore', 
   'backbone',
+  'app',
   'tooltip',
   'common/ego_website',
   'text!templates/signin.html',
   'text!templates/signup.html',
-  ], function($, _, Backbone, tooltip, common, signinTemplate, signupTemplate){
+  ], function($, _, Backbone, appConfig, tooltip, common, signinTemplate, signupTemplate){
   var loginView = Backbone.View.extend({
     el: $('#login'),
     events: {
@@ -15,12 +16,13 @@ define([
         'submit form': 'submit',
         'click a.reminder': 'reminder',
     },
+    app: appConfig.getState(),
 
     submit: function(e){
         if (this.options.action == 'signin') {
             username = this.$('input#username').val();
             password = this.$('input#password').val();
-            this.doLogin(username, password);
+            this.app.doLogin(username, password);
             this.el.hide();
         }
         if (this.options.action == 'signup') {
@@ -50,34 +52,6 @@ define([
         return filter.test(username);
     },
 
-    doLogin: function(username, password) {
-        var that = this;
-        var data = {user:username, secret:password};
-        var url = APP.agent.baseurl+'/authenticate_user';
-        $.getJSON(url, data, function(json){
-            if (json.result) {
-                APP.usernames[username] = {
-                    name: username,
-                    pwd: password,
-                    email: json.email,
-                };
-                APP.user = username;
-                common.cookies.set_cookie(username, password, json.email);
-                // APP.stats('signin', username);
-                that.trigger('login');
-            } else {
-                $('div.alert')
-                    .removeClass('alert-success')
-                    .addClass('alert-error')
-                    .html('Wrong username/email or password.')
-                    .slideDown();
-                setTimeout(function(){
-                    $('div.alert').fadeOut();
-                }, 3000);
-            }
-        });
-        return false;
-    },
     doCreate: function(username, email) {
         var that = this;
         if (! this.isValidEmail(email)) {
@@ -92,62 +66,7 @@ define([
             return false;
         }
 
-        var url = APP.agent.baseurl;
-        $.post(url, {username:username, email:email}, function(json){
-            if (json.error.length>0) {
-                that.$('div.alert')
-                    .html('User '+username+' already exists.')
-                    .slideDown();
-                setTimeout(function(){
-                    that.$('div.alert').fadeOut();
-                }, 3000);
-                return false;
-            } else {
-                APP.user = username;
-                APP.usernames[username] = {
-                    name: username,
-                    pwd: json.secret,
-                    email: email,
-                };
-                common.cookies.set_cookie(username, json.secret, email);
-                // that.state.stats('signup', username);
-                that.el.hide();
-                that.trigger('signedup');
-            }
-        }, 'json');
-        
-        return false;
-    },
-    doReminder: function(email) {
-        console.log('reminder:', email);
-        var that = this;
-        var data = {email:email};
-        var url = APP.agent.baseurl+'/email_reminder';
-        $.post(url, data, function(json){
-            console.log(json);
-            if (json.error) {
-                $('div.alert')
-                    .removeClass('alert-success')
-                    .addClass('alert-error')
-                    .html('Email address not found.')
-                    .slideDown();
-                setTimeout(function(){
-                    $('div.alert').fadeOut();
-                }, 3000);
-            } else {
-                // APP.stats('reminder', email);
-            }
-        }, 'json');
-        
-        $('div.alert')
-            .addClass('alert-success')
-            .removeClass('alert-error')
-            .html('Email reminder sent successfully.')
-            .slideDown();
-        setTimeout(function(){
-            $('div.alert').fadeOut();
-        }, 3000);
-
+        this.app.doCreate(username, email);
         return false;
     },
     
@@ -171,36 +90,10 @@ define([
         if (options.action=='reminder') {
             // this.el.html( compiled_template() ).show();
         }
-        
-        return;
-
-        var that = this;
-
-        var email = this.$('div.'+options.action+' input[type=email]');
-        var password = this.$('div.'+options.action+' input[type=password]');
-        
-        this.$('input[type=text]').focus().keypress(function(evt){
-            if (evt.keyCode==13) {
-                if (options.action=='signin')
-                    password.focus();
-                if (options.action=='signup')
-                    email.focus();
-            }
-        });
-        // password.keypress(function(evt){
-        //     if (evt.keyCode==13)
-        //         that.$('form').submit();
-        // });
-        // email.keypress(function(evt){
-        //     if (evt.keyCode==13)
-        //         that.$('form').submit();
-        // });
-
-        
     },
 
     initialize: function(options) {
-        _.bindAll(this, 'render', 'doLogin', 'doCreate', 'submit', 'reminder');
+        _.bindAll(this, 'render', 'doCreate', 'submit', 'reminder');
     },
   });
   return loginView;

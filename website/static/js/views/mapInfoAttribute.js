@@ -2,18 +2,19 @@ define([
   'jquery',
   'underscore', 
   'backbone',
+  'app',
   'router',
 
   'text!templates/mapInfoAttribute.html',
   'text!templates/userMatch.html'
-  ], function($, _, Backbone, router, mapInfoAttrTemplate, userMatchTemplate){
+  ], function($, _, Backbone, appConfig, router, mapInfoAttrTemplate, userMatchTemplate){
   var welcomeView = Backbone.View.extend({
     // el: $('div'),
     className: 'infobox',
     events: {
         'click a': 'zoomHere',
     },
-
+    app: appConfig.getState(),
     template: _.template( mapInfoAttrTemplate ),
 
     zoomHere: function() {
@@ -22,7 +23,7 @@ define([
             radius: this.options.radius,
         };
         var circle = new google.maps.Circle(contextOptions);
-        APP.map.fitBounds(circle.getBounds());
+        this.app.map.fitBounds(circle.getBounds());
     },
 
     render: function(){

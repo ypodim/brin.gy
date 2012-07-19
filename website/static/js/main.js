@@ -26,14 +26,11 @@ require.config({
   urlArgs: "bust=" +  (new Date()).getTime(),
 });
 
-var APP = {
-    usernames: {},
-};
-
 require([
     'jquery',
     'bootstrap',
     'underscore',
+    'app',
     'common/ego_website',
 
     'router',
@@ -45,23 +42,18 @@ require([
     'views/world',
     'views/navbar',
     'views/login'
-], function($, bootstrap, _, common, Router, Backbone, appState, Attributes, Persons,
+], function($, bootstrap, _, app, common, Router, Backbone, appState, Attributes, Persons,
     worldView, navbarView, loginView
     ){
+
+    var appp = app.getState();
+    console.log('appp', appp)
 
     state = new appState();
     this.state.progress('static files loaded, getting config');
 
     $.getJSON('/config', function(config){
-        APP.config = config;
-        APP.satellite = {};
-        APP.satellite.url = config.discov_url;
-        APP.agent = {};
-        APP.agent.id = config.agentid;
-        APP.agent.baseurl = config.ego_url_prefix;
-        APP.agent.url = config.ego_url_prefix+"/"+config.agentid;
-        APP.website_url = config.website_url_prefix;
-        APP.device = config.device;
+        appp.setConfig(config);
 
         var cookie = common.cookies.get_cookie();
         var pseudonyms = cookie.pseudonyms;
@@ -69,12 +61,12 @@ require([
             // state.user.name = username;
             // state.user.pwd = pseudonyms[username].secret;
             // state.user.email = pseudonyms[username].email;
-            APP.usernames[username] = {
+            appp.usernames[username] = {
                 name: username,
                 pwd: pseudonyms[username].secret,
                 email: pseudonyms[username].email,
             };
-            APP.user = username;
+            appp.user = username;
         }
 
         console.log('context in cookie', cookie.last_context);
@@ -82,7 +74,7 @@ require([
             cookie.last_context = 'all';
             common.cookies.set_context_in_cookie(cookie.last_context);
         }
-        APP.context = {name:cookie.last_context};
+        appp.context = {name:cookie.last_context};
         console.log('now context in cookie', common.cookies.get_cookie().last_context);
 
         var attrCollection = new Attributes([], {state:state});
@@ -108,8 +100,8 @@ require([
         
 
         wldView.login = new loginView();
-        wldView.login.bind('login', navview.render);
-        wldView.login.bind('signedup', navview.render);
+        appp.bind('login', navview.render);
+        appp.bind('signedup', navview.render);
         wldView.login.bind('reminder', wldView.showReminder);
 
         var app_router = new Router({

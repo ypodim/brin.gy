@@ -2,6 +2,7 @@ define([
   'jquery',
   'underscore', 
   'backbone',
+  'app',
   'router',
 
   // 'maps',
@@ -13,13 +14,13 @@ define([
   'views/chooseloc',
   'views/login',
   'views/modal',
-  ], function($, _, Backbone, router, common, keyView, mapInfoAttrView, valueView, chooselocView, loginView, modalView){
+  ], function($, _, Backbone, appConfig, router, common, keyView, mapInfoAttrView, valueView, chooselocView, loginView, modalView){
   var welcomeView = Backbone.View.extend({
     el: $('#container'),
     events: {
         'click button#addLocation': 'addLocation',
     },
-
+    app: appConfig.getState(),
     
     circles: [],
     modal: new modalView(),
@@ -36,7 +37,7 @@ define([
     },
 
     showAccount: function(){
-        if (!APP.user) {
+        if (!this.app.user) {
             console.log('Error: no user found while trying to display account info.');
             return false;
         }
@@ -64,11 +65,12 @@ define([
     // },
 
     onDeleteAccount: function(){
-        var username = APP.user;
-        APP.usernames[username] = {};
-        APP.user = '';
-        common.cookies.del_cookie(username);
-        that.navbar.render();
+        console.log('del')
+        // var username = APP.user;
+        // APP.usernames[username] = {};
+        // APP.user = '';
+        // common.cookies.del_cookie(username);
+        // that.navbar.render();
     },
 
     addLocation: function(e) {
@@ -107,7 +109,7 @@ define([
             }
             
             if (!bounds.isEmpty()) {
-                APP.map.fitBounds(bounds);
+                this.app.map.fitBounds(bounds);
             }
         }
 
@@ -142,7 +144,7 @@ define([
             strokeWeight: 2,
             fillColor: "#FF0000",
             fillOpacity: 0.1,
-            map: APP.map,
+            map: this.app.map,
             center: options.center,
             radius: options.radius,
         };
@@ -162,7 +164,7 @@ define([
 
         var marker = new google.maps.Marker({
             position: options.center,
-            map: APP.map,
+            map: this.app.map,
             title: options.title,
         });
 
@@ -175,11 +177,11 @@ define([
         });
         google.maps.event.addListener(marker, 'click', function() {
             _.each(that.circles, function(circle){ circle.infowindow.close(); })
-            infowindow.open(APP.map, marker);
+            infowindow.open(this.app.map, marker);
         });
         // google.maps.event.addListener(mapCircle, 'click', function() {
         //     _.each(that.circles, function(circle){ circle.infowindow.close(); })
-        //     infowindow.open(APP.map, marker);
+        //     infowindow.open(this.app.map, marker);
         // });
 
         this.circles.push({circle:mapCircle, marker:marker, infowindow:infowindow});
@@ -188,7 +190,7 @@ define([
     render: function(){
 
         var centerLatLng = new google.maps.LatLng(37.748582,-122.418411);
-        APP.map = new google.maps.Map(document.getElementById('map_canvas'), {
+        this.app.map = new google.maps.Map(document.getElementById('map_canvas'), {
             'zoom': 7,
             'center': centerLatLng,
             'mapTypeId': google.maps.MapTypeId.ROADMAP,
@@ -199,8 +201,8 @@ define([
 
         this.$('aside').empty();
         var that = this;
-        url = APP.satellite.url+"/profile/"+APP.context.name+"/keyvals";
-        $.getJSON(url, {user:APP.user}, function(json){
+        url = this.app.satellite.url+"/profile/"+this.app.context.name+"/keyvals";
+        $.getJSON(url, {user:this.app.user}, function(json){
             // that.processNextKey(0, json.items);
             for (var i in json.items) {
                 var attr = json.items[i];
@@ -242,7 +244,7 @@ define([
         // google.maps.event.addListener(this.map, 'mousemove', function(mEvent) {
         //   that.latLngControl.updatePosition(mEvent.latLng);
         // });
-        google.maps.event.addListener(APP.map, 'click', function(event) {
+        google.maps.event.addListener(this.app.map, 'click', function(event) {
             _.each(that.circles, function(circle){ circle.infowindow.close(); })
         });
     },
@@ -254,9 +256,9 @@ define([
         var that = this;
 
         this.modal.bind('logout', function(){
-            var username = APP.user;
-            APP.usernames[username] = {};
-            APP.user = '';
+            var username = that.app.user;
+            that.app.usernames[username] = {};
+            that.app.user = '';
             common.cookies.del_cookie(username);
             that.navbar.render();
         });
@@ -267,7 +269,7 @@ define([
             that.modal.close();
         });
 
-        this.modal.bind('delete', this.onDeleteAccount);
+        this.modal.bind('delete', this.app.doDelete);
 
         // this.router = options.router;
     },

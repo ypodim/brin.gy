@@ -2,10 +2,11 @@ define([
   'jquery',
   'underscore', 
   'backbone',
+  'app',
   'router',
 
   'text!templates/navbar.html'
-  ], function($, _, Backbone, router, navbarTemplate){
+  ], function($, _, Backbone, appConfig, router, navbarTemplate){
   var navView = Backbone.View.extend({
     el: $('#navbar'),
     events: {
@@ -15,6 +16,8 @@ define([
         'click a#account': 'account',
     },
     template: _.template(navbarTemplate),
+    
+    app: appConfig.getState(),
 
     login: function(e){ 
         if ($(e.target).hasClass('highlighted')) {
@@ -35,17 +38,17 @@ define([
     },
 
     render: function(){
-        // $('.navbar a.context').show().html('#'+APP.context.name);
+        // $('.navbar a.context').show().html('#'+app.context.name);
         this.$('a').removeClass('highlighted');
 
-        this.$('a.context').show().html('#'+APP.context.name);
+        this.$('a.context').show().html('#'+this.app.context.name);
         // this.$('.authed').hide();
         // this.$('.noauth').hide();
 
-        if (APP.user) {
+        if (this.app.user) {
             this.$('.authed').show();
             this.$('.noauth').hide();
-            this.$('#username').html(APP.user);
+            this.$('#username').html(this.app.user);
         } else {
             this.$('.noauth').show();
             this.$('.authed').hide();
