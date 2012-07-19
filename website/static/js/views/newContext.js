@@ -4,7 +4,6 @@ define([
     'backbone',
     'scroll',
 
-    'models/key',
     'models/attribute',
     'views/key',
     'views/valueDetailed',
@@ -12,7 +11,7 @@ define([
     'text!templates/newContext.html',
     'text!templates/attributeChoice.html',
 ], function($, _, Backbone, scroll, 
-    kModel, attrModel, keyView, valueDetailedView,
+    kModel, attrModel, valueDetailedView,
     newContextTemplate, attrChoiceTemplate){
     var newAttrView = Backbone.View.extend({
 

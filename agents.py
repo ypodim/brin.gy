@@ -535,7 +535,7 @@ class api_call(tornado.web.RequestHandler):
         for user_name, secret in result:
             message+= 'Username: %s\n' % user_name
             message+= 'Password: %s\n' % secret
-            message+= 'Direct access: http://brin.gy/a/%s\n\n' % secret
+            message+= 'Direct access: http://beta.brin.gy/a/%s\n\n' % secret
 
         message+= 'Cheers\nBrin.gy\n\nPS: IP address that was used: %s' % ip
         if not error:

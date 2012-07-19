@@ -978,31 +978,33 @@ div#map_canvas {
     right: @asideWidth + 10;
 }
 div.infobox {
-    width:400px;
+    width:350px;
     /*height:100px;*/
     /*background-color: rgba(60,60,60,0.8);*/
 }
-div.infobox > div {
-    height: 26;
-}
-div.infobox > div > div.titleKey {
-    float: right;
+div.infobox > div.title {
+    height: 22px;
+    padding: 5px 0 5px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
     font-weight: bold;
     font-size: 22px;
     line-height: 22px;
-    padding: 5px 0 5px 0;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+div.infobox > div.title > div.titleKey {
+    float: right;
     color: gray;
 }
-div.infobox > div > div.titleVal {
+div.infobox > div.title > div.titleVal {
     float: left;
-    font-weight: bold;
-    font-size: 22px;
-    line-height: 22px;
-    padding: 5px 0 5px 0;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
 }
-
+div.infobox > div.body > div.tools {
+    height: 30px;
+    line-height: 30px;
+}
+div.infobox > div.body > div.tools > button#addBtn {
+    margin: 1px 0 1px 0;
+    float: right;
+}
 
 
 

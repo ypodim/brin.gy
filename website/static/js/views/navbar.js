@@ -10,7 +10,7 @@ define([
   var navView = Backbone.View.extend({
     el: $('#navbar'),
     events: {
-        // 'click a#about': 'about',
+        'click a#about': 'about',
         'click a#signin': 'login',
         'click a#signup': 'login',
         'click a#account': 'account',
@@ -19,6 +19,10 @@ define([
     
     app: appConfig.getState(),
 
+    about: function(){
+        console.log(this.app);
+        return false;
+    },
     login: function(e){ 
         if ($(e.target).hasClass('highlighted')) {
             $(e.target).removeClass('highlighted');
@@ -45,10 +49,10 @@ define([
         // this.$('.authed').hide();
         // this.$('.noauth').hide();
 
-        if (this.app.user) {
+        if (this.app.agent.loggedIn()) {
             this.$('.authed').show();
             this.$('.noauth').hide();
-            this.$('#username').html(this.app.user);
+            this.$('#username').html(this.app.agent.id());
         } else {
             this.$('.noauth').show();
             this.$('.authed').hide();

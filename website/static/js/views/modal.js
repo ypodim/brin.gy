@@ -24,12 +24,12 @@ define([
         this.close();
     },
     deleteBtn: function(){
-        this.trigger('delete');
+        if (confirm('All data associated with '+this.app.agent.id()+'\nwill be lost. Delete?'))
+            this.trigger('delete');
+
         this.close();
     },
-    // reminderBtn: function(){
-    //     // this.$('form.reminder').submit();
-    // },
+    
     submitReminder: function() {
         this.trigger('reminder');
         this.$('div.footer > img').show();
@@ -62,8 +62,8 @@ define([
         if (options.title == 'account') {
             inner_template = _.template( accountTemplate );
             data = {
-                username: this.app.usernames[this.app.user].name, 
-                email: this.app.usernames[this.app.user].email,
+                username: this.app.agent.fullInfo().name, 
+                email: this.app.agent.fullInfo().email,
             }
         }
         if (options.title == 'reminder') {

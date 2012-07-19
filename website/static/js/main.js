@@ -7,8 +7,8 @@ require.config({
     jquery: 'libs/jquery/jquery-min',
     cookie: 'libs/jquery/jquery.cookie',
 
+    backbone: 'libs/backbone/backbone-min',
     underscore: 'libs/underscore/underscore-min',
-    backbone: 'libs/backbone/backbone-optamd3-min',
     text: 'libs/require/text',
     order: 'libs/require/order',
 
@@ -37,12 +37,11 @@ require([
     'backbone',
     'models/state',
     'collections/attributes',
-    'collections/persons',
 
     'views/world',
     'views/navbar',
     'views/login'
-], function($, bootstrap, _, app, common, Router, Backbone, appState, Attributes, Persons,
+], function($, bootstrap, _, app, common, Router, Backbone, appState, Attributes,
     worldView, navbarView, loginView
     ){
 
@@ -54,36 +53,15 @@ require([
 
     $.getJSON('/config', function(config){
         appp.setConfig(config);
-
-        var cookie = common.cookies.get_cookie();
-        var pseudonyms = cookie.pseudonyms;
-        for (username in pseudonyms) {
-            // state.user.name = username;
-            // state.user.pwd = pseudonyms[username].secret;
-            // state.user.email = pseudonyms[username].email;
-            appp.usernames[username] = {
-                name: username,
-                pwd: pseudonyms[username].secret,
-                email: pseudonyms[username].email,
-            };
-            appp.user = username;
-        }
-
-        console.log('context in cookie', cookie.last_context);
-        if (!cookie.last_context) {
-            cookie.last_context = 'all';
-            common.cookies.set_context_in_cookie(cookie.last_context);
-        }
-        appp.context = {name:cookie.last_context};
-        console.log('now context in cookie', common.cookies.get_cookie().last_context);
+        appp.initConfig();
 
         var attrCollection = new Attributes([], {state:state});
         attrCollection.state = state;
         state.attrCollection = attrCollection;
 
-        var personCollection = new Persons([], {state:state});
-        personCollection.state = state;
-        state.personCollection = personCollection;
+        // var personCollection = new Persons([], {state:state});
+        // personCollection.state = state;
+        // state.personCollection = personCollection;
 
         var navview = new navbarView({});
         navview.render();
@@ -102,6 +80,7 @@ require([
         wldView.login = new loginView();
         appp.bind('login', navview.render);
         appp.bind('signedup', navview.render);
+        appp.bind('deleted', navview.render);
         wldView.login.bind('reminder', wldView.showReminder);
 
         var app_router = new Router({

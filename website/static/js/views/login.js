@@ -23,7 +23,7 @@ define([
             username = this.$('input#username').val();
             password = this.$('input#password').val();
             this.app.doLogin(username, password);
-            this.el.hide();
+            this.$el.hide();
         }
         if (this.options.action == 'signup') {
             username = this.$('input#username').val();
@@ -79,13 +79,13 @@ define([
 
         if (options.action == 'signup') {
             compiled_template = _.template( signupTemplate );
-            this.el.html( compiled_template() ).css({right:'50px'}).show();
+            this.$el.html( compiled_template() ).css({right:'50px'}).show();
             // this.$('input:first-child').tooltip('show');
             // this.$('button').tooltip('show');
         }
         if (options.action == 'signin') {
             compiled_template = _.template( signinTemplate );
-            this.el.html( compiled_template() ).css({right:'185px'}).show();
+            this.$el.html( compiled_template() ).css({right:'185px'}).show();
         }
         if (options.action=='reminder') {
             // this.el.html( compiled_template() ).show();

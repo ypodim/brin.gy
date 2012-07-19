@@ -3,7 +3,8 @@ define(['underscore', 'backbone'], function(_, Backbone) {
     defaults: {
         key: '',
         val: '',
-        cnt: 0,
+        xdata: {},
+        score: 0,
         haveit: false,
         selected: false,
         display: true,
@@ -14,6 +15,14 @@ define(['underscore', 'backbone'], function(_, Backbone) {
 
     initialize: function() {
         
+    },
+    
+    toggleSelected: function() {
+        this.save({selected: !this.get("selected")});
+    },
+
+    toggle: function() {
+        this.save({haveit: !this.get("haveit")});
     },
 
     clear: function() {

@@ -5,9 +5,8 @@ define([
 
     'views/about',
     'views/login',
-    'views/mobileManager',
+    
     'views/sendMessage',
-    'views/profile',
     'views/newAttribute',
     'views/welcome',
     'views/presentation',
@@ -18,7 +17,7 @@ define([
     'views/world',
 ], function(
     $, _, Backbone, 
-    aboutView, loginView, mobileManagerView, sendMessageView, profileView, newAttrView, welcomeView, presentationView, accountView, contextsView, newContextView, statsView, worldView
+    aboutView, loginView, sendMessageView, newAttrView, welcomeView, presentationView, accountView, contextsView, newContextView, statsView, worldView
     ){
   var AppRouter = Backbone.Router.extend({
     routes: {
@@ -31,7 +30,6 @@ define([
         "c/:context": "setContext",
 
         'presentation/:sno': 'presentation',
-        "u/:user": "showUser",
         'signin': 'login',
         'signup': 'login',
         'reminder': 'login',
@@ -97,20 +95,6 @@ define([
         this.presView.show();
     },
 
-    showUser: function(username) {
-        this.state.stats('user');
-        var pview = new profileView({
-            state: this.state,
-            username:username,
-        });
-        pview.render();
-
-        this.controlsView.setUIstate({
-            footer:false, 
-            title:'',
-            profile: username,
-        });
-    },
     startNewAttribute: function(state){
         if (! state.isLoggedin()) return false;
         state.stats('newattr:btnTop');

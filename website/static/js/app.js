@@ -1,19 +1,71 @@
 define(['jquery','backbone','underscore','cookie'], function ($, Backbone, _, ck) {
 var state = {
-    agent: {},
-    usernames: {},
+    agent: {
+        _baseurl: '',
+        _agentid: '',
+        _usernames: {},
+        url: function(){
+            return this._baseurl+"/"+this._agentid;
+        },
+        baseUrl: function(){
+            return this._baseurl;
+        },
+        setBaseUrl: function(url){ this._baseurl = url; },
+        setAgentId: function(aid){ this._agentid = aid; },
+        unsetAgentId: function(aid){ this._agentid = ''; },
+        loggedIn: function() { return (this._agentid != '')},
+        id: function() { return this._agentid; },
+
+
+        addUserInfo: function(info){
+            this._usernames[info.name] = info;
+        },
+        removeUserInfo: function(username){
+            delete this._usernames[username];
+        },
+        fullInfo: function() {  
+            if (!this.loggedIn()) {
+                console.log('Error: fullInfo: not logged in.');
+                return {};
+            }
+            return this._usernames[this.id()];
+        }
+    },
 
     setConfig: function(config) {
+        console.log('config:', config)
         this.config = config;
         this.satellite = {};
         this.satellite.url = config.discov_url;
-        this.agent = {};
-        this.agent.id = config.agentid;
-        this.agent.baseurl = config.ego_url_prefix;
-        this.agent.url = config.ego_url_prefix+"/"+config.agentid;
+        
+        this.agent.setBaseUrl( config.ego_url_prefix );
+        this.agent.setAgentId( config.agentid );
+
         this.website_url = config.website_url_prefix;
         this.device = config.device;
     },
+
+    initConfig: function() {
+        var cookie = this.cookies.get_cookie();
+        var pseudonyms = cookie.pseudonyms;
+        for (username in pseudonyms) {
+            var pwd = pseudonyms[username].secret;
+            var email = pseudonyms[username].email;
+            var info = {pwd:pwd, email:email, name:username};
+            this.agent.addUserInfo(info);
+            this.agent.setAgentId( username );
+        }
+
+        console.log('context in cookie', cookie.last_context);
+        if (!cookie.last_context) {
+            cookie.last_context = 'all';
+            this.cookies.set_context_in_cookie(cookie.last_context);
+        }
+        this.context = {name:cookie.last_context};
+        console.log('now context in cookie', this.cookies.get_cookie().last_context);
+    },
+
+
 
     cookies: {
         get_cookie: function()
@@ -98,15 +150,14 @@ var state = {
     doLogin: function(username, password) {
         var that = this;
         var data = {user:username, secret:password};
-        var url = this.agent.baseurl+'/authenticate_user';
+        var url = this.agent.baseUrl()+'/authenticate_user';
         $.getJSON(url, data, function(json){
             if (json.result) {
-                that.usernames[username] = {
-                    name: username,
-                    pwd: password,
-                    email: json.email,
-                };
-                that.user = username;
+                var pwd = password;
+                var email = json.email;
+                var info = {pwd:pwd, email:email, name:username};
+                that.agent.addUserInfo(info);
+                that.agent.setAgentId( username );
                 that.cookies.set_cookie(username, password, json.email);
                 // that.stats('signin', username);
                 that.trigger('login');
@@ -126,7 +177,7 @@ var state = {
 
     doCreate: function(username, email) {
         var that = this;
-        var url = this.agent.baseurl;
+        var url = this.agent.baseUrl();
         $.post(url, {username:username, email:email}, function(json){
             if (json.error.length>0) {
                 that.$('div.alert')
@@ -137,12 +188,11 @@ var state = {
                 }, 3000);
                 return false;
             } else {
-                that.user = username;
-                that.usernames[username] = {
-                    name: username,
-                    pwd: json.secret,
-                    email: email,
-                };
+                that.agent.setAgentId( username );
+                var pwd = json.secret;
+                var email = email;
+                var info = {pwd:pwd, email:email, name:username};
+                that.agent.addUserInfo(info);
                 that.cookies.set_cookie(username, json.secret, email);
                 // that.state.stats('signup', username);
                 that.trigger('signedup');
@@ -153,12 +203,10 @@ var state = {
     },
 
     doReminder: function(email) {
-        console.log('reminder:', email);
         var that = this;
         var data = {email:email};
-        var url = this.agent.baseurl+'/email_reminder';
+        var url = this.agent.baseUrl()+'/email_reminder';
         $.post(url, data, function(json){
-            console.log(json);
             if (json.error) {
                 $('div.alert')
                     .removeClass('alert-success')
@@ -186,46 +234,77 @@ var state = {
     },
 
     doDelete: function(){
-        console.log('delete', this.usernames);
+        if (!this.agent.loggedIn()) return;
+
         var that = this;
-        var data = {secret: this.usernames[this.user].pwd};
-        var url = this.agent.baseurl;
+        var username = this.agent.id();
+        var data = {secret: this.agent.fullInfo().pwd};
+        var url = this.agent.url();
+
         $.ajax({
             type: 'DELETE',
             url: url,
             data: data,
             dataType: 'json',
         }).done(function( json ) {
-            alert( "Data Saved: " + json );
-        });
-        return; 
+            that.agent.unsetAgentId();
+            that.agent.removeUserInfo(username);
+            that.cookies.del_cookie(username);
+            
+            $('div.alert')
+                .addClass('alert-success')
+                .removeClass('alert-error')
+                .html('Username deleted successfully.')
+                .slideDown();
+            setTimeout(function(){
+                $('div.alert').fadeOut();
+            }, 3000);
 
-        $.delete(url, data, function(json){
-            console.log(json);
-            if (json.error) {
-                $('div.alert')
-                    .removeClass('alert-success')
-                    .addClass('alert-error')
-                    .html('Email address not found.')
-                    .slideDown();
-                setTimeout(function(){
-                    $('div.alert').fadeOut();
-                }, 3000);
-            } else {
-                // that.stats('reminder', email);
-            }
-        }, 'json');
-        
-        $('div.alert')
-            .addClass('alert-success')
-            .removeClass('alert-error')
-            .html('Email reminder sent successfully.')
-            .slideDown();
-        setTimeout(function(){
-            $('div.alert').fadeOut();
-        }, 3000);
+            that.trigger('deleted');
+        });
 
         return false;
+    },
+
+    mutateKeyValue: function(options) {
+        if (options.type == undefined)
+            options.type = 'POST';
+        if (options.context == undefined)
+            options.context = this.context.name;
+
+        // console.log(options);
+
+        var url = this.agent.url()+'/profile';
+        var data = JSON.stringify([[options.key, options.val]]);
+        if (options.type != 'POST' && options.type != 'DELETE')
+            return false;
+
+        var that = this;
+        // var context_details = {
+        //     description: that.context.descr, 
+        //     location: {
+        //         lat: 0,
+        //         lon: 0,
+        //         radius: 0,
+        //     },
+        //     expiration: 123,
+        // };
+
+        $.ajax({
+            type: options.type,
+            url: url,
+            data: {data:data, 
+                    context:options.context, 
+                    // context_details: JSON.stringify(context_details),
+                    secret:this.agent.fullInfo().pwd,
+                    // contextDescription:that.context.descr
+                },
+            success: function(json){ 
+                if (options.clb != undefined)
+                    options.clb(json);
+            },
+            dataType: "json",
+        });
     },
 };
 
