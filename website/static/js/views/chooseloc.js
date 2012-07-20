@@ -41,10 +41,10 @@ define([
         var that = this;
 
 
-        var label = 'xxx';
-        var icon = 'http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bb|';
-        icon += label+'|FF8080|000000';
-        var shadow = 'http://chart.googleapis.com/chart?chst=d_bubble_text_small_shadow&chld=bb|'+label;
+        // var label = 'xxx';
+        // var icon = 'http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bb|';
+        // icon += label+'|FF8080|000000';
+        // var shadow = 'http://chart.googleapis.com/chart?chst=d_bubble_text_small_shadow&chld=bb|'+label;
         var marker = new google.maps.Marker({
             position: this.contextCircle.getCenter(),
             map: this.app.map,
@@ -53,7 +53,22 @@ define([
             // shadow: new google.maps.MarkerImage(shadow,null, null, new google.maps.Point(0, 45))
         });
 
-        
+        // var model = new attrModel({
+        //     key: attr.key,
+        //     val: val.val,
+        //     xdata: val.xdata,
+        //     score: val.score,
+        //     haveit: val.userhasit,
+        //     selected: false,
+        //     display: true,
+        //     matches: val.matches,
+        //     visited: false,
+        //     showControls: true,
+        //     location: {center:center, radius:radius},
+        // });
+        // that.collection.add(model);
+
+
         var attrView = new mapInfoAttrView({
             title: locationTitle,
             center: this.contextCircle.getCenter(),
@@ -79,7 +94,7 @@ define([
         var top = this.$('#crosshair').offset().top;
         var borderwidth = parseInt(this.$('#crosshair').css('border-width'));
 
-        var x = $(this.app.map.getDiv()).width()/2 + 10;
+        var x = $(this.app.map.getDiv()).width()/2 + 13;
         var y = top - header + padding + 2*borderwidth + 5;
         var scale = Math.pow(2, 21-this.app.map.getZoom());
 
@@ -226,8 +241,6 @@ define([
         //     console.log('map', event)
         // });
 
-        this.$('input#locationinput').focus();
-
         // this.autocomplete();
     },
 
@@ -297,7 +310,7 @@ define([
 
         var compiled_template = _.template( mapTemplate );
         var that = this;
-        this.el.html( compiled_template() );
+        this.$el.html( compiled_template() );
     },
   });
   return welcomeView;

@@ -37,7 +37,8 @@ body {
 #container > div#mapOverlay {
     padding-right: @asideWidth;
 }
-#container > div#mapOverlay > button {
+#container > div#mapOverlay > button#addLocation {
+    display: none;
     position: absolute;
     left: 10px;
     top: 10px;
@@ -926,7 +927,7 @@ div.valcontainer > a > span.value {
     color: white;
     text-shadow: 0 -1px rgba(0,0,0,0.8);
 }
-div.valcontainer > button {
+div.valcontainer > div.btn-group {
     position: absolute;
     right: 5px;
     top: 5px;
@@ -1001,7 +1002,7 @@ div.infobox > div.body > div.tools {
     height: 30px;
     line-height: 30px;
 }
-div.infobox > div.body > div.tools > button#addBtn {
+div.infobox > div.body > div.tools > button {
     margin: 1px 0 1px 0;
     float: right;
 }

@@ -130,7 +130,6 @@ define([
         };
 
         var mapCircle = new google.maps.Circle(contextOptions);
-        // this.contextCircle.cntx = this.tempc++;
         
         // google.maps.event.addListener(this.contextCircle, 'click', this.areaClick);
         google.maps.event.addListener(mapCircle, 'mouseover', function(event) {
