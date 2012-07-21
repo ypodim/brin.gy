@@ -5,7 +5,6 @@ define([
   'app',
   'router',
 
-  // 'maps',
   'text!templates/chooseloc.html',
   'views/mapInfoAttribute',
   ], function($, _, Backbone, appConfig, router, mapTemplate, mapInfoAttrView){
@@ -15,22 +14,34 @@ define([
         'click button#cancel': 'cancelBtn',
         'click button#useloc': 'useBtn',
         'click button#next': 'okBtn',
+        'keyup input#locationinput': 'titleChanged',
     },
     app: appConfig.getState(),
 
     map: null,
     // contexts: {},
-    contextCircle: null,
+    tempCircle: null,
     tempc: 0,
     locationInput: 'locationinput',
+    circle: {},
+
+    titleChanged: function(e){
+        var gotText = ($(e.target).val() != '');
+        var gotCircle = (this.tempCircle != null);
+        var flag = (gotText && gotCircle);
+        this.$('button#next').toggleClass('disabled', !flag);
+    },
 
     close: function() {
         this.undelegateEvents();
         this.$('.locationPicker').remove();
-        this.onCloseClb && this.onCloseClb();
+        this.tempCircle && this.tempCircle.setMap(null);
+
+        this.circle.key = this.selectedKey;
+        this.onCloseClb && this.onCloseClb(this.circle);
     },
     cancelBtn: function() {
-        this.contextCircle && this.contextCircle.setMap(null);
+        this.circle = {};
         this.close();
     },
     okBtn: function() {
@@ -38,57 +49,16 @@ define([
         if (locationTitle == '')
             return;
 
-        var that = this;
-
-
-        // var label = 'xxx';
-        // var icon = 'http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bb|';
-        // icon += label+'|FF8080|000000';
-        // var shadow = 'http://chart.googleapis.com/chart?chst=d_bubble_text_small_shadow&chld=bb|'+label;
-        var marker = new google.maps.Marker({
-            position: this.contextCircle.getCenter(),
-            map: this.app.map,
-            title: locationTitle,
-            // icon: new google.maps.MarkerImage(icon,null, null, new google.maps.Point(0, 42)),
-            // shadow: new google.maps.MarkerImage(shadow,null, null, new google.maps.Point(0, 45))
-        });
-
-        // var model = new attrModel({
-        //     key: attr.key,
-        //     val: val.val,
-        //     xdata: val.xdata,
-        //     score: val.score,
-        //     haveit: val.userhasit,
-        //     selected: false,
-        //     display: true,
-        //     matches: val.matches,
-        //     visited: false,
-        //     showControls: true,
-        //     location: {center:center, radius:radius},
-        // });
-        // that.collection.add(model);
-
-
-        var attrView = new mapInfoAttrView({
-            title: locationTitle,
-            center: this.contextCircle.getCenter(),
-            radius: this.contextCircle.getRadius(),
-        });
-        attrView.render();
-
-        var infowindow = new google.maps.InfoWindow({
-            content: attrView.el,
-        });
-        google.maps.event.addListener(marker, 'click', function() {
-            infowindow.open(that.app.map, marker);
-        });
-        google.maps.event.addListener(this.contextCircle, 'click', function() {
-            infowindow.open(that.app.map, marker);
-        });
-
+        this.circle.title = locationTitle;
         this.close();
     },
     useBtn: function() {
+        var zoom = this.app.map.getZoom();
+        if (zoom < 10) {
+            alert('Such a large area conveys almost no useful information. Please zoom more...');
+            return false;
+        }
+
         var header = 40;
         var padding = parseInt(this.$('#crosshair').css('padding-top').replace(/[^-\d\.]/g, ''));
         var top = this.$('#crosshair').offset().top;
@@ -96,17 +66,12 @@ define([
 
         var x = $(this.app.map.getDiv()).width()/2 + 13;
         var y = top - header + padding + 2*borderwidth + 5;
-        var scale = Math.pow(2, 21-this.app.map.getZoom());
-
+        var scale = Math.pow(2, 20.9-zoom);
+        var radius = 10*scale;
         var center = this.latLngControl.xy2latlng(x,y);
         
-        // this.contexts['chicago'] = {
-        //     center: center,
-        //     radius: 10*scale,
-        // };
-
-
-        var city = 'chicago';
+        this.circle.center = center;
+        this.circle.radius = radius;
 
         var contextOptions = {
             strokeColor: "pink",
@@ -119,15 +84,15 @@ define([
             radius: 10*scale,
         };
 
-        this.contextCircle && this.contextCircle.setMap(null)
-        this.contextCircle = new google.maps.Circle(contextOptions);
-        // this.contextCircle.cntx = this.tempc++;
+        this.tempCircle && this.tempCircle.setMap(null);
+        this.tempCircle = new google.maps.Circle(contextOptions);
+        
+        google.maps.event.addListener(this.tempCircle, 'click', this.areaClick);
+        google.maps.event.addListener(this.tempCircle, 'mouseover', this.areaMouseOver);
+        google.maps.event.addListener(this.tempCircle, 'mouseout', this.areaMouseOut);
 
-        google.maps.event.addListener(this.contextCircle, 'click', this.areaClick);
-        google.maps.event.addListener(this.contextCircle, 'mouseover', this.areaMouseOver);
-        google.maps.event.addListener(this.contextCircle, 'mouseout', this.areaMouseOut);
-
-        this.$('button#next').removeClass('disabled');
+        if (this.$('#'+this.locationInput).val())
+            this.$('button#next').removeClass('disabled');
     },
     areaClick: function(event) {
         // console.log('area', this.cntx)
@@ -307,6 +272,7 @@ define([
 
     initialize: function(options){
         _.bindAll(this, 'render');
+        this.selectedKey = options.key;
 
         var compiled_template = _.template( mapTemplate );
         var that = this;

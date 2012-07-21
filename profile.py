@@ -33,6 +33,7 @@ class profile():
     'USER:profile:key:KEY' # val
 
     
+    'global:nextcid' # holds next key id to be assigned to a context
     'global:nextvid' # holds next key id to be assigned to a complex key
     'profile:keytypes' # set of key types (string, location, time, user)
     'profile:key:KEY:type' # hash of key type fields (eg. loc:lat, lon, radius)
@@ -51,6 +52,9 @@ class profile():
     'context:description:CONTEXT' # a description of CONTEXT
     'context:CONTEXT:location' # a hash of location associated with CONTEXT
     'context:CONTEXT:expiration' # a sorted set of expiration dates associated with CONTEXT
+    'context:CONTEXT:cid' # a context id for CONTEXT
+    'context:cid:CID' # the CONTEXT corresponding to context id CID
+
     
 
     def add_reverse(self, context, key, val):
@@ -91,9 +95,31 @@ class profile():
             
             if self.db.scard('context:users:%s' % context) == 0 and context != 'all':
                 print 'also removing context', context
-                self.db.srem('contexts', context)
-                self.db.delete('context:%s:location' % context)
-                self.db.delete('context:%s:expiration' % context)
+                self.remove_context(context)
+
+    def remove_context(self, context):
+        self.db.srem('contexts', context)
+        self.db.delete('context:%s:location' % context)
+        self.db.delete('context:%s:expiration' % context)
+
+    def add_context(self, contextDic):
+        if self.db.sadd('contexts', contextDic['title']):
+            # only set context properties the first time a kv is posted
+            if contextDic.get('location'):
+                self.db.hmset(
+                    'context:%s:location' % contextDic['title'], 
+                    contextDic.get('location')
+                )
+            if contextDic.get('expiration'):
+                self.db.zadd(
+                    'context:%s:expiration' % contextDic['title'], 
+                    contextDic['title'], 
+                    contextDic.get('expiration')
+                )
+            
+            cid = self.db.incr('global:nextcid')
+            self.db.set('context:%s:cid' % contextDic['title'], cid)
+            self.db.set('context:cid:%s' % cid, contextDic['title'])
 
     def get_keys(self):
         return self.db.smembers('%s:profile:keys' % self.usr)
@@ -115,20 +141,7 @@ class profile():
         print context, type(context)
         print key, val
 
-        if self.db.sadd('contexts', context['title']):
-            # only set context properties the first time a kv is posted
-            if context.get('expiration'):
-                self.db.hmset(
-                    'context:%s:location' % context['title'], 
-                    context.get('location')
-                )
-            if context.get('expiration'):
-                self.db.zadd(
-                    'context:%s:expiration' % context['title'], 
-                    context['title'], 
-                    context.get('expiration')
-                )
-            pass
+        self.add_context(context)
 
         self.db.sadd('%s:contexts' % self.usr, context['title'])
         self.db.sadd('context:users:%s' % context['title'], self.usr)
@@ -189,8 +202,14 @@ class profile():
             
         saved_items = []
         for key in self.get_keys():
+
+            ktype = self.db.get('profile:key:%s:type' % key) or 'string'
+
             for val in self.get_vals(key):
-                saved_items.append(dict(key=key, val=val))
+                dic = dict(key=key, val=val)
+                if ktype != 'string':
+                    dic['xdata'] = getfullkv(self.db, context, key, val)
+                saved_items.append(dic)
         res = {'data':saved_items, 'user':self.usr}
         self.finish( res )
         
@@ -210,7 +229,22 @@ class profile():
             
         res = ''
 
-        for key, val in self.arguments:
+        for attr in self.arguments:
+            if type(attr) == list:
+                key, val = attr
+            else:
+                key = attr['key']
+                val = attr['val']
+                xdata = attr.get('xdata')
+                if xdata:
+                    if not getvid(self.db, key, val):
+                        # print 'POST', attr, type(attr), xdata
+                        ktype = xdata['ktype']
+                        dic = dict(lat=xdata['lat'], lon=xdata['lon'], radius=xdata['radius'])
+                        annotate(self.db, context, key, val, ktype, dic)
+                    # else:
+                        # print 'ALREADY IN', xdata
+
             if type(key) == str:
                 key = unicode(key, errors='replace')
             if type(val) == str:
@@ -229,7 +263,13 @@ class profile():
     def delete(self, context):
         #print 'DELETE', self.usr, self.path, self.arguments
         error = ''
-        for key, val in self.arguments:
+        for attr in self.arguments:
+            if type(attr) == list:
+                key, val = attr
+            else:
+                key = attr['key']
+                val = attr['val']
+
             #key = unicode(key, errors='replace')
             #print 'deleting', key, val
             if type(key) == str:
@@ -259,8 +299,6 @@ class profile():
         
         if self.db.scard('context:users:%s' % context) == 0 and context != 'all':
             print 'also removing context', context
-            self.db.srem('contexts', context)
-            self.db.delete('context:%s:location' % context)
-            self.db.delete('context:%s:expiration' % context)
+            self.remove_context(context)
 
 

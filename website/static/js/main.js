@@ -31,63 +31,72 @@ require([
     'bootstrap',
     'underscore',
     'app',
-    'common/ego_website',
 
     'router',
     'backbone',
-    'models/state',
-    'collections/attributes',
 
     'views/world',
     'views/navbar',
-    'views/login'
-], function($, bootstrap, _, app, common, Router, Backbone, appState, Attributes,
-    worldView, navbarView, loginView
+    'views/login',
+    'views/modal'
+], function($, bootstrap, _, app, Router, Backbone,
+    worldView, navbarView, loginView, modalView
     ){
 
     var appp = app.getState();
     console.log('appp', appp)
 
-    state = new appState();
-    this.state.progress('static files loaded, getting config');
-
     $.getJSON('/config', function(config){
         appp.setConfig(config);
         appp.initConfig();
 
-        var attrCollection = new Attributes([], {state:state});
-        attrCollection.state = state;
-        state.attrCollection = attrCollection;
-
-        // var personCollection = new Persons([], {state:state});
-        // personCollection.state = state;
-        // state.personCollection = personCollection;
-
-        var navview = new navbarView({});
-        navview.render();
-
-        var wldView = new worldView({
-            navbar: navview,
-        });
+        // worldView
+        var wldView = new worldView();
         wldView.render();
+        
+        // navbar
+        appp.navbarView = new navbarView({});
+        appp.navbarView.render();
+   
+        // modal     
+        appp.modal = new modalView();
+        appp.modal.bind('logout', function(){
+            var username = appp.agent.id();
+            // that.app.agent.removeUserInfo(username);
+            appp.cookies.del_cookie(username);
+            appp.agent.unsetAgentId();
+            appp.navbarView.render();
+            wldView.render();
+        });
 
+        appp.modal.bind('reminder', function(){
+            var email = appp.modal.$('input#email').val();
+            appp.doReminder(email);
+            appp.modal.close();
+        });
 
-        navview.bind('signin', wldView.showLoginBox);
-        navview.bind('signup', wldView.showLoginBox);
-        navview.bind('account', wldView.showAccount);
+        appp.modal.bind('delete', function(){
+            appp.doDelete();
+        });
+
         
 
-        wldView.login = new loginView();
-        appp.bind('login', navview.render);
-        appp.bind('signedup', navview.render);
-        appp.bind('deleted', navview.render);
-        wldView.login.bind('reminder', wldView.showReminder);
+        appp.navbarView.bind('signin', wldView.showLoginBox);
+        appp.navbarView.bind('signup', wldView.showLoginBox);
+        appp.navbarView.bind('account', wldView.showAccount);
+        
+        appp.loginView = new loginView();
+        appp.loginView.bind('reminder', wldView.showReminder);
+
+        
+        appp.bind('loggedin', wldView.render);
+        appp.bind('loggedin', appp.navbarView.render);
+        appp.bind('signedup', appp.navbarView.render);
+        appp.bind('deleted', appp.navbarView.render);
 
         var app_router = new Router({
-            // controlsView: cview,
-            // state: state,
+            worldView: wldView,
         });
-        state.router = app_router;
         Backbone.history.start();
     });
 });

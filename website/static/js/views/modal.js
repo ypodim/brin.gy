@@ -39,7 +39,7 @@ define([
 
     close: function(){
         // this.undelegateEvents();
-        this.el.hide();
+        this.$el.hide();
     },
 
     render: function(options){
@@ -55,7 +55,7 @@ define([
         })
 
         var modal_template = _.template( modalTemplate );
-        this.el.html( modal_template({title: options.title}) ).show();
+        this.$el.html( modal_template({title: options.title}) ).show();
         
         var inner_template;
         var data;

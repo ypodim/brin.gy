@@ -2,6 +2,7 @@ define([
     'jquery',
     'underscore',
     'backbone',
+    'app',
 
     'views/about',
     'views/login',
@@ -16,10 +17,11 @@ define([
     'views/stats',
     'views/world',
 ], function(
-    $, _, Backbone, 
+    $, _, Backbone, appConfig, 
     aboutView, loginView, sendMessageView, newAttrView, welcomeView, presentationView, accountView, contextsView, newContextView, statsView, worldView
     ){
   var AppRouter = Backbone.Router.extend({
+    app: appConfig.getState(),
     routes: {
         "about": "showAbout",
 
@@ -68,9 +70,7 @@ define([
         // this.wview = new welcomeView({
         //     state: this.state,
         // });
-
-
-        
+        this.worldView = options.worldView;        
     },
 
     stats: function(){
@@ -207,25 +207,19 @@ define([
     },
     setContext: function( context ) {
         var that = this;
-        var url = this.state.satellite.url+'/contexts';
+        var url = this.app.satellite.url+'/contexts';
         $.getJSON(url, function(json){
             for (var i in json.contexts) {
                 var cntx = json.contexts[i];
-                if (cntx.name == context) {
-                    that.state.setContext({name:context, descr:cntx.description});
-                    that.state.stats('filters:all');
-                    that.contents_view.render();
-                    // that.contents_view.showAll();
-
-                    // that.controlsView.setUIstate({
-                    //     rightTitle: 'Start New Attribute',
-                    //     rightClb: function(){that.startNewAttribute(that.state)},
-                    // });
-
+                if (cntx.id == context) {
+                    that.app.setContext({name:cntx.name, descr:cntx.description});
+                    that.app.cookies.set_context_in_cookie(cntx.name);
+                    that.worldView.render();
+                    that.app.navbarView.render();
                     return;
                 }
             }
-            that.newContext(context);
+            // that.newContext(context);
         })
     },
     

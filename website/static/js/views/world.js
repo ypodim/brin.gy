@@ -12,9 +12,9 @@ define([
   'views/mapInfoAttribute',
   'views/valueDetailed',
   'views/chooseloc',
-  'views/login',
+  // 'views/login',
   'views/modal',
-  ], function($, _, Backbone, appConfig, router, attrModel, attrCollection, keyView, mapInfoAttrView, valueView, chooselocView, loginView, modalView){
+  ], function($, _, Backbone, appConfig, router, attrModel, attrCollection, keyView, mapInfoAttrView, valueView, chooselocView, modalView){
   var welcomeView = Backbone.View.extend({
     el: $('#container'),
     events: {
@@ -23,17 +23,18 @@ define([
     app: appConfig.getState(),
     
     circles: [],
-    modal: new modalView(),
+    // modal: new modalView(),
     collection: new attrCollection(),
+    selectedKey: '',
 
     showLoginBox: function(action){
-        this.login.render({action:action});
+        this.app.loginView.render({action:action});
         
         var that = this;
         $('body').one('click', function(e){
             // that.login.undelegateEvents();
             $('#login').hide();
-            that.navbar.render();
+            that.app.navbarView.render();
         });
     },
 
@@ -44,16 +45,17 @@ define([
         }
 
         var that = this;
-        // var modal = new modalView();
-        this.modal.render();
+        // this.modal.render({title: 'account'});
+        this.app.modal.render({title: 'account'});
     },
 
     showReminder: function(argument) {
-        this.modal.render({title: 'reminder'});
+        // this.modal.render({title: 'reminder'});
+        this.app.modal.render({title: 'reminder'});
     },
 
     onLogin: function(){
-        this.navbar.render();
+        this.app.navbarView.render();
     },
 
     onDeleteAccount: function(){
@@ -61,10 +63,43 @@ define([
     },
 
     addLocation: function(e) {
+        _.each(this.circles, function(circle){ circle.infowindow.close(); })
+
+        var that = this;
         this.$('#popup').empty().addClass('transparent').show();
-        var locView = new chooselocView();
-        locView.render(function(){
-            $(e.target).removeClass('disabled');    
+        var locView = new chooselocView({key:this.selectedKey});
+        locView.render(function(circle){
+            $(e.target).removeClass('disabled');
+            if (!circle.center)
+                return false;
+            
+            var lat = circle.center.lat();
+            var lon = circle.center.lng();
+            var xdata = {lat:lat, lon:lon, radius:circle.radius, ktype:'location'};
+
+            var model = new attrModel({
+                key: circle.key,
+                val: circle.title,
+                xdata: xdata,
+                score: 1,
+                haveit: true,
+                selected: false,
+                display: true,
+                matches: [that.app.agent.id()],
+                visited: false,
+                showControls: true,
+                location: {center:circle.center, radius:circle.radius},
+            });
+
+            that.collection.add(model);
+            that.addMapCircle(model);
+
+            that.app.mutateKeyValue({
+                type: 'POST',
+                key: circle.key,
+                val: circle.title,
+                xdata: xdata,
+            });
         });
         $(e.target).addClass('disabled');
     },
@@ -77,6 +112,7 @@ define([
         this.circles = [];
 
         var models = this.collection.where({key: model.key});
+        this.selectedKey = model.key;
 
         if (model.type == 'location') {
             this.$('button').show();
@@ -158,31 +194,27 @@ define([
             _.each(that.circles, function(circle){ circle.infowindow.close(); })
             infowindow.open(that.app.map, marker);
         });
-        // google.maps.event.addListener(mapCircle, 'click', function() {
-        //     _.each(that.circles, function(circle){ circle.infowindow.close(); })
+        google.maps.event.addListener(mapCircle, 'click', function() {
+            _.each(that.circles, function(circle){ circle.infowindow.close(); })
         //     infowindow.open(this.app.map, marker);
-        // });
+        });
 
         this.circles.push({circle:mapCircle, marker:marker, infowindow:infowindow});
     },
 
     render: function(){
-
-        var centerLatLng = new google.maps.LatLng(37.748582,-122.418411);
-        this.app.map = new google.maps.Map(document.getElementById('map_canvas'), {
-            'zoom': 7,
-            'center': centerLatLng,
-            'mapTypeId': google.maps.MapTypeId.ROADMAP,
-            'zoomControl': false,
-            'streetViewControl': false,
-            'panControl': false,
-        });
+        console.log('w render');
 
         this.$('aside').empty();
+        this.collection.reset();
+
         var that = this;
         url = this.app.satellite.url+"/profile/"+this.app.context.name+"/keyvals";
         $.getJSON(url, {user:this.app.agent.id()}, function(json){
             // that.processNextKey(0, json.items);
+
+            console.log('w render got data', json.items.length, url);
+
             for (var i in json.items) {
                 var attr = json.items[i];
                 attr.key;
@@ -218,58 +250,48 @@ define([
 
                         model.set({location: {center:center, radius:radius}});
                         that.addMapCircle(model);
-
-                        // that.addMapCircle({
-                        //     center:center, 
-                        //     radius:radius, 
-                        //     val: val,
-                        //     key: attr.key,
-                        // });
                     }
-
                     
                     that.collection.add(model);
                 }
             }
         });
-
-        // Register event listeners
-        // google.maps.event.addListener(this.map, 'mouseover', function(mEvent) {
-        //   that.latLngControl.set('visible', true);
-        // });
-        // google.maps.event.addListener(this.map, 'mouseout', function(mEvent) {
-        //   that.latLngControl.set('visible', false);
-        // });
-        // google.maps.event.addListener(this.map, 'mousemove', function(mEvent) {
-        //   that.latLngControl.updatePosition(mEvent.latLng);
-        // });
-        google.maps.event.addListener(this.app.map, 'click', function(event) {
-            _.each(that.circles, function(circle){ circle.infowindow.close(); })
-        });
     },
 
     initialize: function(options){
         _.bindAll(this, 'render', 'keyClickClb', 'showLoginBox', 'showAccount', 'showReminder');
-        this.navbar = options.navbar;
+
+        var centerLatLng = new google.maps.LatLng(37.748582,-122.418411);
+        this.app.map = new google.maps.Map(document.getElementById('map_canvas'), {
+            'zoom': 7,
+            'center': centerLatLng,
+            'mapTypeId': google.maps.MapTypeId.ROADMAP,
+            'zoomControl': false,
+            'streetViewControl': false,
+            'panControl': false,
+        });
+        google.maps.event.addListener(this.app.map, 'click', function(event) {
+            _.each(that.circles, function(circle){ circle.infowindow.close(); })
+        });
         
-        var that = this;
+        // var that = this;
 
-        this.modal.bind('logout', function(){
-            that.app.agent.unsetAgentId();
-            that.navbar.render();
-        });
+        // this.modal.bind('logout', function(){
+        //     that.app.agent.unsetAgentId();
+        //     // that.app.agent.removeUserInfo(username);
+        //     that.app.cookies.del_cookie(username);
+        //     that.app.navbarView.render();
+        // });
 
-        this.modal.bind('reminder', function(){
-            var email = that.modal.$('input#email').val();
-            that.app.doReminder(email);
-            that.modal.close();
-        });
+        // this.modal.bind('reminder', function(){
+        //     var email = that.modal.$('input#email').val();
+        //     that.app.doReminder(email);
+        //     that.modal.close();
+        // });
 
-        this.modal.bind('delete', function(){
-            that.app.doDelete();
-        });
-
-        // this.router = options.router;
+        // this.modal.bind('delete', function(){
+        //     that.app.doDelete();
+        // });
     },
   });
   return welcomeView;

@@ -4,10 +4,10 @@ define([
   'backbone',
   'app',
   'tooltip',
-  'common/ego_website',
+  
   'text!templates/signin.html',
   'text!templates/signup.html',
-  ], function($, _, Backbone, appConfig, tooltip, common, signinTemplate, signupTemplate){
+  ], function($, _, Backbone, appConfig, tooltip, signinTemplate, signupTemplate){
   var loginView = Backbone.View.extend({
     el: $('#login'),
     events: {

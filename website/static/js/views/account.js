@@ -16,16 +16,17 @@ define([
     },
 
     delete: function(){
-      this.state.stats('account:delete');
-        this.state.router.contents_view._lastContext = '';
-        this.state.deleteAccount();
+        // this.state.stats('account:delete');
+        // this.state.router.contents_view._lastContext = '';
+        // this.state.deleteAccount();
     },
     signout: function(){
-        this.state.stats('account:signout');
+        console.log('signout')
+        // this.state.stats('account:signout');
         common.cookies.del_cookie(this.state.user.name);
-        this.state.user = {};
-        this.state.router.contents_view._lastContext = '';
-        this.state.router.navigate('#/', {trigger:true});
+        // this.state.user = {};
+        // this.state.router.contents_view._lastContext = '';
+        // this.state.router.navigate('#/', {trigger:true});
     },
 
     render: function(){

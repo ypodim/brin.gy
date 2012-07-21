@@ -39,8 +39,9 @@ define([
         var key = this.model.get('key');
         var val = this.model.get('val');
         var type = (haveit) ? 'DELETE' : 'POST';
+        var xdata = this.model.get('xdata');
 
-        this.app.mutateKeyValue({key:key, val:val, type:type});
+        this.app.mutateKeyValue({key:key, val:val, type:type, xdata:xdata});
     },
 
     zoomHere: function() {
@@ -50,18 +51,19 @@ define([
         };
         var circle = new google.maps.Circle(contextOptions);
         this.app.map.fitBounds(circle.getBounds());
+        this.app.map.setZoom(this.app.map.getZoom()-2);
     },
 
     render: function(){
         this.$el.html( this.template(this.model.toJSON()) );
 
-        // var btnCaption = '+ me too';
-        // var btnClass = 'btn-success';
-        // if (this.model.get('haveit')) {
-        //     btnCaption = '- remove';
-        //     btnClass = 'btn-warning';
-        // }
-        // this.$('button#addBtn').html(btnCaption).addClass(btnClass);
+        var btnCaption = '+ me too';
+        var btnClass = 'btn-success';
+        if (this.model.get('haveit')) {
+            btnCaption = '- remove';
+            btnClass = 'btn-warning';
+        }
+        this.$('button#addBtn').html(btnCaption).addClass(btnClass);
 
 
 

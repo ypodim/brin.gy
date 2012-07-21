@@ -45,10 +45,10 @@ class serve_index(tornado.web.RequestHandler):
     def get(self):
         self.render('static/index.html')
 
-class serve_user(tornado.web.RequestHandler):
+class serve_context(tornado.web.RequestHandler):
     def get(self):
         username = self.request.uri.split('/')[1:][0]
-        self.redirect("/#/u/%s" % username)
+        self.redirect("/#/c/%s" % username)
 
 
 class serve_authuser(tornado.web.RequestHandler):
@@ -109,7 +109,7 @@ application = tornado.web.Application([
     (r"/oauth", oauth),
 
     (r"/a/[a-zA-Z0-9]+/?$", serve_authuser),
-    (r"/[a-zA-Z0-9]+/?$", serve_user),
+    (r"/[a-zA-Z0-9]+/?$", serve_context),
     (r"/", serve_index),
 ], **settings)
 

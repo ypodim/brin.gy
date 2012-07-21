@@ -65,7 +65,9 @@ var state = {
         console.log('now context in cookie', this.cookies.get_cookie().last_context);
     },
 
-
+    setContext: function(cntx) {
+        this.context = {name:cntx.name};
+    },
 
     cookies: {
         get_cookie: function()
@@ -160,7 +162,7 @@ var state = {
                 that.agent.setAgentId( username );
                 that.cookies.set_cookie(username, password, json.email);
                 // that.stats('signin', username);
-                that.trigger('login');
+                that.trigger('loggedin');
             } else {
                 $('div.alert')
                     .removeClass('alert-success')
@@ -275,7 +277,9 @@ var state = {
         // console.log(options);
 
         var url = this.agent.url()+'/profile';
-        var data = JSON.stringify([[options.key, options.val]]);
+        // var data = JSON.stringify([[options.key, options.val]]);
+        var obj = {key:options.key, val:options.val, xdata:options.xdata};
+        var data = JSON.stringify([obj]);
         if (options.type != 'POST' && options.type != 'DELETE')
             return false;
 
