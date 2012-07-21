@@ -4,7 +4,7 @@ define([
   'backbone',
   'app',
   'text!templates/valueDetailed.html',
-  'text!templates/userMatch.html'
+  'text!templates/userMatch.html',
   ], function($, _, Backbone, appConfig, valuesTemplate, userMatchTemplate){
   var ValueView = Backbone.View.extend({
 
@@ -14,22 +14,36 @@ define([
 
     events: {
         "click a.valpart"    : "toggleUsers",
-        // 'click button#searchBtn'   : 'filterBtn',
         'click button#addBtn'      : 'addBtn',
     },
 
-    initialize: function(model) {
+    initialize: function(options) {
         _.bindAll(this, 'render', 'addBtn', 'toggleUsers');
-        this.model = model;
         this.model.bind('change', this.render);
-        // this.state = options.state;
-        // this.model.bind('destroy', this.remove);
-        // this.model.bind('change', this.render);
-        // this.parentView = options.parentView;
     },
 
-    render: function() {
+    toggleMatches: function(flag) {
+        this.$('#matches').toggle(flag);
+        this.$el.toggleClass('expand', flag);
+    },
+
+    toggleUsers: function(e){
+        var flag = this.$el.hasClass('expand');
+        console.log(flag)
+        this.toggleMatches(!flag);
+    },
+
+    render: function(options) {
         this.$el.html(this.template(this.model.toJSON()));
+
+        if (options && options.newAttr) {
+            this.$('div.btn-group').hide();
+            console.log(this.$('div.newAttr'));
+            this.$('div#matches').hide();
+            return;
+        } else
+            this.$('div.newAttr').hide();
+
 
         var btnCaption = '+ me too';
         var btnClass = 'btn-success';
@@ -38,6 +52,7 @@ define([
             btnClass = 'btn-warning';
         }
         this.$('button#addBtn').html(btnCaption).addClass(btnClass);
+        this.$('button.dropdown-toggle').addClass(btnClass);
             
         var utemplate = _.template(userMatchTemplate);
         var matches = this.model.get('matches');
@@ -51,26 +66,9 @@ define([
             this.$('div#matches').append(uhtml);
             this.$('a.userMatch:last-child > i').css({visibility: 'hidden'});
         }
-        
-        
-
-        // var haveit = this.model.get('haveit');
-        // this.$('button#addBtn').toggleClass('btn-success', haveit);
-        // $(this.el).toggleClass('haveitTag', haveit);
-
-        // this.$('span.count > span.cno').html(this.model.get('vcnt'));
 
         return this;
     },
-
-    // filterBtn: function(e) {
-    //     this.model.set({selected: !this.model.get('selected')});
-    //     $(this.el).toggleClass('filterTag');
-        
-    //     this.state.getMatches(this.matchesClb);
-    //     e.stopPropagation();
-    //     return false;
-    // },
 
     addBtn: function(e) {
         if (! this.app.agent.loggedIn())
@@ -108,10 +106,6 @@ define([
 
         e.stopPropagation();
         return false;
-    },
-
-    toggleUsers: function(e){
-        $(this.el).toggleClass('expand');
     },
   });
   return ValueView;

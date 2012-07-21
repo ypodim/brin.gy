@@ -10,11 +10,10 @@ define([
 
   'views/key',
   'views/mapInfoAttribute',
-  'views/valueDetailed',
+  'views/valueFrame',
   'views/chooseloc',
-  // 'views/login',
   'views/modal',
-  ], function($, _, Backbone, appConfig, router, attrModel, attrCollection, keyView, mapInfoAttrView, valueView, chooselocView, modalView){
+  ], function($, _, Backbone, appConfig, router, attrModel, attrCollection, keyView, mapInfoAttrView, valueFrameView, chooselocView, modalView){
   var welcomeView = Backbone.View.extend({
     el: $('#container'),
     events: {
@@ -133,23 +132,10 @@ define([
 
         if (model.type == 'string') {
             this.$('button').hide();
-            var header = $('<div></div>').addClass('header').html(model.key);
-            var expandBtn = $('<button class="btn"></button>').html('<i class="icon-chevron-down"></i>');
-            expandBtn.css({float:'right'}).click(function(){
-                var flag = $(this).children().hasClass('icon-chevron-down');
-                $('div.valcontainer').toggleClass('expand', flag);
-                $(this).children().toggleClass('icon-chevron-down', !flag);
-                $(this).children().toggleClass('icon-chevron-up', flag);
-            });
-            header.append(expandBtn);
-
-            $('#popup').empty().show().removeClass('transparent').html(header);
-            for (var i in models) {
-                var attr = models[i];
-                var vview = new valueView(attr);
-                vview.render();
-                $('#popup').append(vview.el);
-            }
+            this.vFrameView && this.vFrameView.undelegateEvents();
+            vFrameView = new valueFrameView({models:models, key:model.key});
+            vFrameView.render();
+            this.vFrameView = vFrameView;
         }
     },
 
@@ -261,6 +247,7 @@ define([
     initialize: function(options){
         _.bindAll(this, 'render', 'keyClickClb', 'showLoginBox', 'showAccount', 'showReminder');
 
+        var that = this;
         var centerLatLng = new google.maps.LatLng(37.748582,-122.418411);
         this.app.map = new google.maps.Map(document.getElementById('map_canvas'), {
             'zoom': 7,

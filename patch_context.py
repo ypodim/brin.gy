@@ -53,8 +53,8 @@ def revkeyval(key, val, c='all'):
 
 
 
-# print r.get('global:nextcid')
-# sys.exit()
+print r.get('global:nextcid')
+sys.exit()
 
 
 

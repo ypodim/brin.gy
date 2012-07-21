@@ -6,17 +6,27 @@
         <div class='caption'><% if (score==1) print('person'); else print('people'); %></div>
 	</span>
 	<span class="value"><%= val %></span>
+
+	<div class='newAttr'>
+		<form>
+			<input type='text' autofocus required />
+			<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/>
+			<button type='submit' class='btn btn-success'>save</button>
+		</form>
+	</div>
 </a>
+
 
 
 
 <div class="btn-group">
 	<button id='addBtn' class='btn'>+ me too</button>
 	<button class="btn dropdown-toggle" data-toggle="dropdown">
-	<span class="caret"></span>
+		<span class="caret"></span>
 	</button>
-	<ul class="dropdown-menu">
-	<!-- dropdown menu links -->
+	<ul class="dropdown-menu pull-right">
+		<li><a href="#"><i class='icon-flag'></i>&nbsp;Flag</a></li>
+		<!-- <li class="divider"></li> -->
 	</ul>
 </div>
 

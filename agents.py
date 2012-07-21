@@ -182,9 +182,12 @@ class serve_user(bringy_handler):
             # secret = self.request.body.split('=')[1]
         
         passed = db.authenticate_user(self.username, secret)
+        print 'DELETE', passed, dic
         if passed:
             deleted = db.delete_user(self.username)
+            print 'deleted'
             for capname in capability_names:
+                print 'deleting cap', capname
                 capability = eval(capname)(self.username, self.arguments, self.path, db.r, self.on_response)
                 capability.clear_all()
         else:

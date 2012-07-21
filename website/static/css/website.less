@@ -115,6 +115,10 @@ div#popup > div.header {
     padding: 5px;
     text-shadow: 0 -1px black;
 }
+div#popup > div.header > button {
+    float: right;
+    margin-left: 5px;
+}
 
 aside {
     position: absolute;
@@ -882,7 +886,7 @@ div.valcontainer {
     border: 1px solid rgba(200,200,200,0.6);
     border-radius: 5px;
     padding: 5px;
-    overflow: hidden;
+    /*overflow: hidden;*/
     -webkit-transition: max-height 0.4s ease-in-out;
     -o-transition: max-height 0.4s ease-in-out;
     -moz-transition: max-height 0.4s ease-in-out;
@@ -927,15 +931,20 @@ div.valcontainer > a > span.value {
     color: white;
     text-shadow: 0 -1px rgba(0,0,0,0.8);
 }
-div.valcontainer > div.btn-group {
+div.valcontainer > div.btn-group  {
     position: absolute;
     right: 5px;
-    top: 5px;
-    height: 36px;
-    font-weight: bold;
-    font-size: 16px;
+    top: 10px;
+    /*height: 36px;*/
+    /*font-weight: bold;*/
+    /*font-size: 16px;*/
 }
-
+div.valcontainer > div#matches  {
+    display: none;
+}
+div.valcontainer > a.valpart > div.newAttr  {
+    display: inline-block;
+}
 
 
 div#matches {
