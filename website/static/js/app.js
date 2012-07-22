@@ -13,7 +13,13 @@ var state = {
         setBaseUrl: function(url){ this._baseurl = url; },
         setAgentId: function(aid){ this._agentid = aid; },
         unsetAgentId: function(aid){ this._agentid = ''; },
-        loggedIn: function() { return (this._agentid != '')},
+        loggedIn: function(options) { 
+            if (options && options.alert)
+                alert('Please sign in first.')
+            // if (options && options.signin)
+                
+            return (this._agentid != '')
+        },
         id: function() { return this._agentid; },
 
 

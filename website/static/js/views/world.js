@@ -27,12 +27,14 @@ define([
     selectedKey: '',
 
     showLoginBox: function(action){
+        console.log('ok')
         this.app.loginView.render({action:action});
         
         var that = this;
         $('body').one('click', function(e){
+            console.log('ONE:', e)
             // that.login.undelegateEvents();
-            $('#login').hide();
+            that.app.loginView.close();
             that.app.navbarView.render();
         });
     },

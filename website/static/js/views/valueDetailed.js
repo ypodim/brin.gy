@@ -13,13 +13,26 @@ define([
     app: appConfig.getState(),
 
     events: {
+        'submit form': 'newAttrSubmit',
         "click a.valpart"    : "toggleUsers",
-        'click button#addBtn'      : 'addBtn',
+        'click button#addBtn' : 'addBtn',  
     },
 
     initialize: function(options) {
         _.bindAll(this, 'render', 'addBtn', 'toggleUsers');
         this.model.bind('change', this.render);
+    },
+
+    newAttrSubmit: function() {
+        var val = this.$('#val').val();
+        this.model.set({
+            val:val, 
+            score:1, 
+            haveit:1, 
+            newAttr:0, 
+            matches:[this.app.agent.id()]
+        });
+        return false;
     },
 
     toggleMatches: function(flag) {
@@ -28,9 +41,10 @@ define([
     },
 
     toggleUsers: function(e){
-        var flag = this.$el.hasClass('expand');
-        console.log(flag)
-        this.toggleMatches(!flag);
+        if (! this.model.get('newAttr')) {
+            var flag = this.$el.hasClass('expand');
+            this.toggleMatches(!flag);
+        }
     },
 
     render: function(options) {
@@ -38,12 +52,11 @@ define([
 
         if (options && options.newAttr) {
             this.$('div.btn-group').hide();
-            console.log(this.$('div.newAttr'));
             this.$('div#matches').hide();
+            this.$('span.value').hide();
             return;
-        } else
-            this.$('div.newAttr').hide();
-
+        } else 
+            this.$('form.newAttr').hide();
 
         var btnCaption = '+ me too';
         var btnClass = 'btn-success';

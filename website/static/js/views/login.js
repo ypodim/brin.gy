@@ -17,6 +17,12 @@ define([
         'click a.reminder': 'reminder',
     },
     app: appConfig.getState(),
+    lastWindow: '',
+
+    close: function(){
+        console.log('close!')
+        this.$el.hide();
+    },
 
     submit: function(e){
         if (this.options.action == 'signin') {
@@ -71,11 +77,20 @@ define([
     },
     
     render: function(options){
-        // this.state.router.contents_view._lastContext = '';
         var compiled_template;
         this.options = options;
         if (options==undefined)
             options = {action:'signup'};
+
+        console.log(this.$el.is(':visible'), this.lastWindow, options.action)
+        if (this.$el.is(':visible') && this.lastWindow == options.action) {
+            this.$el.hide();
+            return;
+        }
+
+        this.lastWindow = options.action;
+        console.log('login show')
+        
 
         if (options.action == 'signup') {
             compiled_template = _.template( signupTemplate );
@@ -86,6 +101,7 @@ define([
         if (options.action == 'signin') {
             compiled_template = _.template( signinTemplate );
             this.$el.html( compiled_template() ).css({right:'185px'}).show();
+            console.log('ok', this.$el.is(':visible'))
         }
         if (options.action=='reminder') {
             // this.el.html( compiled_template() ).show();

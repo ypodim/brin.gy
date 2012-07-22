@@ -27,14 +27,20 @@ define([
     },
 
     newAttr: function(){
+        if (! this.app.agent.loggedIn({alert:1})) {
+            this.app.navbarView.login();
+            return false;
+        }
+
         var model = new attrModel({
             key: this.model.get('key'),
-            val: '',
+            val: 'a',
             score: 0,
+            newAttr: 1,
         });
         var vview = new valueView({model:model});
         vview.render({newAttr:true});
-        this.$el.append(vview.$el);
+        this.$('.header').after(vview.$el);
     },
 
     expandBtn: function(e){

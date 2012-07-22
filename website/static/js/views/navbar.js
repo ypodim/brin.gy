@@ -24,16 +24,24 @@ define([
         return false;
     },
     login: function(e){ 
-        if ($(e.target).hasClass('highlighted')) {
-            $(e.target).removeClass('highlighted');
+        var btn;
+        if (e) {
+            console.log('ok')
+            btn = $(e.target);
+            // e.stopPropagation();
+        } else
+            btn = this.$('a#signin');
+
+        if (btn.hasClass('highlighted')) {
+            btn.removeClass('highlighted');
             return;
         }
         $('a').removeClass('highlighted');
-        $(e.target).addClass('highlighted')
+        btn.addClass('highlighted')
 
-        var action = $(e.target).attr('id');
+        var action = btn.attr('id');
         this.trigger(action, action);
-        e.stopPropagation(); 
+        console.log(action)
     },
 
     account: function(){
@@ -60,7 +68,7 @@ define([
     },
 
     initialize: function(options){
-        _.bindAll(this, 'render');
+        _.bindAll(this, 'render', 'login');
         $(this.el).html(this.template());
     },
   });

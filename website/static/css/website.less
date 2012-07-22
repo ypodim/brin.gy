@@ -405,7 +405,7 @@ profile > div#header {
 
 /*############# NEW ATTRIBUTE #############*/
 
-newattribute {
+/*newattribute {
     margin: auto;
     width: 700px;
     display: block;
@@ -434,10 +434,9 @@ label.small {
 newattribute > form > div > input {
     .font-3;
     display:block;
-    /*line-height:40px;*/
     height:50px;
     width:400px;
-}
+}*/
 
 div#suggestions > label {
     display:none;
@@ -902,6 +901,7 @@ div.expand {
 /*div.valcontainer:last-child { margin-bottom: 0; }*/
 div.valcontainer > a {
     display: block;
+    height: 36px;
 }
 div.valcontainer > a:hover { text-decoration: none; }
 div.valcontainer > a > span.count {
@@ -926,26 +926,36 @@ div.valcontainer > a > span.count > div.caption{
 div.valcontainer > a > span.value {
     display: inline-block;
     font-size: 20px;
-    line-height: 36px;
-    height: 36px;
+    line-height: 26px;
+    height: 26px;
     color: white;
     text-shadow: 0 -1px rgba(0,0,0,0.8);
+    /*background-color: yellow;*/
 }
 div.valcontainer > div.btn-group  {
     position: absolute;
     right: 5px;
     top: 10px;
-    /*height: 36px;*/
-    /*font-weight: bold;*/
-    /*font-size: 16px;*/
 }
 div.valcontainer > div#matches  {
     display: none;
 }
-div.valcontainer > a.valpart > div.newAttr  {
-    display: inline-block;
+div.valcontainer > a {
+    /*background-color: blue;*/
 }
-
+div.valcontainer > a > form.newAttr  {
+    position: absolute;
+    top: 10px;
+    left: 55px;
+    height: 26px;
+    width: 338px;
+}
+div.valcontainer > a > form.newAttr > button {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 99px;
+}
 
 div#matches {
     border-top: 1px solid rgba(200,200,200,0.3);
