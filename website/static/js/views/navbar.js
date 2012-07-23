@@ -20,20 +20,19 @@ define([
     app: appConfig.getState(),
 
     about: function(){
-        console.log(this.app);
         return false;
     },
     login: function(e){ 
         var btn;
         if (e) {
-            console.log('ok')
             btn = $(e.target);
-            // e.stopPropagation();
+            e.stopPropagation();
         } else
             btn = this.$('a#signin');
 
         if (btn.hasClass('highlighted')) {
             btn.removeClass('highlighted');
+            this.app.loginView.close();
             return;
         }
         $('a').removeClass('highlighted');
@@ -41,7 +40,6 @@ define([
 
         var action = btn.attr('id');
         this.trigger(action, action);
-        console.log(action)
     },
 
     account: function(){

@@ -34,7 +34,7 @@ define([
 
         var model = new attrModel({
             key: this.model.get('key'),
-            val: 'a',
+            val: '',
             score: 0,
             newAttr: 1,
         });

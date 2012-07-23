@@ -32,6 +32,7 @@ define([
             newAttr:0, 
             matches:[this.app.agent.id()]
         });
+        this.app.trigger('addattr', this.model);
         return false;
     },
 
@@ -84,8 +85,10 @@ define([
     },
 
     addBtn: function(e) {
-        if (! this.app.agent.loggedIn())
+        if (! this.app.agent.loggedIn({alert:1})) {
+            this.app.navbarView.login();
             return false;
+        }
 
         haveit = this.model.get('haveit');
         var newhaveit = !haveit;
@@ -93,29 +96,21 @@ define([
 
         var oldcount = this.model.get('score');
         console.log(oldcount);
-        if (haveit) 
-            // this.model.set({vcnt: oldcount-1});
+        if (haveit)
             newcount = oldcount-1;
         else
-            // this.model.set({vcnt: oldcount+1});
             newcount = oldcount+1;
 
         this.model.set({haveit: newhaveit, score:newcount});
         console.log(oldcount, newcount, haveit, newhaveit);
         // $(this.el).toggleClass('haveitTag');
 
-        var key = this.model.get('key');
-        var val = this.model.get('val');
-        var type = (haveit) ? 'DELETE' : 'POST';
-
-        this.app.mutateKeyValue({key:key, val:val, type:type});
-
-        // var body = {key:key, val:val, context:this.state.context.name};
-        // if (haveit)
-            // this.state.stats('attribute:removed', body)
-        // else
-            // this.state.stats('attribute:added', body)
-        
+        // var key = this.model.get('key');
+        // var val = this.model.get('val');
+        // var type = (haveit) ? 'DELETE' : 'POST';
+        var action = (haveit) ? 'remattr' : 'addattr';
+        this.app.trigger(action, this.model);
+        // this.app.mutateKeyValue({key:key, val:val, type:type});
 
         e.stopPropagation();
         return false;

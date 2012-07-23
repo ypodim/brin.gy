@@ -26,8 +26,25 @@ define([
     collection: new attrCollection(),
     selectedKey: '',
 
+    addAttr: function (model) {
+        this.app.mutateKeyValue({
+            type: 'POST',
+            key: model.get('key'),
+            val: model.get('val'),
+        });
+        this.collection.add(model);
+    },
+    remAttr: function (model) {
+        this.app.mutateKeyValue({
+            type: 'DELETE',
+            key: model.get('key'),
+            val: model.get('val'),
+        });
+        this.collection.remove(model);
+    },
+
     showLoginBox: function(action){
-        console.log('ok')
+        console.log('ok showLoginBox')
         this.app.loginView.render({action:action});
         
         var that = this;
@@ -247,7 +264,7 @@ define([
     },
 
     initialize: function(options){
-        _.bindAll(this, 'render', 'keyClickClb', 'showLoginBox', 'showAccount', 'showReminder');
+        _.bindAll(this, 'render', 'keyClickClb', 'showLoginBox', 'showAccount', 'showReminder', 'addAttr', 'remAttr');
 
         var that = this;
         var centerLatLng = new google.maps.LatLng(37.748582,-122.418411);

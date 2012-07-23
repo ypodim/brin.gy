@@ -93,6 +93,8 @@ require([
         appp.bind('loggedin', appp.navbarView.render);
         appp.bind('signedup', appp.navbarView.render);
         appp.bind('deleted', appp.navbarView.render);
+        appp.bind('addattr', wldView.addAttr);
+        appp.bind('remattr', wldView.remAttr);
 
         var app_router = new Router({
             worldView: wldView,

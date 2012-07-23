@@ -1,4 +1,4 @@
-define(['jquery','backbone','underscore','cookie'], function ($, Backbone, _, ck) {
+define(['jquery','backbone','underscore'], function ($, Backbone, _) {
 var state = {
     agent: {
         _baseurl: '',
@@ -14,14 +14,13 @@ var state = {
         setAgentId: function(aid){ this._agentid = aid; },
         unsetAgentId: function(aid){ this._agentid = ''; },
         loggedIn: function(options) { 
-            if (options && options.alert)
+            var loggedin = (this._agentid != '');
+            if (!loggedin && options && options.alert)
                 alert('Please sign in first.')
-            // if (options && options.signin)
-                
-            return (this._agentid != '')
+
+            return loggedin;
         },
         id: function() { return this._agentid; },
-
 
         addUserInfo: function(info){
             this._usernames[info.name] = info;
