@@ -18,13 +18,23 @@ define([
     el: $('#container'),
     events: {
         'click button#addLocation': 'addLocation',
+        'click button#newKey': 'newKey',
     },
     app: appConfig.getState(),
     
     circles: [],
-    // modal: new modalView(),
     collection: new attrCollection(),
     selectedKey: '',
+
+    newKey: function() {
+        // this.app.modal.render({title: 'newkey'});
+        var keymodel = new Backbone.Model({key:'', score:0});
+        var kview = new keyView({model: keymodel});
+        kview.render({newKey:1});
+
+        // kview.bind('keyclick', that.keyClickClb);
+        this.$('aside > div.list').prepend(kview.el);
+    },
 
     addAttr: function (model) {
         this.app.mutateKeyValue({
@@ -63,12 +73,10 @@ define([
         }
 
         var that = this;
-        // this.modal.render({title: 'account'});
         this.app.modal.render({title: 'account'});
     },
 
     showReminder: function(argument) {
-        // this.modal.render({title: 'reminder'});
         this.app.modal.render({title: 'reminder'});
     },
 
@@ -123,25 +131,28 @@ define([
     },
 
     keyClickClb: function(model){
+        this.$('a.asideKey').removeClass('highlighted');
+        this.$('a.asideKey > i').removeClass('icon-white');
+
         for (var i in this.circles) {
             this.circles[i].circle.setMap(null);
             this.circles[i].marker.setMap(null);
         }
         this.circles = [];
 
-        var models = this.collection.where({key: model.key});
-        this.selectedKey = model.key;
+        var models = this.collection.where({key: model.get('key')});
+        this.selectedKey = model.get('key');
 
-        if (model.type == 'location') {
-            this.$('button').show();
+        if (model.get('type') == 'location') {
+            this.$('button#addLocation').show();
             $('#popup').hide();
             var bounds = new google.maps.LatLngBounds();
             for (var i in models) {
-                var model = models[i];
-                var center = model.get('location').center;
-                var radius = model.get('location').radius;
+                var m = models[i];
+                var center = m.get('location').center;
+                var radius = m.get('location').radius;
                 bounds.extend(center);
-                this.addMapCircle(model);
+                this.addMapCircle(m);
             }
             
             if (!bounds.isEmpty()) {
@@ -149,10 +160,10 @@ define([
             }
         }
 
-        if (model.type == 'string') {
-            this.$('button').hide();
+        if (model.get('type') == 'string') {
+            this.$('button#addLocation').hide();
             this.vFrameView && this.vFrameView.undelegateEvents();
-            vFrameView = new valueFrameView({models:models, key:model.key});
+            vFrameView = new valueFrameView({models:models, key:model.get('key')});
             vFrameView.render();
             this.vFrameView = vFrameView;
         }
@@ -210,7 +221,7 @@ define([
     render: function(){
         console.log('w render');
 
-        this.$('aside').empty();
+        this.$('aside > div.list').empty();
         this.collection.reset();
 
         var that = this;
@@ -225,9 +236,12 @@ define([
                 attr.key;
                 attr.score;
 
-                var kview = new keyView({keyClickClb:that.keyClickClb});
-                kview.render(attr);
-                that.$('aside').append(kview.el);
+                var keymodel = new Backbone.Model(attr);
+                var kview = new keyView({model: keymodel});
+                kview.render();
+                kview.bind('keyclick', that.keyClickClb);
+                that.$('aside > div.list').append(kview.el);
+
                 for (var v in attr.values) {
                     var val = attr.values[v];
                     val.matches;

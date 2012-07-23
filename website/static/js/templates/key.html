@@ -1,4 +1,29 @@
 <a href='#' class='asideKey'>
-	<div class='title'><%= title %></div>
+	<div class='title'><%= key %></div>
 	<i class="<%= icon %>"></i>
+	<i class='icon-user'></i>
+	<div class='score'><%= score %></div>
 </a>
+
+<form class='newKey'>
+	<input id='key' type='text' autofocus required />
+	<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/>
+
+	<div class="btn-group">
+		<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+			<i class='icon-font'></i>
+			<span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu pull-right">
+			<li><a href="#" id='string'>
+				<i class='icon-font'></i>&nbsp;plain text
+			</a></li>
+			<li><a href="#" id='location'>
+				<i class='icon-map-marker'></i>&nbsp;about places
+			</a></li>
+			<li><a href="#" id='users'>
+				<i class='icon-user'></i>&nbsp;about people
+			</a></li>
+		</ul>
+	</div>
+</form>

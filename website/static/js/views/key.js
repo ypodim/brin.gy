@@ -13,36 +13,50 @@ define([
     template: _.template(keyTemplate),
 
     events: {
-        'click a': 'keyClick',
-        // 'submit form': 'submitNewValue',
+        'click a.asideKey': 'keyClick',
+        'click li > a': 'typeSelection',
+    },
+    
+    typeSelection: function(e){
+        
+        var type = $(e.target).attr('id');
+        
+        var kclass = 'icon-font';
+        if (type == 'location')
+            kclass = 'icon-map-marker';
+        if (type == 'users')
+            kclass = 'icon-user';
+        this.$('a.dropdown-toggle > i').attr({class:kclass});
     },
 
     keyClick: function(){
-        $('aside > div > a').removeClass('highlighted');
-        $('aside > div > a > i').removeClass('icon-white');
+        console.log('keyclick');
+
+        this.trigger('keyclick', this.model);
         this.$('a').addClass('highlighted');
         this.$('i').addClass('icon-white');
-        
-        this.keyClickClb && this.keyClickClb(this.model)
         return false;
     },
 
     initialize: function(options) {
       _.bindAll(this, 'render');
-      this.keyClickClb = options.keyClickClb;
-      // this.model.bind('destroy', this.remove);
-      // this.model.view = this;
     },
 
-    render: function(model) {
-        // html = this.template(this.model.toJSON());
-        this.model = model;
+    render: function(options) {
         var icon = 'icon-font';
-        if (model.type == 'location')
+        if (this.model.get('type') == 'location')
             icon = 'icon-map-marker';
+        this.model.set({icon:icon});
 
-        html = this.template({title: model.key, icon:icon});
-        $(this.el).html(html);
+        this.$el.html(this.template(this.model.toJSON()));
+
+        if (options && options.newKey) {
+            this.$('a.asideKey').hide();
+            return;
+        } else 
+            this.$('form.newKey').hide();
+
+
         return this;
     },
 

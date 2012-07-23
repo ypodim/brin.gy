@@ -45,8 +45,6 @@ define([
     render: function(options){
         options = options || {};
         options.title = options.title || 'account';
-        // if (!options || !opti)
-        //     options.title = 'account'
 
         var that = this;
         $('body').keydown(function(e){

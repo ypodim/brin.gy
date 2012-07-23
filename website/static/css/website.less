@@ -120,10 +120,10 @@ div#popup > div.header > button {
     margin-left: 5px;
 }
 
-aside {
+aside > div.list {
     position: absolute;
     right: 0;
-    top: 0;
+    top: 40px;
     bottom: 0;
     width: @asideWidth;
     padding: 10px 5px 5px 5px;
@@ -132,10 +132,23 @@ aside {
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
 }
-aside > div.asideEntry {
+aside > div.list > div.asideEntry {
     width: @asideWidth;
 }
-aside > div.asideEntry > a.asideKey {
+aside > div.list > div.asideEntry > form.newKey {
+    /*background-color: yellow;*/
+    height: 30px;
+    margin: 0;
+    padding: 5px;
+}
+aside > div.list > div.asideEntry > form.newKey > input#key {
+    width: 170px;
+    float: left;
+}
+aside > div.list > div.asideEntry > form.newKey > div.btn-group {
+    float:right;
+}
+aside > div.list > div.asideEntry > a.asideKey {
     color: rgba(50,50,50,0.8);
     display: block;
     position: relative;
@@ -146,12 +159,13 @@ aside > div.asideEntry > a.asideKey {
     line-height: 22px;
     border-radius: 5px;
 }
-aside > div.asideEntry > a.asideKey:hover {
-    /*text-decoration: none;*/
+aside > div.list > div.asideEntry > a.asideKey:hover {
     cursor: pointer;
     color: rgba(0,0,0,0.5);
+    border: 1px solid rgba(0,0,0,0.15);
+    margin: -1px;
 }
-aside > div > a.highlighted {
+aside > div.list > div > a.highlighted {
     background-color: rgba(0,0,0,0.2);
     background-color: rgba(255, 207, 121,0.8);
     background-color: rgba(153, 204, 255, 0.9);
@@ -161,14 +175,54 @@ aside > div > a.highlighted {
     text-shadow: 0 1px rgba(255,255,255,0.5);
     text-shadow: 0 -1px rgba(150,150,150,0.5);
 }
-aside > div.asideEntry > a.asideKey > div.title {
+aside > div.list > div.asideEntry > a.asideKey > div.title {
     position: absolute;
     left:5px;
 }
-aside > div.asideEntry > a.asideKey > i {
+aside > div.list > div.asideEntry > a.asideKey > i {
+    /*position: absolute;*/
+    /*top: 10px;*/
+    /*right:5px;*/
+    float: right;
+    margin: 7px 5px 0 5px;
+}
+aside > div.list > div.asideEntry > a.asideKey > div.score {
     position: absolute;
-    top: 10px;
-    right:5px;
+    top: 2px;
+    left: 221px;
+    background-color: red;
+    display: inline-block;
+    line-height: 11px;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 1px 3px 1px 3px;
+    border-radius: 3px;
+    color:white;
+}
+
+
+aside > div.buttons {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: @asideWidth;
+    padding: 10px 0px 5px 10px;
+    
+    pointer-events: all;
+    /*background-color: yellow;*/
+
+    font-size: 22px;
+    line-height: 30px;
+
+    border-bottom: 1px solid gray;
+    box-shadow: 0 1px white;
+}
+aside > div.buttons > button {
+    position: absolute;
+    top: 8px;
+    right: 5px;
+    height: 30px;
+    float: right;
 }
 
 
