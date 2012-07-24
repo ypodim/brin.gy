@@ -14,6 +14,7 @@ define([
 
     events: {
         'submit form': 'newAttrSubmit',
+        'click form.newAttr > button': 'newAttrSubmit',
         "click a.valpart"    : "toggleUsers",
         'click button#addBtn' : 'addBtn',  
     },
@@ -46,6 +47,7 @@ define([
             var flag = this.$el.hasClass('expand');
             this.toggleMatches(!flag);
         }
+        return false;
     },
 
     render: function(options) {
@@ -113,7 +115,7 @@ define([
         // this.app.mutateKeyValue({key:key, val:val, type:type});
 
         e.stopPropagation();
-        return false;
+        // return false;
     },
   });
   return ValueView;

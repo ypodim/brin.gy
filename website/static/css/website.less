@@ -120,33 +120,82 @@ div#popup > div.header > button {
     margin-left: 5px;
 }
 
-aside > div.list {
+
+
+aside {
     position: absolute;
     right: 0;
-    top: 40px;
+    top: 0;
     bottom: 0;
     width: @asideWidth;
     padding: 10px 5px 5px 5px;
     
     pointer-events: all;
+}
+
+.well {
+    padding: 10px;
+    margin: 5px 0 5px 0;
+}
+form.newKey {
+    /*height: 30px;*/
+    margin: 0;
+    padding: 5px 0 5px 0;
+
+    /*background-color: blue;*/
+}
+form.newKey div.header {
+    text-transform: uppercase;
+    font-weight: bold;
+    color: gray;
+    margin-bottom: 5px;
+}
+form.newKey > input#key {
+    width: 170px;
+    float: left;
+}
+form.newKey > div.btn-group {
+    /*float:right;*/
+}
+form.newKey > div.buttons {
+    /*border-top: 1px solid gray;*/
+    padding-top: 10px;
+    text-align: right;
+}
+form.newKey > div.buttons > button {
+    width: 100px;
+}
+
+aside > div.buttons {
+    height: 30px;
+    margin: 0;
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 30px;
+    padding-bottom: 5px;
+
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 1px rgba(0,0,0,0.4);
+}
+aside > div.buttons > button {
+    float: right;
+}
+
+aside > div.list {
+    position: absolute;
+    right: 0;
+    top: 47px;
+    bottom: 0;
+    padding-left: 5px;
+    /*padding: 10px 5px 5px 5px;*/
+    /*background-color: yellow;*/
+    width: @asideWidth + 5;
+
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
 }
 aside > div.list > div.asideEntry {
     width: @asideWidth;
-}
-aside > div.list > div.asideEntry > form.newKey {
-    /*background-color: yellow;*/
-    height: 30px;
-    margin: 0;
-    padding: 5px;
-}
-aside > div.list > div.asideEntry > form.newKey > input#key {
-    width: 170px;
-    float: left;
-}
-aside > div.list > div.asideEntry > form.newKey > div.btn-group {
-    float:right;
 }
 aside > div.list > div.asideEntry > a.asideKey {
     color: rgba(50,50,50,0.8);
@@ -180,9 +229,6 @@ aside > div.list > div.asideEntry > a.asideKey > div.title {
     left:5px;
 }
 aside > div.list > div.asideEntry > a.asideKey > i {
-    /*position: absolute;*/
-    /*top: 10px;*/
-    /*right:5px;*/
     float: right;
     margin: 7px 5px 0 5px;
 }
@@ -201,29 +247,6 @@ aside > div.list > div.asideEntry > a.asideKey > div.score {
 }
 
 
-aside > div.buttons {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: @asideWidth;
-    padding: 10px 0px 5px 10px;
-    
-    pointer-events: all;
-    /*background-color: yellow;*/
-
-    font-size: 22px;
-    line-height: 30px;
-
-    border-bottom: 1px solid gray;
-    box-shadow: 0 1px white;
-}
-aside > div.buttons > button {
-    position: absolute;
-    top: 8px;
-    right: 5px;
-    height: 30px;
-    float: right;
-}
 
 
 
@@ -245,7 +268,7 @@ div.noTitleTransform {
     position: absolute;
     z-index:0;
     left: 0;
-    top: 95px;
+    top: 40px;
     z-index:100;
     display: none;
     font-size:30px;

@@ -40,6 +40,7 @@ define([
 
         var action = btn.attr('id');
         this.trigger(action, action);
+        return false;
     },
 
     account: function(){

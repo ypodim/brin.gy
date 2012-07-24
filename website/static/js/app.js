@@ -204,6 +204,7 @@ var state = {
                 // that.state.stats('signup', username);
                 that.trigger('signedup');
             }
+            that.loginView.close();
         }, 'json');
         
         return false;

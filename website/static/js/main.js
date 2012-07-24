@@ -79,6 +79,11 @@ require([
             appp.doDelete();
         });
 
+        appp.modal.bind('newkey', function(m){
+            m.prepend = 1;
+            m.score = 1;
+            wldView.appendKey(m);
+        });
         
 
         appp.navbarView.bind('signin', wldView.showLoginBox);

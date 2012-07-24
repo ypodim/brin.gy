@@ -15,6 +15,7 @@ define([
         'click button#useloc': 'useBtn',
         'click button#next': 'okBtn',
         'keyup input#locationinput': 'titleChanged',
+        'submit form': 'submitLocation',
     },
     app: appConfig.getState(),
 
@@ -24,6 +25,10 @@ define([
     tempc: 0,
     locationInput: 'locationinput',
     circle: {},
+
+    submitLocation: function(){
+        return false;
+    },
 
     titleChanged: function(e){
         var gotText = ($(e.target).val() != '');
@@ -129,6 +134,10 @@ define([
     },
 
     render: function(onCloseClb){
+        var compiled_template = _.template( mapTemplate );
+        var that = this;
+        this.$el.html( compiled_template() );
+
         this.onCloseClb = onCloseClb;
 
         // Extend OverlayView so we can access MapCanvasProjection.
@@ -206,10 +215,10 @@ define([
         //     console.log('map', event)
         // });
 
-        // this.autocomplete();
+        this.doAutocomplete();
     },
 
-    autocomplete: function() {
+    doAutocomplete: function() {
         var input = document.getElementById(this.locationInput);
         var autocomplete = new google.maps.places.Autocomplete(input);
         var that = this;
@@ -217,7 +226,7 @@ define([
         autocomplete.bindTo('bounds', this.app.map);
 
         var marker = new google.maps.Marker({
-          map: this.app.map
+            map: that.app.map
         });
 
         
@@ -228,10 +237,10 @@ define([
                 return;
 
             if (place.geometry.viewport) {
-                this.app.map.fitBounds(place.geometry.viewport);
+                that.app.map.fitBounds(place.geometry.viewport);
             } else {
-                this.app.map.setCenter(place.geometry.location);
-                this.app.map.setZoom(17);  // Why 17? Because it looks good.
+                that.app.map.setCenter(place.geometry.location);
+                that.app.map.setZoom(17);  // Why 17? Because it looks good.
             }
 
             var image = new google.maps.MarkerImage(
@@ -273,10 +282,6 @@ define([
     initialize: function(options){
         _.bindAll(this, 'render');
         this.selectedKey = options.key;
-
-        var compiled_template = _.template( mapTemplate );
-        var that = this;
-        this.$el.html( compiled_template() );
     },
   });
   return welcomeView;

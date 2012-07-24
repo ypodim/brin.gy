@@ -19,8 +19,10 @@ define([
     template: _.template( mapInfoAttrTemplate ),
 
     addBtn: function() {
-        if (! this.app.agent.loggedIn())
+        if (! this.app.agent.loggedIn({alert:1})) {
+            this.app.navbarView.login();
             return false;
+        }
 
         haveit = this.model.get('haveit');
         var newhaveit = !haveit;

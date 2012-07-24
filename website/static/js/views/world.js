@@ -19,6 +19,7 @@ define([
     events: {
         'click button#addLocation': 'addLocation',
         'click button#newKey': 'newKey',
+        
     },
     app: appConfig.getState(),
     
@@ -26,14 +27,13 @@ define([
     collection: new attrCollection(),
     selectedKey: '',
 
-    newKey: function() {
-        // this.app.modal.render({title: 'newkey'});
-        var keymodel = new Backbone.Model({key:'', score:0});
-        var kview = new keyView({model: keymodel});
-        kview.render({newKey:1});
 
-        // kview.bind('keyclick', that.keyClickClb);
-        this.$('aside > div.list').prepend(kview.el);
+    newKey: function() {
+        if (! this.app.agent.loggedIn({alert:1})) {
+            this.app.navbarView.login();
+            return false;
+        }
+        this.app.modal.render({title: 'newkey'});
     },
 
     addAttr: function (model) {
@@ -54,12 +54,10 @@ define([
     },
 
     showLoginBox: function(action){
-        console.log('ok showLoginBox')
         this.app.loginView.render({action:action});
         
         var that = this;
         $('body').one('click', function(e){
-            console.log('ONE:', e)
             // that.login.undelegateEvents();
             that.app.loginView.close();
             that.app.navbarView.render();
@@ -85,10 +83,15 @@ define([
     },
 
     onDeleteAccount: function(){
-        console.log('del');
+        // console.log('del');
     },
 
     addLocation: function(e) {
+        if (! this.app.agent.loggedIn({alert:1})) {
+            this.app.navbarView.login();
+            return false;
+        }
+
         _.each(this.circles, function(circle){ circle.infowindow.close(); })
 
         var that = this;
@@ -154,10 +157,15 @@ define([
                 bounds.extend(center);
                 this.addMapCircle(m);
             }
-            
+
             if (!bounds.isEmpty()) {
                 this.app.map.fitBounds(bounds);
             }
+
+            this.app.map.setZoom(this.app.map.getZoom()-1);
+            if (models.length == 1)
+                this.app.map.setZoom(this.app.map.getZoom()-3);
+            
         }
 
         if (model.get('type') == 'string') {
@@ -218,8 +226,25 @@ define([
         this.circles.push({circle:mapCircle, marker:marker, infowindow:infowindow});
     },
 
+    appendKey: function(attr){
+        var keymodel = new Backbone.Model(attr);
+        var kview = new keyView({model: keymodel});
+        kview.render();
+        kview.bind('keyclick', this.keyClickClb);
+
+        if (attr.prepend) {
+            this.$('aside > div.list').prepend(kview.el);
+            kview.keyClick();
+            if (attr.type == 'location')
+                this.$('button#addLocation').click();
+            if (attr.type == 'string')
+                this.vFrameView.newAttr();
+        } else
+            this.$('aside > div.list').append(kview.el);
+        return false;
+    },
+
     render: function(){
-        console.log('w render');
 
         this.$('aside > div.list').empty();
         this.collection.reset();
@@ -229,18 +254,17 @@ define([
         $.getJSON(url, {user:this.app.agent.id()}, function(json){
             // that.processNextKey(0, json.items);
 
-            console.log('w render got data', json.items.length, url);
-
             for (var i in json.items) {
                 var attr = json.items[i];
                 attr.key;
                 attr.score;
 
-                var keymodel = new Backbone.Model(attr);
-                var kview = new keyView({model: keymodel});
-                kview.render();
-                kview.bind('keyclick', that.keyClickClb);
-                that.$('aside > div.list').append(kview.el);
+                that.appendKey(attr);
+                // var keymodel = new Backbone.Model(attr);
+                // var kview = new keyView({model: keymodel});
+                // kview.render();
+                // kview.bind('keyclick', that.keyClickClb);
+                // that.$('aside > div.list').append(kview.el);
 
                 for (var v in attr.values) {
                     var val = attr.values[v];

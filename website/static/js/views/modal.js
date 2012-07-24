@@ -7,7 +7,8 @@ define([
   'text!templates/modal.html',
   'text!templates/account.html',
   'text!templates/reminder.html',
-  ], function($, _, Backbone, appConfig, tooltip, modalTemplate, accountTemplate, reminderTemplate){
+  'text!templates/newKey.html',
+  ], function($, _, Backbone, appConfig, tooltip, modalTemplate, accountTemplate, reminderTemplate, newkeyTemplate){
   var modalView = Backbone.View.extend({
     el: $('#modal'),
     events: {
@@ -15,9 +16,36 @@ define([
         'click button#signout': 'signoutBtn',
         'click button#delete': 'deleteBtn',
         // 'click button#reminder': 'reminderBtn',
-        'submit form.reminder': 'submitReminder'
+        'submit form.reminder': 'submitReminder',
+
+        'click li > a': 'typeSelection',
+        'click button.cancel': 'close',
+        'submit form.newKey': 'newKeySubmit',
+        // 'click button.cancel': 'newKeyCancel',
     },
     app: appConfig.getState(),
+
+    newKeySubmit: function(e){
+        console.log('modal newky submit')
+        var key = this.$('input#key').val();
+        var keytype = this.$('[name=keytype]:checked').val();
+        this.close();
+        this.trigger('newkey', {key:key, type:keytype});
+        return false;
+    },
+    typeSelection: function(e){    
+        var type = $(e.target).attr('id');
+        
+        var kclass = 'icon-font';
+        if (type == 'location')
+            kclass = 'icon-map-marker';
+        if (type == 'users')
+            kclass = 'icon-user';
+        this.$('a.dropdown-toggle > i').attr({class:kclass});
+
+        console.log('oooo')
+        return false;
+    },
 
     signoutBtn: function(){
         this.trigger('logout');
@@ -39,7 +67,9 @@ define([
 
     close: function(){
         // this.undelegateEvents();
+        this.$('[required]').removeAttr('required');
         this.$el.hide();
+        return false;
     },
 
     render: function(options){
@@ -71,12 +101,19 @@ define([
             }
             this.$('div.box').addClass('narrow');
         }
+        if (options.title == 'newkey') {
+            this.$('span#title').html('New attribute')
+            inner_template = _.template( newkeyTemplate );
+            data = {
+                
+            }
+        }
 
         this.$('.content').html( inner_template(data) );
     },
 
     initialize: function(options) {
-        _.bindAll(this, 'render', 'close', 'signoutBtn');
+        _.bindAll(this, 'render', 'close', 'signoutBtn', 'newKeySubmit');
     },
   });
   return modalView;

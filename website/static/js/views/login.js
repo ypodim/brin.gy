@@ -27,7 +27,7 @@ define([
             username = this.$('input#username').val();
             password = this.$('input#password').val();
             this.app.doLogin(username, password);
-            this.$el.hide();
+            this.close();
         }
         if (this.options.action == 'signup') {
             username = this.$('input#username').val();
@@ -40,6 +40,7 @@ define([
     },
     okBtn: function(e) {
         this.$('form').submit();
+        return false;
     },
     defaultClick: function(e){
         e.stopPropagation();
