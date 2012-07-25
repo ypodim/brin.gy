@@ -7,7 +7,8 @@ define([
   
   'text!templates/signin.html',
   'text!templates/signup.html',
-  ], function($, _, Backbone, appConfig, tooltip, signinTemplate, signupTemplate){
+  'text!templates/contexts.html',
+  ], function($, _, Backbone, appConfig, tooltip, signinTemplate, signupTemplate, contextMenuTemplate){
   var loginView = Backbone.View.extend({
     el: $('#login'),
     events: {
@@ -15,8 +16,20 @@ define([
         'click button': 'okBtn',
         'submit form': 'submit',
         'click a.reminder': 'reminder',
+
+        'mouseover ul.contexts > li > a': 'contextMouseOver',
+        'mouseout ul.contexts > li > a': 'contextMouseOut',
+        'click ul.contexts > li > a': 'contextClick',
     },
     app: appConfig.getState(),
+
+    contextMouseOver: function(e){ $(e.target).children('i').removeClass('icon-white'); },
+    contextMouseOut: function(e){ $(e.target).children('i').addClass('icon-white'); },
+    contextClick: function(e){
+        var action = $(e.target).attr('id');
+        this.trigger('context:'+action);
+        this.close();
+    },
 
     close: function(){
         this.$el.hide();
@@ -80,15 +93,25 @@ define([
             options = {action:'signup'};
 
         if (options.action == 'signup') {
-            compiled_template = _.template( signupTemplate );
-            this.$el.html( compiled_template() ).css({right:'50px'}).show();
+            var compiled_template = _.template( signupTemplate );
+            this.$el.html( compiled_template() );
+            var left = options.left - this.$el.width() + options.width;
+            this.$el.css({left:left}).show();
         }
         if (options.action == 'signin') {
-            compiled_template = _.template( signinTemplate );
-            this.$el.html( compiled_template() ).css({right:'185px'}).show();
+            var compiled_template = _.template( signinTemplate );
+            this.$el.html( compiled_template() );
+            var left = options.left - this.$el.width() + options.width;
+            this.$el.css({left:left}).show();
         }
         if (options.action=='reminder') {
             // this.el.html( compiled_template() ).show();
+        }
+        if (options.action=='contexts') {
+            var compiled_template = _.template( contextMenuTemplate );
+            this.$el.html( compiled_template() );
+            var left = options.left - this.$el.width() + options.width;
+            this.$el.css({left:left}).show();
         }
     },
 

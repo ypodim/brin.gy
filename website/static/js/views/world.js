@@ -53,8 +53,8 @@ define([
         this.collection.remove(model);
     },
 
-    showLoginBox: function(action){
-        this.app.loginView.render({action:action});
+    showLoginBox: function(options){
+        this.app.loginView.render(options);
         
         var that = this;
         $('body').one('click', function(e){

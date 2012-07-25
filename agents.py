@@ -545,6 +545,28 @@ class api_call(tornado.web.RequestHandler):
             sendEmail(email, 'info@brin.gy', subject, message)
         self.write(dict(error=error, result=result))
 
+    def api_feedback(self):
+        error = ''
+        result = []
+        feedback = self.get_argument('feedback','')
+        username = self.get_argument('username','')
+        secret = self.get_argument('secret','')
+        passed = db.authenticate_user(username, secret)
+        print 'authentication', username, secret, passed
+
+        subject = 'Brin.gy feedback'
+        ip = self.request.headers.get('X-Real-Ip')
+        message = 'Dude,\n\n'
+        message+= 'You got feedback from: -%s- (verified:%s)\n\n' % (username, passed)
+        message+= '=====================\n'
+        message+= feedback
+        message+= '\n=====================\n'
+        message+= 'IP address that was used: %s' % ip
+        email = 'ypodim@gmail.com'
+        sendEmail(email, 'info@brin.gy', subject, message)
+        self.write(dict(error=error, result=result))
+
+
 class stats(tornado.web.RequestHandler):
     def options(self):
         self.write('')
@@ -693,7 +715,9 @@ application = tornado.web.Application([
     (r"/authenticate_admin_secret", api_call),
     (r"/cleanup", api_call),
     (r"/clear_context", api_call),
+    (r"/feedback", api_call),
     (r"/stats", stats),
+
 
     (r"/users", debug),    
     

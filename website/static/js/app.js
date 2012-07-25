@@ -274,6 +274,18 @@ var state = {
         return false;
     },
 
+    doFeedback: function(text) {
+        var that = this;
+        var url = this.agent.baseUrl() + '/feedback';
+        var data = {username:this.agent.id(), feedback:text, secret: this.agent.fullInfo().pwd};
+
+        $.post(url, data, function(json){
+            console.log(json);
+        }, 'json');
+        
+        return false;
+    },
+
     mutateKeyValue: function(options) {
         if (options.type == undefined)
             options.type = 'POST';

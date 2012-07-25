@@ -40,6 +40,10 @@ class profile():
     'profile:composite:key:KEY:val:VAL' # vid that corresponds to a composite key/val
     'profile:vid:VID' # populated hash of key fields for value VIDdd
 
+    # 'global:nextkid' # holds next unique id for a context/key combination
+    # 'profile:kid:KID' # hash of context and key to which KID points.
+    # 'profile:context:CONTEXT:key:KEY:kid' # (reverse) kid that points to CONTEXT/KEY 
+
     'profile:CONTEXT:keys' # ordered set of all keys in use
     'profile:CONTEXT:key:KEY:agents' # set of agents using this key
     'profile:CONTEXT:key:KEY:values' # ordered set of values for this key

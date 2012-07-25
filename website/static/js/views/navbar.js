@@ -14,11 +14,36 @@ define([
         'click a#signin': 'login',
         'click a#signup': 'login',
         'click a#account': 'account',
+        'click a#feedback': 'feedback',
+        'click a#contexts': 'contextMenu',
     },
     template: _.template(navbarTemplate),
     
     app: appConfig.getState(),
 
+    contextMenu: function(e){
+        var btn;
+        btn = $(e.target);
+        e.stopPropagation();
+
+        if (btn.hasClass('highlighted')) {
+            btn.removeClass('highlighted');
+            this.app.loginView.close();
+            return;
+        }
+        $('a').removeClass('highlighted');
+        btn.addClass('highlighted')
+
+        var action = btn.attr('id');
+        var left = $(e.target).offset().left;
+        var width = $(e.target).width();
+        this.trigger(action, {action:action, left:left, width:width});
+        return false;
+    },
+    feedback: function(){
+        this.app.modal.render({title:'feedback'});
+        return false;
+    },
     about: function(){
         return false;
     },
@@ -39,12 +64,16 @@ define([
         btn.addClass('highlighted')
 
         var action = btn.attr('id');
-        this.trigger(action, action);
+        var left = btn.offset().left;
+        var width = btn.width();
+        this.trigger(action, {action:action, left:left, width:width});
         return false;
     },
 
     account: function(){
-        this.trigger('account');
+        // var left = $(e.target).offset().left;
+        // var width = $(e.target).width();
+        this.trigger('account', {action:'account'});
         return false;
     },
 

@@ -88,6 +88,7 @@ require([
 
         appp.navbarView.bind('signin', wldView.showLoginBox);
         appp.navbarView.bind('signup', wldView.showLoginBox);
+        appp.navbarView.bind('contexts', wldView.showLoginBox);
         appp.navbarView.bind('account', wldView.showAccount);
         
         appp.loginView = new loginView();
@@ -100,6 +101,12 @@ require([
         appp.bind('deleted', appp.navbarView.render);
         appp.bind('addattr', wldView.addAttr);
         appp.bind('remattr', wldView.remAttr);
+
+        appp.loginView.bind('context:new', appp.navbarView.render);
+        appp.loginView.bind('context:new', appp.navbarView.render);
+
+        appp.loginView.bind('context:all', appp.navbarView.render);
+        appp.loginView.bind('context:all', appp.navbarView.render);
 
         var app_router = new Router({
             worldView: wldView,

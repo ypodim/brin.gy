@@ -8,7 +8,8 @@ define([
   'text!templates/account.html',
   'text!templates/reminder.html',
   'text!templates/newKey.html',
-  ], function($, _, Backbone, appConfig, tooltip, modalTemplate, accountTemplate, reminderTemplate, newkeyTemplate){
+  'text!templates/feedback.html',
+  ], function($, _, Backbone, appConfig, tooltip, modalTemplate, accountTemplate, reminderTemplate, newkeyTemplate, feedbackTemplate){
   var modalView = Backbone.View.extend({
     el: $('#modal'),
     events: {
@@ -21,10 +22,16 @@ define([
         'click li > a': 'typeSelection',
         'click button.cancel': 'close',
         'submit form.newKey': 'newKeySubmit',
-        // 'click button.cancel': 'newKeyCancel',
+        'submit form.feedback': 'feedbackSubmit',
     },
     app: appConfig.getState(),
 
+    feedbackSubmit: function(){
+        var text = this.$('textarea').val();
+        this.app.doFeedback(text);
+        this.close();
+        return false;
+    },
     newKeySubmit: function(e){
         console.log('modal newky submit')
         var key = this.$('input#key').val();
@@ -104,6 +111,13 @@ define([
         if (options.title == 'newkey') {
             this.$('span#title').html('New attribute')
             inner_template = _.template( newkeyTemplate );
+            data = {
+                
+            }
+        }
+        if (options.title == 'feedback') {
+            this.$('span#title').html('Feedback')
+            inner_template = _.template( feedbackTemplate );
             data = {
                 
             }
