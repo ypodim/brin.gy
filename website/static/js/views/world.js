@@ -27,7 +27,12 @@ define([
     collection: new attrCollection(),
     selectedKey: '',
 
-
+    showAllContexts: function(){
+        console.log($('div#map_canvas'))
+        this.$('aside').toggleClass('hideAside');
+        this.app.modal.close();
+        $('#popup').hide();
+    },
     newKey: function() {
         if (! this.app.agent.loggedIn({alert:1})) {
             this.app.navbarView.login();
@@ -302,7 +307,7 @@ define([
     },
 
     initialize: function(options){
-        _.bindAll(this, 'render', 'keyClickClb', 'showLoginBox', 'showAccount', 'showReminder', 'addAttr', 'remAttr');
+        _.bindAll(this, 'render', 'keyClickClb', 'showLoginBox', 'showAccount', 'showReminder', 'addAttr', 'remAttr', 'showAllContexts');
 
         var that = this;
         var centerLatLng = new google.maps.LatLng(37.748582,-122.418411);
@@ -313,29 +318,11 @@ define([
             'zoomControl': false,
             'streetViewControl': false,
             'panControl': false,
+            'mapTypeControlOptions': {position: google.maps.ControlPosition.TOP_CENTER},
         });
         google.maps.event.addListener(this.app.map, 'click', function(event) {
             _.each(that.circles, function(circle){ circle.infowindow.close(); })
         });
-        
-        // var that = this;
-
-        // this.modal.bind('logout', function(){
-        //     that.app.agent.unsetAgentId();
-        //     // that.app.agent.removeUserInfo(username);
-        //     that.app.cookies.del_cookie(username);
-        //     that.app.navbarView.render();
-        // });
-
-        // this.modal.bind('reminder', function(){
-        //     var email = that.modal.$('input#email').val();
-        //     that.app.doReminder(email);
-        //     that.modal.close();
-        // });
-
-        // this.modal.bind('delete', function(){
-        //     that.app.doDelete();
-        // });
     },
   });
   return welcomeView;

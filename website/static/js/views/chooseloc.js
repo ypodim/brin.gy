@@ -89,6 +89,8 @@ define([
             radius: 10*scale,
         };
 
+        console.log(center.lat(), center.lng(), radius)
+
         this.tempCircle && this.tempCircle.setMap(null);
         this.tempCircle = new google.maps.Circle(contextOptions);
         

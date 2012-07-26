@@ -53,29 +53,35 @@ def revkeyval(key, val, c='all'):
 
 
 
-print r.get('global:nextcid')
-sys.exit()
+# print r.get('global:nextcid')
+# sys.exit()
 
+patch = {}
+patch['Eastgate'] = [42.361806843086804, -71.08414926021453, 18.66065983073613]
 
+patch['Ignite Boston 9'] = [42.36044625623657, -71.08733706562873, 37.32131966147226]
+patch['MLabber Summer Plans'] = [42.36044625623657, -71.08733706562873, 37.32131966147226]
+patch['MIT Media Lab'] = [42.36044625623657, -71.08733706562873, 37.32131966147226]
 
-
+patch['Coimbatore'] = [11.017387604645862, 76.95991517216794, 9554.257833336898]
+patch['ROFLcon'] = [42.3615489365627, -71.09054183331295, 74.64263932294452]
 
 for c in r.smembers('contexts'):
     if c == 'all':
-        r.set('context:%s:cid' % c, 1000)
-        r.set('context:cid:%s' % 1000, c)
+        continue
 
-    print
+    print c
+    print r.get('context:description:%s' % c)
+    print r.hgetall('context:%s:location' % c)
+    # print r.hgetll('context:%s:expiration' % c)
+    print r.get('context:%s:cid' % c)
+
+    # if c in patch:
+    #     print patch[c]
+    #     loc = dict(lat=patch[c][0], lon=patch[c][1], radius=patch[c][2])
+    #     r.hmset('context:%s:location' % c, loc)
     
-    cid = getcid(r, c)
-    if not cid or cid == 'None':
-        cid = r.incr('global:nextcid')
-        print 'got cid', cid
-        r.set('context:%s:cid' % c, cid)
-        r.set('context:cid:%s' % cid, c)
-        
-    print c, cid
-    continue
+    
 
 
 

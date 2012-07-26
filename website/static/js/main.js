@@ -103,10 +103,10 @@ require([
         appp.bind('remattr', wldView.remAttr);
 
         appp.loginView.bind('context:new', appp.navbarView.render);
-        appp.loginView.bind('context:new', appp.navbarView.render);
+        // appp.loginView.bind('context:new', appp.navbarView.render);
 
         appp.loginView.bind('context:all', appp.navbarView.render);
-        appp.loginView.bind('context:all', appp.navbarView.render);
+        appp.loginView.bind('context:all', wldView.showAllContexts);
 
         var app_router = new Router({
             worldView: wldView,

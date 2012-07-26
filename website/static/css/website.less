@@ -16,7 +16,7 @@ body {
 @asideWidth: 260px;
 #full, #container {
     position: absolute;
-    z-index:0;
+    /*z-index:0;*/
     left: 0;
     right: 0;
     top: 40px;
@@ -149,10 +149,20 @@ aside {
     right: 0;
     top: 0;
     bottom: 0;
+    z-index: 100;
     width: @asideWidth;
     padding: 10px 5px 5px 5px;
-    
+    box-shadow: -4px 0 4px rgba(0,0,0,0.3);
+
     pointer-events: all;
+
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+    -ms-transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
+
+    background-color: #ddd;
 }
 
 .well {
@@ -266,7 +276,13 @@ aside > div.list > div.asideEntry > a.asideKey > div.score {
     border-radius: 3px;
     color:white;
 }
-
+.hideAside {
+    -webkit-transform: translateX(@asideWidth + 50);
+    -moz-transform: translateX(@asideWidth + 50);
+    -o-transform: translateX(@asideWidth + 50);
+    -ms-transform: translateX(@asideWidth + 50);
+    transform: translateX(@asideWidth + 50);
+}
 
 
 
@@ -284,180 +300,16 @@ form.feedback > div.buttons > button {
 
 
 
-
-/*div.fullscreen {
-    padding:0 ! important;
-    position: absolute;
-    left:0;
-    right:0;
-    top:0 ! important;
-    bottom:0 ! important;
-}*/
-div.noTitleTransform {
-    text-transform:none ! important;
-}
-
 #message {
     position: absolute;
-    z-index:0;
     left: 0;
     top: 40px;
-    z-index:100;
     display: none;
     font-size:30px;
     line-height:40px;
     width:100%;
 }
 
- #progressbar {
-    width: 200px;
-    margin: auto;
-    display:none;
- }
-
-
-@height-9: 100px;
-@height-8: 90px;
-@height-7: 80px;
-@height-6: 60px;
-@height-5: 50px;
-@height-4: 40px;
-@height-3: 35px;
-@height-2: 30px;
-@height-1: 20px;
-
-
-
-.height (@h: 60px) {height: @h/2;}
-
-
-.font-1  { font-size:@height-8; line-height:@height-8; }
-.font-12 { font-size:@height-7; line-height:@height-7; }
-.font-2  { font-size:@height-6; line-height:@height-6; }
-.font-3  { font-size:@height-4; line-height:@height-4; }
-.font-s1 { font-size:@height-2; line-height:@height-2; }
-.font-s2 { font-size:@height-1; line-height:@height-1; }
-
-
-/*############# PARAMS end #############*/
-
-/*
-div.mobile {
-    padding:10px 0 20px 0;
-    height: 15px;
-    text-align:center;
-    color: gray;
-    text-shadow: 0 1px rgba(255, 255, 255, 0.6);
-    background-color:white;
-}
-
-div.controlFilters {
-    height:@height-6;
-    margin:5px;
-}
-div.controlFilters > button {
-    height: 60px;
-    width:180px;
-    font-size:30px;
-}
-div.controlFilters > button > span.badge {
-    .font-s1;
-    position: absolute;
-    right:5px;
-    top:5px;
-    display: none;
-    height:32px;
-}
-
-div.scrollableContainer {
-    position:absolute;
-    top: 70px;
-    bottom:0;
-    left:0;
-    right:0;
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-}
-
-
-div.scrollableContainer > div.closingpane {
-    height:300px;
-    background: #fff url('/static/images/website/edgeoflist.png') no-repeat 20px bottom;
-    margin: auto;
-}
-div.scrollableContainer > div.closingpane > button {
-    .font-2;
-    height:100px;
-    margin: 195px 0 0 180px;
-}
-*/
-
-
-
-
-div.resultsTitle{
-    .font-2;
-    padding: 20px 0 0 10px;
-    line-height:60px;
-    color: gray;
-    text-shadow: rgba(0,0,0,0.5) -1px 0, rgba(0,0,0,0.3) 0 -1px, rgba(255,255,255,0.5) 0 1px, rgba(0,0,0,0.3) -1px -2px;
-    display:none;
-}
-
-div#noFilters {
-    display:none;
-    background-color: rgba(0,0,0,0.2);
-    text-shadow: 0 1px rgba(255, 255, 255, .5);
-    padding:20px 40px 20px 40px;
-    .font-3;
-}
-div#noFilters > button {
-    width:150px;
-    height:@height-8;
-    margin: 0 0 0 5px;
-    background-image: url('http://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg');
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: 40%;
-}
-
-
-
-/*############# LOGIN #############*/
-
-/*div.login.alert{
-    .font-s1;
-    position:absolute;
-    top:0px;
-    width:100%;
-    display:none;
-    text-align:center;
-    height:50px;
-}*/
-
-
-.anime {
-    -webkit-transform: scale(2);
-    -webkit-transition:all 0.3s ease-in-out;
-    -moz-transition:all 0.4s ease-in-out;
-    -o-transition:all 0.4s ease-in-out;
-    -ms-transition:all 0.4s ease-in-out;
-}
-
-.flip-vertical {
-    -moz-transform: scaleY(-1);
-    -webkit-transform: scaleY(-1);
-    -o-transform: scaleY(-1);
-    transform: scaleY(-1);
-    filter: flipv; /*IE*/
-}
-.flip-horizontal {
-    -moz-transform: scaleX(-1);
-    -webkit-transform: scaleX(-1);
-    -o-transform: scaleX(-1);
-    transform: scaleX(-1);
-    filter: fliph; /*IE*/
-}
 
 
 /*############# SEND MESSAGE #############*/
@@ -465,7 +317,6 @@ form.sendMessage {
     text-align:center;
 }
 form.sendMessage > textarea {
-    .font-s1;
     display:block;
     margin: 10px auto;
     height:400px;
@@ -473,7 +324,6 @@ form.sendMessage > textarea {
     /*line-height:30px;*/
 }
 form.sendMessage > div {
-    .font-3;
     margin: auto;
     /*line-height:40px;*/
 }
@@ -492,7 +342,6 @@ form.sendMessage .selectedAttr {
 }
 
 div.sendMessage {
-    .font-s1;
     position:absolute;
     top:0px;
     width:100%;
@@ -502,51 +351,9 @@ div.sendMessage {
     height:50px;
 }
 
-/*############# PROFILE #############*/
-
-profile > div#header {
-    .font-3;
-    background-color: rgba(0,0,0,0.3);
-    /*line-height:40px;*/
-    height:50px;
-    text-shadow: 0 1px rgba(255, 255, 255, 0.6);
-    padding: 10px;
-}
 
 /*############# NEW ATTRIBUTE #############*/
 
-/*newattribute {
-    margin: auto;
-    width: 700px;
-    display: block;
-}
-newattribute > form {
-    display: none;
-}
-newattribute > form > div > div#forkey {
-    .font-3;
-    line-height:@height-8;
-}
-newattribute > form > div.title {
-    background-color: rgba(0,0,0,0.2);
-}
-newattribute > form > div.value {
-    background-color: rgba(0,0,0,0.2);
-}
-newattribute > form > div > label {
-    .font-3;
-    text-shadow: 0 1px rgba(255, 255, 255, 0.9);
-}
-label.small {
-    font-size:20px;
-    line-height:20px;
-}
-newattribute > form > div > input {
-    .font-3;
-    display:block;
-    height:50px;
-    width:400px;
-}*/
 
 div#suggestions > label {
     display:none;
@@ -555,32 +362,12 @@ div#suggestions > div#autocomplete > a.suggestion {
     color:#555;
     display:block;
     padding:5px;
-    .font-3;
 }
 div#suggestions > div#autocomplete > a.suggestion:hover {
     text-decoration:none;
 }
 
 
-/*############# FRONT PAGE #############*/
-
-/*div#welcome {
-    
-}
-div#welcome > a {
-    display: block;
-    font-size:40px;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-weight: bold;
-    line-height:50px;
-    margin:10px;
-    width:300px;
-    border-radius:5px;
-}
-div#welcome > a:hover {
-    text-decoration:none;
-}
-*/
 
 /*############# FOOTER #############*/
 
@@ -599,164 +386,6 @@ footer > a:hover {
     color: white;
 }
 
-/*############# ACCOUNT #############*/
-
-div.accountentry {
-    margin:10px;
-    padding:10px;
-    border-radius:5px;
-    background-color:rgba(220,220,220,1);
-    /*font-size:@height-1;*/
-    /*line-height:@height-1;*/
-
-}
-div.account.buttons {
-    text-align:center;
-    background-color:none;
-}
-button.account {
-    width:180px;
-    /*height:50px;*/
-    font-size: 14px;
-    font-weight: bold;
-}
-
-
-/*############# CONTEXTS #############*/
-
-div#contexts > div#contextEntry {
-    .font-3;
-    min-height:@height-7;
-    border: 1px solid gray;
-    position:relative;
-}
-div#contexts > div#contextEntry > a {
-    position: absolute;
-    top:5px;
-    left:5px;
-    right:0;
-    color:#333;
-    text-shadow: 0px 1px 0px #fff;
-}
-div#contexts > div#contextEntry > a:hover {
-    text-decoration:none;
-}
-div#contexts > div#contextEntry > a > div {
-    float:left;
-    margin: 0 5px 0 0;
-}
-div#contexts > div#contextEntry > a > div.count {
-    color: white;
-    background-color:#ff2244;
-    padding: 0px 10px 0px 10px;
-    text-align:center;
-    text-shadow: 0px -2px 0px rgba(0,0,0,0.5);
-    box-shadow: 0px 3px 1px rgba(0,0,0,0.5);
-    border-radius: 3px;
-    height:70px;
-    line-height:50px;
-}
-div#contexts > div#contextEntry > a > div.count > span.cno {
-    display:block;
-}
-div#contexts > div#contextEntry > a > div.count > span.caption{
-    display:block;
-    font-size:12px;
-    line-height:12px;
-}
-
-div#contexts > div#contextEntry > a > div.details {
-    margin-left: 5px;
-}
-div#contexts > div#contextEntry > a > div.details > span.name {
-    display:block;
-}
-div#contexts > div#contextEntry > a > div.details > span.description {
-    margin-top:5px;
-    .font-s2;
-    display:block;
-    color:gray;
-}
-div#contexts > div#contextEntry > button#actionBtn {
-    .font-3;
-    position:absolute;
-    right:5px;
-    top:5px;
-}
-
-newcontext {
-    margin: auto;
-    width: 620px;
-    display: block;
-}
-newcontext > form > * {
-    .font-s1;
-    line-height:@height-6;
-    height:@height-6;
-    width: 620px;
-    
-}
-newcontext > form > textarea {
-    .font-s2;
-    height:100px;
-}
-newcontext > form > label {
-    line-height:@height-4;
-    padding: 20px 0 0 0;
-    height:@height-4;
-}
-newcontext > div#attributes {
-    padding: 20px 0 0 0;
-    display:none;
-    overflow: scroll;
-    -webkit-overflow-scrolling: touch;
-}
-newcontext > div#attributes > div#buttons {
-    position: relative;
-    height:@height-4;
-}
-newcontext > div#attributes > div#buttons > span.counter {
-    float:right;
-}
-newcontext > div#attributes > div#buttons > button {
-    display:inline-block;
-}
-newcontext > div#attributes > div#attrList {
-    border: 1px solid #ccc;
-    border-radius:5px;
-    padding:10px;
-}
-newcontext > div#attributes > div#attrList > a {
-    margin: 10px 0 5px 0;
-    display: block;
-    position:relative;
-    height:@height-2;
-    .font-s2;
-    color:gray;
-}
-newcontext > div#attributes > div#attrList > a:hover {
-    text-decoration:none;
-}
-newcontext > div#attributes > div#attrList > a > i {
-    position:absolute;
-    left:5px;
-    top:10px;
-}
-newcontext > div#attributes > div#attrList > a > div.value {
-    position:absolute;
-    left:10px;
-    top:5px;
-
-    margin: 0 0 0 20px;
-    float:left;
-}
-newcontext > div#attributes > div#attrList > a > div.value > b {
-    margin-left:20px;
-}
-.borderSelection {
-    outline: 1px solid gray;
-    box-shadow: 0px 0px 2px 2px gray;
-}
 
 
 
@@ -926,6 +555,7 @@ div.locationPicker {
     /*background-color: rgba(0,0,0,0.1);*/
     border: 1px solid rgba(0,0,0,0.15);
 }
+div.locationPicker > div#page2 { display: none; }
 div.locationPicker > div.wizardPage {
     height:440px;
     margin:auto;
@@ -1105,7 +735,10 @@ div#map_canvas {
     top: 40px;
     bottom: 0;
     left: 0;
-    right: @asideWidth + 10;
+    /*right: @asideWidth + 10;*/
+    right: 0;
+    z-index: 0;
+    /*box-shadow: inset 0 0 5px 5px gray;*/
 }
 div.infobox {
     width:350px;
@@ -1140,6 +773,12 @@ div.infobox > div.body > div.tools > button {
 
 
 div#navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+
     height: 40px;
     padding-left: 20px;
     padding-right: 20px;
@@ -1153,7 +792,7 @@ div#navbar {
     background-repeat: repeat-x;
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .25), inset 0 -1px 0 rgba(0, 0, 0, .1);
     -moz-box-shadow: 0 1px 3px rgba(0,0,0,.25), inset 0 -1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, .25), inset 0 -1px 0 rgba(0, 0, 0, .1);
+    box-shadow: 0 4px 4px rgba(0, 0, 0, .3), inset 0 -1px 0 rgba(0, 0, 0, .1);
 }
 div#navbar .brand {
     font-weight: bold;

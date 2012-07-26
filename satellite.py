@@ -298,12 +298,14 @@ class contexts(tornado.web.RequestHandler):
             if c == 'all':
                 description = 'This is the top level context that includes everything and everyone.'
 
+            loc = r.hgetall('context:%s:location' % c)
             cid = getcid(r, c)
             context = dict(name=c, 
                            count=count, 
                            userhasit=0, 
                            description=description,
-                           id=cid)
+                           id=cid,
+                           location=loc)
             if user:
                 context['userhasit'] = r.sismember('context:users:%s' % c, user)
             dic['contexts'].append(context) 
