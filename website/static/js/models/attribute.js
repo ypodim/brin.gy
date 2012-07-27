@@ -11,6 +11,8 @@ define(['underscore', 'backbone'], function(_, Backbone) {
         matches: {},
         visited: false,
         showControls: true,
+        fillcolor: 'purple',
+        strokecolor: 'purple',
     },
 
     initialize: function() {

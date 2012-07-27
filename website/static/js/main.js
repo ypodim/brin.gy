@@ -88,7 +88,9 @@ require([
 
         appp.navbarView.bind('signin', wldView.showLoginBox);
         appp.navbarView.bind('signup', wldView.showLoginBox);
-        appp.navbarView.bind('contexts', wldView.showLoginBox);
+        // appp.navbarView.bind('contexts', wldView.showLoginBox);
+        // appp.navbarView.bind('contexts', wldView.showLoginBox);
+        appp.navbarView.bind('contexts', wldView.showAllContexts);
         appp.navbarView.bind('account', wldView.showAccount);
         
         appp.loginView = new loginView();

@@ -22,6 +22,9 @@ define([
     app: appConfig.getState(),
 
     contextMenu: function(e){
+        this.trigger('contexts');
+        return false;
+
         var btn;
         btn = $(e.target);
         e.stopPropagation();

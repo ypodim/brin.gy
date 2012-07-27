@@ -44,6 +44,11 @@ class profile():
     # 'profile:kid:KID' # hash of context and key to which KID points.
     # 'profile:context:CONTEXT:key:KEY:kid' # (reverse) kid that points to CONTEXT/KEY 
 
+    'global:nextlid' # holds next location id to be assigned to a location
+    'location:lid:LID' # location information hash for location id LID 
+    'location:names' # set of location names for easy name lookup
+    'location:name:LOCATION:lid' # location id for a given location name LOCATION
+
     'profile:CONTEXT:keys' # ordered set of all keys in use
     'profile:CONTEXT:key:KEY:agents' # set of agents using this key
     'profile:CONTEXT:key:KEY:values' # ordered set of values for this key
@@ -60,6 +65,13 @@ class profile():
     'context:cid:CID' # the CONTEXT corresponding to context id CID
 
     
+    def add_location(self, name, lat, lon, radius, creator):
+        # if name is successfully added to the set
+        if self.db.sadd('location:names', name):
+            ldic = dict(name=name, lat=lat, lon=lon, radius=radius, creator=creator)
+            lid = self.db.incr('global:nextlid')
+            self.db.hmset('location:lid:%s' % lid, ldic)
+            self.db.set('location:name:%s:lid' % name, lid)
 
     def add_reverse(self, context, key, val):
         if self.db.sadd(getKA(context, key), self.usr):   # add agent to set for this key
@@ -101,15 +113,16 @@ class profile():
                 print 'also removing context', context
                 self.remove_context(context)
 
-    def remove_context(self, context):
-        self.db.srem('contexts', context)
-        self.db.delete('context:%s:location' % context)
-        self.db.delete('context:%s:expiration' % context)
+    def remove_context(self, contextName):
+        self.db.srem('contexts', contextName)
+        self.db.delete('context:%s:location' % contextName)
+        self.db.delete('context:%s:expiration' % contextName)
 
     def add_context(self, contextDic):
         if self.db.sadd('contexts', contextDic['title']):
             # only set context properties the first time a kv is posted
             if contextDic.get('location'):
+                self.add_location(name, lat, lon, radius, creator):
                 self.db.hmset(
                     'context:%s:location' % contextDic['title'], 
                     contextDic.get('location')

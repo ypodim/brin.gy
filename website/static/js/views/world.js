@@ -10,10 +10,11 @@ define([
 
   'views/key',
   'views/mapInfoAttribute',
+  'views/mapInfoContext',
   'views/valueFrame',
   'views/chooseloc',
   'views/modal',
-  ], function($, _, Backbone, appConfig, router, attrModel, attrCollection, keyView, mapInfoAttrView, valueFrameView, chooselocView, modalView){
+  ], function($, _, Backbone, appConfig, router, attrModel, attrCollection, keyView, mapInfoAttrView, mapInfoContextView, valueFrameView, chooselocView, modalView){
   var welcomeView = Backbone.View.extend({
     el: $('#container'),
     events: {
@@ -28,10 +29,49 @@ define([
     selectedKey: '',
 
     showAllContexts: function(){
-        console.log($('div#map_canvas'))
         this.$('aside').toggleClass('hideAside');
         this.app.modal.close();
         $('#popup').hide();
+
+        // clear map
+        _.each(this.circles, function(circle){ circle.infowindow.close(); })
+        for (var i in this.circles) {
+            this.circles[i].circle.setMap(null);
+            this.circles[i].marker.setMap(null);
+        }
+        this.circles = [];
+
+        var that = this;
+        this.app.getContexts(function(json){
+            var bounds = new google.maps.LatLngBounds();
+            for (var i in json.contexts) {
+                var c = json.contexts[i];
+                if (c.name == 'all')
+                    continue;
+                
+                var center = new google.maps.LatLng(c.location.lat, c.location.lon);
+                var radius = parseInt(c.location.radius);
+                bounds.extend(center);
+
+                var model = new Backbone.Model({
+                    name: c.name,
+                    description: c.description,
+                    haveit: c.userhasit,
+                    score: c.count,
+                    location: {
+                        center: center,
+                        radius: radius,
+                    },
+                    type: 'context',
+                    cid: c.id,
+                });
+                that.addMapCircle(model);        
+            }
+
+            if (!bounds.isEmpty()) {
+                that.app.map.fitBounds(bounds);
+            }
+        });
     },
     newKey: function() {
         if (! this.app.agent.loggedIn({alert:1})) {
@@ -184,10 +224,10 @@ define([
 
     addMapCircle: function(model){
         var contextOptions = {
-            strokeColor: "pink",
+            strokeColor: model.get('strokecolor'),
             strokeOpacity: 0.8,
             strokeWeight: 2,
-            fillColor: "#FF0000",
+            fillColor: model.get('fillcolor'),
             fillOpacity: 0.1,
             map: this.app.map,
             center: model.get('location').center,
@@ -201,7 +241,7 @@ define([
             this.setOptions({strokeColor:'red'});
         });
         google.maps.event.addListener(mapCircle, 'mouseout', function(event) {
-            this.setOptions({strokeColor:'pink'});
+            this.setOptions({strokeColor: model.get('strokecolor')});
             this.setOptions({zIndex:0});
         });
 
@@ -213,11 +253,20 @@ define([
         });
 
         var that = this;
-        var attrView = new mapInfoAttrView(model);
-        attrView.render();
+        var infowindowView;
+        
+        if (model.get('type') == 'location') {
+            var infowindowView = new mapInfoAttrView(model);
+            infowindowView.render();    
+        }
+        if (model.get('type') == 'context') {
+            var infowindowView = new mapInfoContextView(model);
+            infowindowView.render();    
+        }
+        console.log(model.get('type'))
 
         var infowindow = new google.maps.InfoWindow({
-            content: attrView.el,
+            content: infowindowView.el,
         });
         google.maps.event.addListener(marker, 'click', function() {
             _.each(that.circles, function(circle){ circle.infowindow.close(); })
@@ -288,6 +337,7 @@ define([
                         matches: val.matches,
                         visited: false,
                         showControls: true,
+                        type: attr.type,
                     });
 
                     if (attr.type == 'location') {

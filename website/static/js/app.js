@@ -154,6 +154,13 @@ var state = {
         },
     },
 
+    getContexts: function(clb) {
+        var url = this.satellite.url+'/contexts';
+        $.getJSON(url, {user:this.agent.id()}, function(json){
+            clb && clb(json);
+        });
+    },
+
     doLogin: function(username, password) {
         var that = this;
         var data = {user:username, secret:password};
