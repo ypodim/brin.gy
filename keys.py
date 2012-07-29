@@ -15,9 +15,9 @@ def annotate(r, c, k, v, ktype, dic):
     r.sadd('profile:keytypes', 'string', 'location', 'time', 'user')
     r.set('profile:key:%s:type' % k, ktype)
 
-    vid = getvid(r, k,v) or r.incr('global:nextvid')
+    vid = getlid(r, k,v) or r.incr('global:nextlid')
 
-    r.hmset('profile:vid:%s' % vid, dic)
+    r.hmset('location:lid:%s' % vid, dic)
     r.set('profile:composite:key:%s:val:%s' % (k, v), vid)
 
 
@@ -27,12 +27,12 @@ def deannotate(r, c, k, v):
 
     vid = getvid(r, k,v)
     if vid:
-        r.delete('profile:vid:%s' % vid)
+        r.delete('location:lid:%s' % vid)
         r.delete('profile:composite:key:%s:val:%s' % (k, v), vid) 
 
 
 def getfullkv(r, c,k,v):
     vid = getvid(r, k,v)
-    dic = r.hgetall('profile:vid:%s' % vid)
+    dic = r.hgetall('location:lid:%s' % vid)
     dic['ktype'] = r.get('profile:key:%s:type' % k)
     return dic

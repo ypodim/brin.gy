@@ -69,7 +69,7 @@ define([
         var top = this.$('#crosshair').offset().top;
         var borderwidth = parseInt(this.$('#crosshair').css('border-width'));
 
-        var x = $(this.app.map.getDiv()).width()/2 + 13;
+        var x = $(this.app.map.getDiv()).width()/2 - 120;
         var y = top - header + padding + 2*borderwidth + 5;
         var scale = Math.pow(2, 20.9-zoom);
         var radius = 10*scale;

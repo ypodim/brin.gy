@@ -44,6 +44,7 @@ define([
         var that = this;
         this.app.getContexts(function(json){
             var bounds = new google.maps.LatLngBounds();
+            console.log('got contexts:', json.contexts.length);
             for (var i in json.contexts) {
                 var c = json.contexts[i];
                 if (c.name == 'all')
@@ -65,7 +66,7 @@ define([
                     type: 'context',
                     cid: c.id,
                 });
-                that.addMapCircle(model);        
+                that.addMapCircle(model);
             }
 
             if (!bounds.isEmpty()) {
@@ -163,6 +164,7 @@ define([
                 visited: false,
                 showControls: true,
                 location: {center:circle.center, radius:circle.radius},
+                type: 'location',
             });
 
             that.collection.add(model);
@@ -206,11 +208,12 @@ define([
             if (!bounds.isEmpty()) {
                 this.app.map.fitBounds(bounds);
             }
-
+            
             this.app.map.setZoom(this.app.map.getZoom()-1);
             if (models.length == 1)
                 this.app.map.setZoom(this.app.map.getZoom()-3);
-            
+
+            this.app.map.panBy(130, 0);
         }
 
         if (model.get('type') == 'string') {
@@ -263,7 +266,6 @@ define([
             var infowindowView = new mapInfoContextView(model);
             infowindowView.render();    
         }
-        console.log(model.get('type'))
 
         var infowindow = new google.maps.InfoWindow({
             content: infowindowView.el,

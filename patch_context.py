@@ -46,44 +46,117 @@ def revkeyval(key, val, c='all'):
     return r.smembers('profile:%s:key:%s:val:%s:agents' % (c, key, val))
 
 
-# print r.delete('profile:keytypes')
-# print r.sadd('profile:keytypes', 'string', 'location', 'time', 'user')
-# print r.smembers('profile:keytypes')
+
+def reset_loc():
+    toplid = int(r.get('global:nextlid'))
+    for lid in xrange(1001, toplid+1):
+        ldic = r.hgetall('location:lid:%s' % lid)
+        r.delete('location:title:%s:lid' % ldic['title'])
+        r.delete('location:lid:%s' % lid)
+
+    r.delete('location:names')
+    r.delete('global:nextlid')
+
+def all_loc():
+    toplid = int(r.get('global:nextlid'))
+    for lid in xrange(1001, toplid+1):
+        ldic = r.hgetall('location:lid:%s' % lid)
+        print ldic, r.sismember('location:names', ldic['title'])
+
+    print r.smembers('location:names')
+    # r.set('location:title:%s:lid' % title, lid)
+
+def add_location(ldic):
+    # if title is successfully added to the set
+    if not r.get('global:nextlid'):
+        r.set('global:nextlid',1000)
+
+    title = ldic.get('title')
+    if not title:
+        return None
+    if r.sadd('location:names', title):
+        lid = r.incr('global:nextlid')
+        print r.hmset('location:lid:%s' % lid, ldic)
+        r.set('location:title:%s:lid' % title, lid)
+    else:
+        lid = r.get('location:title:%s:lid' % title)
+    return lid
 
 
 
+def upgrade_values():
+    for vid in xrange(1001, int(r.get('global:nextvid'))+1):
 
-# print r.get('global:nextcid')
-# sys.exit()
+        ldic = r.hgetall('profile:vid:%s' % vid)
+        print vid, ldic
+        add_location(ldic)
 
-patch = {}
-patch['Eastgate'] = [42.361806843086804, -71.08414926021453, 18.66065983073613]
+def upgrade_context():
+    for c in r.smembers('contexts'):
+        if c == 'all':
+            continue
+        ldic = r.hgetall('context:%s:location' % c)
+        print ldic
+        if ldic:
+            r.delete('context:%s:location' % c)
 
-patch['Ignite Boston 9'] = [42.36044625623657, -71.08733706562873, 37.32131966147226]
-patch['MLabber Summer Plans'] = [42.36044625623657, -71.08733706562873, 37.32131966147226]
-patch['MIT Media Lab'] = [42.36044625623657, -71.08733706562873, 37.32131966147226]
+        eastgateid = 1003
+        mlid = 1004
 
-patch['Coimbatore'] = [11.017387604645862, 76.95991517216794, 9554.257833336898]
-patch['ROFLcon'] = [42.3615489365627, -71.09054183331295, 74.64263932294452]
+        if c == 'Eastgate':
+            r.set('context:%s:lid' % c, eastgateid)
+        if c == 'MIT Media Lab':
+            r.set('context:%s:lid' % c, mlid)
+        if c == 'Ignite Boston 9':
+            r.set('context:%s:lid' % c, mlid)
+        if c == 'MLabber Summer Plans':
+            r.set('context:%s:lid' % c, mlid)
 
+
+        if c == 'Coimbatore':
+            ldic = dict(lat=11.0173876046, 
+                        lon=76.9599151722, 
+                        radius=9554.25783334, 
+                        title=c)
+            lid = add_location(ldic)
+            r.set('context:%s:lid' % c, lid)
+        if c == 'ROFLcon':
+            ldic = dict(lat=42.3615489366, 
+                        lon=-71.0905418333, 
+                        radius=74.6426393229, 
+                        title=c)
+            lid = add_location(ldic)
+            r.set('context:%s:lid' % c, lid)
+
+
+upgrade_values()
+# upgrade_context()
+
+sys.exit()
+
+vids = {}
 for c in r.smembers('contexts'):
     if c == 'all':
         continue
-
-    print c
-    print r.get('context:description:%s' % c)
-    print r.hgetall('context:%s:location' % c)
-    # print r.hgetll('context:%s:expiration' % c)
-    print r.get('context:%s:cid' % c)
-
-    # if c in patch:
-    #     print patch[c]
-    #     loc = dict(lat=patch[c][0], lon=patch[c][1], radius=patch[c][2])
-    #     r.hmset('context:%s:location' % c, loc)
-    
-    
+    for k in r.zrevrangebyscore(getK(c), '+inf', '-inf'):
+        for v in r.zrevrangebyscore(getKV(c, k), '+inf', '-inf'):
+            vid = r.get('profile:composite:key:%s:val:%s' % (k,v))
+            if vid:
+                if vid not in vids:
+                    vids[vid] =[]
+                vids[vid].append((k,v))
 
 
 
+
+for vid in vids:
+    title = vids[vid][0][1]
+    ldic = r.hgetall('profile:vid:%s' % vid)
+    # print r.hset('location:lid:%s' % vid, 'title', vids[vid][0][1])
+
+    if r.sadd('location:titles', title):
+        lid = r.incr('global:nextlid')
+        print r.hmset('location:lid:%s' % lid, ldic)
+        r.set('location:title:%s:lid' % title, lid)
 
 

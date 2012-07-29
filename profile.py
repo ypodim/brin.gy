@@ -34,11 +34,11 @@ class profile():
 
     
     'global:nextcid' # holds next key id to be assigned to a context
-    'global:nextvid' # holds next key id to be assigned to a complex key
+    # 'global:nextvid' # holds next key id to be assigned to a complex key
     'profile:keytypes' # set of key types (string, location, time, user)
     'profile:key:KEY:type' # hash of key type fields (eg. loc:lat, lon, radius)
     'profile:composite:key:KEY:val:VAL' # vid that corresponds to a composite key/val
-    'profile:vid:VID' # populated hash of key fields for value VIDdd
+    'profile:vid:VID' # populated hash of key fields for value id VID
 
     # 'global:nextkid' # holds next unique id for a context/key combination
     # 'profile:kid:KID' # hash of context and key to which KID points.
@@ -46,8 +46,8 @@ class profile():
 
     'global:nextlid' # holds next location id to be assigned to a location
     'location:lid:LID' # location information hash for location id LID 
-    'location:names' # set of location names for easy name lookup
-    'location:name:LOCATION:lid' # location id for a given location name LOCATION
+    'location:titles' # set of location names for easy title lookup
+    'location:title:LOCATION:lid' # location id for a given location title LOCATION
 
     'profile:CONTEXT:keys' # ordered set of all keys in use
     'profile:CONTEXT:key:KEY:agents' # set of agents using this key
@@ -59,20 +59,22 @@ class profile():
     'USER:contexts' # set of contexts in which USER participates
     'context:users:CONTEXT' # set of users participating in CONTEXT
     'context:description:CONTEXT' # a description of CONTEXT
-    'context:CONTEXT:location' # a hash of location associated with CONTEXT
+    'context:CONTEXT:lid' # location id of location associated with CONTEXT
     'context:CONTEXT:expiration' # a sorted set of expiration dates associated with CONTEXT
     'context:CONTEXT:cid' # a context id for CONTEXT
     'context:cid:CID' # the CONTEXT corresponding to context id CID
 
     
-    def add_location(self, name, lat, lon, radius, creator):
-        # if name is successfully added to the set
-        if self.db.sadd('location:names', name):
-            ldic = dict(name=name, lat=lat, lon=lon, radius=radius, creator=creator)
+    def add_location(self, title, lat, lon, radius, creator):
+        # if title is successfully added to the set
+        if self.db.sadd('location:names', title):
+            ldic = dict(title=title, lat=lat, lon=lon, radius=radius, creator=creator)
             lid = self.db.incr('global:nextlid')
             self.db.hmset('location:lid:%s' % lid, ldic)
-            self.db.set('location:name:%s:lid' % name, lid)
-
+            self.db.set('location:title:%s:lid' % title, lid)
+        else:
+            lid = self.db.get('location:title:%s:lid' % title)
+        return lid
     def add_reverse(self, context, key, val):
         if self.db.sadd(getKA(context, key), self.usr):   # add agent to set for this key
             self.db.zincrby(getK(context), key, 1)     # add key and increase its score
@@ -115,18 +117,21 @@ class profile():
 
     def remove_context(self, contextName):
         self.db.srem('contexts', contextName)
-        self.db.delete('context:%s:location' % contextName)
+        self.db.delete('context:%s:lid' % contextName)
         self.db.delete('context:%s:expiration' % contextName)
 
     def add_context(self, contextDic):
         if self.db.sadd('contexts', contextDic['title']):
             # only set context properties the first time a kv is posted
             if contextDic.get('location'):
-                self.add_location(name, lat, lon, radius, creator):
-                self.db.hmset(
-                    'context:%s:location' % contextDic['title'], 
-                    contextDic.get('location')
-                )
+                ldic = contextDic.get('location')
+                lid = self.add_location(ldic['name'], 
+                                        ldic['lat'], 
+                                        ldic['lon'], 
+                                        ldic['radius'], 
+                                        ldic['creator'])
+                self.db.set('context:%s:lid' % c, lid)
+
             if contextDic.get('expiration'):
                 self.db.zadd(
                     'context:%s:expiration' % contextDic['title'], 

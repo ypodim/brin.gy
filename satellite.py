@@ -298,7 +298,8 @@ class contexts(tornado.web.RequestHandler):
             if c == 'all':
                 description = 'This is the top level context that includes everything and everyone.'
 
-            loc = r.hgetall('context:%s:location' % c)
+            lid = r.get('context:%s:lid' % c)
+            loc = r.hgetall('location:lid:%s' % lid)
             cid = getcid(r, c)
             context = dict(name=c, 
                            count=count, 
