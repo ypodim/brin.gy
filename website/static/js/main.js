@@ -44,7 +44,6 @@ require([
     ){
 
     var appp = app.getState();
-    console.log('appp', appp)
 
     $.getJSON('/config', function(config){
         appp.setConfig(config);

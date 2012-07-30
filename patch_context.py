@@ -82,19 +82,51 @@ def add_location(ldic):
         lid = r.get('location:title:%s:lid' % title)
     return lid
 
+def safe_remove_location(lid):
+    title = ldic.get('title')
+    if not title:
+        return None
+    if r.sadd('location:names', title):
+        lid = r.incr('global:nextlid')
+        print r.hmset('location:lid:%s' % lid, ldic)
+        r.set('location:title:%s:lid' % title, lid)
+    else:
+        lid = r.get('location:title:%s:lid' % title)
+    return lid
+
+def get_kv_by_vid(vid):
+    vids = {}
+    for c in r.smembers('contexts'):
+        if c == 'all':
+            continue
+        for k in r.zrevrangebyscore(getK(c), '+inf', '-inf'):
+            for v in r.zrevrangebyscore(getKV(c, k), '+inf', '-inf'):
+                vidtest = r.get('profile:composite:key:%s:val:%s' % (k,v))
+                if vidtest and int(vid) == int(vidtest):
+                    return (k,v)
+    return None
 
 
 def upgrade_values():
     for vid in xrange(1001, int(r.get('global:nextvid'))+1):
 
         ldic = r.hgetall('profile:vid:%s' % vid)
-        print vid, ldic
-        add_location(ldic)
+        kv = get_kv_by_vid(vid)
+        if kv:
+            # print vid, ldic
+            title = kv[1]
+            # print r.sismember('location:names', title), title, ldic
+            ldic['title'] = title
+            lid = add_location(ldic)
+            r.set('profile:composite:key:%s:val:%s' % (kv[0],kv[1]), lid)
 
 def upgrade_context():
     for c in r.smembers('contexts'):
         if c == 'all':
             continue
+
+        print c
+
         ldic = r.hgetall('context:%s:location' % c)
         print ldic
         if ldic:
@@ -103,48 +135,57 @@ def upgrade_context():
         eastgateid = 1003
         mlid = 1004
 
-        if c == 'Eastgate':
-            r.set('context:%s:lid' % c, eastgateid)
-        if c == 'MIT Media Lab':
-            r.set('context:%s:lid' % c, mlid)
-        if c == 'Ignite Boston 9':
-            r.set('context:%s:lid' % c, mlid)
-        if c == 'MLabber Summer Plans':
-            r.set('context:%s:lid' % c, mlid)
 
-
-        if c == 'Coimbatore':
-            ldic = dict(lat=11.0173876046, 
-                        lon=76.9599151722, 
-                        radius=9554.25783334, 
-                        title=c)
-            lid = add_location(ldic)
-            r.set('context:%s:lid' % c, lid)
-        if c == 'ROFLcon':
-            ldic = dict(lat=42.3615489366, 
+        medialab = dict(lat=42.3604457757343, 
+                        lon=-71.08734495781516, 
+                        radius=37.32131966147226, 
+                        title='MIT Media Lab')
+        csail = dict(lat=42.3615489366, 
                         lon=-71.0905418333, 
                         radius=74.6426393229, 
-                        title=c)
-            lid = add_location(ldic)
+                        title='CSAIL')
+        coimbatore = dict(lat=11.0173876046, 
+                        lon=76.9599151722, 
+                        radius=9554.25783334, 
+                        title='Coimbatore')
+        eastgate = dict(lat=42.36187077420754, 
+                        lon=-71.0840029253826, 
+                        radius=37.32131966147226, 
+                        title='Eastgate')
+
+        if c == 'Coimbatore':
+            lid = add_location(coimbatore)
             r.set('context:%s:lid' % c, lid)
+
+        if c == 'ROFLcon':
+            lid = add_location(csail)
+            r.set('context:%s:lid' % c, lid)
+
+        if c == 'Eastgate':
+            lid = add_location(eastgate)
+            r.set('context:%s:lid' % c, lid)
+
+        if c == 'MIT Media Lab':
+            lid = add_location(medialab)
+            r.set('context:%s:lid' % c, lid)
+
+        if c == 'Ignite Boston 9':
+            lid = add_location(medialab)
+            r.set('context:%s:lid' % c, lid)
+
+        if c == 'MLabber Summer Plans':
+            lid = add_location(medialab)
+            r.set('context:%s:lid' % c, lid)
+
 
 
 upgrade_values()
 # upgrade_context()
+# all_loc()
 
 sys.exit()
 
-vids = {}
-for c in r.smembers('contexts'):
-    if c == 'all':
-        continue
-    for k in r.zrevrangebyscore(getK(c), '+inf', '-inf'):
-        for v in r.zrevrangebyscore(getKV(c, k), '+inf', '-inf'):
-            vid = r.get('profile:composite:key:%s:val:%s' % (k,v))
-            if vid:
-                if vid not in vids:
-                    vids[vid] =[]
-                vids[vid].append((k,v))
+
 
 
 

@@ -44,7 +44,6 @@ define([
         var that = this;
         this.app.getContexts(function(json){
             var bounds = new google.maps.LatLngBounds();
-            console.log('got contexts:', json.contexts.length);
             for (var i in json.contexts) {
                 var c = json.contexts[i];
                 if (c.name == 'all')
@@ -180,7 +179,7 @@ define([
         $(e.target).addClass('disabled');
     },
 
-    keyClickClb: function(model){
+    keyClickClb: function(kmodel){
         this.$('a.asideKey').removeClass('highlighted');
         this.$('a.asideKey > i').removeClass('icon-white');
 
@@ -190,15 +189,16 @@ define([
         }
         this.circles = [];
 
-        var models = this.collection.where({key: model.get('key')});
-        this.selectedKey = model.get('key');
+        var models = this.collection.where({key: kmodel.get('key')});
+        this.selectedKey = kmodel.get('key');
 
-        if (model.get('type') == 'location') {
+        if (kmodel.get('type') == 'location') {
             this.$('button#addLocation').show();
             $('#popup').hide();
             var bounds = new google.maps.LatLngBounds();
             for (var i in models) {
                 var m = models[i];
+
                 var center = m.get('location').center;
                 var radius = m.get('location').radius;
                 bounds.extend(center);
@@ -216,10 +216,10 @@ define([
             this.app.map.panBy(130, 0);
         }
 
-        if (model.get('type') == 'string') {
+        if (kmodel.get('type') == 'string') {
             this.$('button#addLocation').hide();
             this.vFrameView && this.vFrameView.undelegateEvents();
-            vFrameView = new valueFrameView({models:models, key:model.get('key')});
+            vFrameView = new valueFrameView({models:models, key:kmodel.get('key')});
             vFrameView.render();
             this.vFrameView = vFrameView;
         }

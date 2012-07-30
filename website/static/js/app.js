@@ -38,7 +38,6 @@ var state = {
     },
 
     setConfig: function(config) {
-        console.log('config:', config)
         this.config = config;
         this.satellite = {};
         this.satellite.url = config.discov_url;
@@ -61,13 +60,13 @@ var state = {
             this.agent.setAgentId( username );
         }
 
-        console.log('context in cookie', cookie.last_context);
+        // console.log('context in cookie', cookie.last_context);
         if (!cookie.last_context) {
             cookie.last_context = 'all';
             this.cookies.set_context_in_cookie(cookie.last_context);
         }
         this.context = {name:cookie.last_context};
-        console.log('now context in cookie', this.cookies.get_cookie().last_context);
+        // console.log('now context in cookie', this.cookies.get_cookie().last_context);
     },
 
     setContext: function(cntx) {

@@ -10,7 +10,7 @@ define([
   ], function($, _, Backbone, appConfig, router, mapInfoAttrTemplate, userMatchTemplate){
   var welcomeView = Backbone.View.extend({
     // el: $('div'),
-    className: 'infoboxContext',
+    className: 'infobox',
     events: {
         'click a.zoom': 'zoomHere',
         'click button#addBtn': 'addBtn',
@@ -59,16 +59,23 @@ define([
     render: function(){
         this.$el.html( this.template(this.model.toJSON()) );
 
-        var btnCaption = '+ join';
+        var btnCaption = '+ me too';
         var btnClass = 'btn-success';
         if (this.model.get('haveit')) {
-            btnCaption = '- leave';
+            btnCaption = '- remove';
             btnClass = 'btn-warning';
         }
         this.$('button#addBtn').html(btnCaption).addClass(btnClass);
 
         var score = this.model.get('score');
 
+        var utemplate = _.template(userMatchTemplate);
+        var matches = this.model.get('matches');
+        for (var m in matches) {
+            var username = matches[m];
+            var uhtml = utemplate({username:username});
+            this.$('div#matches').append(uhtml);
+        }
     },
 
     initialize: function(model){
