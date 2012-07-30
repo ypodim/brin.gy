@@ -27,14 +27,29 @@ define([
     
     circles: [],
     collection: new attrCollection(),
-    selectedKey: '',
+    selectedKeyModel: '',
 
     addContext: function(){
         
     },
     backToContext: function(){
+        this.app.navbarView.enableContextMenu();
         this.$('aside').toggleClass('hideAside');
         this.$('button#addContext').fadeOut();
+
+        this.clearMap();
+        if (this.selectedKeyModel)
+            this.keyClickClb( this.selectedKeyModel );
+
+    },
+
+    clearMap: function(){
+        _.each(this.circles, function(circle){ circle.infowindow.close(); })
+        for (var i in this.circles) {
+            this.circles[i].circle.setMap(null);
+            this.circles[i].marker.setMap(null);
+        }
+        this.circles = [];
     },
 
     showAllContexts: function(){
@@ -45,39 +60,54 @@ define([
         this.$('button#addContext').show();
         this.$('button#backToContext').html('Back to '+this.app.context.name+' >').show();
 
-        // clear map
-        _.each(this.circles, function(circle){ circle.infowindow.close(); })
-        for (var i in this.circles) {
-            this.circles[i].circle.setMap(null);
-            this.circles[i].marker.setMap(null);
-        }
-        this.circles = [];
+        this.clearMap();
 
         var that = this;
         this.app.getContexts(function(json){
             var bounds = new google.maps.LatLngBounds();
+
+            var locTitles = {};
             for (var i in json.contexts) {
                 var c = json.contexts[i];
                 if (c.name == 'all')
                     continue;
-                
+
                 var center = new google.maps.LatLng(c.location.lat, c.location.lon);
                 var radius = parseInt(c.location.radius);
+                var markerPos = center;
+                var strokecolor = 
                 bounds.extend(center);
+
+
+                if (locTitles[c.location.title]) {
+                    var randomRadius = Math.min( (0.3+Math.random()) * radius, radius*0.8 );
+                    var randomAngle = Math.random()*360;
+                    markerPos = google.maps.geometry.spherical.computeOffset(
+                                    center, 
+                                    randomRadius, 
+                                    randomAngle
+                                )
+                } else {
+                    locTitles[c.location.title] = c.name;
+                }
 
                 var model = new Backbone.Model({
                     name: c.name,
                     description: c.description,
                     haveit: c.userhasit,
                     score: c.count,
+                    // strokecolor: (c.userhasit) ? 'red' : 'green',
+                    // fillcolor: (c.userhasit) ? 'red' : 'green',
                     location: {
                         title: c.location.title,
                         center: center,
                         radius: radius,
+                        markerPos: markerPos,
                     },
                     type: 'context',
                     cid: c.id,
                 });
+
                 that.addMapCircle(model);
             }
 
@@ -154,7 +184,7 @@ define([
 
         var that = this;
         this.$('#popup').empty().addClass('transparent').show();
-        var locView = new chooselocView({key:this.selectedKey});
+        var locView = new chooselocView({key:this.selectedKeyModel.get('key')});
         locView.render(function(circle){
             $(e.target).removeClass('disabled');
             if (!circle.center)
@@ -193,17 +223,10 @@ define([
     },
 
     keyClickClb: function(kmodel){
-        this.$('a.asideKey').removeClass('highlighted');
-        this.$('a.asideKey > i').removeClass('icon-white');
-
-        for (var i in this.circles) {
-            this.circles[i].circle.setMap(null);
-            this.circles[i].marker.setMap(null);
-        }
-        this.circles = [];
+        this.clearMap();
 
         var models = this.collection.where({key: kmodel.get('key')});
-        this.selectedKey = kmodel.get('key');
+        this.selectedKeyModel = kmodel;
 
         if (kmodel.get('type') == 'location') {
             this.$('button#addLocation').show();
@@ -262,8 +285,15 @@ define([
         });
 
 
+        var markerPos = model.get('location').markerPos;
+        if (! markerPos)
+            markerPos = model.get('location').center;
+
+        var icon = 'http://www.google.com/intl/en_ALL/mapfiles/marker_';
+        icon += (model.get('haveit')) ? 'orange.png':'green.png';
         var marker = new google.maps.Marker({
-            position: model.get('location').center,
+            icon: icon,
+            position: markerPos,
             map: this.app.map,
             title: 'options.title',
         });
@@ -298,7 +328,12 @@ define([
     appendKey: function(attr){
         var keymodel = new Backbone.Model(attr);
         var kview = new keyView({model: keymodel});
+        var that = this;
         kview.render();
+        kview.bind('keyclick', function(){
+            that.$('a.asideKey').removeClass('highlighted');
+            that.$('a.asideKey > i').removeClass('icon-white');
+        });
         kview.bind('keyclick', this.keyClickClb);
 
         if (attr.prepend) {
@@ -321,7 +356,6 @@ define([
         var that = this;
         url = this.app.satellite.url+"/profile/"+this.app.context.name+"/keyvals";
         $.getJSON(url, {user:this.app.agent.id()}, function(json){
-            // that.processNextKey(0, json.items);
 
             for (var i in json.items) {
                 var attr = json.items[i];
@@ -329,11 +363,6 @@ define([
                 attr.score;
 
                 that.appendKey(attr);
-                // var keymodel = new Backbone.Model(attr);
-                // var kview = new keyView({model: keymodel});
-                // kview.render();
-                // kview.bind('keyclick', that.keyClickClb);
-                // that.$('aside > div.list').append(kview.el);
 
                 for (var v in attr.values) {
                     var val = attr.values[v];
@@ -375,9 +404,9 @@ define([
         _.bindAll(this, 'render', 'keyClickClb', 'showLoginBox', 'showAccount', 'showReminder', 'addAttr', 'remAttr', 'showAllContexts');
 
         var that = this;
-        var centerLatLng = new google.maps.LatLng(37.748582,-122.418411);
+        var centerLatLng = new google.maps.LatLng(42.3604457757343,-71.08734495781516);
         this.app.map = new google.maps.Map(document.getElementById('map_canvas'), {
-            'zoom': 7,
+            'zoom': 11,
             'center': centerLatLng,
             'mapTypeId': google.maps.MapTypeId.ROADMAP,
             'zoomControl': false,

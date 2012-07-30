@@ -10,6 +10,9 @@ def getvid(r, k,v):
 def getcid(r, context):
     return r.get('context:%s:cid' % context)
 
+def getlid(r, k,v):
+    return r.get('profile:composite:key:%s:val:%s' % (k, v))
+
 
 def annotate(r, c, k, v, ktype, dic):
     r.sadd('profile:keytypes', 'string', 'location', 'time', 'user')

@@ -9,23 +9,23 @@ define([
     
     'views/sendMessage',
     // 'views/newAttribute',
-    'views/welcome',
-    'views/presentation',
+    // 'views/welcome',
+    // 'views/presentation',
     'views/account',
-    'views/contexts',
-    'views/newContext',
+    // 'views/contexts',
+    // 'views/newContext',
     'views/stats',
     'views/world',
 ], function(
     $, _, Backbone, appConfig, 
-    aboutView, loginView, sendMessageView, welcomeView, presentationView, accountView, contextsView, newContextView, statsView, worldView
+    aboutView, loginView, sendMessageView, accountView, statsView, worldView
     ){
   var AppRouter = Backbone.Router.extend({
     app: appConfig.getState(),
     routes: {
         "about": "showAbout",
 
-        'context': 'showContext',
+        // 'context': 'showContext',
         'newcontext': 'newContext',
         'newcontext/:context': 'newContext',
         "context/:context": "setContext",

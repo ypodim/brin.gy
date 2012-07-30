@@ -14,7 +14,9 @@ define([
         'click button#cancel': 'cancelBtn',
         'click button#useloc': 'useBtn',
         'click button#next': 'okBtn',
-        'keyup input#locationinput': 'titleChanged',
+        // 'change input#locationinput': 'autoFieldChanged',
+        'keyup input#autoField': 'titleChanged',
+        
         'submit form': 'submitLocation',
     },
     app: appConfig.getState(),
@@ -35,6 +37,12 @@ define([
         var gotCircle = (this.tempCircle != null);
         var flag = (gotText && gotCircle);
         this.$('button#next').toggleClass('disabled', !flag);
+
+
+        var input = this.$('#autoField').val()
+        console.log(input)
+        this.$('#locationinput').val(input)
+        // this.autoFieldChanged();
     },
 
     close: function() {
@@ -217,19 +225,55 @@ define([
         //     console.log('map', event)
         // });
 
+        // this.autocomplete = new google.maps.places.Autocomplete(document.getElementById('locationinput'));
         this.doAutocomplete();
     },
 
+    autoFieldChanged: function(){
+        console.log('ok')
+        var place = this.autocomplete.getPlace();
+        // console.log(place)
+        if (place.geometry == undefined)
+            return;
+
+        if (place.geometry.viewport) {
+            this.app.map.fitBounds(place.geometry.viewport);
+        } else {
+            this.app.map.setCenter(place.geometry.location);
+            this.app.map.setZoom(17);  // Why 17? Because it looks good.
+        }
+
+        var image = new google.maps.MarkerImage(
+          place.icon,
+          new google.maps.Size(71, 71),
+          new google.maps.Point(0, 0),
+          new google.maps.Point(17, 34),
+          new google.maps.Size(35, 35));
+        // marker.setIcon(image);
+        // marker.setPosition(place.geometry.location);
+
+        var address = '';
+        if (place.address_components) {
+            address = [(place.address_components[0] &&
+                        place.address_components[0].short_name || ''),
+                        (place.address_components[1] &&
+                        place.address_components[1].short_name || ''),
+                        (place.address_components[2] &&
+                        place.address_components[2].short_name || '')
+                    ].join(' ');
+        }
+        console.log(place.name, address, place);
+    },
     doAutocomplete: function() {
         var input = document.getElementById(this.locationInput);
         var autocomplete = new google.maps.places.Autocomplete(input);
         var that = this;
 
-        autocomplete.bindTo('bounds', this.app.map);
+        // autocomplete.bindTo('bounds', this.app.map);
 
-        var marker = new google.maps.Marker({
-            map: that.app.map
-        });
+        // var marker = new google.maps.Marker({
+        //     map: that.app.map
+        // });
 
         
         google.maps.event.addListener(autocomplete, 'place_changed', function() {
@@ -251,8 +295,8 @@ define([
               new google.maps.Point(0, 0),
               new google.maps.Point(17, 34),
               new google.maps.Size(35, 35));
-            marker.setIcon(image);
-            marker.setPosition(place.geometry.location);
+            // marker.setIcon(image);
+            // marker.setPosition(place.geometry.location);
 
             var address = '';
             if (place.address_components) {
@@ -276,9 +320,9 @@ define([
           });
         }
 
-        setupClickListener('changetype-all', []);
-        setupClickListener('changetype-establishment', ['establishment']);
-        setupClickListener('changetype-geocode', ['geocode']);
+        // setupClickListener('changetype-all', []);
+        // setupClickListener('changetype-establishment', ['establishment']);
+        // setupClickListener('changetype-geocode', ['geocode']);
     },
 
     initialize: function(options){

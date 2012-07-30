@@ -36,6 +36,7 @@ body {
 }
 #container > div#mapOverlay {
     padding-right: @asideWidth;
+    position: relative;
 }
 #container > div#mapOverlay > button {
     display: none;
@@ -52,6 +53,11 @@ body {
 #container > div#mapOverlay > button#backToContext {
     left: inherit;
     right: 10px;
+    width: @asideWidth;
+
+    /*white-space: nowrap;*/
+    /*overflow: hidden;*/
+    text-overflow: ellipsis;
 }
 
 div#login {
@@ -123,15 +129,18 @@ div#popup {
     /*position: absolute;*/
     /*left: 50%;*/
     width: @popupWidth;
-    margin: 60px auto;
+    margin: 10px auto;
     background-color: rgba(60,60,60,0.8);
     pointer-events: all;
-    padding: 5px;
+    padding: 10px;
     display: none;
 }
 .transparent {
     background-color: rgba(60,60,60,0) ! important;
     pointer-events: none ! important;
+}
+.overlay {
+
 }
 div#popup > div.header {
     font-weight: bold;
@@ -517,7 +526,7 @@ div.pickLocation > div#page1 > input#location {
 div.pickLocation > div#page2 > div.caption {
     margin-top: 20px;
 }
-div.pickLocation > div#page2 input,textarea,select {
+div.pickLocation > div#page2 input,select {
     width: @wizardWidth - 30;
     margin: 0 50px 0 0;
     
@@ -555,13 +564,14 @@ div.locationPicker {
     text-align: center;
     pointer-events: none;
     color: rgba(0,0,0,0.8);
-    background: 10px 10px url(/static/images/hole.png?2); 
-    /*background-color: rgba(0,0,0,0.1);*/
+    /*background: 10px 10px url(/static/images/hole.png?2); */
+    background-color: rgba(0,0,0,0.7);
     border: 1px solid rgba(0,0,0,0.15);
 }
 div.locationPicker > div#page2 { display: none; }
 div.locationPicker > div.wizardPage {
     height:440px;
+    height:80px;
     margin:auto;
 }
 div.locationPicker div.caption {
@@ -593,8 +603,21 @@ div.locationPicker > div.buttons > button {
     box-shadow: 0 0 100px black ! important;
     width: 120px;
 }
-div.locationPicker > div.wizardPage > div#crosshair {
-    margin: 20px auto ;
+
+div.locationPicker > div.wizardPage > form > input#locationinput {
+    width: @wizardWidth - 10;
+    padding:5px;
+    box-shadow: 0 0 50px black;
+    font-weight: bold;
+    border-radius:5px;
+    pointer-events: all;
+}
+div.locationPicker > div.wizardPage > form > input#autoField {
+    display: none;
+}
+div#popup div#crosshair {
+    /*background: 10px 10px url(/static/images/crosshair.png); */
+    margin: 10px auto ;
     width: 20px;
     
     padding: 150px;
@@ -606,16 +629,6 @@ div.locationPicker > div.wizardPage > div#crosshair {
     font-size: 40px;
     box-shadow: 0 0 100px black;
 }
-div.locationPicker > div.wizardPage > form > input#locationinput {
-    width: @wizardWidth - 10;
-    padding:5px;
-    box-shadow: 0 0 50px black;
-    font-weight: bold;
-    border-radius:5px;
-    pointer-events: all;
-}
-
-
 
 
 /*************   VALCONTAINER  ***************/
@@ -648,7 +661,8 @@ div.valcontainer > a {
     height: 36px;
 }
 div.valcontainer > a:hover { text-decoration: none; }
-div.valcontainer > a > span.count {
+
+span.count {
     display:inline-block;
     color: white;
     background-color:#ff2244;
@@ -658,15 +672,16 @@ div.valcontainer > a > span.count {
     text-shadow: 0px -1px 0px rgba(0,0,0,0.6);
     border-radius: 3px;
 }
-div.valcontainer > a > span.count > div.cno {
+span.count > div.cno {
     font-size: 16px;
     font-weight: bold;
     line-height: 16px;
 }
-div.valcontainer > a > span.count > div.caption{
+span.count > div.caption{
     font-size: 10px;
     line-height: 10px;
 }
+
 div.valcontainer > a > span.value {
     display: inline-block;
     font-size: 20px;
@@ -769,7 +784,36 @@ div.infobox > div.body > div.tools {
     line-height: 30px;
 }
 div.infobox > div.body > div.tools > button {
-    margin: 1px 0 1px 0;
+    margin: 1px 0 1px 5px;
+    float: right;
+}
+
+div.infoboxContext {
+    width:350px;
+    /*height:100px;*/
+    /*background-color: rgba(60,60,60,0.8);*/
+}
+div.infoboxContext > div.title {
+    height: 36px;
+    padding: 5px 0 5px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    font-weight: bold;
+    font-size: 22px;
+    line-height: 36px;
+}
+div.infoboxContext > div.title > div.titleKey {
+    /*float: right;*/
+    color: gray;
+}
+div.infoboxContext > div.title > a.titleVal {
+    /*float: left;*/
+}
+div.infoboxContext > div.body > div.tools {
+    height: 30px;
+    line-height: 30px;
+}
+div.infoboxContext > div.body > div.tools > button {
+    margin: 1px 0 1px 5px;
     float: right;
 }
 
@@ -825,12 +869,18 @@ div#navbar ul > li.authed {
     display: none;
 }
 div#navbar ul > li.authed > a {
-    background-color: rgba(80,80,80,0.8);
+    /*background-color: rgba(80,80,80,0.8);*/
     border: 1px solid rgba(0,0,0,0.2);
     padding: 10px 20px 10px 20px;
 }
 div#navbar ul > li.noauth {
     display: none;
+}
+div#navbar ul > li > a.disabled {
+    background-color: #bbb;
+    color: gray;
+    /*border: 1px solid rgba(0,0,0,0.2);*/
+    /*padding: 10px 20px 10px 20px;*/
 }
 
 div#navbar > ul > li > a {
@@ -916,7 +966,9 @@ div#modal > div.box > div.header > span#title {
     text-transform: uppercase;
 }
 div#modal > div.box > div.content {
-    
+    max-height: 500px;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
 }
 div#modal > div.box > div.content > form.reminder {
     height: 50px;
@@ -929,5 +981,20 @@ div#modal > div.box > div.content > form.reminder > div.footer > button {
 }
 div#modal > div.box > div.content > form.reminder > div.footer > img {
     display: none;
+}
+
+div#modal > div.box > div.content > div.accountentry {
+    border-radius: 5px;
+    background-color: #ccc;
+    padding: 10px;
+    margin-top: 5px;
+}
+div#modal > div.box > div.content > div.buttons {
+    /*height: 50px;*/
+    text-align: center;
+    margin: 20px 0 10px 0;
+}
+div#modal > div.box > div.content > div.buttons > button {
+    width: 150px;
 }
 

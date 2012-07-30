@@ -113,6 +113,7 @@ define([
             var left = options.left - this.$el.width() + options.width;
             this.$el.css({left:left}).show();
         }
+        this.$('form').children(':first').focus();
     },
 
     initialize: function(options) {

@@ -20,9 +20,16 @@ define([
     template: _.template(navbarTemplate),
     
     app: appConfig.getState(),
+    contextMenuClicked: false,
 
     contextMenu: function(e){
+        if (this.contextMenuClicked)
+            return false;
+
         this.trigger('contexts');
+        this.contextMenuClicked = true;
+
+        $(e.target).addClass('disabled');
         return false;
 
         var btn;
@@ -43,11 +50,16 @@ define([
         this.trigger(action, {action:action, left:left, width:width});
         return false;
     },
+    enableContextMenu: function(){
+        this.$('a').removeClass('disabled');
+        this.contextMenuClicked = false;
+    },
     feedback: function(){
         this.app.modal.render({title:'feedback'});
         return false;
     },
     about: function(){
+        this.trigger('about');
         return false;
     },
     login: function(e){ 

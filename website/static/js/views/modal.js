@@ -9,7 +9,8 @@ define([
   'text!templates/reminder.html',
   'text!templates/newKey.html',
   'text!templates/feedback.html',
-  ], function($, _, Backbone, appConfig, tooltip, modalTemplate, accountTemplate, reminderTemplate, newkeyTemplate, feedbackTemplate){
+  'text!templates/about.html',
+  ], function($, _, Backbone, appConfig, tooltip, modalTemplate, accountTemplate, reminderTemplate, newkeyTemplate, feedbackTemplate, aboutTemplate){
   var modalView = Backbone.View.extend({
     el: $('#modal'),
     events: {
@@ -122,6 +123,14 @@ define([
                 
             }
         }
+        if (options.title == 'about') {
+            this.$('span#title').html('About')
+            inner_template = _.template( aboutTemplate );
+            data = {
+                
+            }
+        }
+        
 
         this.$('.content').html( inner_template(data) );
     },

@@ -87,10 +87,11 @@ require([
 
         appp.navbarView.bind('signin', wldView.showLoginBox);
         appp.navbarView.bind('signup', wldView.showLoginBox);
-        // appp.navbarView.bind('contexts', wldView.showLoginBox);
-        // appp.navbarView.bind('contexts', wldView.showLoginBox);
         appp.navbarView.bind('contexts', wldView.showAllContexts);
         appp.navbarView.bind('account', wldView.showAccount);
+        appp.navbarView.bind('about', function(){
+            appp.modal.render({title: 'about'});
+        });
         
         appp.loginView = new loginView();
         appp.loginView.bind('reminder', wldView.showReminder);

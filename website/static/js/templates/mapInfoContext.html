@@ -1,12 +1,16 @@
 
 <div class='title'>
-	<div class='titleVal'><%= location.title %></div>
+	<span class="count">
+	    <div class='cno'><%= score %></div>
+        <div class='caption'><% if (score==1) print('person'); else print('people'); %></div>
+	</span>
+	<a class='titleVal' href='/<%= cid %>'><%= name %></a>
 </div>
 <div class='body'>
+	location: <%= location.title %>
 	<div class='tools'>
 		<a class='zoom' href='#'>zoom here</a>
 		<button id='addBtn' class='btn'>+ me too</button>
 	</div>
-	<a href='/<%= cid %>'><%= name %></a>
 	<div id='matches'></div>
 </div>
