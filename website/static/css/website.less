@@ -37,7 +37,7 @@ body {
 #container > div#mapOverlay {
     padding-right: @asideWidth;
 }
-#container > div#mapOverlay > button#addLocation {
+#container > div#mapOverlay > button {
     display: none;
     position: absolute;
     left: 10px;
@@ -48,6 +48,10 @@ body {
     padding: 10px;
     pointer-events: all;
     box-shadow: 0 0 100px black;
+}
+#container > div#mapOverlay > button#backToContext {
+    left: inherit;
+    right: 10px;
 }
 
 div#login {

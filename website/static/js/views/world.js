@@ -20,7 +20,8 @@ define([
     events: {
         'click button#addLocation': 'addLocation',
         'click button#newKey': 'newKey',
-        
+        'click button#addContext': 'addContext',
+        'click button#backToContext': 'backToContext',
     },
     app: appConfig.getState(),
     
@@ -28,10 +29,21 @@ define([
     collection: new attrCollection(),
     selectedKey: '',
 
+    addContext: function(){
+        
+    },
+    backToContext: function(){
+        this.$('aside').toggleClass('hideAside');
+        this.$('button#addContext').fadeOut();
+    },
+
     showAllContexts: function(){
         this.$('aside').toggleClass('hideAside');
         this.app.modal.close();
         $('#popup').hide();
+
+        this.$('button#addContext').show();
+        this.$('button#backToContext').html('Back to '+this.app.context.name+' >').show();
 
         // clear map
         _.each(this.circles, function(circle){ circle.infowindow.close(); })
