@@ -71,6 +71,7 @@ define([
                     haveit: c.userhasit,
                     score: c.count,
                     location: {
+                        title: c.location.title,
                         center: center,
                         radius: radius,
                     },
