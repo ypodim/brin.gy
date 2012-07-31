@@ -83,16 +83,12 @@ def add_location(ldic):
     return lid
 
 def safe_remove_location(lid):
+    ldic = r.hgetall('location:lid:%s' % lid)
     title = ldic.get('title')
-    if not title:
-        return None
-    if r.sadd('location:names', title):
-        lid = r.incr('global:nextlid')
-        print r.hmset('location:lid:%s' % lid, ldic)
-        r.set('location:title:%s:lid' % title, lid)
-    else:
-        lid = r.get('location:title:%s:lid' % title)
-    return lid
+    
+    r.srem('location:names', title):
+    r.delete('location:lid:%s' % lid)
+    r.set('location:title:%s:lid' % title, lid)
 
 def get_kv_by_vid(vid):
     vids = {}
@@ -179,9 +175,10 @@ def upgrade_context():
 
 
 
-upgrade_values()
+# upgrade_values()
 # upgrade_context()
 # all_loc()
+print safe_remove_location(1026)
 
 sys.exit()
 

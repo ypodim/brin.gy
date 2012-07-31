@@ -40,7 +40,6 @@ define([
         this.clearMap();
         if (this.selectedKeyModel)
             this.keyClickClb( this.selectedKeyModel );
-
     },
 
     clearMap: function(){
@@ -180,12 +179,47 @@ define([
             return false;
         }
 
-        _.each(this.circles, function(circle){ circle.infowindow.close(); })
-
         var that = this;
+        var locCollection = new Backbone.Collection();
+
+        this.clearMap();
+        this.app.getAllLocations(function(json){
+            for (var i in json.locations){
+                var loc = json.locations[i];
+
+                var radius = parseFloat(loc.radius);
+                var lat = parseFloat(loc.lat);
+                var lng = parseFloat(loc.lon);
+                var center = new google.maps.LatLng(lat, lng);
+                model = new Backbone.Model({
+                    id: loc.id,
+                    center: center,
+                    radius: radius,
+                    title: loc.title,
+                });
+
+                options = {
+                    center: center,
+                    radius: radius,
+                    // icon: icon,
+                    // markerPos: markerPos,
+                    infowindowContent: loc.title,
+                    // strokecolor: model.get('strokecolor'),
+                    // fillcolor: model.get('fillcolor'),
+                };
+                that.addPlainMapCircle(options);
+
+                // if (locCollection.get(model.get('id')))
+                //     that.addMapCircle(model);
+            }
+        });
+
         this.$('#popup').empty().addClass('transparent').show();
         var locView = new chooselocView({key:this.selectedKeyModel.get('key')});
         locView.render(function(circle){
+            if (that.selectedKeyModel)
+                that.keyClickClb( that.selectedKeyModel );
+
             $(e.target).removeClass('disabled');
             if (!circle.center)
                 return false;
@@ -262,45 +296,14 @@ define([
     },
 
     addMapCircle: function(model){
-        var contextOptions = {
-            strokeColor: model.get('strokecolor'),
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: model.get('fillcolor'),
-            fillOpacity: 0.1,
-            map: this.app.map,
-            center: model.get('location').center,
-            radius: model.get('location').radius,
-        };
-
-        var mapCircle = new google.maps.Circle(contextOptions);
-        
-        // google.maps.event.addListener(this.contextCircle, 'click', this.areaClick);
-        google.maps.event.addListener(mapCircle, 'mouseover', function(event) {
-            this.setOptions({strokeColor:'red'});
-        });
-        google.maps.event.addListener(mapCircle, 'mouseout', function(event) {
-            this.setOptions({strokeColor: model.get('strokecolor')});
-            this.setOptions({zIndex:0});
-        });
-
-
         var markerPos = model.get('location').markerPos;
         if (! markerPos)
             markerPos = model.get('location').center;
 
         var icon = 'http://www.google.com/intl/en_ALL/mapfiles/marker_';
         icon += (model.get('haveit')) ? 'orange.png':'green.png';
-        var marker = new google.maps.Marker({
-            icon: icon,
-            position: markerPos,
-            map: this.app.map,
-            title: 'options.title',
-        });
 
-        var that = this;
         var infowindowView;
-        
         if (model.get('type') == 'location') {
             var infowindowView = new mapInfoAttrView(model);
             infowindowView.render();    
@@ -310,8 +313,56 @@ define([
             infowindowView.render();    
         }
 
+        options = {
+            center: model.get('location').center,
+            radius: model.get('location').radius,
+            icon: icon,
+            markerPos: markerPos,
+            infowindowContent: infowindowView.el,
+            strokecolor: model.get('strokecolor'),
+            fillcolor: model.get('fillcolor'),
+        };
+        this.addPlainMapCircle(options);
+    },
+
+    addPlainMapCircle: function(options){
+        var contextOptions = {
+            strokeColor: options.strokecolor,
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: options.fillcolor,
+            fillOpacity: 0.1,
+            map: this.app.map,
+            center: options.center,
+            radius: options.radius,
+        };
+
+        var mapCircle = new google.maps.Circle(contextOptions);
+        
+        google.maps.event.addListener(mapCircle, 'mouseover', function(event) {
+            this.setOptions({strokeColor:'red'});
+        });
+        google.maps.event.addListener(mapCircle, 'mouseout', function(event) {
+            this.setOptions({strokeColor: options.strokecolor});
+            this.setOptions({zIndex:0});
+        });
+
+        var markerPos = options.markerPos;
+        if (! markerPos)
+            markerPos = options.center;
+
+        var marker = new google.maps.Marker({
+            // icon: options.icon,
+            position: markerPos,
+            map: this.app.map,
+            title: 'options.title',
+        });
+        if (options.icon)
+            marker.setIcon(options.icon);
+
+        var that = this;
         var infowindow = new google.maps.InfoWindow({
-            content: infowindowView.el,
+            content: options.infowindowContent,
         });
         google.maps.event.addListener(marker, 'click', function() {
             _.each(that.circles, function(circle){ circle.infowindow.close(); })
@@ -319,7 +370,6 @@ define([
         });
         google.maps.event.addListener(mapCircle, 'click', function() {
             _.each(that.circles, function(circle){ circle.infowindow.close(); })
-        //     infowindow.open(this.app.map, marker);
         });
 
         this.circles.push({circle:mapCircle, marker:marker, infowindow:infowindow});

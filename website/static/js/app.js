@@ -153,6 +153,12 @@ var state = {
         },
     },
 
+    getAllLocations: function(clb){
+        var url = this.satellite.url+'/location';
+        $.getJSON(url, {}, function(json){
+            clb && clb(json);
+        });
+    },
     getContexts: function(clb) {
         var url = this.satellite.url+'/contexts';
         $.getJSON(url, {user:this.agent.id()}, function(json){

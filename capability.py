@@ -101,15 +101,40 @@ class location:
         count = len(matches)
         return dict(error='', count=count, matches=matches)
             
-        
+  
+    def inBounds(self, point, bounds):
+        if not bounds:
+            return True
+        lat = point['lat']
+        lon = point['lon']
+        # if bounds['ne']['lat']
+        print bounds['ne']
+        print bounds['sw']
+        print point
+
+        return True
+
     def get(self, params, arguments):
         #print 'satellite location get'
         
         error = ''
-        matches = []
+        locations = []
         count = 0
         lat = lon = ''
-        
+
+        bounds = {}
+        nelat = arguments.get('nelat')
+        nelon = arguments.get('nelon')
+        swlat = arguments.get('swlat')
+        swlon = arguments.get('swlon')
+
+        if nelat and nelon and swlat and swlon:
+            nelat = float(nelat[0])
+            nelon = float(nelon[0])
+            swlat = float(swlat[0])
+            swlon = float(swlon[0])
+            bounds = dict(ne={lat:nelat, lon:nelon}, sw={lat:swlat,lon:swlon})
+
         if len(params) >= 1:
             if params[0] == 'fetch':
                 if len(params) > 2:
@@ -124,8 +149,14 @@ class location:
                         dic = self.get_count(key, val)
                         count = dic['count']
                         matches = dic['matches']
-            
-        return dict(matches=matches, error=error, count=count, lat=lat, lon=lon)
+        else:
+            for lid in xrange(1001, int(self.r.get('global:nextlid'))+1):
+                ldic = self.r.hgetall('location:lid:%s' % lid)
+                ldic['id'] = lid
+                if self.inBounds(ldic, bounds):
+                    locations.append(ldic)
+
+        return dict(locations=locations, error=error, count=count, lat=lat, lon=lon)
 
         
 class profile:
@@ -168,7 +199,7 @@ class profile:
         
         if len(params) < 2:
             return dict(items=items, error='invalid/insufficient parameters', count=count)
-            
+        
         context = str(params[0])
         kparam = params[1]
         # print 'context', context
@@ -206,7 +237,7 @@ class profile:
                     vitem['matches'] = list(matches)
                     item['values'].append(vitem)
                 items.append(item)
-                
+        
         elif kparam == 'key' and len(params) > 3:
             key = params[2]
             if params[3] == 'agents':
