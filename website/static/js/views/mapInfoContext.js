@@ -3,11 +3,10 @@ define([
   'underscore', 
   'backbone',
   'app',
-  'router',
 
   'text!templates/mapInfoContext.html',
   'text!templates/userMatch.html'
-  ], function($, _, Backbone, appConfig, router, mapInfoContextTemplate, userMatchTemplate){
+  ], function($, _, Backbone, appConfig, mapInfoContextTemplate, userMatchTemplate){
   var mapinfoContextView = Backbone.View.extend({
     
     className: 'infoboxContext',
@@ -43,7 +42,7 @@ define([
         var type = (haveit) ? 'DELETE' : 'POST';
         var xdata = this.model.get('xdata');
 
-        this.app.mutateKeyValue({key:key, val:val, type:type, xdata:xdata});
+        // this.app.mutateKeyValue({key:key, val:val, type:type, xdata:xdata});
     },
 
     zoomHere: function() {
@@ -72,9 +71,6 @@ define([
 
     initialize: function(model){
         _.bindAll(this, 'render');
-        // this.options = options;
-
-        this.model = model;
         this.model.bind('change', this.render);
     },
   });

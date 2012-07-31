@@ -86,7 +86,7 @@ def safe_remove_location(lid):
     ldic = r.hgetall('location:lid:%s' % lid)
     title = ldic.get('title')
     
-    r.srem('location:names', title):
+    r.srem('location:names', title)
     r.delete('location:lid:%s' % lid)
     r.set('location:title:%s:lid' % title, lid)
 
@@ -173,12 +173,50 @@ def upgrade_context():
             lid = add_location(medialab)
             r.set('context:%s:lid' % c, lid)
 
+def upgrade_loc_titles():
+    for name in r.smembers('location:names'):
+        r.delete('location:title:%s:lid' % name)
+    r.delete('location:names')
 
+    for title in r.smembers('location:titles'):
+        r.delete('location:title:%s:lid' % title)
+    r.delete('location:titles')
+
+    for latlonstring in r.smembers('location:latlonstrings'):
+        r.delete('location:latlonstring:%s:lid' % latlonstring)
+    r.delete('location:latlonstrings')
+
+    toplid = int(r.get('global:nextlid'))
+    for lid in xrange(1001, toplid+1):
+        ldic = r.hgetall('location:lid:%s' % lid)
+        
+        r.set('location:title:%s:lid' % ldic['title'], lid)
+        r.sadd('location:titles', ldic['title'])
+
+        latlonstr = '%s %s' % (ldic['lat'], ldic['lon'])
+        r.set('location:latlonstring:%s:lid' % latlonstr, lid)
+        r.sadd('location:latlonstrings', latlonstr)
+
+        print lid, \
+            ldic.get('title'), \
+            get_kv_by_vid(lid), \
+            r.sismember('location:names', ldic.get('title')), \
+            r.sismember('location:titles', ldic.get('title')), \
+            r.get('location:title:%s:lid' % ldic.get('title'))
+
+    
+
+print r.delete('location:lid:1026')
+print r.set('global:nextlid', 1025)
+print r.smembers('location:titles')
+print r.smembers('location:names')
 
 # upgrade_values()
 # upgrade_context()
 # all_loc()
-print safe_remove_location(1026)
+# print safe_remove_location(1026)
+
+upgrade_loc_titles()
 
 sys.exit()
 

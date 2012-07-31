@@ -47,7 +47,9 @@ class profile():
     'global:nextlid' # holds next location id to be assigned to a location
     'location:lid:LID' # location information hash for location id LID 
     'location:titles' # set of location names for easy title lookup
-    'location:title:LOCATION:lid' # location id for a given location title LOCATION
+    'location:title:LOCATION' # set of location ids for a given location title LOCATION
+    'location:latlonstrings' # set of location strings for easy lookup of existing lat/lons
+    'location:latlonstring:LATLONSTR:lid' # location id for a given location string LATLONSTR
 
     'profile:CONTEXT:keys' # ordered set of all keys in use
     'profile:CONTEXT:key:KEY:agents' # set of agents using this key
@@ -66,14 +68,18 @@ class profile():
 
     
     def add_location(self, title, lat, lon, radius, creator):
-        # if title is successfully added to the set
-        if self.db.sadd('location:names', title):
+        if not title:
+            return False
+        latlonstr = '%s %s' % (lat, lon)
+        if self.db.sadd('location:latlonstrings' % latlonstr):
             ldic = dict(title=title, lat=lat, lon=lon, radius=radius, creator=creator)
             lid = self.db.incr('global:nextlid')
             self.db.hmset('location:lid:%s' % lid, ldic)
-            self.db.set('location:title:%s:lid' % title, lid)
+            self.db.sadd('location:titles' % title)
+            self.db.sadd('location:title:%s' % title, lid)
+            self.db.set('location:latlonstring:%s:lid' % latlonstr, lid)
         else:
-            lid = self.db.get('location:title:%s:lid' % title)
+            lid = self.db.get('location:latlonstring:%s:lid' % latlonstr)
         return lid
     def add_reverse(self, context, key, val):
         if self.db.sadd(getKA(context, key), self.usr):   # add agent to set for this key
@@ -132,12 +138,12 @@ class profile():
                                         ldic['creator'])
                 self.db.set('context:%s:lid' % c, lid)
 
-            if contextDic.get('expiration'):
-                self.db.zadd(
-                    'context:%s:expiration' % contextDic['title'], 
-                    contextDic['title'], 
-                    contextDic.get('expiration')
-                )
+            # if contextDic.get('expiration'):
+            #     self.db.zadd(
+            #         'context:%s:expiration' % contextDic['title'], 
+            #         contextDic['title'], 
+            #         contextDic.get('expiration')
+            #     )
             
             cid = self.db.incr('global:nextcid')
             self.db.set('context:%s:cid' % contextDic['title'], cid)

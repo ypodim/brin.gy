@@ -11,10 +11,11 @@ define([
   'views/key',
   'views/mapInfoAttribute',
   'views/mapInfoContext',
+  'views/mapInfoLocation',
   'views/valueFrame',
   'views/chooseloc',
   'views/modal',
-  ], function($, _, Backbone, appConfig, router, attrModel, attrCollection, keyView, mapInfoAttrView, mapInfoContextView, valueFrameView, chooselocView, modalView){
+  ], function($, _, Backbone, appConfig, router, attrModel, attrCollection, keyView, mapInfoAttrView, mapInfoContextView, mapInfoLocationView, valueFrameView, chooselocView, modalView){
   var welcomeView = Backbone.View.extend({
     el: $('#container'),
     events: {
@@ -196,14 +197,18 @@ define([
                     center: center,
                     radius: radius,
                     title: loc.title,
+                    creator: loc.creator,
                 });
+
+                var infowindowView = new mapInfoLocationView({model:model});
+                infowindowView.render();    
 
                 options = {
                     center: center,
                     radius: radius,
                     // icon: icon,
                     // markerPos: markerPos,
-                    infowindowContent: loc.title,
+                    infowindowContent: infowindowView.$el,
                     // strokecolor: model.get('strokecolor'),
                     // fillcolor: model.get('fillcolor'),
                 };
@@ -310,7 +315,7 @@ define([
         }
         if (model.get('type') == 'context') {
             var infowindowView = new mapInfoContextView(model);
-            infowindowView.render();    
+            infowindowView.render();
         }
 
         options = {
