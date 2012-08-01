@@ -22,7 +22,6 @@ define([
             return false;
         }
         this.trigger('uselocation', this.model);
-        console.log(this.app.map.getZoom())
     },
 
     zoomHere: function() {

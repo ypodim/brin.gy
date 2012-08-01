@@ -21,7 +21,7 @@ define([
   var welcomeView = Backbone.View.extend({
     el: $('#container'),
     events: {
-        'click button#addLocation': 'addLocation',
+        'click button#addLocation': 'addLocationBtn',
         'click button#newKey': 'newKey',
         'click button#addContext': 'addContext',
         'click button#backToContext': 'backToContext',
@@ -176,15 +176,67 @@ define([
         // console.log('del');
     },
 
-    addLocation: function(e) {
+    postLocationAttr: function(circle){
+        if (this.selectedKeyModel)
+            this.keyClickClb( this.selectedKeyModel );
+
+        this.$('button#addLocation').show();
+        if (!circle.center)
+            return false;
+        
+        var lat = circle.center.lat();
+        var lon = circle.center.lng();
+        var xdata = {
+            lat:lat, lon:lon, 
+            radius:circle.radius, 
+            ktype:'location', 
+            creator:this.app.agent.id(),
+            title: circle.title,
+        };
+
+        var model = new attrModel({
+            key: circle.key,
+            val: circle.title,
+            xdata: xdata,
+            score: 1,
+            haveit: true,
+            selected: false,
+            display: true,
+            matches: [this.app.agent.id()],
+            visited: false,
+            showControls: true,
+            location: {center:circle.center, radius:circle.radius},
+            type: 'location',
+        });
+
+        this.collection.add(model);
+        this.addMapCircle(model);
+
+        this.app.mutateKeyValue({
+            type: 'POST',
+            key: circle.key,
+            val: circle.title,
+            xdata: xdata,
+        });
+    },
+
+    addLocationBtn: function(e) {
         if (! this.app.agent.loggedIn({alert:1})) {
             this.app.navbarView.login();
             return false;
         }
 
         var that = this;
-        var locCollection = new Backbone.Collection();
 
+        this.$('#popup').empty().addClass('transparent').show();
+        var locView = new chooselocView({key:this.selectedKeyModel.get('key')});
+        locView.render().bind('newlocation', function(circle){ 
+            that.postLocationAttr(circle) 
+        });
+        $(e.target).hide();
+
+        
+        // var locCollection = new Backbone.Collection();
         this.clearMap();
         this.app.getAllLocations(function(json){
             for (var i in json.locations){
@@ -199,14 +251,12 @@ define([
                     center: center,
                     radius: radius,
                     title: loc.title,
-                    creator: loc.creator,
+                    creator: loc.creator || '"unknown"',
                 });
 
                 var infowindowView = new mapInfoLocationView({model:model});
                 infowindowView.render();
-                infowindowView.bind('uselocation', function(model){
-                    console.log('will use', model);
-                });
+                infowindowView.bind('uselocation', locView.useLocation);
 
                 options = {
                     center: center,
@@ -221,49 +271,6 @@ define([
                 that.addPlainMapCircle(options);
             }
         });
-
-        this.$('#popup').empty().addClass('transparent').show();
-        var locView = new chooselocView({key:this.selectedKeyModel.get('key')});
-        locView.render(function(circle){
-            if (that.selectedKeyModel)
-                that.keyClickClb( that.selectedKeyModel );
-
-            // $(e.target).removeClass('disabled');
-            $(e.target).show();
-            if (!circle.center)
-                return false;
-            
-            var lat = circle.center.lat();
-            var lon = circle.center.lng();
-            var xdata = {lat:lat, lon:lon, radius:circle.radius, ktype:'location'};
-
-            var model = new attrModel({
-                key: circle.key,
-                val: circle.title,
-                xdata: xdata,
-                score: 1,
-                haveit: true,
-                selected: false,
-                display: true,
-                matches: [that.app.agent.id()],
-                visited: false,
-                showControls: true,
-                location: {center:circle.center, radius:circle.radius},
-                type: 'location',
-            });
-
-            that.collection.add(model);
-            that.addMapCircle(model);
-
-            that.app.mutateKeyValue({
-                type: 'POST',
-                key: circle.key,
-                val: circle.title,
-                xdata: xdata,
-            });
-        });
-        // $(e.target).addClass('disabled');
-        $(e.target).hide();
     },
 
     keyClickClb: function(kmodel){
@@ -281,8 +288,11 @@ define([
 
                 var center = m.get('location').center;
                 var radius = m.get('location').radius;
-                bounds.extend(center);
-                this.addMapCircle(m);
+
+                if (radius && center.lat() && center.lng()) {
+                    bounds.extend(center);
+                    this.addMapCircle(m);
+                }
             }
 
             if (!bounds.isEmpty()) {

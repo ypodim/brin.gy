@@ -820,18 +820,29 @@ div.infoboxContext > div.title > div.titleKey {
     /*float: right;*/
     color: gray;
 }
-div.infoboxContext > div.title > a.titleVal {
-    /*float: left;*/
+div.infoboxContext > div.title > div.titleVal {
+    display: inline-block;
 }
 div.infoboxContext > div.body > div.tools {
     height: 30px;
     line-height: 30px;
+    padding-top: 5px;
 }
 div.infoboxContext > div.body > div.tools > button {
     margin: 1px 0 1px 5px;
     float: right;
+    width: 100px;
 }
-
+div.infoboxContext > div.body > div.tools > button#useBtn {
+    margin: 0 5px 0 0;
+    float: left;
+}
+div.infoboxContext > div.body > div.tools > a.zoom {
+    line-height: 30px;
+}
+div.infoboxContext > div.body > div.creator {
+    color: gray;
+}
 
 
 

@@ -71,6 +71,7 @@ class profile():
         if not title:
             return False
         latlonstr = '%s %s' % (lat, lon)
+
         if self.db.sadd('location:latlonstrings' % latlonstr):
             ldic = dict(title=title, lat=lat, lon=lon, radius=radius, creator=creator)
             lid = self.db.incr('global:nextlid')
@@ -266,9 +267,9 @@ class profile():
                 xdata = attr.get('xdata')
                 if xdata:
                     if not getvid(self.db, key, val):
-                        # print 'POST', attr, type(attr), xdata
+                        print 'POST', attr, type(attr), xdata
                         ktype = xdata['ktype']
-                        dic = dict(lat=xdata['lat'], lon=xdata['lon'], radius=xdata['radius'])
+                        dic = dict(lat=xdata['lat'], lon=xdata['lon'], radius=xdata['radius'], creator=xdata['creator'], title=xdata['title'])
                         annotate(self.db, context, key, val, ktype, dic)
                     # else:
                         # print 'ALREADY IN', xdata

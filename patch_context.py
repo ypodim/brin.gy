@@ -227,12 +227,26 @@ def verify_loc_keyvalues():
                     for u in agents:
                         r.srem('%s:profile:key:%s' % (u,k), v)
                         print r.sismember('%s:profile:key:%s' % (u,k), v)
-                    
+
+def reset_creator():
+    toplid = int(r.get('global:nextlid'))
+    for lid in xrange(1001, toplid+1):
+        ldic = r.hgetall('location:lid:%s' % lid)
+        r.hset('location:lid:%s' % lid, 'creator', 'ypodim')
+        print ldic
+
+
+# reset_creator()
 
 # verify_loc_keyvalues()
 
+print r.get('global:nextlid')
+# print r.hgetall('location:lid:1026')
+# print get_kv_by_vid(1026)
 # print r.delete('location:lid:1026')
+# print r.delete('location:lid:1027')
 # print r.set('global:nextlid', 1025)
+
 # print r.smembers('location:titles')
 # print r.smembers('location:names')
 # upgrade_loc_titles()
