@@ -224,13 +224,13 @@ class profile:
                     userhasit = int(self.r.sismember(getKVA(context, key, val), aid))
                     #print key, val, aid, userhasit
 
-                    xdata = {}
+                    xdataEntries = []
                     if ktype != 'string':
-                        xdata = getfullkv(self.r, context, key, val)
+                        xdataEntries = getfullkv(self.r, context, key, val)
 
                     vitem = dict(val=val, 
                                  userhasit=userhasit, 
-                                 xdata=xdata,
+                                 xdata=xdataEntries,
                                  score=vscore, 
                                  matches=[])
                     matches = self.r.smembers(getKVA(context, key, val))

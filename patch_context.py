@@ -91,16 +91,25 @@ def safe_remove_location(lid):
     r.set('location:title:%s:lid' % title, lid)
 
 def get_kv_by_vid(vid):
-    vids = {}
+    res = []
     for c in r.smembers('contexts'):
         if c == 'all':
             continue
         for k in r.zrevrangebyscore(getK(c), '+inf', '-inf'):
             for v in r.zrevrangebyscore(getKV(c, k), '+inf', '-inf'):
-                vidtest = r.get('profile:composite:key:%s:val:%s' % (k,v))
-                if vidtest and int(vid) == int(vidtest):
-                    return (k,v)
-    return None
+                try:
+                    vids = r.smembers('profile:composite:key:%s:val:%s' % (k,v))
+                except:
+                    print 'bad type', c,k,v, r.get('profile:composite:key:%s:val:%s' % (k,v))
+                    r.delete('profile:composite:key:%s:val:%s' % (k,v))
+                # if vidtest == 'None':
+                #     print 'skatoules', c,k,v
+                #     continue
+                for vidtest in vids:
+                    if vidtest and int(vid) == int(vidtest):
+                        res.append( (k,v) )
+
+    return res
 
 
 def upgrade_values():
@@ -235,17 +244,35 @@ def reset_creator():
         r.hset('location:lid:%s' % lid, 'creator', 'ypodim')
         print ldic
 
+def convert_kvcomposite_to_list():
+    for c in r.smembers('contexts'):
+        for k in r.zrevrangebyscore(getK(c), '+inf', '-inf'):
+            for v in r.zrevrangebyscore(getKV(c, k), '+inf', '-inf'):
+                try:
+                    lidtest = r.get('profile:composite:key:%s:val:%s' % (k,v))
+                except:
+                    continue
+                if lidtest:
+                    print 'converting', k,v, lidtest
+                    print r.delete('profile:composite:key:%s:val:%s' % (k,v))
+                    r.sadd('profile:composite:key:%s:val:%s' % (k,v), lidtest)
+
+
+# convert_kvcomposite_to_list()
+# sys.exit()
 
 # reset_creator()
 
 # verify_loc_keyvalues()
 
-print r.get('global:nextlid')
-# print r.hgetall('location:lid:1026')
-# print get_kv_by_vid(1026)
-# print r.delete('location:lid:1026')
-# print r.delete('location:lid:1027')
-# print r.set('global:nextlid', 1025)
+lastlid = r.get('global:nextlid')
+# lastlid = 1023
+print lastlid
+print r.hgetall('location:lid:%s' % lastlid)
+print get_kv_by_vid(lastlid)
+# print r.delete('location:lid:%s' % lastlid)
+# print r.set('global:nextlid', int(lastlid)-1)
+
 
 # print r.smembers('location:titles')
 # print r.smembers('location:names')
@@ -256,24 +283,4 @@ print r.get('global:nextlid')
 # upgrade_context()
 # all_loc()
 # print safe_remove_location(1026)
-
-
-
-sys.exit()
-
-
-
-
-
-
-for vid in vids:
-    title = vids[vid][0][1]
-    ldic = r.hgetall('profile:vid:%s' % vid)
-    # print r.hset('location:lid:%s' % vid, 'title', vids[vid][0][1])
-
-    if r.sadd('location:titles', title):
-        lid = r.incr('global:nextlid')
-        print r.hmset('location:lid:%s' % lid, ldic)
-        r.set('location:title:%s:lid' % title, lid)
-
 

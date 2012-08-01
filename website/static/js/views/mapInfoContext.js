@@ -12,12 +12,12 @@ define([
     className: 'infoboxContext',
     events: {
         'click a.zoom': 'zoomHere',
-        'click button#addBtn': 'addBtn',
+        'click button#enterBtn': 'enterBtn',
     },
     app: appConfig.getState(),
     template: _.template( mapInfoContextTemplate ),
 
-    addBtn: function() {
+    enterBtn: function() {
         window.location.href = '/'+this.model.get('cid');
     },
 

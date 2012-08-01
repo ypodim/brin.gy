@@ -43,11 +43,10 @@ define([
     close: function() {
         this.undelegateEvents();
         this.$('.locationPicker').remove();
+        this.$('#crosshair').remove();
         this.tempCircle && this.tempCircle.setMap(null);
 
-        this.circle.key = this.selectedKey;
         this.trigger('newlocation', this.circle);
-        console.log(this.circle);
     },
     cancelBtn: function() {
         this.circle = {};
@@ -63,7 +62,8 @@ define([
     },
 
     useLocation: function(model){
-        console.log('uselocaiton', model);
+        this.circle = model.toJSON();
+        this.close();
     },
 
     useBtn: function() {
@@ -160,7 +160,6 @@ define([
 
     initialize: function(options){
         _.bindAll(this, 'render');
-        this.selectedKey = options.key;
 
         var that = this;
         LatLngControl = function (map) { this.setMap(that.app.map); }

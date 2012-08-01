@@ -23,7 +23,7 @@ define([
     events: {
         'click button#addLocation': 'addLocationBtn',
         'click button#newKey': 'newKey',
-        'click button#addContext': 'addContext',
+        'click button#addContext': 'addContextBtn',
         'click button#backToContext': 'backToContext',
     },
     app: appConfig.getState(),
@@ -32,9 +32,6 @@ define([
     collection: new attrCollection(),
     selectedKeyModel: '',
 
-    addContext: function(){
-        
-    },
     backToContext: function(){
         this.app.navbarView.enableContextMenu();
         this.$('aside').toggleClass('hideAside');
@@ -60,6 +57,7 @@ define([
         $('#popup').hide();
 
         this.$('button#addContext').show();
+        this.$('button#addLocation').hide();
         this.$('button#backToContext').html('Back to '+this.app.context.name+' >').show();
 
         this.clearMap();
@@ -177,9 +175,6 @@ define([
     },
 
     postLocationAttr: function(circle){
-        if (this.selectedKeyModel)
-            this.keyClickClb( this.selectedKeyModel );
-
         this.$('button#addLocation').show();
         if (!circle.center)
             return false;
@@ -187,6 +182,7 @@ define([
         var lat = circle.center.lat();
         var lon = circle.center.lng();
         var xdata = {
+            id: circle.id,
             lat:lat, lon:lon, 
             radius:circle.radius, 
             ktype:'location', 
@@ -220,23 +216,50 @@ define([
         });
     },
 
+
+    addContextBtn: function(e){
+        if (! this.app.agent.loggedIn({alert:1})) {
+            this.app.navbarView.login();
+            return false;
+        }
+        $(e.target).hide();
+
+        this.getLocationInput( function(circle){
+            console.log('deep', circle)
+            // this.postLocationAttr(circle);
+        });
+    },
+
     addLocationBtn: function(e) {
         if (! this.app.agent.loggedIn({alert:1})) {
             this.app.navbarView.login();
             return false;
         }
+        $(e.target).hide();
 
+        var that = this;
+        this.getLocationInput( function(circle){
+            var key = that.selectedKeyModel.get('key');
+            circle.key = key;
+            console.log('deep', circle)
+
+            if (that.selectedKeyModel)
+                that.keyClickClb( that.selectedKeyModel );
+            // this.postLocationAttr(circle);
+        });
+    },
+
+    getLocationInput: function(clb) {
         var that = this;
 
         this.$('#popup').empty().addClass('transparent').show();
-        var locView = new chooselocView({key:this.selectedKeyModel.get('key')});
-        locView.render().bind('newlocation', function(circle){ 
-            that.postLocationAttr(circle) 
-        });
-        $(e.target).hide();
-
         
-        // var locCollection = new Backbone.Collection();
+        var locView = new chooselocView();
+        locView.render().bind('newlocation', function(circle){ 
+            console.log('got back', circle)
+            clb && clb(circle);
+        });
+        
         this.clearMap();
         this.app.getAllLocations(function(json){
             for (var i in json.locations){
@@ -256,7 +279,7 @@ define([
 
                 var infowindowView = new mapInfoLocationView({model:model});
                 infowindowView.render();
-                infowindowView.bind('uselocation', locView.useLocation);
+                infowindowView.bind('uselocation', function(model){ locView.useLocation(model) });
 
                 options = {
                     center: center,
@@ -482,31 +505,35 @@ define([
                     val.score;
                     val.val;
 
-                    var model = new attrModel({
-                        key: attr.key,
-                        val: val.val,
-                        xdata: val.xdata,
-                        score: val.score,
-                        haveit: val.userhasit,
-                        selected: false,
-                        display: true,
-                        matches: val.matches,
-                        visited: false,
-                        showControls: true,
-                        type: attr.type,
-                    });
-
-                    if (attr.type == 'location') {
-                        var lat = parseFloat(val.xdata.lat);
-                        var lng = parseFloat(val.xdata.lon);
-                        var center = new google.maps.LatLng(lat, lng);
-                        var radius = parseInt(val.xdata.radius);
-
-                        model.set({location: {center:center, radius:radius}});
-                        that.addMapCircle(model);
-                    }
+                    for (var i in val.xdata) {
+                        var xdata = val.xdata[i];
                     
-                    that.collection.add(model);
+                        var model = new attrModel({
+                            key: attr.key,
+                            val: val.val,
+                            xdata: xdata,
+                            score: val.score,
+                            haveit: val.userhasit,
+                            selected: false,
+                            display: true,
+                            matches: val.matches,
+                            visited: false,
+                            showControls: true,
+                            type: attr.type,
+                        });
+
+                        if (attr.type == 'location') {
+                            var lat = parseFloat(xdata.lat);
+                            var lng = parseFloat(xdata.lon);
+                            var center = new google.maps.LatLng(lat, lng);
+                            var radius = parseInt(xdata.radius);
+
+                            model.set({location: {center:center, radius:radius}});
+                            that.addMapCircle(model);
+                        }
+                        
+                        that.collection.add(model);
+                    }
                 }
             }
         });

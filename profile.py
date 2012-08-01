@@ -259,20 +259,29 @@ class profile():
         res = ''
 
         for attr in self.arguments:
+            print 'profile POST:', attr
             if type(attr) == list:
                 key, val = attr
             else:
+                if not (('key' in attr) and ('val' in attr)):
+                    print 'bad request:', attr
+                    return {'result':'', 'data':self.arguments, 'error':'missing parameter key and/or val'}
+
                 key = attr['key']
                 val = attr['val']
                 xdata = attr.get('xdata')
                 if xdata:
-                    if not getvid(self.db, key, val):
-                        print 'POST', attr, type(attr), xdata
-                        ktype = xdata['ktype']
-                        dic = dict(lat=xdata['lat'], lon=xdata['lon'], radius=xdata['radius'], creator=xdata['creator'], title=xdata['title'])
-                        annotate(self.db, context, key, val, ktype, dic)
-                    # else:
-                        # print 'ALREADY IN', xdata
+                    print 'POST', attr, type(attr), xdata
+                    ktype = xdata['ktype']
+                    dic = dict(lat=xdata['lat'], 
+                               lon=xdata['lon'], 
+                               radius=xdata['radius'], 
+                               creator=xdata['creator'], 
+                               title=xdata['title'],
+                               id=xdata.get('id')
+                               )
+                    print 'dic', dic
+                    annotate(self.db, context, key, val, ktype, dic)
 
             if type(key) == str:
                 key = unicode(key, errors='replace')
