@@ -205,18 +205,45 @@ def upgrade_loc_titles():
             r.get('location:title:%s:lid' % ldic.get('title'))
 
     
+def verify_loc_keyvalues():
+    for c in r.smembers('contexts'):
+        for k in r.zrevrangebyscore(getK(c), '+inf', '-inf'):
+            ktype = r.get('profile:key:%s:type' % k)
+            if ktype != 'location':
+                continue
+            
+            for v in r.zrevrangebyscore(getKV(c, k), '+inf', '-inf'):
+                lid = r.get('profile:composite:key:%s:val:%s' % (k,v))
+                ldic = r.hgetall('location:lid:%s' % lid)
+                if not ldic:
+                    agents = r.smembers('profile:%s:key:%s:val:%s:agents' % (c,k,v))
+                    print c, k, ktype, v, lid, agents
 
-print r.delete('location:lid:1026')
-print r.set('global:nextlid', 1025)
-print r.smembers('location:titles')
-print r.smembers('location:names')
+                    # take action
+                    r.delete('profile:%s:key:%s:val:%s:agents' % (c,k,v))
+                    print r.scard('profile:%s:key:%s:val:%s:agents' % (c,k,v))
+                    r.zrem('profile:%s:key:%s:values' % (c,k), v)
+                    print (v in r.zrevrangebyscore(getKV(c, k), '+inf', '-inf'))
+                    for u in agents:
+                        r.srem('%s:profile:key:%s' % (u,k), v)
+                        print r.sismember('%s:profile:key:%s' % (u,k), v)
+                    
+
+# verify_loc_keyvalues()
+
+# print r.delete('location:lid:1026')
+# print r.set('global:nextlid', 1025)
+# print r.smembers('location:titles')
+# print r.smembers('location:names')
+# upgrade_loc_titles()
+
 
 # upgrade_values()
 # upgrade_context()
 # all_loc()
 # print safe_remove_location(1026)
 
-upgrade_loc_titles()
+
 
 sys.exit()
 

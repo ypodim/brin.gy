@@ -69,7 +69,7 @@ define([
         var score = this.model.get('score');
     },
 
-    initialize: function(model){
+    initialize: function(){
         _.bindAll(this, 'render');
         this.model.bind('change', this.render);
     },

@@ -10,7 +10,7 @@ define([
   ], function($, _, Backbone, appConfig, router, mapInfoAttrTemplate, userMatchTemplate){
   var welcomeView = Backbone.View.extend({
     // el: $('div'),
-    className: 'infobox',
+    className: 'infoboxAttribute',
     events: {
         'click a.zoom': 'zoomHere',
         'click button#addBtn': 'addBtn',
@@ -78,9 +78,8 @@ define([
         }
     },
 
-    initialize: function(model){
+    initialize: function(){
         _.bindAll(this, 'render');
-        this.model = model;
         this.model.bind('change', this.render);
     },
   });

@@ -15,7 +15,9 @@ define([
   'views/valueFrame',
   'views/chooseloc',
   'views/modal',
-  ], function($, _, Backbone, appConfig, router, attrModel, attrCollection, keyView, mapInfoAttrView, mapInfoContextView, mapInfoLocationView, valueFrameView, chooselocView, modalView){
+
+  'http://google-maps-utility-library-v3.googlecode.com/svn/tags/infobox/1.1.9/src/infobox.js'
+  ], function($, _, Backbone, appConfig, router, attrModel, attrCollection, keyView, mapInfoAttrView, mapInfoContextView, mapInfoLocationView, valueFrameView, chooselocView, modalView, test){
   var welcomeView = Backbone.View.extend({
     el: $('#container'),
     events: {
@@ -201,21 +203,22 @@ define([
                 });
 
                 var infowindowView = new mapInfoLocationView({model:model});
-                infowindowView.render();    
+                infowindowView.render();
+                infowindowView.bind('uselocation', function(model){
+                    console.log('will use', model);
+                });
 
                 options = {
                     center: center,
                     radius: radius,
                     // icon: icon,
                     // markerPos: markerPos,
-                    infowindowContent: infowindowView.$el,
+                    infowindowContent: infowindowView.el,
                     // strokecolor: model.get('strokecolor'),
                     // fillcolor: model.get('fillcolor'),
+                    calloutSide: true,
                 };
                 that.addPlainMapCircle(options);
-
-                // if (locCollection.get(model.get('id')))
-                //     that.addMapCircle(model);
             }
         });
 
@@ -225,7 +228,8 @@ define([
             if (that.selectedKeyModel)
                 that.keyClickClb( that.selectedKeyModel );
 
-            $(e.target).removeClass('disabled');
+            // $(e.target).removeClass('disabled');
+            $(e.target).show();
             if (!circle.center)
                 return false;
             
@@ -258,7 +262,8 @@ define([
                 xdata: xdata,
             });
         });
-        $(e.target).addClass('disabled');
+        // $(e.target).addClass('disabled');
+        $(e.target).hide();
     },
 
     keyClickClb: function(kmodel){
@@ -310,11 +315,11 @@ define([
 
         var infowindowView;
         if (model.get('type') == 'location') {
-            var infowindowView = new mapInfoAttrView(model);
+            var infowindowView = new mapInfoAttrView({model:model});
             infowindowView.render();    
         }
         if (model.get('type') == 'context') {
-            var infowindowView = new mapInfoContextView(model);
+            var infowindowView = new mapInfoContextView({model:model});
             infowindowView.render();
         }
 
@@ -366,6 +371,48 @@ define([
             marker.setIcon(options.icon);
 
         var that = this;
+        var background = 'url(/static/images/';
+        background += (options.calloutSide) ? 'callout_side' : 'callout';
+        background += '.png?14)';
+        var offsetX = (options.calloutSide) ? 8 : -194;
+        var offsetY = (options.calloutSide) ? -83 : -178;
+        var padding = (options.calloutSide) ? '0 10px 22px 28px' : '10px';
+        var height = (options.calloutSide) ? '100px' : '150px';
+
+        var myOptions = {
+            content: options.infowindowContent,
+            disableAutoPan: false,
+            maxWidth: 0,
+            pixelOffset: new google.maps.Size(offsetX, offsetY),
+            zIndex: null,
+            boxStyle: { 
+                background: background,
+                'background-repeat': 'no-repeat',
+                'background-size': '100%',
+                'padding': padding,
+                height: height,
+                'z-index': 3000,
+            },
+            infoBoxClearance: new google.maps.Size(1, 1),
+            isHidden: false,
+            pane: "floatPane",
+            enableEventPropagation: false,
+        };
+
+        var ib = new InfoBox(myOptions);
+
+        google.maps.event.addListener(marker, 'click', function() {
+            _.each(that.circles, function(circle){ circle.infowindow.close(); })
+            ib.open(that.app.map, marker);
+        });
+        google.maps.event.addListener(mapCircle, 'click', function() {
+            _.each(that.circles, function(circle){ circle.infowindow.close(); })
+        });
+
+        this.circles.push({circle:mapCircle, marker:marker, infowindow:ib});
+
+        return;
+
         var infowindow = new google.maps.InfoWindow({
             content: options.infowindowContent,
         });

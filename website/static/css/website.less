@@ -612,22 +612,22 @@ div.locationPicker > div.wizardPage > form > input#locationinput {
     border-radius:5px;
     pointer-events: all;
 }
-div.locationPicker > div.wizardPage > form > input#autoField {
-    display: none;
-}
 div#popup div#crosshair {
-    /*background: 10px 10px url(/static/images/crosshair.png); */
-    margin: 10px auto ;
-    width: 20px;
-    
-    padding: 150px;
-    border: 5px dotted rgba(255,0,0,0.5);
-    border-radius: 300px;
+    background: 10px 10px url(/static/images/crosshair.png?1); 
+    background-repeat: no-repeat;
+    background-size: 100%;
+    width: 400px;
+    height: 400px;
+    /*margin: 10px auto ;*/
+    /*width: 20px;*/
+    /*padding: 150px;*/
+    /*border: 5px dotted rgba(255,0,0,0.5);*/
+    /*border-radius: 300px;*/
 
-    text-align:center;
-    color: rgba(255,0,0,0.5);
-    font-size: 40px;
-    box-shadow: 0 0 100px black;
+    /*text-align:center;*/
+    /*color: rgba(255,0,0,0.5);*/
+    /*font-size: 40px;*/
+    /*box-shadow: 0 0 100px black;*/
 }
 
 
@@ -759,37 +759,52 @@ div#map_canvas {
     z-index: 0;
     /*box-shadow: inset 0 0 5px 5px gray;*/
 }
-div.infobox {
-    width:350px;
-    /*height:100px;*/
-    /*background-color: rgba(60,60,60,0.8);*/
+div.infoBox {
+    z-index: 2000;
+
+    width: 350px;
+    height: 150px;
+    margin: -1px;
+
+    /*background: url(/static/images/callout.png?7) no-repeat;*/
+    /*background-color: yellow;*/
+    background-size: 100%;
+    padding: 10px;
+
+    
 }
-div.infobox > div.title {
+div.infoBox > img {
+    display: none;
+}
+div.infoboxAttribute {
+    /*height:100px;*/
+}
+div.infoboxAttribute > div.title {
     height: 22px;
-    padding: 5px 0 5px 0;
+    padding: 0 0 5px 0;
     border-bottom: 1px solid rgba(0,0,0,0.1);
     font-weight: bold;
     font-size: 22px;
     line-height: 22px;
 }
-div.infobox > div.title > div.titleKey {
+div.infoboxAttribute > div.title > div.titleKey {
     float: right;
     color: gray;
 }
-div.infobox > div.title > div.titleVal {
+div.infoboxAttribute > div.title > div.titleVal {
     float: left;
 }
-div.infobox > div.body > div.tools {
+div.infoboxAttribute > div.body > div.tools {
     height: 30px;
     line-height: 30px;
 }
-div.infobox > div.body > div.tools > button {
+div.infoboxAttribute > div.body > div.tools > button {
     margin: 1px 0 1px 5px;
     float: right;
 }
 
 div.infoboxContext {
-    width:350px;
+    /*width:350px;*/
     /*height:100px;*/
     /*background-color: rgba(60,60,60,0.8);*/
 }

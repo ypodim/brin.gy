@@ -14,8 +14,7 @@ define([
         'click button#cancel': 'cancelBtn',
         'click button#useloc': 'useBtn',
         'click button#next': 'okBtn',
-        // 'change input#locationinput': 'autoFieldChanged',
-        'keyup input#autoField': 'titleChanged',
+        'change input#locationinput': 'titleChanged',
         
         'submit form': 'submitLocation',
     },
@@ -38,10 +37,6 @@ define([
         var flag = (gotText && gotCircle);
         this.$('button#next').toggleClass('disabled', !flag);
 
-
-        var input = this.$('#autoField').val()
-        console.log(input)
-        this.$('#locationinput').val(input)
         // this.autoFieldChanged();
     },
 
@@ -78,7 +73,7 @@ define([
         var borderwidth = parseInt(this.$('#crosshair').css('border-width'));
 
         var x = $(this.app.map.getDiv()).width()/2 - 120;
-        var y = top - header + padding + 2*borderwidth + 5;
+        var y = top - header + padding + 2*borderwidth + 210;
         var scale = Math.pow(2, 20.9-zoom);
         var radius = 10*scale;
         var center = this.latLngControl.xy2latlng(x,y);
@@ -96,8 +91,6 @@ define([
             center: center,
             radius: 10*scale,
         };
-
-        console.log(center.lat(), center.lng(), radius)
 
         this.tempCircle && this.tempCircle.setMap(null);
         this.tempCircle = new google.maps.Circle(contextOptions);
@@ -145,7 +138,6 @@ define([
 
     render: function(onCloseClb){
         var compiled_template = _.template( mapTemplate );
-        var that = this;
         this.$el.html( compiled_template() );
 
         this.onCloseClb = onCloseClb;
@@ -204,66 +196,13 @@ define([
             var latlng = projection.fromContainerPixelToLatLng(point);
             return latlng;
         };
-
         
         // Create new control to display latlng and coordinates under mouse.
         this.latLngControl = new this.LatLngControl(this.app.map);
-        // var that = this;
-
-
-        // Register event listeners
-        // google.maps.event.addListener(this.map, 'mouseover', function(mEvent) {
-        //   that.latLngControl.set('visible', true);
-        // });
-        // google.maps.event.addListener(this.map, 'mouseout', function(mEvent) {
-        //   that.latLngControl.set('visible', false);
-        // });
-        // google.maps.event.addListener(this.map, 'mousemove', function(mEvent) {
-        //   that.latLngControl.updatePosition(mEvent.latLng);
-        // });
-        // google.maps.event.addListener(map, 'click', function(event) {
-        //     console.log('map', event)
-        // });
-
-        // this.autocomplete = new google.maps.places.Autocomplete(document.getElementById('locationinput'));
+        
         this.doAutocomplete();
     },
 
-    autoFieldChanged: function(){
-        console.log('ok')
-        var place = this.autocomplete.getPlace();
-        // console.log(place)
-        if (place.geometry == undefined)
-            return;
-
-        if (place.geometry.viewport) {
-            this.app.map.fitBounds(place.geometry.viewport);
-        } else {
-            this.app.map.setCenter(place.geometry.location);
-            this.app.map.setZoom(17);  // Why 17? Because it looks good.
-        }
-
-        var image = new google.maps.MarkerImage(
-          place.icon,
-          new google.maps.Size(71, 71),
-          new google.maps.Point(0, 0),
-          new google.maps.Point(17, 34),
-          new google.maps.Size(35, 35));
-        // marker.setIcon(image);
-        // marker.setPosition(place.geometry.location);
-
-        var address = '';
-        if (place.address_components) {
-            address = [(place.address_components[0] &&
-                        place.address_components[0].short_name || ''),
-                        (place.address_components[1] &&
-                        place.address_components[1].short_name || ''),
-                        (place.address_components[2] &&
-                        place.address_components[2].short_name || '')
-                    ].join(' ');
-        }
-        console.log(place.name, address, place);
-    },
     doAutocomplete: function() {
         var input = document.getElementById(this.locationInput);
         var autocomplete = new google.maps.places.Autocomplete(input);
@@ -277,7 +216,6 @@ define([
 
         
         google.maps.event.addListener(autocomplete, 'place_changed', function() {
-            console.log('ok')
             var place = autocomplete.getPlace();
             if (place.geometry == undefined)
                 return;
