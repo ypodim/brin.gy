@@ -268,8 +268,22 @@ def convert_kvcomposite_to_list():
 lastlid = r.get('global:nextlid')
 # lastlid = 1023
 print lastlid
-print r.hgetall('location:lid:%s' % lastlid)
+ldic = r.hgetall('location:lid:%s' % lastlid)
+print ldic
 print get_kv_by_vid(lastlid)
+
+lat = ldic['lat']
+lon = ldic['lon']
+title = ldic['title']
+latlonstr = '%s %s' % (lat, lon)
+print r.sismember('location:latlonstrings', latlonstr)
+print r.sismember('location:titles', title)
+print r.sismember('location:title:%s' % title, lastlid)
+print r.get('location:latlonstring:%s:lid' % latlonstr)
+
+
+
+
 # print r.delete('location:lid:%s' % lastlid)
 # print r.set('global:nextlid', int(lastlid)-1)
 

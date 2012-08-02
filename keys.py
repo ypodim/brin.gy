@@ -13,28 +13,36 @@ def getcid(r, context):
 def getlid(r, k,v):
     return r.smembers('profile:composite:key:%s:val:%s' % (k, v))
 
+def add_location(r, title, lat, lon, radius, creator):
+    error = ''
+    if title:
+        latlonstr = '%s %s' % (lat, lon)
+
+        if r.sadd('location:latlonstrings', latlonstr):
+            ldic = dict(title=title, lat=lat, lon=lon, radius=radius, creator=creator)
+            lid = r.incr('global:nextlid')
+            r.hmset('location:lid:%s' % lid, ldic)
+            r.sadd('location:titles', title)
+            r.sadd('location:title:%s' % title, lid)
+            r.set('location:latlonstring:%s:lid' % latlonstr, lid)
+        else:
+            error = 'attempt to add existing center, returned existing lid %s' % lid
+            print 'WARNING: add_location: %s' % error
+            lid = r.get('location:latlonstring:%s:lid' % latlonstr)
+    else:
+        error = 'no title provided'
+        print error
+    return dict(lid=lid, error=error)
+    
 
 def annotate(r, c, k, v, ktype, dic):
     r.sadd('profile:keytypes', 'string', 'location', 'time', 'user')
     r.set('profile:key:%s:type' % k, ktype)
 
-    vid = dic.get('id')
-    if vid:
-        if not r.hgetall('%s:lid:%s' % (ktype,vid)):
-            print 'WARNING: annotating kv with empty xdata entry:', ktype, c,k,v,vid
-        print 'used existing vid:', vid
-    else:
-        # vid = getlid(r, k,v) or r.incr('global:nextlid')
-        vid = r.incr('global:nextlid')
-        r.sadd('profile:composite:key:%s:val:%s' % (k, v), vid)
-        print 'created new vid:', vid
-
-
-    print 'annotate: getlid(r,k,v):', getlid(r, k,v)
-    print 'annotate: vid:', vid
-    print 'annotate: dic:', dic
-    print r.hmset('location:lid:%s' % vid, dic)
-    # print r.set('profile:composite:key:%s:val:%s' % (k, v), vid)
+    vid = dic['id']
+    if not r.hgetall('%s:lid:%s' % (ktype,vid)):
+        print 'WARNING: annotating kv with empty xdata entry:', ktype, c,k,v,vid
+    print 'annontate', r.sadd('profile:composite:key:%s:val:%s' % (k, v), vid)
 
 
 def deannotate(r, c, k, v):

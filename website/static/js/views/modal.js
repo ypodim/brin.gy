@@ -33,8 +33,8 @@ define([
     newContextSubmit: function(){
         var title = this.$('input#title').val();
         var dic = {title:title};
-        this.trigger('newcontext', dic)
         this.close({silent:true});
+        this.trigger('newcontext', dic)
         return false;
     },
     feedbackSubmit: function(){
@@ -87,7 +87,7 @@ define([
         this.$('[required]').removeAttr('required');
         this.$el.hide();
         if (!(options && options.silent))
-        this.trigger('modal:closed');
+            this.trigger('modal:closed');
         return false;
     },
 
@@ -123,6 +123,7 @@ define([
             data = {
                 
             }
+            console.log('modal - newkey')
         }
         if (options.title == 'feedback') {
             this.$('span#title').html('Feedback')

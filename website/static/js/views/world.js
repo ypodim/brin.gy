@@ -230,8 +230,6 @@ define([
         this.getLocationInput( function(circle){
             that.$('button#addContext').show();
 
-            
-
             if (circle && circle.center) {
                 console.log('deeeeaaeep', circle)
                 // this.postLocationAttr(circle);
@@ -247,6 +245,8 @@ define([
                     that.app.navbarView.render();
                     that.backToContext();
                     that.render();
+                    // that.newKey();
+                    that.app.modal.render({title: 'newkey'});
                     // that.showAllContexts({notoggle:true});
                 });
             } else

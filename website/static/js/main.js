@@ -81,6 +81,7 @@ require([
         appp.modal.bind('newkey', function(m){
             m.prepend = 1;
             m.score = 1;
+            console.log('app', m)
             wldView.appendKey(m);
         });
         

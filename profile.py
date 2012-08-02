@@ -67,21 +67,7 @@ class profile():
     'context:cid:CID' # the CONTEXT corresponding to context id CID
 
     
-    def add_location(self, title, lat, lon, radius, creator):
-        if not title:
-            return False
-        latlonstr = '%s %s' % (lat, lon)
 
-        if self.db.sadd('location:latlonstrings' % latlonstr):
-            ldic = dict(title=title, lat=lat, lon=lon, radius=radius, creator=creator)
-            lid = self.db.incr('global:nextlid')
-            self.db.hmset('location:lid:%s' % lid, ldic)
-            self.db.sadd('location:titles' % title)
-            self.db.sadd('location:title:%s' % title, lid)
-            self.db.set('location:latlonstring:%s:lid' % latlonstr, lid)
-        else:
-            lid = self.db.get('location:latlonstring:%s:lid' % latlonstr)
-        return lid
     def add_reverse(self, context, key, val):
         if self.db.sadd(getKA(context, key), self.usr):   # add agent to set for this key
             self.db.zincrby(getK(context), key, 1)     # add key and increase its score
@@ -132,11 +118,13 @@ class profile():
             # only set context properties the first time a kv is posted
             if contextDic.get('location'):
                 ldic = contextDic.get('location')
-                lid = self.add_location(ldic['name'], 
-                                        ldic['lat'], 
-                                        ldic['lon'], 
-                                        ldic['radius'], 
-                                        ldic['creator'])
+                lres = add_location(self.db, 
+                                    ldic['name'], 
+                                    ldic['lat'], 
+                                    ldic['lon'], 
+                                    ldic['radius'], 
+                                    ldic['creator'])
+                lid = lres['lid']
                 self.db.set('context:%s:lid' % c, lid)
 
             # if contextDic.get('expiration'):
@@ -272,14 +260,30 @@ class profile():
                 xdata = attr.get('xdata')
                 if xdata:
                     print 'POST', attr, type(attr), xdata
+                    print 'context', context
                     ktype = xdata['ktype']
-                    dic = dict(lat=xdata['lat'], 
-                               lon=xdata['lon'], 
-                               radius=xdata['radius'], 
-                               creator=xdata['creator'], 
-                               title=xdata['title'],
-                               id=xdata.get('id')
-                               )
+                    title = xdata['title']
+                    lat = xdata['lat']
+                    lon = xdata['lon']
+                    radius = xdata['radius']
+                    creator = xdata['creator']
+
+                    print 'id exists:', xdata.get('id')
+                    if xdata.get('id'):
+                        lid = int(xdata.get('id'))
+                    else:
+                        dic = add_location(self.db, title, lat, lon, radius, creator)
+                        print 'add_location:', dic
+                        # if dic['error']:
+                            # print dic['error']
+                        lid = dic['lid']
+
+                    dic = dict(lat=lat, 
+                               lon=lon, 
+                               radius=radius, 
+                               creator=creator, 
+                               title=title,
+                               id=lid)
                     print 'dic', dic
                     annotate(self.db, context, key, val, ktype, dic)
 
