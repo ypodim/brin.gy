@@ -49,6 +49,7 @@ define([
         var keytype = this.$('[name=keytype]:checked').val();
         this.close();
         this.trigger('newkey', {key:key, type:keytype});
+        console.log('newkey triggered?')
         return false;
     },
     typeSelection: function(e){    
@@ -94,8 +95,6 @@ define([
     render: function(options){
         options = options || {};
         options.title = options.title || 'account';
-
-        this.unbind();
 
         var that = this;
         var modal_template = _.template( modalTemplate );

@@ -247,6 +247,9 @@ define([
                     that.render();
                     // that.newKey();
                     that.app.modal.render({title: 'newkey'});
+                    that.app.modal.bind('newkey', function(obj){
+                        console.log('tester', obj)
+                    })
                     // that.showAllContexts({notoggle:true});
                 });
             } else

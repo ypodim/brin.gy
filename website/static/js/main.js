@@ -70,6 +70,9 @@ require([
 
         appp.modal.bind('reminder', function(){
             var email = appp.modal.$('input#email').val();
+            console.log('reminder works', email);
+            return;
+            
             appp.doReminder(email);
             appp.modal.close();
         });
