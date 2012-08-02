@@ -32,8 +32,9 @@ define([
 
     newContextSubmit: function(){
         var title = this.$('input#title').val();
-        console.log('title', title)
-        this.close();
+        var dic = {title:title};
+        this.trigger('newcontext', dic)
+        this.close({silent:true});
         return false;
     },
     feedbackSubmit: function(){
@@ -82,9 +83,10 @@ define([
         return false;
     },
 
-    close: function(){
+    close: function(options){
         this.$('[required]').removeAttr('required');
         this.$el.hide();
+        if (!(options && options.silent))
         this.trigger('modal:closed');
         return false;
     },

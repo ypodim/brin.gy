@@ -226,8 +226,6 @@ define([
         }
         $(e.target).hide();
 
-        var d = new Date();
-
         var that = this;
         this.getLocationInput( function(circle){
             that.$('button#addContext').show();
@@ -241,8 +239,15 @@ define([
                     title: 'newContextOptions', 
                     location: circle.title,
                 }).bind('modal:closed', function(){
-                    console.log('newcontext - modal closed', d);
+                    console.log('newcontext - modal closed');
                     that.showAllContexts({notoggle:true});
+                }).bind('newcontext', function(locdic){
+                    console.log('newcontext - modal closed with', locdic);
+                    that.app.context.name = locdic.title;
+                    that.app.navbarView.render();
+                    that.backToContext();
+                    that.render();
+                    // that.showAllContexts({notoggle:true});
                 });
             } else
                 that.showAllContexts({notoggle:true});
@@ -267,7 +272,7 @@ define([
                 var key = that.selectedKeyModel.get('key');
                 circle.key = key;
                 console.log('deeeeeep', circle)
-                this.postLocationAttr(circle);
+                that.postLocationAttr(circle);
             }
         });
     },
