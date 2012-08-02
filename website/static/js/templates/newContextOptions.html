@@ -1,0 +1,40 @@
+
+
+<form class='newContextOptions'>
+	<label>Location: <%= location %></label>
+    <input type='text' id='title' autofocus required placeholder='Title' />
+    <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/>
+    
+	<div class='well'>
+        <div class='header'>Time constraints (coming soon)</div>
+        <label>All information pertaining to this application will self-destruct in:</label>
+        <input type='number' disabled value="abc" placeholder=0 />
+		<select id="fruits" disabled>
+			<option value="never" selected> never </option>
+			<option value="minutes">minutes</option>
+			<option value="hours">hours</option> 
+			<option value="days">days</option> 
+			<option value="months">months</option> 
+		</select>
+    </div>
+
+
+	<div class='well'>
+        <div class='header'>Permissions</div>
+        <label class="radio">
+            <input type="radio" id='location' value="location" name='keytype' checked />
+            Anyone can participate.
+        </label>
+        <label class="radio">
+            <input disabled type="radio" id='users' value="users" name='keytype' disabled />
+            Only users with at least 10 friends/followers can participate (FB/Twitter required). (coming soon)
+        </label>
+    </div>
+
+    <div class='footer'>
+		<!-- <img class='loader' src='/static/images/website/ajax-loader-white.gif?0' /> -->
+	    <button id='newcontext' class='btn btn-success'>Create Application</button>
+	</div>
+</form>
+
+

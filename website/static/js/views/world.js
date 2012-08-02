@@ -31,6 +31,7 @@ define([
     circles: [],
     collection: new attrCollection(),
     selectedKeyModel: '',
+    popup: null,
 
     backToContext: function(){
         this.app.navbarView.enableContextMenu();
@@ -51,10 +52,12 @@ define([
         this.circles = [];
     },
 
-    showAllContexts: function(){
-        this.$('aside').toggleClass('hideAside');
-        this.app.modal.close();
-        $('#popup').hide();
+    showAllContexts: function(options){
+        if (!(options && options.notoggle))
+            this.$('aside').toggleClass('hideAside');
+
+        // this.app.modal.close();
+        this.popup && this.popup.close({force:true});
 
         this.$('button#addContext').show();
         this.$('button#addLocation').hide();
@@ -175,7 +178,6 @@ define([
     },
 
     postLocationAttr: function(circle){
-        this.$('button#addLocation').show();
         if (!circle.center)
             return false;
         
@@ -224,9 +226,26 @@ define([
         }
         $(e.target).hide();
 
+        var d = new Date();
+
+        var that = this;
         this.getLocationInput( function(circle){
-            console.log('deep', circle)
-            // this.postLocationAttr(circle);
+            that.$('button#addContext').show();
+
+            
+
+            if (circle && circle.center) {
+                console.log('deeeeaaeep', circle)
+                // this.postLocationAttr(circle);
+                that.app.modal.render({
+                    title: 'newContextOptions', 
+                    location: circle.title,
+                }).bind('modal:closed', function(){
+                    console.log('newcontext - modal closed', d);
+                    that.showAllContexts({notoggle:true});
+                });
+            } else
+                that.showAllContexts({notoggle:true});
         });
     },
 
@@ -239,24 +258,28 @@ define([
 
         var that = this;
         this.getLocationInput( function(circle){
-            var key = that.selectedKeyModel.get('key');
-            circle.key = key;
-            console.log('deep', circle)
-
+            that.$('button#addLocation').show();
+            
             if (that.selectedKeyModel)
                 that.keyClickClb( that.selectedKeyModel );
-            // this.postLocationAttr(circle);
+
+            if (circle && circle.center) {
+                var key = that.selectedKeyModel.get('key');
+                circle.key = key;
+                console.log('deeeeeep', circle)
+                this.postLocationAttr(circle);
+            }
         });
     },
 
     getLocationInput: function(clb) {
         var that = this;
 
-        this.$('#popup').empty().addClass('transparent').show();
-        
-        var locView = new chooselocView();
-        locView.render().bind('newlocation', function(circle){ 
-            console.log('got back', circle)
+        this.popup && this.popup.close({force:true});
+        this.popup = new chooselocView();
+        this.popup.render();
+        this.popup.unbind('newlocation');
+        this.popup.bind('newlocation', function(circle){ 
             clb && clb(circle);
         });
         
@@ -279,7 +302,9 @@ define([
 
                 var infowindowView = new mapInfoLocationView({model:model});
                 infowindowView.render();
-                infowindowView.bind('uselocation', function(model){ locView.useLocation(model) });
+                infowindowView.bind('uselocation', function(model){ 
+                    that.popup.useLocation(model);
+                });
 
                 options = {
                     center: center,
@@ -304,7 +329,7 @@ define([
 
         if (kmodel.get('type') == 'location') {
             this.$('button#addLocation').show();
-            $('#popup').hide();
+            this.popup && this.popup.close({force:true});
             var bounds = new google.maps.LatLngBounds();
             for (var i in models) {
                 var m = models[i];
@@ -331,10 +356,9 @@ define([
 
         if (kmodel.get('type') == 'string') {
             this.$('button#addLocation').hide();
-            this.vFrameView && this.vFrameView.undelegateEvents();
-            vFrameView = new valueFrameView({models:models, key:kmodel.get('key')});
-            vFrameView.render();
-            this.vFrameView = vFrameView;
+            this.popup && this.popup.close({force:true});
+            this.popup = new valueFrameView({models:models, key:kmodel.get('key')});
+            this.popup.render();
         }
     },
 
@@ -477,7 +501,8 @@ define([
             if (attr.type == 'location')
                 this.$('button#addLocation').click();
             if (attr.type == 'string')
-                this.vFrameView.newAttr();
+                // this.vFrameView.newAttr();
+                this.popup.newAttr();
         } else
             this.$('aside > div.list').append(kview.el);
         return false;
@@ -505,34 +530,53 @@ define([
                     val.score;
                     val.val;
 
-                    for (var i in val.xdata) {
-                        var xdata = val.xdata[i];
-                    
+                    if (attr.type == 'string') {
                         var model = new attrModel({
                             key: attr.key,
                             val: val.val,
                             xdata: xdata,
                             score: val.score,
                             haveit: val.userhasit,
-                            selected: false,
-                            display: true,
+                            // selected: false,
+                            // display: true,
                             matches: val.matches,
-                            visited: false,
-                            showControls: true,
+                            // visited: false,
+                            // showControls: true,
                             type: attr.type,
                         });
 
-                        if (attr.type == 'location') {
-                            var lat = parseFloat(xdata.lat);
-                            var lng = parseFloat(xdata.lon);
-                            var center = new google.maps.LatLng(lat, lng);
-                            var radius = parseInt(xdata.radius);
-
-                            model.set({location: {center:center, radius:radius}});
-                            that.addMapCircle(model);
-                        }
-                        
                         that.collection.add(model);
+                    }
+                    if (attr.type == 'location') {
+                        for (var i in val.xdata) {
+                            var xdata = val.xdata[i];
+                        
+                            var model = new attrModel({
+                                key: attr.key,
+                                val: val.val,
+                                xdata: xdata,
+                                score: val.score,
+                                haveit: val.userhasit,
+                                // selected: false,
+                                // display: true,
+                                matches: val.matches,
+                                // visited: false,
+                                // showControls: true,
+                                type: attr.type,
+                            });
+
+                            // if (attr.type == 'location') {
+                                var lat = parseFloat(xdata.lat);
+                                var lng = parseFloat(xdata.lon);
+                                var center = new google.maps.LatLng(lat, lng);
+                                var radius = parseInt(xdata.radius);
+
+                                model.set({location: {center:center, radius:radius}});
+                                that.addMapCircle(model);
+                            // }
+                            
+                            that.collection.add(model);
+                        }
                     }
                 }
             }

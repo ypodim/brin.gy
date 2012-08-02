@@ -2,11 +2,11 @@ define([
   'jquery',
   'underscore', 
   'backbone',
-  'common/ego_website',
+  'app',
   'router',
 
   'text!templates/account.html',
-  ], function($, _, Backbone, common, router, accountViewTemplate){
+  ], function($, _, Backbone, appConfig, router, accountViewTemplate){
   var accountView = Backbone.View.extend({
     el: $("#container"),
     template: _.template(accountViewTemplate),
@@ -14,6 +14,7 @@ define([
         'click button#signout': 'signout',
         'click button#delete': 'delete',
     },
+    app: appConfig.getState(),
 
     delete: function(){
         // this.state.stats('account:delete');
@@ -23,7 +24,7 @@ define([
     signout: function(){
         console.log('signout')
         // this.state.stats('account:signout');
-        common.cookies.del_cookie(this.state.user.name);
+        this.app.cookies.del_cookie(this.app.agent.id());
         // this.state.user = {};
         // this.state.router.contents_view._lastContext = '';
         // this.state.router.navigate('#/', {trigger:true});

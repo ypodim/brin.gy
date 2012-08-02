@@ -40,11 +40,15 @@ define([
         // this.autoFieldChanged();
     },
 
-    close: function() {
+    close: function(options) {
         this.undelegateEvents();
         this.$('.locationPicker').remove();
         this.$('#crosshair').remove();
         this.tempCircle && this.tempCircle.setMap(null);
+        this.$el.hide();
+
+        if (options && options.force)
+            return;
 
         this.trigger('newlocation', this.circle);
     },
@@ -121,8 +125,10 @@ define([
 
     render: function(){
         var compiled_template = _.template( mapTemplate );
-        this.$el.html( compiled_template() );
+        this.$el.html( compiled_template() ).addClass('transparent').show();
 
+        this.unbind();
+        
         this.doAutocomplete();
         return this;
     },

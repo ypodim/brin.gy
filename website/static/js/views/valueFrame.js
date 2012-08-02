@@ -26,6 +26,11 @@ define([
         this.models = options.models;
     },
 
+    close: function(options) {
+        this.undelegateEvents();
+        this.$el.hide();
+    },
+
     newAttr: function(){
         if (! this.app.agent.loggedIn({alert:1})) {
             this.app.navbarView.login();

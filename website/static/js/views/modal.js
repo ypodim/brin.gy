@@ -10,7 +10,9 @@ define([
   'text!templates/newKey.html',
   'text!templates/feedback.html',
   'text!templates/about.html',
-  ], function($, _, Backbone, appConfig, tooltip, modalTemplate, accountTemplate, reminderTemplate, newkeyTemplate, feedbackTemplate, aboutTemplate){
+  'text!templates/newContextOptions.html',
+  
+  ], function($, _, Backbone, appConfig, tooltip, modalTemplate, accountTemplate, reminderTemplate, newkeyTemplate, feedbackTemplate, aboutTemplate, newContextOptionsTemplate){
   var modalView = Backbone.View.extend({
     el: $('#modal'),
     events: {
@@ -24,9 +26,16 @@ define([
         'click button.cancel': 'close',
         'submit form.newKey': 'newKeySubmit',
         'submit form.feedback': 'feedbackSubmit',
+        'submit form.newContextOptions': 'newContextSubmit',
     },
     app: appConfig.getState(),
 
+    newContextSubmit: function(){
+        var title = this.$('input#title').val();
+        console.log('title', title)
+        this.close();
+        return false;
+    },
     feedbackSubmit: function(){
         var text = this.$('textarea').val();
         this.app.doFeedback(text);
@@ -74,9 +83,9 @@ define([
     },
 
     close: function(){
-        // this.undelegateEvents();
         this.$('[required]').removeAttr('required');
         this.$el.hide();
+        this.trigger('modal:closed');
         return false;
     },
 
@@ -84,12 +93,9 @@ define([
         options = options || {};
         options.title = options.title || 'account';
 
-        var that = this;
-        $('body').keydown(function(e){
-            if (e.keyCode == 27)
-                that.close();
-        })
+        this.unbind();
 
+        var that = this;
         var modal_template = _.template( modalTemplate );
         this.$el.html( modal_template({title: options.title}) ).show();
         
@@ -130,13 +136,25 @@ define([
                 
             }
         }
-        
+        if (options.title == 'newContextOptions') {
+            this.$('span#title').html('Application options')
+            inner_template = _.template( newContextOptionsTemplate );
+            data = {
+                location: options.location,
+            };
+        }
 
         this.$('.content').html( inner_template(data) );
+        return this;
     },
 
     initialize: function(options) {
         _.bindAll(this, 'render', 'close', 'signoutBtn', 'newKeySubmit');
+        var that = this;
+        $('body').keydown(function(e){
+            if (e.keyCode == 27)
+                that.close();
+        })
     },
   });
   return modalView;

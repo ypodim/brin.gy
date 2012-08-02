@@ -1,4 +1,4 @@
-define(['jquery','backbone','underscore'], function ($, Backbone, _) {
+define(['jquery','backbone','underscore','cookie'], function ($, Backbone, _, cookie) {
 var state = {
     agent: {
         _baseurl: '',
