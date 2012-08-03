@@ -49,15 +49,9 @@ require([
         appp.setConfig(config);
         appp.initConfig();
 
-        console.log('1', appp, appp.context, appp.config)
-
         // worldView
         var wldView = new worldView();
-        wldView.render();
-
-        console.log('2', appp, appp['context'])
-
-        appp.tester = 1
+        // wldView.render();
         
         // navbar
         appp.navbarView = new navbarView({});
@@ -76,9 +70,6 @@ require([
 
         appp.modal.bind('reminder', function(){
             var email = appp.modal.$('input#email').val();
-            console.log('reminder works', email);
-            return;
-            
             appp.doReminder(email);
             appp.modal.close();
         });
@@ -90,7 +81,6 @@ require([
         appp.modal.bind('newkey', function(m){
             m.prepend = 1;
             m.score = 1;
-            console.log('app', m)
             wldView.appendKey(m);
         });
         

@@ -257,7 +257,7 @@ class contexts(tornado.web.RequestHandler):
             lid = r.get('context:%s:lid' % c)
             loc = r.hgetall('location:lid:%s' % lid)
             cid = getcid(r, c)
-            context = dict(name=c, 
+            context = dict(title=c, 
                            count=count, 
                            userhasit=0, 
                            description=description,
@@ -269,7 +269,7 @@ class contexts(tornado.web.RequestHandler):
 
         tempc = sorted(dic['contexts'], key=lambda cntx: cntx['count'], reverse=True)
         for i in xrange(len(tempc)):
-            if tempc[i]['name'] == 'all':
+            if tempc[i]['title'] == 'all':
                 allc = tempc[i]
                 tempc = tempc[:i]+tempc[i+1:]+[allc]
         

@@ -520,7 +520,6 @@ define([
     },
 
     render: function(){
-
         this.$('aside > div.list').empty();
         this.collection.reset();
 

@@ -96,9 +96,6 @@ define([
         // $('.navbar a.context').show().html('#'+app.context.title);
         this.$('a').removeClass('highlighted');
 
-        console.log('a', this.app.context)
-        console.log('b', this.app.tester)
-
         this.$('a.context').show().html('#'+this.app.context.title);
         // this.$('.authed').hide();
         // this.$('.noauth').hide();
