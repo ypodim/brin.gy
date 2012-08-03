@@ -61,7 +61,7 @@ define([
 
         this.$('button#addContext').show();
         this.$('button#addLocation').hide();
-        this.$('button#backToContext').html('Back to '+this.app.context.name+' >').show();
+        this.$('button#backToContext').html('Back to '+this.app.context.title+' >').show();
 
         this.clearMap();
 
@@ -72,7 +72,7 @@ define([
             var locTitles = {};
             for (var i in json.contexts) {
                 var c = json.contexts[i];
-                if (c.name == 'all')
+                if (c.title == 'all')
                     continue;
 
                 var center = new google.maps.LatLng(c.location.lat, c.location.lon);
@@ -91,11 +91,11 @@ define([
                                     randomAngle
                                 )
                 } else {
-                    locTitles[c.location.title] = c.name;
+                    locTitles[c.location.title] = c.title;
                 }
 
                 var model = new Backbone.Model({
-                    name: c.name,
+                    title: c.title,
                     description: c.description,
                     haveit: c.userhasit,
                     score: c.count,
@@ -230,6 +230,8 @@ define([
         this.getLocationInput( function(circle){
             that.$('button#addContext').show();
 
+            that.app.context.location = circle;
+
             if (circle && circle.center) {
                 console.log('deeeeaaeep', circle)
                 // this.postLocationAttr(circle);
@@ -239,9 +241,10 @@ define([
                 }).bind('modal:closed', function(){
                     console.log('newcontext - modal closed');
                     that.showAllContexts({notoggle:true});
-                }).bind('newcontext', function(locdic){
-                    console.log('newcontext - modal closed with', locdic);
-                    that.app.context.name = locdic.title;
+                }).bind('newcontext', function(appdic){
+                    console.log('newcontext - modal closed with', appdic);
+                    that.app.context.title = appdic.title;
+                    that.app.context.description = appdic.description;
                     that.app.navbarView.render();
                     that.backToContext();
                     that.render();
@@ -522,7 +525,7 @@ define([
         this.collection.reset();
 
         var that = this;
-        url = this.app.satellite.url+"/profile/"+this.app.context.name+"/keyvals";
+        url = this.app.satellite.url+"/profile/"+this.app.context.title+"/keyvals";
         $.getJSON(url, {user:this.app.agent.id()}, function(json){
 
             for (var i in json.items) {

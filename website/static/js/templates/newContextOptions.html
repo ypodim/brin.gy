@@ -2,8 +2,12 @@
 
 <form class='newContextOptions'>
 	<label>Location: <%= location %></label>
+
+    <div><b>Application Title</b></div>
     <input type='text' id='title' autofocus required placeholder='Title' />
-    <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/>
+
+    <div><b>Application Description</b></div>
+    <textarea id='description' required placeholder='what is this application about?'></textarea>
     
 	<div class='well'>
         <div class='header'>Time constraints (coming soon)</div>
@@ -35,6 +39,7 @@
 		<!-- <img class='loader' src='/static/images/website/ajax-loader-white.gif?0' /> -->
 	    <button id='newcontext' class='btn btn-success'>Create Application</button>
 	</div>
+    <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/>
 </form>
 
 

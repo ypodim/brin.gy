@@ -116,8 +116,8 @@ class profile():
     def add_context(self, contextDic):
         if self.db.sadd('contexts', contextDic['title']):
             # only set context properties the first time a kv is posted
-            if contextDic.get('location'):
-                ldic = contextDic.get('location')
+            ldic = contextDic.get('location')
+            if ldic:
                 lres = add_location(self.db, 
                                     ldic['name'], 
                                     ldic['lat'], 
@@ -157,6 +157,7 @@ class profile():
         print 'set_val'
         print context, type(context)
         print key, val
+        return
 
         self.add_context(context)
 
@@ -231,6 +232,9 @@ class profile():
         self.finish( res )
         
     def post(self, context):
+        print 'POST context', context
+        print self.arguments
+
         if self.path[-1] == 'visited':
             res = 0
             for key in self.arguments:
@@ -285,7 +289,7 @@ class profile():
                                title=title,
                                id=lid)
                     print 'dic', dic
-                    annotate(self.db, context, key, val, ktype, dic)
+                    annotate(self.db, key, val, ktype, dic)
 
             if type(key) == str:
                 key = unicode(key, errors='replace')

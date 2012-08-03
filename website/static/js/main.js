@@ -49,9 +49,15 @@ require([
         appp.setConfig(config);
         appp.initConfig();
 
+        console.log('1', appp, appp.context, appp.config)
+
         // worldView
         var wldView = new worldView();
         wldView.render();
+
+        console.log('2', appp, appp['context'])
+
+        
         
         // navbar
         appp.navbarView = new navbarView({});

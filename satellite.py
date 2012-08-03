@@ -78,55 +78,11 @@ class serve_request(tornado.web.RequestHandler):
     def post(self):
         cap = eval('%s' % self.cap)(r)
         
-        agents = self.params.get('agents')
-        if agents:
-            agents = tornado.escape.url_unescape(agents)
-            agents = tornado.escape.json_decode(agents)
-        else:
-            agent = self.params.get('agent')
-            if agent:
-                agents = {agent:self.params}
-            else:
-                response = dict(error='*** Post error: No valid "agent" or "agents" param')
-                #print response
-                #print self.params
-                self.finilize_call(response)
-                return
-        
-        
-        response = dict(agents={}, cap=self.cap)
-        
-        
-        for agent, params in agents.items():
-            #agent = tornado.escape.url_unescape(agent)
-            res = {}
-            
-            
-            if self.cap == 'location':
-                #print params
-                aid = params.get('agent')
-                quantsize = 0.000005
-                lat = float(params.get('lat'))
-                lat = lat - lat % quantsize
-                lon = float(params.get('lon'))
-                lon = lon - lon % quantsize
-                thres = params.get('threshold')
-                res['matched'] = cap.mutate(aid, lat, lon, thres)
-            
-            if self.cap == 'profile':
-                for key, val in params:
-                    #res['matched'] = cap.mutate(agent, key, val)
-                    #res['matched'] = cap.set(agent, key, val)
-                    cap.set(agent, key, val)
-                
-            if self.cap == 'buysell':
-                for key, val in params:
-                    dic = tornado.escape.json_decode(val)
-                    #print dic
-                    res['matched'] = cap.mutate(dic['action'], dic['product'], dic['price'], agent)
+        if self.cap == 'profile':
+            print self.params
+            print self.arguments
 
-            response['agents'][agent] = res
-        
+        response = dict(res={}, cap=self.cap)
         self.finilize_call(response)
         
     def delete(self):

@@ -32,7 +32,8 @@ define([
 
     newContextSubmit: function(){
         var title = this.$('input#title').val();
-        var dic = {title:title};
+        var description = this.$('textarea#description').val();
+        var dic = {title:title, description:description};
         this.close({silent:true});
         this.trigger('newcontext', dic)
         return false;

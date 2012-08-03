@@ -93,10 +93,12 @@ define([
     },
 
     render: function(){
-        // $('.navbar a.context').show().html('#'+app.context.name);
+        // $('.navbar a.context').show().html('#'+app.context.title);
         this.$('a').removeClass('highlighted');
 
-        this.$('a.context').show().html('#'+this.app.context.name);
+        console.log(this.app)
+
+        this.$('a.context').show().html('#'+this.app.context.title);
         // this.$('.authed').hide();
         // this.$('.noauth').hide();
 

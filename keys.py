@@ -26,22 +26,22 @@ def add_location(r, title, lat, lon, radius, creator):
             r.sadd('location:title:%s' % title, lid)
             r.set('location:latlonstring:%s:lid' % latlonstr, lid)
         else:
+            lid = r.get('location:latlonstring:%s:lid' % latlonstr)
             error = 'attempt to add existing center, returned existing lid %s' % lid
             print 'WARNING: add_location: %s' % error
-            lid = r.get('location:latlonstring:%s:lid' % latlonstr)
     else:
         error = 'no title provided'
         print error
     return dict(lid=lid, error=error)
     
 
-def annotate(r, c, k, v, ktype, dic):
+def annotate(r, k, v, ktype, dic):
     r.sadd('profile:keytypes', 'string', 'location', 'time', 'user')
     r.set('profile:key:%s:type' % k, ktype)
 
     vid = dic['id']
     if not r.hgetall('%s:lid:%s' % (ktype,vid)):
-        print 'WARNING: annotating kv with empty xdata entry:', ktype, c,k,v,vid
+        print 'WARNING: annotating kv with empty xdata entry:', ktype, k,v,vid
     print 'annontate', r.sadd('profile:composite:key:%s:val:%s' % (k, v), vid)
 
 

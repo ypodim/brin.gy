@@ -65,12 +65,12 @@ var state = {
             cookie.last_context = 'all';
             this.cookies.set_context_in_cookie(cookie.last_context);
         }
-        this.context = {name:cookie.last_context};
-        // console.log('now context in cookie', this.cookies.get_cookie().last_context);
+        this.context = {title:cookie.last_context};
+        console.log('now context in cookie', this.cookies.get_cookie().last_context);
     },
 
     setContext: function(cntx) {
-        this.context = {name:cntx.name};
+        this.context = {title: cntx.title};
     },
 
     cookies: {
@@ -302,9 +302,9 @@ var state = {
         if (options.type == undefined)
             options.type = 'POST';
         if (options.context == undefined)
-            options.context = this.context.name;
+            options.context = this.context.title;
 
-        // console.log(options);
+        console.log('mutate', options, this.context);
 
         var url = this.agent.url()+'/profile';
         // var data = JSON.stringify([[options.key, options.val]]);
@@ -314,21 +314,11 @@ var state = {
             return false;
 
         var that = this;
-        // var context_details = {
-        //     description: that.context.descr, 
-        //     location: {
-        //         lat: 0,
-        //         lon: 0,
-        //         radius: 0,
-        //     },
-        //     expiration: 123,
-        // };
-
         $.ajax({
             type: options.type,
             url: url,
             data: {data:data, 
-                    context:options.context, 
+                    context: JSON.stringify(that.context), 
                     // context_details: JSON.stringify(context_details),
                     secret:this.agent.fullInfo().pwd,
                     // contextDescription:that.context.descr

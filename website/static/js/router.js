@@ -98,7 +98,7 @@ define([
     startNewAttribute: function(state){
         if (! state.isLoggedin()) return false;
         state.stats('newattr:btnTop');
-        state.router.navigate('#/new/'+state.context.name, {trigger:true});
+        state.router.navigate('#/new/'+state.context.title, {trigger:true});
     },
     login: function() {
         var lview = new loginView({
@@ -128,7 +128,7 @@ define([
 
     newAttribute: function(context, key, val) {
         if (!context) {
-            // context = this.state.context.name;
+            // context = this.state.context.title;
             // this.navigate('#/new/'+context, {trigger:true});
             this.navigate('#/attributes', {trigger:true});
             return;
@@ -212,8 +212,8 @@ define([
             for (var i in json.contexts) {
                 var cntx = json.contexts[i];
                 if (cntx.id == context) {
-                    that.app.setContext({name:cntx.name, descr:cntx.description});
-                    that.app.cookies.set_context_in_cookie(cntx.name);
+                    that.app.setContext({title:cntx.title, descr:cntx.description});
+                    that.app.cookies.set_context_in_cookie(cntx.title);
                     that.worldView.render();
                     that.app.navbarView.render();
                     return;
@@ -224,7 +224,7 @@ define([
     },
     
     attributes: function() {
-        this.navigate('#/c/'+this.state.context.name, {trigger:true});
+        this.navigate('#/c/'+this.state.context.title, {trigger:true});
     },
 
     account: function(){
