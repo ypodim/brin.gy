@@ -57,7 +57,7 @@ require([
 
         console.log('2', appp, appp['context'])
 
-        
+        appp.tester = 1
         
         // navbar
         appp.navbarView = new navbarView({});
