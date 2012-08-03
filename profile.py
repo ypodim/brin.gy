@@ -119,7 +119,7 @@ class profile():
             ldic = contextDic.get('location')
             if ldic:
                 lres = add_location(self.db, 
-                                    ldic['name'], 
+                                    ldic['title'], 
                                     ldic['lat'], 
                                     ldic['lon'], 
                                     ldic['radius'], 
@@ -157,7 +157,6 @@ class profile():
         print 'set_val'
         print context, type(context)
         print key, val
-        return
 
         self.add_context(context)
 

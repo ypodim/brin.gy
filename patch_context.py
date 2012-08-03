@@ -258,6 +258,34 @@ def convert_kvcomposite_to_list():
                     r.sadd('profile:composite:key:%s:val:%s' % (k,v), lidtest)
 
 
+def show_last_location():
+    lastlid = r.get('global:nextlid')
+    # lastlid = 1023
+    print lastlid
+    ldic = r.hgetall('location:lid:%s' % lastlid)
+    print ldic
+    print get_kv_by_vid(lastlid)
+
+    lat = ldic['lat']
+    lon = ldic['lon']
+    title = ldic['title']
+    latlonstr = '%s %s' % (lat, lon)
+    print r.sismember('location:latlonstrings', latlonstr)
+    print r.sismember('location:titles', title)
+    print r.sismember('location:title:%s' % title, lastlid)
+    print r.get('location:latlonstring:%s:lid' % latlonstr)
+
+
+def show_contexts():
+    print r.smembers('contexts')
+    topcid = int(r.get('global:nextcid'))
+    for cid in xrange(1001, topcid+1): 
+        print cid
+        print r.get('context:cid:%s' % cid)
+
+
+show_contexts()
+
 # convert_kvcomposite_to_list()
 # sys.exit()
 
@@ -265,21 +293,7 @@ def convert_kvcomposite_to_list():
 
 # verify_loc_keyvalues()
 
-lastlid = r.get('global:nextlid')
-# lastlid = 1023
-print lastlid
-ldic = r.hgetall('location:lid:%s' % lastlid)
-print ldic
-print get_kv_by_vid(lastlid)
 
-lat = ldic['lat']
-lon = ldic['lon']
-title = ldic['title']
-latlonstr = '%s %s' % (lat, lon)
-print r.sismember('location:latlonstrings', latlonstr)
-print r.sismember('location:titles', title)
-print r.sismember('location:title:%s' % title, lastlid)
-print r.get('location:latlonstring:%s:lid' % latlonstr)
 
 
 

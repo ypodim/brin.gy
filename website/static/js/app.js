@@ -66,7 +66,6 @@ var state = {
             this.cookies.set_context_in_cookie(cookie.last_context);
         }
         this.context = {title:cookie.last_context};
-        console.log('now context in cookie', this.cookies.get_cookie().last_context);
     },
 
     setContext: function(cntx) {
