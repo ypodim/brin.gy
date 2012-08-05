@@ -56,17 +56,13 @@ class profile():
     'profile:CONTEXT:key:KEY:values' # ordered set of values for this key
     'profile:CONTEXT:key:KEY:val:VAL:agents' # set of agents using this key/val pair
     
-
+    
     'contexts' # set of all contexts available
     'USER:contexts' # set of contexts in which USER participates
-    'context:users:CONTEXT' # set of users participating in CONTEXT
-    'context:description:CONTEXT' # a description of CONTEXT
-    'context:CONTEXT:lid' # location id of location associated with CONTEXT
-    'context:CONTEXT:expiration' # a sorted set of expiration dates associated with CONTEXT
-    'context:CONTEXT:cid' # a context id for CONTEXT
-    'context:cid:CID' # the CONTEXT corresponding to context id CID
+    'context:cid:CID' # hash: id, title, description, expiration, lid
+    'context:cid:CID:users' # set
+    'context:title:CONTEXTTITLE:cid' # string
 
-    
 
     def add_reverse(self, context, key, val):
         if self.db.sadd(getKA(context, key), self.usr):   # add agent to set for this key

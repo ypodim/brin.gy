@@ -36,6 +36,11 @@ var state = {
             return this._usernames[this.id()];
         }
     },
+    _context: {
+        id:null,
+        title:null,
+        description:null,
+    },
 
     setConfig: function(config) {
         this.config = config;
@@ -62,14 +67,27 @@ var state = {
 
         // console.log('context in cookie', cookie.last_context);
         if (!cookie.last_context) {
-            cookie.last_context = 'all';
+            cookie.last_context = {title:'all'};
             this.cookies.set_context_in_cookie(cookie.last_context);
+
+            // this.setContextTitle(cookie.last_context);
         }
-        this.context = {title:cookie.last_context};
     },
 
-    setContext: function(cntx) {
-        this.context = {title: cntx.title};
+    setContextTitle: function(title) {
+        this._context.title = title;
+    },
+
+    setContext: function(cdic) {
+        this._context.id = cdic.id;
+        this._context.title = cdic.title;
+        this._context.description = cdic.description;
+        this._context.lid = cdic.lid;
+        this._context.expiration = cdic.expiration;
+    },
+
+    getContext: function(){
+        return this._context;
     },
 
     cookies: {
@@ -328,6 +346,15 @@ var state = {
             },
             dataType: "json",
         });
+    },
+
+    getKeyvals: function(clb){
+        if (! this.getContext()) {
+            console.log('ERROR: context not set, cannot get keyvals');
+            return;
+        }
+        var url = this.satellite.url+"/profile/"+this.getContext().title+"/keyvals";
+        $.getJSON(url, {user:this.agent.id()}, clb);
     },
 };
 

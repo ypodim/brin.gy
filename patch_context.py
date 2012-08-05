@@ -258,13 +258,13 @@ def convert_kvcomposite_to_list():
                     r.sadd('profile:composite:key:%s:val:%s' % (k,v), lidtest)
 
 
-def show_last_location():
-    lastlid = r.get('global:nextlid')
+def show_last_location(lastid=None):
+    lastlid = lastid or r.get('global:nextlid')
     # lastlid = 1023
     print lastlid
     ldic = r.hgetall('location:lid:%s' % lastlid)
     print ldic
-    print get_kv_by_vid(lastlid)
+    # print get_kv_by_vid(lastlid)
 
     lat = ldic['lat']
     lon = ldic['lon']
@@ -277,14 +277,111 @@ def show_last_location():
 
 
 def show_contexts():
-    print r.smembers('contexts')
+    contextTitles = r.smembers('contexts')
+    print contextTitles
     topcid = int(r.get('global:nextcid'))
-    for cid in xrange(1001, topcid+1): 
+    for cid in xrange(1001, topcid+1):
         print cid
-        print r.get('context:cid:%s' % cid)
+        c = r.get('context:cid:%s' % cid)
+        print c
+        print 'cid', r.get('context:%s:cid' % c)
+        lid = r.get('context:%s:lid' % c)
+        ldic = r.hgetall('location:lid:%s' % lid)
+        print 'lid', lid, ldic
+        print 'descr', r.get('context:description:%s' % c)
+        print 'users', r.smembers('context:users:%s' % c)
+
+        contextTitles.remove(c)
+        print
+
+    print 'leftover contexts:', contextTitles
+    for ctitle in contextTitles:
+        if ctitle == 'all': continue
+        print 'cid', r.get('context:%s:cid' % ctitle)
+        print 'lid', r.get('context:%s:lid' % ctitle)
+        print 'description', r.get('context:description:%s' % ctitle)
 
 
-show_contexts()
+def patch_context(cid, descr='', lid=None):
+    cname = r.get('context:cid:%s' % cid)
+    if lid:
+        print r.set('context:%s:lid' % cname, lid)
+    ldic = r.hgetall('location:lid:%s' % lid)
+    print 'lid', lid, ldic
+
+    if descr:
+        print 'descr', r.set('context:description:%s' % cname, descr)
+
+def patch_contexts():
+    topcid = int(r.get('global:nextcid'))
+    for cid in xrange(1001, topcid+1):
+        ctitle = r.get('context:cid:%s' % cid)
+        # ctitle = cdic['title']
+        print (r.get('context:%s:cid' % ctitle) == '%s' % cid)
+        print 'exp', r.get('context:%s:expiration' % ctitle)
+        print 'lid', r.get('context:%s:lid' % ctitle)
+        print 'dsc', r.get('context:description:%s' % ctitle)
+        print 'urs', r.scard('context:users:%s' % ctitle)
+
+        
+        
+        cdic = dict(
+            id=cid, 
+            title=ctitle, 
+            description=r.get('context:description:%s' % ctitle),
+            expiration=r.get('context:%s:expiration' % ctitle),
+            lid=r.get('context:%s:lid' % ctitle),
+        )
+
+        r.delete('context:cid:%s' % cid)
+        print r.hmset('context:cid:%s' % cid, cdic)
+        r.sadd('context:cid:%s:users' % cid, *(r.smembers('context:users:%s' % ctitle)))
+        r.set('context:title:%s:cid' % ctitle, cid)
+
+        print
+
+def test_contexts():
+    topcid = int(r.get('global:nextcid'))
+    for cid in xrange(1001, topcid+1):
+        cdic = r.hgetall('context:cid:%s' % cid)
+        ctitle = cdic['title']
+        print 'exp', cdic['expiration']
+        print 'lid', cdic['lid']
+        print 'dsc', cdic['description']
+        print 'urs', r.smembers('context:cid:%s:users' % cid)
+        print 'cid', r.get('context:title:%s:cid' % ctitle)
+
+        print
+
+
+def show_locations():
+    toplid = int(r.get('global:nextlid'))
+    for lid in xrange(1001, toplid+1):
+        ldic = r.hgetall('location:lid:%s' % lid)
+        print ldic
+        # print get_kv_by_vid(lastlid)
+
+        lat = ldic['lat']
+        lon = ldic['lon']
+        title = ldic['title']
+        latlonstr = '%s %s' % (lat, lon)
+        print r.sismember('location:latlonstrings', latlonstr)
+        print r.sismember('location:titles', title)
+        print r.sismember('location:title:%s' % title, lid)
+        print r.get('location:latlonstring:%s:lid' % latlonstr)
+        print
+
+# patch_context(1007, '', 1005)
+# show_contexts()
+# show_locations()
+
+# patch_contexts()
+test_contexts()
+
+# show_last_location('None')
+
+
+
 
 # convert_kvcomposite_to_list()
 # sys.exit()

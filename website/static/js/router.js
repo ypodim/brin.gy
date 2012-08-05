@@ -13,7 +13,6 @@ define([
     // 'views/presentation',
     'views/account',
     // 'views/contexts',
-    // 'views/newContext',
     'views/stats',
     'views/world',
 ], function(
@@ -25,10 +24,6 @@ define([
     routes: {
         "about": "showAbout",
 
-        // 'context': 'showContext',
-        'newcontext': 'newContext',
-        'newcontext/:context': 'newContext',
-        "context/:context": "setContext",
         "c/:context": "setContext",
 
         'presentation/:sno': 'presentation',
@@ -178,48 +173,21 @@ define([
         aboutView.render();
     },
 
-    newContext: function(contextName) {
-        ncview = new newContextView({
-            state: this.state,
-            context: contextName,
-        });
-        ncview.render(contextName);
-
-        this.controlsView.setUIstate({
-            footer:false, 
-            title:'New context',
-            leftClb: function(){ncview.previous()},
-            rightClb: function(){ncview.next()},
-            rightTitle: 'Next',
-        });
-    },
-    showContext: function(){
-        var cview = new contextsView({
-            state: this.state,
-        });
-        cview.render();
-        var that = this;
-        this.controlsView.setUIstate({
-            rightClb: function(){that.navigate('#/newcontext', {trigger:true});},
-            rightTitle: 'New Context',
-            title: 'Contexts',
-        });
-    },
-    setContext: function( context ) {
+    setContext: function( cid ) {
         var that = this;
         var url = this.app.satellite.url+'/contexts';
         $.getJSON(url, function(json){
             for (var i in json.contexts) {
                 var cntx = json.contexts[i];
-                if (cntx.id == context) {
-                    that.app.setContext({title:cntx.title, descr:cntx.description});
-                    that.app.cookies.set_context_in_cookie(cntx.title);
+                if (cntx.id == cid) {
+                    console.log('found', cntx)
+                    that.app.setContext(cntx);
+                    that.app.cookies.set_context_in_cookie(cntx);
                     that.worldView.render();
                     that.app.navbarView.render();
                     return;
                 }
             }
-            // that.newContext(context);
         })
     },
     

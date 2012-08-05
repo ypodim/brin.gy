@@ -246,25 +246,24 @@ class contexts(tornado.web.RequestHandler):
     def get(self):
         user = self.get_argument('user','')
         dic = dict(contexts=[])
-        contexts=list(r.smembers('contexts'))
-        for c in contexts:
-            count = r.scard('context:users:%s' % c)
-            
-            description = r.get('context:description:%s' % c)
-            if c == 'all':
-                description = 'This is the top level context that includes everything and everyone.'
 
-            lid = r.get('context:%s:lid' % c)
+        topcid = int(r.get('global:nextcid'))
+        for cid in xrange(1001, topcid+1):
+            count = r.scard('context:cid:%s:users' % cid)
+            title = r.hget('context:cid:%s' % cid, 'title')
+            description = r.hget('context:cid:%s' % cid, 'description')
+
+            lid = r.hget('context:cid:%s' % cid, 'lid')
             loc = r.hgetall('location:lid:%s' % lid)
-            cid = getcid(r, c)
-            context = dict(title=c, 
+            userhasit = (user!='' and r.sismember('context:cid:%s:users' % cid, user))
+
+            context = dict(title=title, 
                            count=count, 
-                           userhasit=0, 
+                           userhasit=userhasit, 
                            description=description,
                            id=cid,
                            location=loc)
-            if user:
-                context['userhasit'] = r.sismember('context:users:%s' % c, user)
+            
             dic['contexts'].append(context) 
 
         tempc = sorted(dic['contexts'], key=lambda cntx: cntx['count'], reverse=True)

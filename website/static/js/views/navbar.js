@@ -96,7 +96,14 @@ define([
         // $('.navbar a.context').show().html('#'+app.context.title);
         this.$('a').removeClass('highlighted');
 
-        this.$('a.context').show().html('#'+this.app.context.title);
+        var context = this.app.getContext();
+        if (context) 
+            this.$('a.context').show().html('#'+context.title);
+        else
+            this.$('a.context').hide();
+        // var ctitle = (context) ? context.title : 'fae skata';
+        // this.$('a.context').show().html('#'+ctitle);
+
         // this.$('.authed').hide();
         // this.$('.noauth').hide();
 

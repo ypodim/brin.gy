@@ -61,7 +61,10 @@ define([
 
         this.$('button#addContext').show();
         this.$('button#addLocation').hide();
-        this.$('button#backToContext').html('Back to '+this.app.context.title+' >').show();
+        if (this.app.getContext())
+            this.$('button#backToContext').html('Back to '+this.app.getContext().title+' >').show();
+        else
+            this.$('button#backToContext').hide();
 
         this.clearMap();
 
@@ -243,6 +246,7 @@ define([
                     that.showAllContexts({notoggle:true});
                 }).bind('newcontext', function(appdic){
                     console.log('newcontext - modal closed with', appdic);
+
                     that.app.context.title = appdic.title;
                     that.app.context.description = appdic.description;
                     that.app.navbarView.render();
@@ -524,8 +528,9 @@ define([
         this.collection.reset();
 
         var that = this;
-        url = this.app.satellite.url+"/profile/"+this.app.context.title+"/keyvals";
-        $.getJSON(url, {user:this.app.agent.id()}, function(json){
+        this.app.getKeyvals(function(json){
+
+            var bounds = new google.maps.LatLngBounds();
 
             for (var i in json.items) {
                 var attr = json.items[i];
@@ -581,6 +586,8 @@ define([
                                 var center = new google.maps.LatLng(lat, lng);
                                 var radius = parseInt(xdata.radius);
 
+                                bounds.extend(center);
+
                                 model.set({location: {center:center, radius:radius}});
                                 that.addMapCircle(model);
                             // }
@@ -590,6 +597,9 @@ define([
                     }
                 }
             }
+
+            that.app.map.fitBounds(bounds);
+            that.app.map.panBy(130,0);
         });
     },
 
@@ -600,7 +610,7 @@ define([
         var centerLatLng = new google.maps.LatLng(42.3604457757343,-71.08734495781516);
         this.app.map = new google.maps.Map(document.getElementById('map_canvas'), {
             'zoom': 11,
-            'center': centerLatLng,
+            // 'center': centerLatLng,
             'mapTypeId': google.maps.MapTypeId.ROADMAP,
             'zoomControl': false,
             'streetViewControl': false,
