@@ -37,6 +37,7 @@ define([
         this.app.navbarView.enableContextMenu();
         this.$('aside').toggleClass('hideAside');
         this.$('button#addContext').fadeOut();
+        this.app.navbarView.toggleContextTitle({flag:true});
 
         this.clearMap();
         if (this.selectedKeyModel)
@@ -61,10 +62,12 @@ define([
 
         this.$('button#addContext').show();
         this.$('button#addLocation').hide();
-        if (this.app.getContext())
-            this.$('button#backToContext').html('Back to '+this.app.getContext().title+' >').show();
-        else
-            this.$('button#backToContext').hide();
+
+        this.app.navbarView.toggleContextTitle({flag:false});
+
+        var ctitle = this.app.getContext().title;
+        this.$('button#backToContext').html('Back to '+this.app.getContext().title+' >').toggle(ctitle != null);
+        console.log((ctitle != null));
 
         this.clearMap();
 
@@ -471,6 +474,8 @@ define([
                 'padding': padding,
                 height: height,
                 'z-index': 3000,
+                closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
+                closeBoxMargin: "10px 2px 2px 2px",
             },
             infoBoxClearance: new google.maps.Size(1, 1),
             isHidden: false,
@@ -533,6 +538,9 @@ define([
     render: function(){
         this.$('aside > div.list').empty();
         this.collection.reset();
+
+        this.app.navbarView.toggleContextTitle({flag:true});
+        console.log('WORLD render', this.app.getContext().title)
 
         var that = this;
         this.app.getKeyvals(function(json){
@@ -606,7 +614,8 @@ define([
             }
 
             that.app.map.fitBounds(bounds);
-            that.app.map.setZoom(that.app.map.getZoom()-3);
+            var newZoom = Math.max(that.app.map.getZoom()-3, 3);
+            that.app.map.setZoom(newZoom);
             that.app.map.panBy(130,0);
         });
     },

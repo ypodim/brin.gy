@@ -774,7 +774,7 @@ div.infoBox {
     
 }
 div.infoBox > img {
-    display: none;
+    /*display: none;*/
 }
 div.infoboxAttribute {
     /*height:100px;*/
@@ -790,9 +790,17 @@ div.infoboxAttribute > div.title {
 div.infoboxAttribute > div.title > div.titleKey {
     float: right;
     color: gray;
+    max-width: 170px;
+    text-overflow: clip;
+    overflow: hidden;
+    white-space: nowrap;
 }
 div.infoboxAttribute > div.title > div.titleVal {
     float: left;
+    max-width: 170px;
+    text-overflow: clip;
+    overflow: hidden;
+    white-space: nowrap;
 }
 div.infoboxAttribute > div.body > div.tools {
     height: 30px;
@@ -805,7 +813,7 @@ div.infoboxAttribute > div.body > div.tools > button {
 
 div.infoboxContext {
     /*width:350px;*/
-    /*height:100px;*/
+    
     /*background-color: rgba(60,60,60,0.8);*/
 }
 div.infoboxContext > div.title {
@@ -822,6 +830,13 @@ div.infoboxContext > div.title > div.titleKey {
 }
 div.infoboxContext > div.title > div.titleVal {
     display: inline-block;
+    max-width: 300px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+div.infoboxContext > div.body {
+    height:250px;
 }
 div.infoboxContext > div.body > div.tools {
     height: 30px;

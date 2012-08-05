@@ -109,6 +109,10 @@ class profile():
             print 'WARNING: add_context: cid already exists:', cid
             return cid
         else:
+            if self.db.sismember('contexts', context['title']):
+                print 'ERROR: add_context: context title already exists: cid:', self.db.get('context:title:%s:cid' % context['title'])
+                return None
+
             lid = None
             ldic = context.get('location')
             if ldic:
@@ -118,19 +122,11 @@ class profile():
                                     ldic['lat'], 
                                     ldic['lon'], 
                                     ldic['radius'], 
-                                    ldic['creator'])
+                                    ldic.get('creator',self.usr))
                 lid = lres['lid']
                 # self.db.set('context:%s:lid' % c, lid)
 
-            # if contextDic.get('expiration'):
-            #     self.db.zadd(
-            #         'context:%s:expiration' % contextDic['title'], 
-            #         contextDic['title'], 
-            #         contextDic.get('expiration')
-            #     )
-
             cid = self.db.incr('global:nextcid')
-
             cdic = dict(id=cid,
                         title=context['title'], 
                         description=context['description'],
@@ -138,6 +134,10 @@ class profile():
             
             self.db.set('context:%s:cid' % context['title'], cid)
             self.db.hmset('context:cid:%s' % cid, cdic)
+            self.db.set('context:title:%s:cid' % context['title'], cid)
+            self.db.sadd('contexts', context['title'])
+            print 'add_context returning', cid
+            return cid
 
     def get_keys(self):
         return self.db.smembers('%s:profile:keys' % self.usr)
@@ -159,10 +159,12 @@ class profile():
         print context, type(context)
         print key, val
 
-        self.add_context(context)
+        cid = self.add_context(context)
+        if not cid:
+            return None
 
         self.db.sadd('%s:contexts' % self.usr, context['title'])
-        self.db.sadd('context:cid:%s:users' % context['id'], self.usr)
+        self.db.sadd('context:cid:%s:users' % cid, self.usr)
         
         self.set_key(key)
         self.add_reverse(context['title'], key, val)
@@ -297,9 +299,9 @@ class profile():
             if type(val) == str:
                 val = unicode(val, errors='replace')
             
-            self.db.sadd('churn:%s:keys' % self.cap, key)
-            self.db.sadd('churn:%s:%s:vals' % (self.cap, key), val)
-            self.db.incr('churn:%s:%s:%s:add' % (self.cap, key, val))
+            # self.db.sadd('churn:%s:keys' % self.cap, key)
+            # self.db.sadd('churn:%s:%s:vals' % (self.cap, key), val)
+            # self.db.incr('churn:%s:%s:%s:add' % (self.cap, key, val))
             
             self.set_val(context, key, val)
             if context['title'] != 'all':

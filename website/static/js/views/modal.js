@@ -27,9 +27,26 @@ define([
         'submit form.newKey': 'newKeySubmit',
         'submit form.feedback': 'feedbackSubmit',
         'submit form.newContextOptions': 'newContextSubmit',
+        'keyup input#title': 'contextTitleChange',
     },
     app: appConfig.getState(),
 
+    contextTitleChange: function(e){
+        var that = this;
+        var testTitle = $(e.target).val();
+        this.timeout && clearTimeout(this.timeout);
+        this.timeout = setTimeout(function(){
+            console.log('testing')
+            that.app.getContexts(function(json){
+                e.target.setCustomValidity('');
+                for (var i in json.contexts) {
+                    var c = json.contexts[i];
+                    if (c.title.toLowerCase() == testTitle.toLowerCase())
+                        e.target.setCustomValidity('Application title exists!')
+                }
+            });    
+        }, 200);
+    },
     newContextSubmit: function(){
         var title = this.$('input#title').val();
         var description = this.$('textarea#description').val();

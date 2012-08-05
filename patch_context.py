@@ -344,15 +344,19 @@ def test_contexts():
     topcid = int(r.get('global:nextcid'))
     for cid in xrange(1001, topcid+1):
         cdic = r.hgetall('context:cid:%s' % cid)
+        if not cdic:
+            continue
         ctitle = cdic['title']
-        print 'exp', cdic['expiration']
+        print 'tit', ctitle
+        print 'exp', cdic.get('expiration')
         print 'lid', cdic['lid']
         print 'dsc', cdic['description']
         print 'urs', r.smembers('context:cid:%s:users' % cid)
-        print 'cid', r.get('context:title:%s:cid' % ctitle)
+        print 'cid', r.get('context:title:%s:cid' % ctitle), cdic['id']
 
         print
 
+    print r.smembers('contexts')
 
 def show_locations():
     toplid = int(r.get('global:nextlid'))

@@ -29,7 +29,7 @@ define([
         this.trigger('contexts');
         this.contextMenuClicked = true;
 
-        $(e.target).addClass('disabled');
+        this.$('a#contexts').addClass('disabled');
         return false;
 
         var btn;
@@ -92,12 +92,18 @@ define([
         return false;
     },
 
+    toggleContextTitle: function(options){
+        var flag = (options && options.flag);
+        this.$('a.context').toggle(flag);
+    },
+
     render: function(){
         // $('.navbar a.context').show().html('#'+app.context.title);
         this.$('a').removeClass('highlighted');
 
+
         var context = this.app.getContext();
-        if (context) 
+        if (context.title) 
             this.$('a.context').show().html('#'+context.title);
         else
             this.$('a.context').hide();

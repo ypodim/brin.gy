@@ -4,7 +4,6 @@ define([
     'backbone',
     'app',
 
-    'views/about',
     'views/login',
     
     'views/sendMessage',
@@ -16,8 +15,7 @@ define([
     'views/stats',
     'views/world',
 ], function(
-    $, _, Backbone, appConfig, 
-    aboutView, loginView, sendMessageView, accountView, statsView, worldView
+    $, _, Backbone, appConfig, loginView, sendMessageView, accountView, statsView, worldView
     ){
   var AppRouter = Backbone.Router.extend({
     app: appConfig.getState(),
@@ -169,8 +167,7 @@ define([
         // this.controlsView.setUIstate({
             // footer:false,
         // });
-
-        aboutView.render();
+        this.app.modal.render({title: 'about'});
     },
 
     setContext: function( cid ) {
@@ -206,24 +203,9 @@ define([
     },
 
     defaultRoute: function( cntx ){
-    //     this.controlsView.setUIstate({
-    //         title: 'Brin.gy',
-    //         fullscreen: true,
-    //         footer: false,
-    //     });
-        
-    //     this.state.stats('home');
-    //     this.wview.render();
-    // },
-
-    // world: function( cntx ){
-        // this.controlsView.setUIstate({
-        //     title: 'Brin.gy',
-        //     fullscreen: true,
-        //     footer: false,
-        // });
-        
-        
+        console.log('default route')
+        // this.worldView.showAllContexts();
+        this.app.navbarView.contextMenu();
     },
   });
 
