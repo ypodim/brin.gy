@@ -74,15 +74,13 @@ var state = {
         }
     },
 
-    setContextTitle: function(title) {
-        this._context.title = title;
-    },
-
     setContext: function(cdic) {
+        console.log('setContext', cdic.id, cdic.title, cdic.description, cdic.lid, cdic.location, cdic.expiration)
         this._context.id = cdic.id;
         this._context.title = cdic.title;
         this._context.description = cdic.description;
         this._context.lid = cdic.lid;
+        this._context.location = cdic.location;
         this._context.expiration = cdic.expiration;
     },
 
@@ -318,10 +316,8 @@ var state = {
     mutateKeyValue: function(options) {
         if (options.type == undefined)
             options.type = 'POST';
-        if (options.context == undefined)
-            options.context = this.context.title;
-
-        console.log('mutate', options, this.context);
+        // if (options.context == undefined)
+            // options.context = this.context.title;
 
         var url = this.agent.url()+'/profile';
         // var data = JSON.stringify([[options.key, options.val]]);
@@ -335,7 +331,7 @@ var state = {
             type: options.type,
             url: url,
             data: {data:data, 
-                    context: JSON.stringify(that.context), 
+                    context: JSON.stringify(that.getContext()), 
                     // context_details: JSON.stringify(context_details),
                     secret:this.agent.fullInfo().pwd,
                     // contextDescription:that.context.descr

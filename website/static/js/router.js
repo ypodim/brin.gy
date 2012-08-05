@@ -180,7 +180,6 @@ define([
             for (var i in json.contexts) {
                 var cntx = json.contexts[i];
                 if (cntx.id == cid) {
-                    console.log('found', cntx)
                     that.app.setContext(cntx);
                     that.app.cookies.set_context_in_cookie(cntx);
                     that.worldView.render();

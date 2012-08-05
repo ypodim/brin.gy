@@ -232,12 +232,8 @@ define([
         var that = this;
         this.getLocationInput( function(circle){
             that.$('button#addContext').show();
-
-            that.app.context.location = circle;
-
+            
             if (circle && circle.center) {
-                console.log('deeeeaaeep', circle)
-                // this.postLocationAttr(circle);
                 that.app.modal.render({
                     title: 'newContextOptions', 
                     location: circle.title,
@@ -247,10 +243,21 @@ define([
                 }).bind('newcontext', function(appdic){
                     console.log('newcontext - modal closed with', appdic);
 
-                    that.app.context.title = appdic.title;
-                    that.app.context.description = appdic.description;
+                    circle.lat = circle.center.lat();
+                    circle.lon = circle.center.lng();
+
+                    that.app.setContext({
+                        id: null,
+                        title: appdic.title,
+                        description: appdic.description,
+                        lid: circle.id,
+                        location: circle,
+                        expiration: null,
+                    });
+
                     that.app.navbarView.render();
                     that.backToContext();
+
                     that.render();
                     // that.newKey();
                     that.app.modal.render({title: 'newkey'});
@@ -599,6 +606,7 @@ define([
             }
 
             that.app.map.fitBounds(bounds);
+            that.app.map.setZoom(that.app.map.getZoom()-3);
             that.app.map.panBy(130,0);
         });
     },

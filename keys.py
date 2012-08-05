@@ -13,25 +13,26 @@ def getcid(r, context):
 def getlid(r, k,v):
     return r.smembers('profile:composite:key:%s:val:%s' % (k, v))
 
-def add_location(r, title, lat, lon, radius, creator):
+def add_location(r, lid, title, lat, lon, radius, creator):
     error = ''
-    if title:
-        latlonstr = '%s %s' % (lat, lon)
+    if not lid:
+        if title:
+            latlonstr = '%s %s' % (lat, lon)
 
-        if r.sadd('location:latlonstrings', latlonstr):
-            ldic = dict(title=title, lat=lat, lon=lon, radius=radius, creator=creator)
-            lid = r.incr('global:nextlid')
-            r.hmset('location:lid:%s' % lid, ldic)
-            r.sadd('location:titles', title)
-            r.sadd('location:title:%s' % title, lid)
-            r.set('location:latlonstring:%s:lid' % latlonstr, lid)
+            if r.sadd('location:latlonstrings', latlonstr):
+                ldic = dict(title=title, lat=lat, lon=lon, radius=radius, creator=creator)
+                lid = r.incr('global:nextlid')
+                r.hmset('location:lid:%s' % lid, ldic)
+                r.sadd('location:titles', title)
+                r.sadd('location:title:%s' % title, lid)
+                r.set('location:latlonstring:%s:lid' % latlonstr, lid)
+            else:
+                lid = r.get('location:latlonstring:%s:lid' % latlonstr)
+                error = 'attempt to add existing center, returned existing lid %s' % lid
+                print 'WARNING: add_location: %s' % error
         else:
-            lid = r.get('location:latlonstring:%s:lid' % latlonstr)
-            error = 'attempt to add existing center, returned existing lid %s' % lid
-            print 'WARNING: add_location: %s' % error
-    else:
-        error = 'no title provided'
-        print error
+            error = 'no title provided'
+            print error
     return dict(lid=lid, error=error)
     
 

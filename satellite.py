@@ -249,8 +249,11 @@ class contexts(tornado.web.RequestHandler):
 
         topcid = int(r.get('global:nextcid'))
         for cid in xrange(1001, topcid+1):
-            count = r.scard('context:cid:%s:users' % cid)
             title = r.hget('context:cid:%s' % cid, 'title')
+            if not title:
+                continue
+                
+            count = r.scard('context:cid:%s:users' % cid)
             description = r.hget('context:cid:%s' % cid, 'description')
 
             lid = r.hget('context:cid:%s' % cid, 'lid')
@@ -262,6 +265,7 @@ class contexts(tornado.web.RequestHandler):
                            userhasit=userhasit, 
                            description=description,
                            id=cid,
+                           lid=lid,
                            location=loc)
             
             dic['contexts'].append(context) 

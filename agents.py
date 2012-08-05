@@ -285,7 +285,9 @@ class serve_capability(bringy_handler):
         arguments = tornado.escape.json_decode(arguments)
         # print 'delete:', arguments, params
         secret = params.get('secret')
-        context = tornado.escape.url_unescape(params.get('context','all'))
+        context = tornado.escape.url_unescape(params['context'])
+        context = tornado.escape.json_decode(context)
+
         passed = db.authenticate_user(self.username, secret)
         if passed:
             res = self.execute(context=context, arguments=arguments)
