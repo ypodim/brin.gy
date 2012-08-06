@@ -19,9 +19,9 @@ from email.mime.text import MIMEText
 from db import DB
 from profile import profile
 from location import location
-from buysell import buysell
+from keys import *
 
-capability_names = ['profile','location','buysell']
+capability_names = ['profile','location']
 
 class sendEmail:
     def __init__(self, to, fromuser, subject, message):
@@ -201,21 +201,31 @@ class serve_user(bringy_handler):
         context = self.get_argument('context','')
         action = self.get_argument('action','')
         passed = db.authenticate_user(self.username, secret)
+        options = self.get_argument('options','')
         if not passed:
             error = 'authentication failed for user:%s secret:%s' % (self.username, secret)
-        if not context:
+        if not options and not context:
             error = 'invalid context'
-        if action not in ['join','leave','email']:
+        if action not in ['join','leave','email','options']:
             error = 'invalid action %s' % action
         if action == 'leave' and context == 'all':
             error = 'You can check in any time you like, but you can never leave'
-            
+        if action == 'options' and not options:
+            error = 'No valid options'
+
         if not error and action == 'join':
             db.join_context(context, self.username)
         if not error and action == 'leave':
             #db.leave_context(context, self.username)
             p = profile(self.username, [], self.request.path.split('/'), db.r, None)
             p.leave_context(context)
+        if not error and action == 'options':
+            options = tornado.escape.json_decode(options)
+            if not options.get('option') in ['onapplication','onattribute','onvalue']:
+                error = 'invalid option %s' % options.get('option')
+            else:
+                set_user_option(db.r, self.username, options['option'], options['value'])
+                print options['option'], get_user_option(db.r, self.username, options['option'])
         if not error and action == 'email':
             msg = self.get_argument('msg')
             to = self.get_argument('to')
@@ -386,22 +396,6 @@ class api_call(tornado.web.RequestHandler):
             res['locations'][arguments[x]] = dict(lat=result[2*x], lon=result[2*x+1])
             
         self.finilize_call(res)
-        
-    def api_batch_buysell(self):
-        arguments = tornado.escape.json_decode(self.get_argument('data'))
-        #agents = {}
-        for agent, prof in arguments.items():
-            
-            if not db.user_exists(agent):
-                print '*** user does not exist:', agent
-                continue
-            
-            print agent, prof
-            p = buysell(agent, prof.items(), db.r, None)
-            p.clear_all()
-            #p.post()
-        
-        self.finilize_call({})
         
     def api_batch_location2(self):
         arguments = tornado.escape.json_decode(self.get_argument('data'))
@@ -701,7 +695,6 @@ application = tornado.web.Application([
     (r"/ustats", api_call),
     (r"/batch_profile", api_call),
     (r"/batch_location", api_call),
-    (r"/batch_buysell", api_call),
     (r"/controller", api_call),
     (r"/authenticate_user", api_call),
     (r"/email_reminder", api_call),

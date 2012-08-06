@@ -7,6 +7,23 @@
 	<span id='email'><%= email %></span>
 </div>
 
+<div class='accountentry'>
+    <div class='header'>Alerts</div>
+    <label>Alert me when:</label>
+    <label class="checkbox">
+		<input type="checkbox" name="onapplication" />
+		a new application is created.
+	</label>
+	<label class="checkbox">
+		<input type="checkbox" name="onattribute" />
+		a new attribute is created in an application I participate in.
+	</label>
+	<label class="checkbox">
+		<input type="checkbox" name="onvalue" checked />
+		a new value is added to an attribute that I have.
+	</label>
+</div>
+
 <div class='account buttons'>
 	<button class='account btn btn-primary' id='signout'>sign out</button>
 	<button class='account btn btn-danger' id='delete'>delete account</button>

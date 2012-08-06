@@ -64,3 +64,17 @@ def getfullkv(r, c,k,v):
         dic['ktype'] = r.get('profile:key:%s:type' % k)
         res.append(dic)
     return res
+
+
+
+def set_user_option(r, username, option, value):
+    return r.hset('options:user:%s' % username, 'alert:%s'%option, value)
+def get_user_option(r, username, option):
+    return r.hget('options:user:%s' % username, 'alert:%s'%option)
+
+
+
+
+
+
+

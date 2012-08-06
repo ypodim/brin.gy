@@ -352,6 +352,19 @@ var state = {
         var url = this.satellite.url+"/profile/"+this.getContext().title+"/keyvals";
         $.getJSON(url, {user:this.agent.id()}, clb);
     },
+
+    saveOption: function(options){
+        var url = this.agent.url();
+        var data = {
+            options: JSON.stringify(options),
+            action: 'options',
+            secret: this.agent.fullInfo().pwd,
+        };
+
+        $.post(url, data, function(json){
+            console.log(json);
+        }, 'json');
+    },
 };
 
 _.extend(state, Backbone.Events);

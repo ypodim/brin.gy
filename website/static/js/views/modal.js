@@ -28,9 +28,17 @@ define([
         'submit form.feedback': 'feedbackSubmit',
         'submit form.newContextOptions': 'newContextSubmit',
         'keyup input#title': 'contextTitleChange',
+        'change input[type=checkbox]': 'alertOption',
     },
     app: appConfig.getState(),
 
+    alertOption: function(e){
+        var input = $(e.target);
+        var option = input.attr('name');
+        var checked = (input.attr('checked') == 'checked');
+        var options = {option: option, value: checked};
+        this.app.saveOption(options);
+    },
     contextTitleChange: function(e){
         var that = this;
         var testTitle = $(e.target).val();

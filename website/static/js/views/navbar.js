@@ -16,12 +16,17 @@ define([
         'click a#account': 'account',
         'click a#feedback': 'feedback',
         'click a#contexts': 'contextMenu',
+        'click a.context': 'contextTitle',
     },
     template: _.template(navbarTemplate),
     
     app: appConfig.getState(),
     contextMenuClicked: false,
 
+    contextTitle: function(){
+        
+        return false;
+    },
     contextMenu: function(e){
         if (this.contextMenuClicked)
             return false;
