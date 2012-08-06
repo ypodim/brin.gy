@@ -22,6 +22,7 @@ define([
     },
 
     zoomHere: function() {
+        console.log('context zoom')
         var contextOptions = {
             center: this.model.get('location').center,
             radius: this.model.get('location').radius,
@@ -29,6 +30,7 @@ define([
         var circle = new google.maps.Circle(contextOptions);
         this.app.map.fitBounds(circle.getBounds());
         this.app.map.setZoom(this.app.map.getZoom()-2);
+        return false;
     },
 
     render: function(){

@@ -44,7 +44,7 @@ define([
         if (btn.hasClass('highlighted')) {
             btn.removeClass('highlighted');
             this.app.loginView.close();
-            return;
+            return false;
         }
         $('a').removeClass('highlighted');
         btn.addClass('highlighted')
@@ -78,7 +78,7 @@ define([
         if (btn.hasClass('highlighted')) {
             btn.removeClass('highlighted');
             this.app.loginView.close();
-            return;
+            return false;
         }
         $('a').removeClass('highlighted');
         btn.addClass('highlighted')

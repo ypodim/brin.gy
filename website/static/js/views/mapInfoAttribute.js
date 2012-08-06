@@ -54,6 +54,7 @@ define([
         var circle = new google.maps.Circle(contextOptions);
         this.app.map.fitBounds(circle.getBounds());
         this.app.map.setZoom(this.app.map.getZoom()-2);
+        return false;
     },
 
     render: function(){

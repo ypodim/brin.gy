@@ -204,8 +204,7 @@ define([
 
     defaultRoute: function( cntx ){
         console.log('default route')
-        // this.worldView.showAllContexts();
-        this.app.navbarView.contextMenu();
+        // this.app.navbarView.contextMenu();
     },
   });
 

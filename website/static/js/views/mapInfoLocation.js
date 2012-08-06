@@ -25,6 +25,7 @@ define([
     },
 
     zoomHere: function() {
+        console.log('location zoom')
         var contextOptions = {
             center: this.model.get('center'),
             radius: this.model.get('radius'),
@@ -40,6 +41,7 @@ define([
         var offX = 120;
         var offY = $(this.app.map.getDiv()).height()/2-415;
         this.app.map.panBy(offX,offY);
+        return false;
     },
 
     render: function(){
