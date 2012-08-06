@@ -52,7 +52,11 @@ class profile():
     'context:cid:CID:users' # set
     'context:title:CONTEXTTITLE:cid' # string
 
-    
+    'alert:on:everything:users' # set
+    'alert:on:application:users' # set
+    'alert:on:attribute:users' # set
+    'alert:on:value:users' # set
+    'USER:alerts'
 
     def add_reverse(self, context, key, val):
         if self.db.sadd(getKA(context, key), self.usr):   # add agent to set for this key
