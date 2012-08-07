@@ -29,9 +29,21 @@ define([
         'submit form.newContextOptions': 'newContextSubmit',
         'keyup input#title': 'contextTitleChange',
         'change input[type=checkbox]': 'alertOption',
+
+        'click a.help': 'showHelp',
     },
     app: appConfig.getState(),
 
+    showHelp: function(e){
+        var helpContent = $(e.target).parent().children('.helpContent');
+        var caption = 'hide';
+        var helpVisible = helpContent.is(':visible');
+        if (helpVisible)
+            caption = 'show help!';
+        $(e.target).html(caption);
+        helpContent.slideToggle(helpVisible);
+        return false;
+    },
     alertOption: function(e){
         var input = $(e.target);
         var option = input.attr('name');

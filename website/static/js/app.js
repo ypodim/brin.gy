@@ -345,10 +345,11 @@ var state = {
     },
 
     postNewContext: function(options, clb){
-        var url = this.agent.url();
+        var url = this.satellite.url+'/contexts';
         var data = {
             context: JSON.stringify(options),
             action: 'newcontext',
+            username: this.agent.id(),
             secret: this.agent.fullInfo().pwd,
         };
         $.post(url, data, function(json){

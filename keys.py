@@ -73,10 +73,10 @@ def get_user_option(r, username, option):
     return r.hget('options:user:%s' % username, 'alert:%s'%option)
 
 
-def add_context(r, context):
+def add_context(r, context, username):
     print
     print 'add_context', context
-    cid = context['id']
+    cid = context.get('id')
     if r.hgetall('context:cid:%s' % cid):
         print 'WARNING: add_context: cid already exists:', cid
         return cid
@@ -87,6 +87,7 @@ def add_context(r, context):
 
         lid = None
         ldic = context.get('location')
+
         if ldic:
             lres = add_location(r, 
                                 ldic.get('id'), 
@@ -94,7 +95,7 @@ def add_context(r, context):
                                 ldic['lat'], 
                                 ldic['lon'], 
                                 ldic['radius'], 
-                                ldic['creator'],
+                                ldic.get('creator',username))
             lid = lres['lid']
             # r.set('context:%s:lid' % c, lid)
 

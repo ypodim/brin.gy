@@ -9,9 +9,11 @@ import tornado.escape
 import sys, os, time, random
 from optparse import OptionParser
 
-from capability import *
-
 import redis
+
+from capability import *
+from db import DB
+from keys import *
 
 CAPS = ['buysell','location','profile']
 
@@ -69,7 +71,7 @@ class serve_request(tornado.web.RequestHandler):
     def get(self):
         res = {}
         if not self.error:
-            cap = eval('%s' % self.cap)(r)
+            cap = eval('%s' % self.cap)(db.r)
             arguments = tornado.escape.url_unescape(self.get_argument('data', ''))
             res = cap.get(self.path, self.request.arguments)
             
@@ -106,20 +108,20 @@ class stats(tornado.web.RequestHandler):
         self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
         self.set_header('Content-Type','application/json; charset=UTF-8')
     def get(self):
-        #keys = r.smembers('profile:keys')
+        #keys = db.r.smembers('profile:keys')
         
         zkey = 'profile:all:keys'
-        keys = r.zrevrangebyscore(zkey, '+inf', '-inf') or []
+        keys = db.r.zrevrangebyscore(zkey, '+inf', '-inf') or []
         
         vals = 0
         for k in keys:
-            #vals += r.scard('profile:key:%s' % k)
-            vals += r.zscore('profile:all:keys', k)
+            #vals += db.r.scard('profile:key:%s' % k)
+            vals += db.r.zscore('profile:all:keys', k)
         
         queries = 0
         
         dic = dict(churn=self.churn(), 
-                   users=r.scard('users'),
+                   users=db.r.scard('users'),
                    keys=len(keys),
                    values=vals,
                    queries=queries)
@@ -128,11 +130,11 @@ class stats(tornado.web.RequestHandler):
         dic = {}
         for cap in ['profile','location']:
             if cap not in dic: dic[cap] = {}
-            for key in r.smembers('churn:%s:keys' % cap):
+            for key in db.r.smembers('churn:%s:keys' % cap):
                 if key not in dic[cap]: dic[cap][key] = {}
-                for val in r.smembers('churn:%s:%s:vals' % (cap, key)):
-                    add = r.get('churn:%s:%s:%s:add' % (cap, key, val))
-                    rem = r.get('churn:%s:%s:%s:rem' % (cap, key, val))
+                for val in db.r.smembers('churn:%s:%s:vals' % (cap, key)):
+                    add = db.r.get('churn:%s:%s:%s:add' % (cap, key, val))
+                    rem = db.r.get('churn:%s:%s:%s:rem' % (cap, key, val))
                     dic[cap][key][val] = dict(add=add, rem=rem)
         return dic
 
@@ -217,7 +219,7 @@ class randomstat(tornado.web.RequestHandler):
     def get(self):
         kvlist = []
         while not kvlist:
-            keys = r.zrevrangebyscore(getK('all'), '+inf', '-inf', withscores=True)
+            keys = db.r.zrevrangebyscore(getK('all'), '+inf', '-inf', withscores=True)
             
             if not keys:
                 self.write(dict(error='No data. Nichts.'))
@@ -226,7 +228,7 @@ class randomstat(tornado.web.RequestHandler):
             key, score = random.choice(keys)
             
             zkey = 'profile:all:key:%s:values' % key
-            kvlist = r.zrevrangebyscore(zkey, '+inf', '-inf', withscores=True) or []
+            kvlist = db.r.zrevrangebyscore(zkey, '+inf', '-inf', withscores=True) or []
         val, score = random.choice(kvlist)
         
         res = dict(key=key, val=val, score=score)
@@ -247,18 +249,18 @@ class contexts(tornado.web.RequestHandler):
         user = self.get_argument('user','')
         dic = dict(contexts=[])
 
-        topcid = int(r.get('global:nextcid'))
+        topcid = int(db.r.get('global:nextcid'))
         for cid in xrange(1001, topcid+1):
-            title = r.hget('context:cid:%s' % cid, 'title')
+            title = db.r.hget('context:cid:%s' % cid, 'title')
             if not title:
                 continue
                 
-            count = r.scard('context:cid:%s:users' % cid)
-            description = r.hget('context:cid:%s' % cid, 'description')
+            count = db.r.scard('context:cid:%s:users' % cid)
+            description = db.r.hget('context:cid:%s' % cid, 'description')
 
-            lid = r.hget('context:cid:%s' % cid, 'lid')
-            loc = r.hgetall('location:lid:%s' % lid)
-            userhasit = (user!='' and r.sismember('context:cid:%s:users' % cid, user))
+            lid = db.r.hget('context:cid:%s' % cid, 'lid')
+            loc = db.r.hgetall('location:lid:%s' % lid)
+            userhasit = (user!='' and db.r.sismember('context:cid:%s:users' % cid, user))
 
             context = dict(title=title, 
                            count=count, 
@@ -279,7 +281,28 @@ class contexts(tornado.web.RequestHandler):
         dic['contexts'] = tempc
         self.write(dic)
 
-            
+    def post(self):
+        error = ''
+        cid = None
+        secret = self.get_argument('secret','')
+        username = self.get_argument('username','')
+        context = self.get_argument('context','')
+
+        passed = db.authenticate_user(username, secret)
+        if not passed:
+            error = 'authentication failed for user:%s secret:%s' % (username, secret)
+        if not context:
+            error = 'no valid context params'
+
+        if not error:
+            context = tornado.escape.json_decode(context)
+            print 'DEBUG', context
+            cid = add_context(db.r, context, username)
+            print cid
+            print
+
+        res = dict(error=error, username=username, cid=cid)
+        self.write(res)
             
 #########################################
 
@@ -301,7 +324,8 @@ if __name__ == "__main__":
     
     statistics = Statistics()
     
-    r = redis.Redis(host='localhost', port=6379, db=0)
+    db = DB(0)
+    # r = redis.Redis(host='localhost', port=6379, db=0)
     
     parser = OptionParser(add_help_option=False)
     parser.add_option("-h", "--host", dest="host", default='')

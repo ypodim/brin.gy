@@ -246,19 +246,37 @@ define([
                 that.$('button#addContext').show();
                 
                 if (circle && circle.center) {
-                    circle.lat = circle.center.lat();
-                    circle.lon = circle.center.lng();
-
                     console.log('newcontext - modal closed with', appdic, circle);
+
+                    contextOptions = {
+                        id: null,
+                        title: appdic.title,
+                        description: appdic.description,
+                        location: {
+                            id: circle.id,
+                            title: circle.title,
+                            lat: circle.center.lat(),
+                            lon: circle.center.lng(),
+                            radius: circle.radius,
+                            creator: circle.creator,
+                        },
+                    }
+
+                    
                     var clb = function(json){
                         console.log('new context post got back:', json);
+                        if (json.error) {
+                            alert(json.error);
+                            return false;
+                        }
 
+                        that.app.router.navigate('#/c/'+json.cid);
                         that.app.modal.render({title: 'newkey'});
                         that.app.modal.bind('newkey', function(obj){
                             console.log('new key result', obj)
                         })
                     };
-                    that.app.postNewContext(appdic, clb);
+                    that.app.postNewContext(contextOptions, clb);
                     
                 } else
                     that.showAllContexts({notoggle:true});
