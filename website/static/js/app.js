@@ -344,6 +344,18 @@ var state = {
         });
     },
 
+    postNewContext: function(options, clb){
+        var url = this.agent.url();
+        var data = {
+            context: JSON.stringify(options),
+            action: 'newcontext',
+            secret: this.agent.fullInfo().pwd,
+        };
+        $.post(url, data, function(json){
+            clb && clb(json);
+        }, 'json');
+    },
+
     getKeyvals: function(clb){
         if (! this.getContext()) {
             console.log('ERROR: context not set, cannot get keyvals');

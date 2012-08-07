@@ -202,16 +202,19 @@ class serve_user(bringy_handler):
         action = self.get_argument('action','')
         passed = db.authenticate_user(self.username, secret)
         options = self.get_argument('options','')
+        newcontext = self.get_argument('context','')
         if not passed:
             error = 'authentication failed for user:%s secret:%s' % (self.username, secret)
         if not options and not context:
             error = 'invalid context'
-        if action not in ['join','leave','email','options']:
+        if action not in ['join','leave','email','options','newcontext']:
             error = 'invalid action %s' % action
         if action == 'leave' and context == 'all':
             error = 'You can check in any time you like, but you can never leave'
         if action == 'options' and not options:
             error = 'No valid options'
+        if action == 'newcontext' and not newcontext:
+            error = 'No valid context parameters'
 
         if not error and action == 'join':
             db.join_context(context, self.username)
@@ -226,6 +229,9 @@ class serve_user(bringy_handler):
             else:
                 set_user_option(db.r, self.username, options['option'], options['value'])
                 print options['option'], get_user_option(db.r, self.username, options['option'])
+        if not error and action == 'newcontext':
+            newcontext = tornado.escape.json_decode(newcontext)
+            print newcontext
         if not error and action == 'email':
             msg = self.get_argument('msg')
             to = self.get_argument('to')

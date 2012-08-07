@@ -30,6 +30,8 @@ define([
     contextMenu: function(e){
         if (this.contextMenuClicked)
             return false;
+        else
+            return true;
 
         this.trigger('contexts');
         this.contextMenuClicked = true;
@@ -102,30 +104,24 @@ define([
         this.$('a.context').toggle(flag);
     },
 
-    render: function(){
-        // $('.navbar a.context').show().html('#'+app.context.title);
+    render: function(options){
+        if (options && options.message) {
+            this.$('li.menu').hide();
+            this.$('li.message').show();
+            this.$('li.message').html(options.message);
+            return false;
+        }
+
+        this.$('li.menu').show();
+        this.$('li.message').hide();
         this.$('a').removeClass('highlighted');
 
-
-        var context = this.app.getContext();
-        if (context.title) 
-            this.$('a.context').show().html('#'+context.title);
-        else
-            this.$('a.context').hide();
-        // var ctitle = (context) ? context.title : 'fae skata';
-        // this.$('a.context').show().html('#'+ctitle);
-
-        // this.$('.authed').hide();
-        // this.$('.noauth').hide();
-
-        if (this.app.agent.loggedIn()) {
-            this.$('.authed').show();
-            this.$('.noauth').hide();
-            this.$('#username').html(this.app.agent.id());
-        } else {
-            this.$('.noauth').show();
-            this.$('.authed').hide();
-        }
+        var ctitle = this.app.getContext().title;
+        this.$('a.context').toggle((ctitle!=null)).html('#'+ctitle);
+        
+        this.$('.authed').toggle(this.app.agent.loggedIn());
+        this.$('.noauth').toggle(!this.app.agent.loggedIn());
+        this.$('#username').html(this.app.agent.id());
     },
 
     initialize: function(options){

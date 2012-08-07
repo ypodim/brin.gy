@@ -141,7 +141,6 @@ class profile():
             self.db.hmset('context:cid:%s' % cid, cdic)
             self.db.set('context:title:%s:cid' % context['title'], cid)
             self.db.sadd('contexts', context['title'])
-            print 'add_context returning', cid
             return cid
 
     def get_keys(self):

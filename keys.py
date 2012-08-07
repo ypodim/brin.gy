@@ -73,7 +73,42 @@ def get_user_option(r, username, option):
     return r.hget('options:user:%s' % username, 'alert:%s'%option)
 
 
+# def add_context(r, context):
+#     print
+#     print 'add_context', context
+#     cid = context['id']
+#     if r.hgetall('context:cid:%s' % cid):
+#         print 'WARNING: add_context: cid already exists:', cid
+#         return cid
+#     else:
+#         if r.sismember('contexts', context['title']):
+#             print 'ERROR: add_context: context title already exists: cid:', r.get('context:title:%s:cid' % context['title'])
+#             return None
 
+#         lid = None
+#         ldic = context.get('location')
+#         if ldic:
+#             lres = add_location(r, 
+#                                 ldic.get('id'), 
+#                                 ldic['title'], 
+#                                 ldic['lat'], 
+#                                 ldic['lon'], 
+#                                 ldic['radius'], 
+#                                 ldic['creator')
+#             lid = lres['lid']
+#             # r.set('context:%s:lid' % c, lid)
+
+#         cid = r.incr('global:nextcid')
+#         cdic = dict(id=cid,
+#                     title=context['title'], 
+#                     description=context['description'],
+#                     lid=lid)
+        
+#         r.set('context:%s:cid' % context['title'], cid)
+#         r.hmset('context:cid:%s' % cid, cdic)
+#         r.set('context:title:%s:cid' % context['title'], cid)
+#         r.sadd('contexts', context['title'])
+#         return cid
 
 
 

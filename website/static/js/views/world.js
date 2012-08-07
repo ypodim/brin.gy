@@ -30,18 +30,12 @@ define([
     
     circles: [],
     collection: new attrCollection(),
-    selectedKeyModel: '',
+    selectedKeyModel: null,
     popup: null,
 
     backToContext: function(){
-        this.app.navbarView.enableContextMenu();
-        this.$('aside').toggleClass('hideAside');
-        this.$('button#addContext').fadeOut();
-        this.app.navbarView.toggleContextTitle({flag:true});
-
-        this.clearMap();
-        if (this.selectedKeyModel)
-            this.keyClickClb( this.selectedKeyModel );
+        this.app.router.navigate('#/c/'+this.app.getContext().id);
+        return false;
     },
 
     clearMap: function(){
@@ -55,7 +49,7 @@ define([
 
     showAllContexts: function(options){
         if (!(options && options.notoggle))
-            this.$('aside').toggleClass('hideAside');
+            this.$('aside').show().toggleClass('hideAside', true);
 
         // this.app.modal.close();
         this.popup && this.popup.close({force:true});
@@ -233,44 +227,67 @@ define([
         $(e.target).hide();
 
         var that = this;
-        this.getLocationInput( function(circle){
-            that.$('button#addContext').show();
-            
-            if (circle && circle.center) {
-                that.app.modal.render({
-                    title: 'newContextOptions', 
-                    location: circle.title,
-                }).bind('modal:closed', function(){
-                    console.log('newcontext - modal closed');
-                    that.showAllContexts({notoggle:true});
-                }).bind('newcontext', function(appdic){
-                    console.log('newcontext - modal closed with', appdic);
 
+
+        this.app.modal.render({
+            title: 'newContextOptions', 
+            // location: circle.title,
+        }).bind('modal:closed', function(){
+            console.log('newcontext - modal closed');
+            that.showAllContexts({notoggle:true});
+        }).bind('newcontext', function(appdic){
+            
+            var message = 'Choosing location for new application: "'+appdic.title+'"';
+            that.app.navbarView.render({message:message})
+            that.getLocationInput( function(circle){
+
+                that.app.navbarView.render();
+
+                that.$('button#addContext').show();
+                
+                if (circle && circle.center) {
                     circle.lat = circle.center.lat();
                     circle.lon = circle.center.lng();
 
-                    that.app.setContext({
-                        id: null,
-                        title: appdic.title,
-                        description: appdic.description,
-                        lid: circle.id,
-                        location: circle,
-                        expiration: null,
-                    });
+                    console.log('newcontext - modal closed with', appdic, circle);
+                    var clb = function(json){
+                        console.log('new context post got back:', json);
 
-                    that.app.navbarView.render();
-                    that.backToContext();
+                        that.app.modal.render({title: 'newkey'});
+                        that.app.modal.bind('newkey', function(obj){
+                            console.log('new key result', obj)
+                        })
+                    };
+                    that.app.postNewContext(appdic, clb);
+                } else
+                    that.showAllContexts({notoggle:true});
+            });
 
-                    that.render();
-                    // that.newKey();
-                    that.app.modal.render({title: 'newkey'});
-                    that.app.modal.bind('newkey', function(obj){
-                        console.log('tester', obj)
-                    })
-                    // that.showAllContexts({notoggle:true});
-                });
-            } else
-                that.showAllContexts({notoggle:true});
+            
+
+            
+            // that.app.postNewContext()
+            return false;
+
+            that.app.setContext({
+                id: null,
+                title: appdic.title,
+                description: appdic.description,
+                lid: circle.id,
+                location: circle,
+                expiration: null,
+            });
+
+            that.app.navbarView.render();
+            // that.backToContext();
+
+            that.render();
+            // that.newKey();
+            that.app.modal.render({title: 'newkey'});
+            that.app.modal.bind('newkey', function(obj){
+                console.log('tester', obj)
+            })
+            // that.showAllContexts({notoggle:true});
         });
     },
 
@@ -494,21 +511,6 @@ define([
         });
 
         this.circles.push({circle:mapCircle, marker:marker, infowindow:ib});
-
-        return;
-
-        var infowindow = new google.maps.InfoWindow({
-            content: options.infowindowContent,
-        });
-        google.maps.event.addListener(marker, 'click', function() {
-            _.each(that.circles, function(circle){ circle.infowindow.close(); })
-            infowindow.open(that.app.map, marker);
-        });
-        google.maps.event.addListener(mapCircle, 'click', function() {
-            _.each(that.circles, function(circle){ circle.infowindow.close(); })
-        });
-
-        this.circles.push({circle:mapCircle, marker:marker, infowindow:infowindow});
     },
 
     appendKey: function(attr){
@@ -536,13 +538,22 @@ define([
     },
 
     render: function(){
-        this.$('aside > div.list').empty();
-        this.collection.reset();
-
+        this.app.navbarView.enableContextMenu();
         this.app.navbarView.toggleContextTitle({flag:true});
+        this.$('aside').toggleClass('hideAside', false);
+        this.$('button#addContext').fadeOut();
+        this.clearMap();
+
+        if (this.selectedKeyModel) {
+            this.keyClickClb( this.selectedKeyModel );
+            return false;
+        }
+
         console.log('WORLD render', this.app.getContext().title)
 
         var that = this;
+        this.collection.reset();
+        this.$('aside > div.list').empty();
         this.app.getKeyvals(function(json){
 
             var bounds = new google.maps.LatLngBounds();

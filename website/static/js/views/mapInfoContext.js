@@ -18,6 +18,7 @@ define([
     template: _.template( mapInfoContextTemplate ),
 
     enterBtn: function() {
+        // this.app.router.navigate('/'+this.model.get('cid'));
         window.location.href = '/'+this.model.get('cid');
     },
 

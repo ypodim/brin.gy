@@ -40,7 +40,7 @@ define([
         'account': 'account',
         'stats': 'stats',
 
-        'world': 'world',
+        'apps': 'apps',
 
         "*actions": "defaultRoute",
     },
@@ -64,6 +64,11 @@ define([
         //     state: this.state,
         // });
         this.worldView = options.worldView;        
+    },
+
+    apps: function(){
+        console.log('world')
+        this.worldView.showAllContexts();
     },
 
     stats: function(){

@@ -113,6 +113,8 @@ require([
         var app_router = new Router({
             worldView: wldView,
         });
+        appp.router = app_router;
         Backbone.history.start();
+        // app_router.navigate('apps');
     });
 });

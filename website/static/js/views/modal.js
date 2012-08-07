@@ -44,7 +44,6 @@ define([
         var testTitle = $(e.target).val();
         this.timeout && clearTimeout(this.timeout);
         this.timeout = setTimeout(function(){
-            console.log('testing')
             that.app.getContexts(function(json){
                 e.target.setCustomValidity('');
                 for (var i in json.contexts) {
@@ -168,7 +167,7 @@ define([
             this.$('span#title').html('Application options')
             inner_template = _.template( newContextOptionsTemplate );
             data = {
-                location: options.location,
+                // location: options.location,
             };
         }
 
