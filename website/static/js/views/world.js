@@ -259,6 +259,7 @@ define([
                         })
                     };
                     that.app.postNewContext(appdic, clb);
+                    
                 } else
                     that.showAllContexts({notoggle:true});
             });
