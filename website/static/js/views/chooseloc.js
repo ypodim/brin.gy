@@ -3,12 +3,10 @@ define([
   'underscore', 
   'backbone',
   'app',
-  'router',
 
-  'text!templates/chooseloc.html',
-  'views/mapInfoAttribute',
-  ], function($, _, Backbone, appConfig, router, mapTemplate, mapInfoAttrView){
-  var welcomeView = Backbone.View.extend({
+  'text!templates/chooseloc.html'
+  ], function($, _, Backbone, appConfig, mapTemplate){
+  var chooseLocationView = Backbone.View.extend({
     el: $("#popup"),
     events: {
         'click button#cancel': 'cancelBtn',
@@ -174,5 +172,5 @@ define([
         this.latLngControl = new LatLngControl();
     },
   });
-  return welcomeView;
+  return chooseLocationView;
 });

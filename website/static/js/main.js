@@ -38,7 +38,7 @@ require([
     'views/world',
     'views/navbar',
     'views/login',
-    'views/modal'
+    'views/modal',
 ], function($, bootstrap, _, app, Router, Backbone,
     worldView, navbarView, loginView, modalView
     ){

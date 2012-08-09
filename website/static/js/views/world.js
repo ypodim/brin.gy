@@ -13,11 +13,12 @@ define([
   'views/mapInfoContext',
   'views/mapInfoLocation',
   'views/valueFrame',
-  'views/chooseloc',
+  
   'views/modal',
+  'views/chooseloc',
 
   'http://google-maps-utility-library-v3.googlecode.com/svn/tags/infobox/1.1.9/src/infobox.js'
-  ], function($, _, Backbone, appConfig, router, attrModel, attrCollection, keyView, mapInfoAttrView, mapInfoContextView, mapInfoLocationView, valueFrameView, chooselocView, modalView, test){
+  ], function($, _, Backbone, appConfig, router, attrModel, attrCollection, keyView, mapInfoAttrView, mapInfoContextView, mapInfoLocationView, valueFrameView, modalView, chooselocView, test){
   var welcomeView = Backbone.View.extend({
     el: $('#container'),
     events: {

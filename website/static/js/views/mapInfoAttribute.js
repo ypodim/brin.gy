@@ -3,11 +3,10 @@ define([
   'underscore', 
   'backbone',
   'app',
-  'router',
 
   'text!templates/mapInfoAttribute.html',
   'text!templates/userMatch.html'
-  ], function($, _, Backbone, appConfig, router, mapInfoAttrTemplate, userMatchTemplate){
+  ], function($, _, Backbone, appConfig, mapInfoAttrTemplate, userMatchTemplate){
   var welcomeView = Backbone.View.extend({
     // el: $('div'),
     className: 'infoboxAttribute',
