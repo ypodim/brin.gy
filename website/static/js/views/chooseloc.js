@@ -14,9 +14,9 @@ define([
         'click button#cancel': 'cancelBtn',
         'click button#useloc': 'useBtn',
         'click button#next': 'okBtn',
-        'change input#locationinput': 'titleChanged',
+        // 'change input#locationinput': 'titleChanged',
         
-        'submit form': 'submitLocation',
+        'submit form': 'close',
     },
     app: appConfig.getState(),
 
@@ -27,20 +27,7 @@ define([
     locationInput: 'locationinput',
     circle: {},
 
-    submitLocation: function(){
-        return false;
-    },
-
-    titleChanged: function(e){
-        var gotText = ($(e.target).val() != '');
-        var gotCircle = (this.tempCircle != null);
-        var flag = (gotText && gotCircle);
-        this.$('button#next').toggleClass('disabled', !flag);
-
-        // this.autoFieldChanged();
-    },
-
-    close: function(options) {
+    close: function(options){
         this.undelegateEvents();
         this.$('.locationPicker').remove();
         this.$('#crosshair').remove();
@@ -48,13 +35,18 @@ define([
         this.$el.hide();
 
         if (options && options.force)
-            return;
+            return false;
+
+        var gotCircle = (this.circle != null);
+        if (gotCircle)
+            console.log('submit')
 
         this.trigger('newlocation', this.circle);
     },
     cancelBtn: function() {
         this.circle = {};
         this.close();
+        // return false;
     },
     okBtn: function() {
         var locationTitle = this.$('#'+this.locationInput).val();
@@ -62,7 +54,7 @@ define([
             return;
 
         this.circle.title = locationTitle;
-        this.close();
+        // this.close();
     },
 
     useLocation: function(model){
@@ -109,8 +101,10 @@ define([
         google.maps.event.addListener(this.tempCircle, 'mouseover', this.areaMouseOver);
         google.maps.event.addListener(this.tempCircle, 'mouseout', this.areaMouseOut);
 
-        if (this.$('#'+this.locationInput).val())
-            this.$('button#next').removeClass('disabled');
+        // if (this.$('#'+this.locationInput).val())
+            // this.$('button#next').removeClass('disabled');
+
+        return false;
     },
     areaClick: function(event) {
         // console.log('area', this.cntx)

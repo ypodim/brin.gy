@@ -424,127 +424,6 @@ footer > a:hover {
 
 
 @wizardWidth: 400px;
-div.pickLocation {
-    position: absolute;
-    left: 0;
-    top: 40px;
-    right: 0;
-    bottom: 0;
-
-    height:530px;
-    width:@wizardWidth;
-
-    left:50%;
-    margin: 10px 0 0 -@wizardWidth/2;
-    padding:10px;
-    
-    text-align: center;
-    pointer-events: none;
-    color: rgba(0,0,0,0.8);
-
-    background-color: rgba(0,0,0,0.1);
-    border: 1px solid rgba(0,0,0,0.15);
-}
-
-div.pickLocation > div.wizardPage {
-    height:440px;
-    margin:auto;
-}
-
-div.pickLocation div.caption {
-    font-size: 22px;
-    font-weight: bold;
-    line-height: 30px;
-    margin: 0px auto 5px auto;
-    padding:5px;
-
-    background-color: rgba(255,255,255,0.9);
-    box-shadow: 0 0 100px black;
-
-    border-radius:5px;
-}
-div.pickLocation div.caption > div#tip {
-    padding:5px;
-    font-size: 13px;
-    line-height: 13px;
-}
-
-
-div.pickLocation > div.buttons {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 0 0 10px 0;
-    pointer-events: all;
-}
-div.pickLocation > div.buttons > button {
-    box-shadow: 0 0 100px black ! important;
-    width: 120px;
-}
-
-div.pickLocation div.box {
-    background-color: rgba(255,255,255,0.9);
-    border-radius: 5px;
-    padding: 5px;
-}
-
-div.pickLocation > div.wizardPage { display:none; }
-div.pickLocation > div#page1 { display:block; }
-
-div.pickLocation > div#page1 > div#crosshair {
-    margin: 20px auto ;
-    width: 20px;
-    
-    padding: 150px;
-    border: 5px dotted rgba(255,0,0,0.5);
-    border-radius: 300px;
-
-    text-align:center;
-    color: rgba(255,0,0,0.5);
-    font-size: 40px;
-    box-shadow: 0 0 100px black;
-}
-div.pickLocation > div#page1 > div#tip {
-    padding:5px;
-
-    background-color: rgba(255,255,255,0.9);
-    box-shadow: 0 0 50px black;
-    font-weight: bold;
-    text-align: center;
-    border-radius:5px;
-}
-div.pickLocation > div#page1 > input#location {
-    padding:5px;
-
-    /*background-color: rgba(255,255,255,0.9);*/
-    box-shadow: 0 0 50px black;
-    font-weight: bold;
-    border-radius:5px;
-    pointer-events: all;
-}
-
-
-
-
-div.pickLocation > div#page2 > div.caption {
-    margin-top: 20px;
-}
-div.pickLocation > div#page2 input,select {
-    width: @wizardWidth - 30;
-    margin: 0 50px 0 0;
-    
-    font-size:20px;
-    line-height: 20px;
-    pointer-events: all;
-}
-div.pickLocation > div#page2 input{
-    height:24px;
-}
-div.pickLocation > div#page2 input[type=number],select {
-    width:40%;
-    margin:0;
-}
 
 
 
@@ -552,13 +431,7 @@ div.pickLocation > div#page2 input[type=number],select {
 
 div.locationPicker {
     position: relative;
-    /*position: absolute;*/
-    /*left: 0;*/
-    /*top: 0;*/
-    /*right: 0;*/
-    /*bottom: 0;*/
-
-    /*height:530px;*/
+    
     width:@wizardWidth;
 
     /*left:50%;*/
@@ -573,7 +446,7 @@ div.locationPicker {
     border: 1px solid rgba(0,0,0,0.15);
 }
 div.locationPicker > div#page2 { display: none; }
-div.locationPicker > div.wizardPage {
+div.locationPicker > form.wizardPage {
     height:440px;
     height:80px;
     margin:auto;
@@ -595,7 +468,7 @@ div.locationPicker div.caption > div#tip {
     font-size: 13px;
     line-height: 13px;
 }
-div.locationPicker > div.buttons {
+div.locationPicker > .wizardPage > div.buttons {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -603,12 +476,12 @@ div.locationPicker > div.buttons {
     padding: 0 0 10px 0;
     pointer-events: all;
 }
-div.locationPicker > div.buttons > button {
+div.locationPicker > .wizardPage > div.buttons > button {
     box-shadow: 0 0 100px black ! important;
     width: 120px;
 }
 
-div.locationPicker > div.wizardPage > form > input#locationinput {
+div.locationPicker > .wizardPage > input#locationinput {
     width: @wizardWidth - 10;
     padding:5px;
     box-shadow: 0 0 50px black;

@@ -11,8 +11,9 @@ define([
   'text!templates/feedback.html',
   'text!templates/about.html',
   'text!templates/newContextOptions.html',
+  'text!templates/newLocationAttr.html',
   
-  ], function($, _, Backbone, appConfig, tooltip, modalTemplate, accountTemplate, reminderTemplate, newkeyTemplate, feedbackTemplate, aboutTemplate, newContextOptionsTemplate){
+  ], function($, _, Backbone, appConfig, tooltip, modalTemplate, accountTemplate, reminderTemplate, newkeyTemplate, feedbackTemplate, aboutTemplate, newContextOptionsTemplate, newLocationAttrTemplate){
   var modalView = Backbone.View.extend({
     el: $('#modal'),
     events: {
@@ -182,6 +183,14 @@ define([
                 // location: options.location,
             };
         }
+        if (options.title == 'getLocTitle') {
+            this.$('span#title').html('about this place')
+            inner_template = _.template( newLocationAttrTemplate );
+            data = {
+                // location: options.location,
+            };
+        }
+        
 
         this.$('.content').html( inner_template(data) );
         return this;

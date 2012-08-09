@@ -319,21 +319,21 @@ define([
 
         var that = this;
         this.getLocationInput( function(circle){
-            
-            if (! circle.title)
-                return false;
-
-            console.log('circle', circle)
-            
             that.$('button#addLocation').show();
-            
+
             if (that.selectedKeyModel)
                 that.keyClickClb( that.selectedKeyModel );
 
             if (circle && circle.center) {
                 var key = that.selectedKeyModel.get('key');
+                that.app.modal.render({
+                    title: 'getLocTitle',
+                    key: key,
+                    circle: circle,
+                });
+
                 console.log('deeeeeep', circle)
-                that.postLocationAttr(key, circle.title, circle);
+                // that.postLocationAttr(key, circle.title, circle);
             }
         });
     },

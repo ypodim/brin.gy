@@ -9,40 +9,19 @@
 		</div>
 	</div>
 
-	<div id='page1' class='wizardPage'>
-		<form>
-			<input id='locationinput' type='text' autofocus required placeholder='search for place' />
+	<form class='wizardPage'>
+		<!-- <form> -->
+			<input id='locationinput' type='text' autofocus required placeholder='place name' required />
 			<!-- <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/> -->
-		</form>
-		
-	</div>
+		<!-- </form> -->
+	
 
-	<div id='page2' class='wizardPage'>
-		<div class='box'>
-			<input id='title' type='text' placeholder='Title...' />
-			<textarea id='description' placeholder='Description...' rows=3></textarea>
+		<div class='buttons'>
+			<button id='cancel' class='btn btn-large'>Cancel</button>
+			<button id='useloc' class='btn btn-large btn-danger'>Use this area</button>
+			<button id='next' class='btn btn-large btn-success ' type='submit'>OK</button>
 		</div>
-
-		<div class='caption'>Time constraints (optional)</div>
-		<div class='box'>
-			<div>This information will self-destruct in:</div>
-			<input type='number' value="abc" placeholder=0 />
-			<select id="fruits">
-				<option value="never" selected> never </option>
-				<option value="minutes">minutes</option>
-				<option value="hours">hours</option> 
-				<option value="days">days</option> 
-				<option value="months">months</option> 
-			</select>
-		</div>
-	</div>
-
-
-	<div class='buttons'>
-		<button id='cancel' class='btn btn-large'>Cancel</button>
-		<button id='useloc' class='btn btn-large btn-danger'>Use this area</button>
-		<button id='next' class='btn btn-large btn-success disabled'>OK</button>
-	</div>
+	</form>
 </div>
 
 <div id='crosshair'></div>
