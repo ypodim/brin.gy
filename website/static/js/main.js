@@ -4,7 +4,7 @@
 // Require.js allows us to configure shortcut alias
 require.config({
   paths: {
-    jquery: 'libs/jquery/jquery-min',
+    // jquery: 'libs/jquery/jquery-min',
     cookie: 'libs/jquery/jquery.cookie',
 
     backbone: 'libs/backbone/backbone-min',
