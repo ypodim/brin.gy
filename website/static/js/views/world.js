@@ -585,6 +585,7 @@ define([
         this.app.getKeyvals(function(json){
 
             var bounds = new google.maps.LatLngBounds();
+            var locTitles = {};
 
             for (var i in json.items) {
                 var attr = json.items[i];
@@ -640,9 +641,29 @@ define([
                                 var center = new google.maps.LatLng(lat, lng);
                                 var radius = parseInt(xdata.radius);
 
-                                bounds.extend(center);
 
-                                model.set({location: {center:center, radius:radius}});
+                                var markerPos = center;
+                                var lid = xdata.id;
+
+                                if (locTitles[lid]) {
+                                    var randomRadius = Math.min( (0.3+Math.random()) * radius, radius*0.8 );
+                                    var randomAngle = Math.random()*360;
+                                    markerPos = google.maps.geometry.spherical.computeOffset(
+                                                    center, 
+                                                    randomRadius, 
+                                                    randomAngle
+                                                )
+                                } else {
+                                    locTitles[lid] = lid;
+                                }
+
+                                bounds.extend(markerPos);
+
+                                model.set({location: {
+                                    center:center, 
+                                    radius:radius,
+                                    markerPos: markerPos,
+                                }});
                                 that.addMapCircle(model);
                             // }
                             

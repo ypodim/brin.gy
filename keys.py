@@ -62,6 +62,7 @@ def getfullkv(r, c,k,v):
     for vid in getlid(r, k,v):
         dic = r.hgetall('location:lid:%s' % vid)
         dic['ktype'] = r.get('profile:key:%s:type' % k)
+        dic['id'] = vid
         res.append(dic)
     return res
 
