@@ -75,7 +75,6 @@ var state = {
     },
 
     setContext: function(cdic) {
-        console.log('setContext', cdic.id, cdic.title, cdic.description, cdic.lid, cdic.location, cdic.expiration)
         this._context.id = cdic.id;
         this._context.title = cdic.title;
         this._context.description = cdic.description;

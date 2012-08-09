@@ -644,6 +644,7 @@ define([
 
                                 var markerPos = center;
                                 var lid = xdata.id;
+                                console.log(lid, locTitles[lid], xdata.title);
 
                                 if (locTitles[lid]) {
                                     var randomRadius = Math.min( (0.3+Math.random()) * radius, radius*0.8 );
