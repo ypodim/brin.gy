@@ -28,6 +28,9 @@ define([
     circle: {},
 
     close: function(options){
+        if (!(options && options.close))
+            return false;
+
         this.undelegateEvents();
         this.$('.locationPicker').remove();
         this.$('#crosshair').remove();
@@ -37,15 +40,12 @@ define([
         if (options && options.force)
             return false;
 
-        var gotCircle = (this.circle != null);
-        if (gotCircle)
-            console.log('submit')
-
         this.trigger('newlocation', this.circle);
+        return false;
     },
-    cancelBtn: function() {
+    cancelBtn: function(e) {
         this.circle = {};
-        this.close();
+        this.close({close:true});
         // return false;
     },
     okBtn: function() {
@@ -54,12 +54,12 @@ define([
             return;
 
         this.circle.title = locationTitle;
-        // this.close();
+        this.close({close:true});
     },
 
     useLocation: function(model){
         this.circle = model.toJSON();
-        this.close();
+        this.close({close:true});
     },
 
     useBtn: function() {

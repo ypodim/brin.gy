@@ -30,6 +30,7 @@ define([
         'submit form.newContextOptions': 'newContextSubmit',
         'keyup input#title': 'contextTitleChange',
         'change input[type=checkbox]': 'alertOption',
+        'submit form.newLocationAttr': 'newLocationAttr',
 
         'click a.help': 'showHelp',
     },
@@ -43,6 +44,14 @@ define([
             caption = 'show help!';
         $(e.target).html(caption);
         helpContent.slideToggle(helpVisible);
+        return false;
+    },
+    newLocationAttr: function(){
+        var dic = {
+            val: this.$('input#title').val(),
+        };
+        this.close({silent:true});
+        this.trigger('newlocationattr', dic);
         return false;
     },
     alertOption: function(e){
@@ -72,7 +81,7 @@ define([
         var description = this.$('textarea#description').val();
         var dic = {title:title, description:description};
         this.close({silent:true});
-        this.trigger('newcontext', dic)
+        this.trigger('newcontext', dic);
         return false;
     },
     feedbackSubmit: function(){
@@ -123,6 +132,7 @@ define([
     },
 
     close: function(options){
+        // this.undelegateEvents();
         this.$('[required]').removeAttr('required');
         this.$el.hide();
         if (!(options && options.silent))
@@ -187,8 +197,9 @@ define([
             this.$('span#title').html('about this place')
             inner_template = _.template( newLocationAttrTemplate );
             data = {
-                // location: options.location,
+                location: options.location,
             };
+            this.$('div.box').addClass('mid-narrow');
         }
         
 

@@ -328,12 +328,15 @@ define([
                 var key = that.selectedKeyModel.get('key');
                 that.app.modal.render({
                     title: 'getLocTitle',
-                    key: key,
-                    circle: circle,
+                    location: circle.title,
+                }).unbind('modal:closed').unbind('newlocationattr');
+                that.app.modal.bind('modal:closed', function(){
+                    // console.log('newcontext - modal closed');
+                }).bind('newlocationattr', function(options){
+                    var val = options.val;
+                    // console.log('modal closed submit', key, circle, val);
+                    that.postLocationAttr(key, val, circle);
                 });
-
-                console.log('deeeeeep', circle)
-                // that.postLocationAttr(key, circle.title, circle);
             }
         });
     },
@@ -669,6 +672,23 @@ define([
             'panControl': false,
             'mapTypeControlOptions': {position: google.maps.ControlPosition.TOP_CENTER},
         });
+
+
+        // var moonTypeOptions = {
+        //     getTileUrl: function(coord, zoom) {
+        //         return 'http://localhost:8889/static/images/tile256.png';
+        //     },
+        //     isPng: true,
+        //     tileSize: new google.maps.Size(256, 256),
+        //     maxZoom: 9,
+        //     minZoom: 0,
+        //     radius: 1738000,
+        //     name: 'Moon'
+        // };
+        // var moonMapType = new google.maps.ImageMapType(moonTypeOptions);
+        // this.app.map.mapTypes.set('moon', moonMapType);
+        // this.app.map.setMapTypeId('moon');
+
         google.maps.event.addListener(this.app.map, 'click', function(event) {
             _.each(that.circles, function(circle){ circle.infowindow.close(); })
         });
