@@ -24,7 +24,7 @@ require.config({
     maps: 'libs/gmaps/gmaps',
   },
   urlArgs: "bust=" +  (new Date()).getTime(),
-});
+})
 
 require([
     'jquery',
@@ -117,4 +117,4 @@ require([
         Backbone.history.start();
         // app_router.navigate('apps');
     });
-});
+})

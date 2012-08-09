@@ -177,7 +177,7 @@ define([
         // console.log('del');
     },
 
-    postLocationAttr: function(circle){
+    postLocationAttr: function(key, val, circle){
         if (!circle.center)
             return false;
         
@@ -193,8 +193,8 @@ define([
         };
 
         var model = new attrModel({
-            key: circle.key,
-            val: circle.title,
+            key: key,
+            val: val,
             xdata: xdata,
             score: 1,
             haveit: true,
@@ -212,8 +212,8 @@ define([
 
         this.app.mutateKeyValue({
             type: 'POST',
-            key: circle.key,
-            val: circle.title,
+            key: key,
+            val: val,
             xdata: xdata,
         });
     },
@@ -319,6 +319,12 @@ define([
 
         var that = this;
         this.getLocationInput( function(circle){
+            
+            if (! circle.title)
+                return false;
+
+            console.log('circle', circle)
+            
             that.$('button#addLocation').show();
             
             if (that.selectedKeyModel)
@@ -326,9 +332,8 @@ define([
 
             if (circle && circle.center) {
                 var key = that.selectedKeyModel.get('key');
-                circle.key = key;
                 console.log('deeeeeep', circle)
-                that.postLocationAttr(circle);
+                that.postLocationAttr(key, circle.title, circle);
             }
         });
     },
