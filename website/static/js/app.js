@@ -4,6 +4,7 @@ var state = {
         _baseurl: '',
         _agentid: '',
         _usernames: {},
+        _options: {},
         url: function(){
             return this._baseurl+"/"+this._agentid;
         },
@@ -22,8 +23,17 @@ var state = {
         },
         id: function() { return this._agentid; },
 
-        addUserInfo: function(info){
+        setUserInfo: function(info){
             this._usernames[info.name] = info;
+        },
+        loadUserOptions: function(clb){
+            var url = this.url();
+            var data = {secret: this.fullInfo().pwd};
+            var that = this;
+            $.getJSON(url, data, function(json){
+                that._options = json;
+                clb && clb(json);
+            });
         },
         removeUserInfo: function(username){
             delete this._usernames[username];
@@ -61,7 +71,7 @@ var state = {
             var pwd = pseudonyms[username].secret;
             var email = pseudonyms[username].email;
             var info = {pwd:pwd, email:email, name:username};
-            this.agent.addUserInfo(info);
+            this.agent.setUserInfo(info);
             this.agent.setAgentId( username );
         }
 
@@ -189,7 +199,7 @@ var state = {
                 var pwd = password;
                 var email = json.email;
                 var info = {pwd:pwd, email:email, name:username};
-                that.agent.addUserInfo(info);
+                that.agent.setUserInfo(info);
                 that.agent.setAgentId( username );
                 that.cookies.set_cookie(username, password, json.email);
                 // that.stats('signin', username);
@@ -225,7 +235,7 @@ var state = {
                 var pwd = json.secret;
                 var email = email;
                 var info = {pwd:pwd, email:email, name:username};
-                that.agent.addUserInfo(info);
+                that.agent.setUserInfo(info);
                 that.cookies.set_cookie(username, json.secret, email);
                 // that.state.stats('signup', username);
                 that.trigger('signedup');
@@ -374,7 +384,7 @@ var state = {
         };
 
         $.post(url, data, function(json){
-            console.log(json);
+            // console.log(json);
         }, 'json');
     },
 };

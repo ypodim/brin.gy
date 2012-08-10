@@ -1,3 +1,5 @@
+import time
+
 def getK (context):            return 'profile:%s:keys'                 % (context)
 def getKA(context, key):       return 'profile:%s:key:%s:agents'        % (context, key)
 def getKV(context, key):       return 'profile:%s:key:%s:values'        % (context, key)
@@ -72,6 +74,40 @@ def set_user_option(r, username, option, value):
     return r.hset('options:user:%s' % username, 'alert:%s'%option, value)
 def get_user_option(r, username, option):
     return r.hget('options:user:%s' % username, 'alert:%s'%option)
+
+
+def doalert(r, atype, c, k, v, u):
+    if c == 'all':
+        return
+
+    matches = []
+    if atype == 'onvalueadded':
+        matches = r.smembers(getKVA(c, k, v)) - set([u])
+    if atype == 'onvaluecreated':
+        matches = r.smembers(getKA(c, k)) - set([u])
+    if atype == 'onattribute':
+        cid = r.get('context:title:%s:cid' % c)
+        matches = r.smembers('context:cid:%s:users' % cid) - set([u])
+    if atype == 'onapplication':
+        # matches = r.smembers('context:cid:%s:users' % c)
+        pass
+
+    for umatch in matches:
+        storedOption = get_user_option(r, umatch, atype)
+        if storedOption == 'True':
+            umatch
+            alert = dict(
+                atype=atype, 
+                key=k, 
+                val=v, 
+                context=c, 
+                user=u,
+                tstamp=time.time())
+            r.rpush('user:%s:alerts' % umatch, alert)
+            print umatch, alert
+
+
+    # print 'alert', atype, k, v, u, c
 
 
 def add_context(r, context, username):

@@ -170,6 +170,17 @@ class serve_user(bringy_handler):
             self.on_response(dict(error=error))
     def get(self):
         dic = dict(capabilities=capability_names)
+
+        secret = self.get_argument('secret','')
+        passed = db.authenticate_user(self.username, secret)
+        if passed:
+            dic = db.r.hgetall('options:user:%s' % self.username)
+            for k in dic:
+                if dic[k] == 'True':
+                    dic[k] = 1
+                if dic[k] == 'False':
+                    dic[k] = 0
+        
         dic = self.finilize_call(dic)
         self.write(dic)
     def delete(self):
@@ -220,11 +231,10 @@ class serve_user(bringy_handler):
             p.leave_context(context)
         if not error and action == 'options':
             options = tornado.escape.json_decode(options)
-            if not options.get('option') in ['onapplication','onattribute','onvalue']:
+            if not options.get('option') in ['onvalueadded','onvaluecreated','onapplication','onattribute']:
                 error = 'invalid option %s' % options.get('option')
             else:
                 set_user_option(db.r, self.username, options['option'], options['value'])
-                print options['option'], get_user_option(db.r, self.username, options['option'])
         if not error and action == 'email':
             msg = self.get_argument('msg')
             to = self.get_argument('to')

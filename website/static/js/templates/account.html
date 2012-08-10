@@ -10,17 +10,21 @@
 <div class='accountentry'>
     <div class='header'>Alerts</div>
     <label>Alert me when:</label>
-    <label class="checkbox">
-		<input type="checkbox" name="onapplication" />
-		a new application is created.
+	<label class="checkbox">
+		<input type="checkbox" name="onvalueadded" <%= onvalueadded %> />
+		a user added an attribute that I also have.
 	</label>
 	<label class="checkbox">
-		<input type="checkbox" name="onattribute" />
+		<input type="checkbox" name="onvaluecreated" <%= onvaluecreated %> />
+		a new value is added to an attribute that I have.
+	</label>
+	<label class="checkbox">
+		<input type="checkbox" name="onattribute" <%= onattribute %> />
 		a new attribute is created in an application I participate in.
 	</label>
 	<label class="checkbox">
-		<input type="checkbox" name="onvalue" checked />
-		a new value is added to an attribute that I have.
+		<input type="checkbox" name="onapplication" <%= onapplication %> />
+		a new application is created.
 	</label>
 </div>
 

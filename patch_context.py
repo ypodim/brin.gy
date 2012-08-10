@@ -376,12 +376,14 @@ def show_locations():
         print
 
 
-def show_alerts():
-    for atype in ['everything', 'application', 'attribute', 'value']:
-        for a in r.smembers('alert:on:%s:users' % atype):
-            print atype, a
+def show_alerts(u):
+    for i in xrange(r.llen('user:%s:alerts' % u)):
+        print r.lindex('user:%s:alerts' % u, i)
+    # for atype in ['onvalueadded', 'onvaluecreated', 'onattribute', 'onapplication']:
+        # for a in r.smembers('alert:on:%s:users' % atype):
+            # print atype, a
 
-show_alerts()
+show_alerts('ypodim')
 
 # patch_context(1007, '', 1005)
 # show_contexts()

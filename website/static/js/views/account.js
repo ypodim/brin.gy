@@ -37,11 +37,26 @@ define([
     },
 
     render: function(){
-        var username = this.app.agent.fullInfo().name;
-        var email = this.app.agent.fullInfo().email;
-        var t = this.template( {username:username, email:email} );
-        this.$el.html(t);
+        var that = this;
+        this.app.agent.loadUserOptions(function(options){
+            var onvalueadded = options['alert:onvalueadded'];
+            var onvaluecreated = options['alert:onvaluecreated'];
+            var onattribute = options['alert:onattribute'];
+            var onapplication = options['alert:onapplication'];
 
+            var username = that.app.agent.fullInfo().name;
+            var email = that.app.agent.fullInfo().email;
+            var t = that.template({
+                username: username, 
+                email: email,
+                onvalueadded: (onvalueadded) ? 'checked' : '',
+                onvaluecreated: (onvaluecreated) ? 'checked' : '',
+                onattribute: (onattribute) ? 'checked' : '',
+                onapplication: (onapplication) ? 'checked' : '',
+            });
+            that.$el.html(t);
+        });
+        
 
         // window.fbAsyncInit = this.fbAsyncInit;
         // var js, id = 'facebook-jssdk'; 

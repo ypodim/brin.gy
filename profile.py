@@ -52,20 +52,25 @@ class profile():
     'context:cid:CID:users' # set
     'context:title:CONTEXTTITLE:cid' # string
 
-    'alert:on:everything:users' # set
-    'alert:on:application:users' # set
-    'alert:on:attribute:users' # set
-    'alert:on:value:users' # set
-    'USER:alerts'
-    
+    # 'alert:on:everything:users' # set
+    # 'alert:on:application:users' # set
+    # 'alert:on:attribute:users' # set
+    # 'alert:on:value:users' # set
+    'user:USER:alerts' # list
+
 
     def add_reverse(self, context, key, val):
         if self.db.sadd(getKA(context, key), self.usr):   # add agent to set for this key
-            self.db.zincrby(getK(context), key, 1)     # add key and increase its score
+            score = self.db.zincrby(getK(context), key, 1)     # add key and increase its score
+            if score == 1:
+                doalert(self.db, 'onattribute', context, key, val, self.usr)
             
         if self.db.sadd(getKVA(context, key, val), self.usr):  # add agent to set for this key/val pair
-            self.db.zincrby(getKV(context, key), val, 1)     # add key/val pair and increase its score
-        
+            score = self.db.zincrby(getKV(context, key), val, 1)     # add key/val pair and increase its score
+            doalert(self.db, 'onvalueadded', context, key, val, self.usr)
+            if score == 1:
+                doalert(self.db, 'onvaluecreated', context, key, val, self.usr)
+
     def del_reverse(self, context, key, val):
         ctitle = context['title']
         cid = context['id']
@@ -108,11 +113,9 @@ class profile():
         self.db.delete('context:title:%s:cid' % context['title'])
 
     def add_context(self, context):
-        print
-        print 'add_context', context
         cid = context['id']
         if self.db.hgetall('context:cid:%s' % cid):
-            print 'WARNING: add_context: cid already exists:', cid
+            # print 'WARNING: add_context: cid already exists:', cid
             return cid
         else:
             if self.db.sismember('contexts', context['title']):
@@ -141,7 +144,8 @@ class profile():
             self.db.set('context:%s:cid' % context['title'], cid)
             self.db.hmset('context:cid:%s' % cid, cdic)
             self.db.set('context:title:%s:cid' % context['title'], cid)
-            self.db.sadd('contexts', context['title'])
+            if self.db.sadd('contexts', context['title']):
+                doalert(self.db, 'onapplication', context, None, None, self.usr)
             return cid
 
     def get_keys(self):
@@ -159,10 +163,9 @@ class profile():
         return self.db.smembers('%s:profile:key:%s' % (self.usr, key))
     
     def set_val(self, context, key, val):
-        # context is dictionary
-        print 'set_val'
-        print context, type(context)
-        print key, val
+        # print 'set_val'
+        # print context, type(context)
+        # print key, val
 
         cid = self.add_context(context)
         if not cid:
@@ -181,7 +184,7 @@ class profile():
         kv_exists_in_other_contexts = ''
         if self.db.sismember('%s:profile:key:%s' % (self.usr, key), val):
             for cntx in self.db.smembers('%s:contexts' % self.usr):
-                print 'looking in', cntx, (cntx != context['title']), self.usr, getKVA(cntx, key, val)
+                # print 'looking in', cntx, (cntx != context['title']), self.usr, getKVA(cntx, key, val)
 
                 ismember = self.db.sismember(getKVA(cntx, key, val), self.usr)
                 if cntx != context['title'] and ismember:
@@ -189,9 +192,10 @@ class profile():
 
         res = 0
         if kv_exists_in_other_contexts:
-            print 'kv', key, val, 'also exists in', kv_exists_in_other_contexts
+            # print 'kv', key, val, 'also exists in', kv_exists_in_other_contexts
+            pass
         else:
-            print 'kv', key, val, 'DOES NOT exist in other contexts'
+            # print 'kv', key, val, 'DOES NOT exist in other contexts'
             res = self.db.srem('%s:profile:key:%s' % (self.usr, key), val)
 
         if res:
@@ -239,16 +243,13 @@ class profile():
         self.finish( res )
         
     def post(self, context):
-        print 'POST context', context
-        print self.arguments
-
+        print
         if self.path[-1] == 'visited':
             res = 0
             for key in self.arguments:
                 key = unicode(key, errors='replace')
                 
                 lst = self.arguments[key]
-                print 'profile to add', lst, '-', key
                 self.db.sadd('%s:profile:visited:keys' % self.usr, key)
                 self.db.sadd('%s:profile:visited:key:%s' % (self.usr, key), *lst)
                 res += len(lst)
@@ -258,7 +259,6 @@ class profile():
         res = ''
 
         for attr in self.arguments:
-            print 'profile POST:', attr
             if type(attr) == list:
                 key, val = attr
             else:
