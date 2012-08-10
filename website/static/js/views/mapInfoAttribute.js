@@ -4,9 +4,11 @@ define([
   'backbone',
   'app',
 
+  'tooltip',
+
   'text!templates/mapInfoAttribute.html',
   'text!templates/userMatch.html'
-  ], function($, _, Backbone, appConfig, mapInfoAttrTemplate, userMatchTemplate){
+  ], function($, _, Backbone, appConfig, tooltipjs, mapInfoAttrTemplate, userMatchTemplate){
   var welcomeView = Backbone.View.extend({
     // el: $('div'),
     className: 'infoboxAttribute',
@@ -76,6 +78,10 @@ define([
             var uhtml = utemplate({username:username});
             this.$('div#matches').append(uhtml);
         }
+
+
+        this.$('.titleKey').tooltip({title: this.$('.titleKey').html()});
+        this.$('.titleVal').tooltip({title: this.$('.titleVal').html()});
     },
 
     initialize: function(){

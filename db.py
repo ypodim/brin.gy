@@ -56,6 +56,7 @@ class DB:
         return res
         
     def delete_user(self, username):
+        print 'delete user options', self.r.delete('options:user:%s' % username)
         return self.r.srem('users', username)
         
     def user_exists(self, username):

@@ -3,7 +3,6 @@ define([
   'underscore', 
   'backbone',
   'app',
-  'router',
 
   'models/attribute',
   'collections/attributes',
@@ -18,7 +17,7 @@ define([
   'views/chooseloc',
 
   'http://google-maps-utility-library-v3.googlecode.com/svn/tags/infobox/1.1.9/src/infobox.js'
-  ], function($, _, Backbone, appConfig, router, attrModel, attrCollection, keyView, mapInfoAttrView, mapInfoContextView, mapInfoLocationView, valueFrameView, modalView, chooselocView, test){
+  ], function($, _, Backbone, appConfig, attrModel, attrCollection, keyView, mapInfoAttrView, mapInfoContextView, mapInfoLocationView, valueFrameView, modalView, chooselocView, test){
   var welcomeView = Backbone.View.extend({
     el: $('#container'),
     events: {
@@ -475,14 +474,6 @@ define([
         };
 
         var mapCircle = new google.maps.Circle(contextOptions);
-        
-        google.maps.event.addListener(mapCircle, 'mouseover', function(event) {
-            this.setOptions({strokeColor:'red'});
-        });
-        google.maps.event.addListener(mapCircle, 'mouseout', function(event) {
-            this.setOptions({strokeColor: options.strokecolor});
-            this.setOptions({zIndex:0});
-        });
 
         var markerPos = options.markerPos;
         if (! markerPos)
@@ -497,6 +488,14 @@ define([
         if (options.icon)
             marker.setIcon(options.icon);
 
+        // google.maps.event.addListener(mapCircle, 'mouseover', function(event) {
+        //     this.setOptions({strokeColor:'red'});
+        // });
+        // google.maps.event.addListener(mapCircle, 'mouseout', function(event) {
+        //     this.setOptions({strokeColor: options.strokecolor});
+        //     this.setOptions({zIndex:0});
+        // });
+
         var that = this;
         var background = 'url(/static/images/';
         background += (options.calloutSide) ? 'callout_side' : 'callout';
@@ -504,7 +503,7 @@ define([
         var offsetX = (options.calloutSide) ? 8 : -194;
         var offsetY = (options.calloutSide) ? -83 : -178;
         var padding = (options.calloutSide) ? '0 10px 22px 28px' : '10px';
-        var height = (options.calloutSide) ? '100px' : '150px';
+        // var height = (options.calloutSide) ? '100px' : '150px';
 
         var myOptions = {
             content: options.infowindowContent,
@@ -517,7 +516,7 @@ define([
                 'background-repeat': 'no-repeat',
                 'background-size': '100%',
                 'padding': padding,
-                height: height,
+                // height: height,
                 'z-index': 3000,
                 closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
                 closeBoxMargin: "10px 2px 2px 2px",
@@ -531,8 +530,12 @@ define([
         var ib = new InfoBox(myOptions);
 
         google.maps.event.addListener(marker, 'click', function() {
-            _.each(that.circles, function(circle){ circle.infowindow.close(); })
+            _.each(that.circles, function(circle){ 
+                circle.infowindow.close(); 
+                circle.circle.setOptions({strokeColor: options.strokecolor});
+            })
             ib.open(that.app.map, marker);
+            mapCircle.setOptions({strokeColor: 'red'});
         });
         google.maps.event.addListener(mapCircle, 'click', function() {
             _.each(that.circles, function(circle){ circle.infowindow.close(); })
@@ -577,7 +580,7 @@ define([
             return false;
         }
 
-        console.log('WORLD render', this.app.getContext().title)
+        // console.log('WORLD render', this.app.getContext().title)
 
         var that = this;
         this.collection.reset();
@@ -641,10 +644,8 @@ define([
                                 var center = new google.maps.LatLng(lat, lng);
                                 var radius = parseInt(xdata.radius);
 
-
                                 var markerPos = center;
                                 var lid = xdata.id;
-                                console.log(lid, locTitles[lid], xdata.title);
 
                                 if (locTitles[lid]) {
                                     var randomRadius = Math.min( (0.3+Math.random()) * radius, radius*0.8 );

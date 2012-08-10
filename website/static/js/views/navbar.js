@@ -3,10 +3,9 @@ define([
   'underscore', 
   'backbone',
   'app',
-  'router',
 
   'text!templates/navbar.html'
-  ], function($, _, Backbone, appConfig, router, navbarTemplate){
+  ], function($, _, Backbone, appConfig, navbarTemplate){
   var navView = Backbone.View.extend({
     el: $('#navbar'),
     events: {
@@ -24,7 +23,7 @@ define([
     contextMenuClicked: false,
 
     contextTitle: function(){
-        
+        this.trigger('context:title');
         return false;
     },
     contextMenu: function(e){

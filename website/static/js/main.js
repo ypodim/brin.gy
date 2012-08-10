@@ -59,7 +59,7 @@ require([
    
         // modal     
         appp.modal = new modalView();
-        appp.modal.bind('logout', function(){
+        appp.bind('signout', function(){
             var username = appp.agent.id();
             // that.app.agent.removeUserInfo(username);
             appp.cookies.del_cookie(username);
@@ -74,7 +74,8 @@ require([
             appp.modal.close();
         });
 
-        appp.modal.bind('delete', function(){
+        appp.bind('delete', function(){
+            console.log('delete')
             appp.doDelete();
         });
 
@@ -89,6 +90,10 @@ require([
         appp.navbarView.bind('signup', wldView.showLoginBox);
         appp.navbarView.bind('contexts', wldView.showAllContexts);
         appp.navbarView.bind('account', wldView.showAccount);
+        appp.navbarView.bind('context:title', function(){
+            wldView.selectedKeyModel = null;
+            wldView.render()
+        });
         appp.navbarView.bind('about', function(){
             appp.modal.render({title: 'about'});
         });

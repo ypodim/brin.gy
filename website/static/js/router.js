@@ -7,15 +7,10 @@ define([
     'views/login',
     
     'views/sendMessage',
-    // 'views/newAttribute',
-    // 'views/welcome',
-    // 'views/presentation',
     'views/account',
-    // 'views/contexts',
-    'views/stats',
     'views/world',
 ], function(
-    $, _, Backbone, appConfig, loginView, sendMessageView, accountView, statsView, worldView
+    $, _, Backbone, appConfig, loginView, sendMessageView, accountView, worldView
     ){
   var AppRouter = Backbone.Router.extend({
     app: appConfig.getState(),
@@ -31,11 +26,6 @@ define([
         
         'sendmessage': 'sendmessage',
 
-        // 'new': 'newAttribute',
-        // 'new/:context': 'newAttribute',
-        // 'new/:context/:key': 'newAttribute',
-        // 'new/:context/:key/:val': 'newAttribute',
-
         'attributes': 'attributes',
         'account': 'account',
         'stats': 'stats',
@@ -47,40 +37,12 @@ define([
     
     initialize: function(options){
         _.bindAll(this, 'login');
-        // this.state = options.state;
-        // this.controlsView = options.controlsView;
-
-        // this.contents_view = new mobileManagerView({
-        //     state: this.state,
-        //     controls: this.controlsView,
-        // });
-        // this.contents_view.resetCollections();
-
-        // this.presView = new presentationView({
-        //     router:this,
-        // });
-
-        // this.wview = new welcomeView({
-        //     state: this.state,
-        // });
         this.worldView = options.worldView;        
     },
 
     apps: function(){
         console.log('world')
         this.worldView.showAllContexts();
-    },
-
-    stats: function(){
-        var sview = new statsView({
-            state: this.state,
-        });
-        sview.render();
-
-        this.controlsView.setUIstate({
-            title: 'stats',
-            footer:false,
-        });
     },
 
     presentation: function(sno){

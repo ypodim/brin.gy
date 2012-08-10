@@ -4,8 +4,10 @@ define([
   'backbone',
   'app',
   'tooltip',
+
+  'views/account',
+
   'text!templates/modal.html',
-  'text!templates/account.html',
   'text!templates/reminder.html',
   'text!templates/newKey.html',
   'text!templates/feedback.html',
@@ -13,13 +15,11 @@ define([
   'text!templates/newContextOptions.html',
   'text!templates/newLocationAttr.html',
   
-  ], function($, _, Backbone, appConfig, tooltip, modalTemplate, accountTemplate, reminderTemplate, newkeyTemplate, feedbackTemplate, aboutTemplate, newContextOptionsTemplate, newLocationAttrTemplate){
+  ], function($, _, Backbone, appConfig, tooltip, accountView, modalTemplate, reminderTemplate, newkeyTemplate, feedbackTemplate, aboutTemplate, newContextOptionsTemplate, newLocationAttrTemplate){
   var modalView = Backbone.View.extend({
     el: $('#modal'),
     events: {
         'click a.close': 'close',
-        'click button#signout': 'signoutBtn',
-        'click button#delete': 'deleteBtn',
         // 'click button#reminder': 'reminderBtn',
         'submit form.reminder': 'submitReminder',
 
@@ -29,7 +29,6 @@ define([
         'submit form.feedback': 'feedbackSubmit',
         'submit form.newContextOptions': 'newContextSubmit',
         'keyup input#title': 'contextTitleChange',
-        'change input[type=checkbox]': 'alertOption',
         'submit form.newLocationAttr': 'newLocationAttr',
 
         'click a.help': 'showHelp',
@@ -54,13 +53,7 @@ define([
         this.trigger('newlocationattr', dic);
         return false;
     },
-    alertOption: function(e){
-        var input = $(e.target);
-        var option = input.attr('name');
-        var checked = (input.attr('checked') == 'checked');
-        var options = {option: option, value: checked};
-        this.app.saveOption(options);
-    },
+    
     contextTitleChange: function(e){
         var that = this;
         var testTitle = $(e.target).val();
@@ -113,17 +106,6 @@ define([
         return false;
     },
 
-    signoutBtn: function(){
-        this.trigger('logout');
-        this.close();
-    },
-    deleteBtn: function(){
-        if (confirm('All data associated with '+this.app.agent.id()+'\nwill be lost. Delete?'))
-            this.trigger('delete');
-
-        this.close();
-    },
-    
     submitReminder: function() {
         this.trigger('reminder');
         this.$('div.footer > img').show();
@@ -151,12 +133,28 @@ define([
         var inner_template;
         var data;
         if (options.title == 'account') {
-            inner_template = _.template( accountTemplate );
-            data = {
-                username: this.app.agent.fullInfo().name, 
-                email: this.app.agent.fullInfo().email,
-            }
+            // inner_template = _.template( accountTemplate );
+            // data = {
+            //     username: this.app.agent.fullInfo().name, 
+            //     email: this.app.agent.fullInfo().email,
+            // }
+            var that = this;
+            var aview = new accountView();
+            aview.render();
+            
+            aview.unbind('delete');
+            aview.bind('delete', function(){that.close()});
+
+            aview.unbind('signout');
+            aview.bind('signout', function(){that.close()});
+            
+            this.$('.content').html( aview.$el );
+            return this;
         }
+
+
+
+
         if (options.title == 'reminder') {
             inner_template = _.template( reminderTemplate );
             data = {
@@ -208,7 +206,7 @@ define([
     },
 
     initialize: function(options) {
-        _.bindAll(this, 'render', 'close', 'signoutBtn', 'newKeySubmit');
+        _.bindAll(this, 'render', 'close', 'newKeySubmit');
         var that = this;
         $('body').keydown(function(e){
             if (e.keyCode == 27)

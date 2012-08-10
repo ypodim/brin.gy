@@ -375,12 +375,20 @@ def show_locations():
         print r.get('location:latlonstring:%s:lid' % latlonstr)
         print
 
+
+def show_alerts():
+    for atype in ['everything', 'application', 'attribute', 'value']:
+        for a in r.smembers('alert:on:%s:users' % atype):
+            print atype, a
+
+show_alerts()
+
 # patch_context(1007, '', 1005)
 # show_contexts()
 # show_locations()
 
 # patch_contexts()
-test_contexts()
+# test_contexts()
 
 # show_last_location('None')
 
