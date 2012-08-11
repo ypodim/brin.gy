@@ -4,6 +4,7 @@ import random
 import json
 import time
 import sys
+import json
 
 from copy import copy
 from math import sqrt
@@ -173,6 +174,19 @@ class location:
                 ldic = self.r.hgetall('location:lid:%s' % lid)
                 ldic['id'] = lid
                 if self.inBounds(ldic, bounds):
+                    reversePointers = []
+                    for rpointer in self.r.smembers('location:lid:%s:reverse' % lid):
+                        reversePointers = json.loads(rpointer)
+                        for rp in reversePointers:
+                            if rp['type'] == 'context':
+                                cdata = self.r.hgetall('context:cid:%s' % rp['cid'])
+                                rp['cdata'] = cdata
+
+                    ldic['reversePointers'] = reversePointers
+                    
+                    
+                    
+                    # arguments.get('radius')
                     locations.append(ldic)
 
         return dict(locations=locations, error=error, count=count, lat=lat, lon=lon)

@@ -115,22 +115,16 @@ define([
         var radius = 10*scale;
         var center = this.latLngControl.xy2latlng(x,y);
         
-        // var contextOptions = {
-        //     strokeColor: "pink",
-        //     strokeOpacity: 0.8,
-        //     strokeWeight: 2,
-        //     fillColor: "#FF0000",
-        //     fillOpacity: 0.1,
-        //     map: this.app.map,
-        //     center: center,
-        //     radius: 10*scale,
-        // };
-
-        // this.tempCircle && this.tempCircle.setMap(null);
-        // this.tempCircle = new google.maps.Circle(contextOptions);
-
         this.app.getAllLocations(function(json){
-            console.log(json.locations.length);
+            // console.log(json.locations.length);
+            for (var i in json.locations) {
+                var revlocation = json.locations[i];
+                // console.log(revlocation)
+                for (var j in revlocation.reversePointers) {
+                    var revpointer = revlocation.reversePointers[j];
+                    console.log( JSON.stringify(revpointer) )    
+                }
+            }
         }, {lat:center.lat(), lon:center.lng(), radius:radius});
         
         clearTimeout(this.timer);

@@ -26,12 +26,12 @@ class profile():
     'USER:profile:key:KEY' # val
 
     
-    'global:nextcid' # holds next key id to be assigned to a context
+    
     # 'global:nextvid' # holds next key id to be assigned to a complex key
     'profile:keytypes' # set of key types (string, location, time, user)
     'profile:key:KEY:type' # hash of key type fields (eg. loc:lat, lon, radius)
     'profile:composite:key:KEY:val:VAL' # vid that corresponds to a composite key/val
-    'profile:vid:VID' # populated hash of key fields for value id VID
+    # 'profile:vid:VID' # populated hash of key fields for value id VID
 
     'global:nextlid' # holds next location id to be assigned to a location
     'location:lid:LID' # location information hash for location id LID 
@@ -39,13 +39,15 @@ class profile():
     'location:title:LOCATION' # set of location ids for a given location title LOCATION
     'location:latlonstrings' # set of location strings for easy lookup of existing lat/lons
     'location:latlonstring:LATLONSTR:lid' # location id for a given location string LATLONSTR
+    'location:lid:LID:reverse' # list of {type:context/profile, cid/key/val:pointer}
 
     'profile:CONTEXT:keys' # ordered set of all keys in use
     'profile:CONTEXT:key:KEY:agents' # set of agents using this key
     'profile:CONTEXT:key:KEY:values' # ordered set of values for this key
     'profile:CONTEXT:key:KEY:val:VAL:agents' # set of agents using this key/val pair
     
-
+    
+    'global:nextcid' # holds next key id to be assigned to a context
     'contexts' # set of all contexts available
     'USER:contexts' # set of contexts in which USER participates
     'context:cid:CID' # hash: id, title, description, expiration, lid

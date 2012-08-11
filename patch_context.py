@@ -111,6 +111,18 @@ def get_kv_by_vid(vid):
 
     return res
 
+def get_context_by_lid(vid):
+    res = []
+    topcid = int(r.get('global:nextcid'))
+    for cid in xrange(1001, topcid+1):
+        c = r.hgetall('context:cid:%s' % cid)
+        lid = c.get('lid')
+        if str(vid) == str(lid):
+            res.append(cid)
+
+    return res
+
+
 
 def upgrade_values():
     for vid in xrange(1001, int(r.get('global:nextvid'))+1):
@@ -383,8 +395,25 @@ def show_alerts(u):
         # for a in r.smembers('alert:on:%s:users' % atype):
             # print atype, a
 
+def add_reverse_location_pointers():
+    toplid = int(r.get('global:nextlid'))
+    for lid in xrange(1001, toplid+1):
+        reverse_pointers = []
+        for k,v in get_kv_by_vid(lid):
+            revdic = dict(type='profile', key=k, val=v)
+            reverse_pointers.append(revdic)
+        for cid in get_context_by_lid(lid):
+            revdic = dict(type='context', cid=cid)
+            reverse_pointers.append(revdic)
 
-print get_kv_by_vid(1046)
+        print reverse_pointers
+        if reverse_pointers:
+            print r.sadd('location:lid:%s:reverse' % lid, json.dumps(reverse_pointers))
+
+
+add_reverse_location_pointers()
+
+# print get_kv_by_vid(1046)
 # show_alerts('ypodim')
 
 # patch_context(1007, '', 1005)
