@@ -31,7 +31,7 @@ var state = {
             var data = {secret: this.fullInfo().pwd};
             var that = this;
             $.getJSON(url, data, function(json){
-                that._options = json;
+                that._options = json.options;
                 clb && clb(json);
             });
         },

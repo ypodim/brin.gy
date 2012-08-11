@@ -6,6 +6,7 @@ define([
   'tooltip',
 
   'views/account',
+  'views/alerts',
 
   'text!templates/modal.html',
   'text!templates/reminder.html',
@@ -14,8 +15,9 @@ define([
   'text!templates/about.html',
   'text!templates/newContextOptions.html',
   'text!templates/newLocationAttr.html',
+  // 'text!templates/alerts.html',
   
-  ], function($, _, Backbone, appConfig, tooltip, accountView, modalTemplate, reminderTemplate, newkeyTemplate, feedbackTemplate, aboutTemplate, newContextOptionsTemplate, newLocationAttrTemplate){
+  ], function($, _, Backbone, appConfig, tooltip, accountView, alertsView, modalTemplate, reminderTemplate, newkeyTemplate, feedbackTemplate, aboutTemplate, newContextOptionsTemplate, newLocationAttrTemplate){
   var modalView = Backbone.View.extend({
     el: $('#modal'),
     events: {
@@ -132,7 +134,7 @@ define([
         
         var inner_template;
         var data;
-        if (options.title == 'account') {
+        if (options.title == 'settings') {
             // inner_template = _.template( accountTemplate );
             // data = {
             //     username: this.app.agent.fullInfo().name, 
@@ -151,7 +153,20 @@ define([
             this.$('.content').html( aview.$el );
             return this;
         }
+        if (options.title == 'alerts') {
+            var that = this;
+            var aview = new alertsView();
+            aview.render();
+            
+            // aview.unbind('delete');
+            // aview.bind('delete', function(){that.close()});
 
+            // aview.unbind('signout');
+            // aview.bind('signout', function(){that.close()});
+            
+            this.$('.content').html( aview.$el );
+            return this;
+        }
 
 
 

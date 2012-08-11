@@ -7,8 +7,9 @@ define([
   
   'text!templates/signin.html',
   'text!templates/signup.html',
-  'text!templates/contexts.html',
-  ], function($, _, Backbone, appConfig, tooltip, signinTemplate, signupTemplate, contextMenuTemplate){
+  'text!templates/aboutMenu.html',
+  'text!templates/accountMenu.html',
+  ], function($, _, Backbone, appConfig, tooltip, signinTemplate, signupTemplate, aboutMenuTemplate, accountMenuTemplate){
   var loginView = Backbone.View.extend({
     el: $('#login'),
     events: {
@@ -17,19 +18,26 @@ define([
         'submit form': 'submit',
         'click a.reminder': 'reminder',
 
-        'mouseover ul.contexts > li > a': 'contextMouseOver',
-        'mouseout ul.contexts > li > a': 'contextMouseOut',
-        'click ul.contexts > li > a': 'contextClick',
+        'mouseover ul.menu > li > a': 'mouseOver',
+        'mouseout ul.menu > li > a': 'mouseOut',
+        'click ul.menu > li > a.about': 'aboutClick',
+        'click ul.menu > li > a.account': 'accountClick',
     },
     app: appConfig.getState(),
 
-    contextMouseOver: function(e){ $(e.target).children('i').removeClass('icon-white'); },
-    contextMouseOut: function(e){ $(e.target).children('i').addClass('icon-white'); },
-    contextClick: function(e){
+    mouseOver: function(e){ $(e.target).children('i').removeClass('icon-white'); },
+    mouseOut: function(e){ $(e.target).children('i').addClass('icon-white'); },
+    aboutClick: function(e){
         var action = $(e.target).attr('id');
-        this.trigger('context:'+action);
+        this.trigger('about:'+action);
         this.close();
     },
+    accountClick: function(e){
+        var action = $(e.target).attr('id');
+        this.trigger('account:'+action);
+        this.close();
+    },
+    
 
     close: function(){
         this.$el.hide();
@@ -107,12 +115,25 @@ define([
         if (options.action=='reminder') {
             // this.el.html( compiled_template() ).show();
         }
-        if (options.action=='contexts') {
-            var compiled_template = _.template( contextMenuTemplate );
+        // if (options.action=='contexts') {
+        //     var compiled_template = _.template( contextMenuTemplate );
+        //     this.$el.html( compiled_template() );
+        //     var left = options.left - this.$el.width() + options.width;
+        //     this.$el.css({left:left}).show();
+        // }
+        if (options.action=='about') {
+            var compiled_template = _.template( aboutMenuTemplate );
             this.$el.html( compiled_template() );
             var left = options.left - this.$el.width() + options.width;
             this.$el.css({left:left}).show();
         }
+        if (options.action=='account') {
+            var compiled_template = _.template( accountMenuTemplate );
+            this.$el.html( compiled_template() );
+            var left = options.left - this.$el.width() + options.width;
+            this.$el.css({left:left}).show();
+        }
+        
         this.$('form').children(':first').focus();
     },
 

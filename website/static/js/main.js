@@ -89,17 +89,35 @@ require([
         appp.navbarView.bind('signin', wldView.showLoginBox);
         appp.navbarView.bind('signup', wldView.showLoginBox);
         appp.navbarView.bind('contexts', wldView.showAllContexts);
-        appp.navbarView.bind('account', wldView.showAccount);
+        // appp.navbarView.bind('account', wldView.showAccount);
         appp.navbarView.bind('context:title', function(){
             wldView.selectedKeyModel = null;
             wldView.render()
         });
-        appp.navbarView.bind('about', function(){
-            appp.modal.render({title: 'about'});
-        });
         
         appp.loginView = new loginView();
         appp.loginView.bind('reminder', wldView.showReminder);
+
+
+        appp.navbarView.bind('about', wldView.showLoginBox);
+        appp.loginView.bind('about:about', function(){
+            appp.modal.render({title: 'about'});
+        });
+        appp.loginView.bind('about:feedback', function(){
+            appp.modal.render({title:'feedback'});
+        });
+
+
+        appp.navbarView.bind('account', wldView.showLoginBox);
+        appp.loginView.bind('account:alerts', function(){
+            appp.modal.render({title: 'alerts'});
+        });
+        appp.loginView.bind('account:settings', function(){
+            appp.modal.render({title:'settings'});
+        });
+
+        appp.modal.bind('modal:closed', appp.navbarView.render);
+        
 
         
         appp.bind('loggedin', wldView.render);

@@ -155,16 +155,6 @@ define([
         });
     },
 
-    showAccount: function(){
-        if (!this.app.agent.loggedIn()) {
-            console.log('Error: no user found while trying to display account info.');
-            return false;
-        }
-
-        var that = this;
-        this.app.modal.render({title: 'account'});
-    },
-
     showReminder: function(argument) {
         this.app.modal.render({title: 'reminder'});
     },
@@ -498,7 +488,7 @@ define([
 
         var that = this;
         var background = 'url(/static/images/';
-        background += (options.calloutSide) ? 'callout_side' : 'callout';
+        background += (options.calloutSide) ? 'callout_side' : 'callout-large';
         background += '.png?14)';
         var offsetX = (options.calloutSide) ? 8 : -194;
         var offsetY = (options.calloutSide) ? -83 : -178;
@@ -683,7 +673,7 @@ define([
     },
 
     initialize: function(options){
-        _.bindAll(this, 'render', 'keyClickClb', 'showLoginBox', 'showAccount', 'showReminder', 'addAttr', 'remAttr', 'showAllContexts');
+        _.bindAll(this, 'render', 'keyClickClb', 'showLoginBox', 'showReminder', 'addAttr', 'remAttr', 'showAllContexts');
 
         var that = this;
         var centerLatLng = new google.maps.LatLng(42.3604457757343,-71.08734495781516);

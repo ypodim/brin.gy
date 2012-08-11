@@ -174,12 +174,20 @@ class serve_user(bringy_handler):
         secret = self.get_argument('secret','')
         passed = db.authenticate_user(self.username, secret)
         if passed:
-            dic = db.r.hgetall('options:user:%s' % self.username)
-            for k in dic:
-                if dic[k] == 'True':
-                    dic[k] = 1
-                if dic[k] == 'False':
-                    dic[k] = 0
+            dic['options'] = db.r.hgetall('options:user:%s' % self.username)
+            for k in dic['options']:
+                if dic['options'][k] == 'True':
+                    dic['options'][k] = 1
+                if dic['options'][k] == 'False':
+                    dic['options'][k] = 0
+
+            dic['alerts'] = []
+            rkey = 'user:%s:alerts' % self.username
+            llen = db.r.llen(rkey)
+            for i in xrange(llen):
+                alert = db.r.lpop(rkey)
+                dic['alerts'].append(alert)
+                db.r.rpush(rkey, alert)
         
         dic = self.finilize_call(dic)
         self.write(dic)
