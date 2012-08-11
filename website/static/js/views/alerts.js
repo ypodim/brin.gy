@@ -5,14 +5,13 @@ define([
   'app',
 
   'text!templates/alerts.html',
-  ], function($, _, Backbone, appConfig, alertsViewTemplate){
+  'text!templates/alert.html',
+  ], function($, _, Backbone, appConfig, alertsViewTemplate, alertViewTemplate){
   var alertsView = Backbone.View.extend({
-    // el: $("#container"),
     template: _.template(alertsViewTemplate),
+    alertTemplate: _.template(alertViewTemplate),
     events: {
-        // 'click button#signout': 'signout',
-        // 'click button#delete': 'delete',
-        // 'change input[type=checkbox]': 'alertOption',
+
     },
     app: appConfig.getState(),
 
@@ -21,8 +20,12 @@ define([
         this.app.agent.loadUserOptions(function(json){
             that.$el.html(that.template());
             for (var i in json.alerts) {
+                
                 var alert = json.alerts[i];
-                that.$('div.alerts').append(alert);
+                var alerthtml = that.alertTemplate(alert);
+                alerthtml = $(alerthtml).children('.'+alert.atype);
+
+                that.$('div.alerts').append(alerthtml);
             }
         });
 

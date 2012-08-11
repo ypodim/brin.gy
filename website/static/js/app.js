@@ -177,9 +177,17 @@ var state = {
         },
     },
 
-    getAllLocations: function(clb){
+    getAllLocations: function(clb, circleBound){
         var url = this.satellite.url+'/location';
-        $.getJSON(url, {}, function(json){
+        var data = {};
+        if (circleBound)
+            data = {
+                centerlat:circleBound.lat, 
+                centerlon:circleBound.lon, 
+                radius:circleBound.radius,
+            };
+
+        $.getJSON(url, data, function(json){
             clb && clb(json);
         });
     },

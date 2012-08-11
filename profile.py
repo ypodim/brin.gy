@@ -52,10 +52,7 @@ class profile():
     'context:cid:CID:users' # set
     'context:title:CONTEXTTITLE:cid' # string
 
-    # 'alert:on:everything:users' # set
-    # 'alert:on:application:users' # set
-    # 'alert:on:attribute:users' # set
-    # 'alert:on:value:users' # set
+    
     'user:USER:alerts' # list
 
 

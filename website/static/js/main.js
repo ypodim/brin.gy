@@ -89,7 +89,8 @@ require([
         appp.navbarView.bind('signin', wldView.showLoginBox);
         appp.navbarView.bind('signup', wldView.showLoginBox);
         appp.navbarView.bind('contexts', wldView.showAllContexts);
-        // appp.navbarView.bind('account', wldView.showAccount);
+        appp.navbarView.bind('explore', function(){wldView.showExplorer()});
+
         appp.navbarView.bind('context:title', function(){
             wldView.selectedKeyModel = null;
             wldView.render()

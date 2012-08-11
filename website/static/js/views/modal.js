@@ -155,16 +155,10 @@ define([
         }
         if (options.title == 'alerts') {
             var that = this;
-            var aview = new alertsView();
+            var aview = new alertsView({el:this.$('.content')});
             aview.render();
-            
-            // aview.unbind('delete');
-            // aview.bind('delete', function(){that.close()});
 
-            // aview.unbind('signout');
-            // aview.bind('signout', function(){that.close()});
-            
-            this.$('.content').html( aview.$el );
+            this.$('.footer').html("<button class='account btn btn-success cancel'>Close</button>")
             return this;
         }
 

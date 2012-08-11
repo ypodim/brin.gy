@@ -33,6 +33,38 @@ define([
     selectedKeyModel: null,
     popup: null,
 
+    showExplorer: function(){
+        this.populateAllLocations();
+        
+        var heatMapData = [
+            {location: new google.maps.LatLng(37.782, -122.447), weight: 0.5},
+            new google.maps.LatLng(37.782, -122.445),
+            {location: new google.maps.LatLng(37.782, -122.443), weight: 2},
+            {location: new google.maps.LatLng(37.782, -122.441), weight: 3},
+            {location: new google.maps.LatLng(37.782, -122.439), weight: 2},
+            new google.maps.LatLng(37.782, -122.437),
+            {location: new google.maps.LatLng(37.782, -122.435), weight: 0.5},
+
+            {location: new google.maps.LatLng(37.785, -122.447), weight: 3},
+            {location: new google.maps.LatLng(37.785, -122.445), weight: 2},
+            new google.maps.LatLng(37.785, -122.443),
+            {location: new google.maps.LatLng(37.785, -122.441), weight: 0.5},
+            new google.maps.LatLng(37.785, -122.439),
+            {location: new google.maps.LatLng(37.785, -122.437), weight: 2},
+            {location: new google.maps.LatLng(37.785, -122.435), weight: 3}
+        ];
+
+        // var heatmap = new google.maps.visualization.HeatmapLayer({
+            // data: heatMapData,
+        // });
+        // heatmap.setMap(this.app.map);
+
+
+        this.popup && this.popup.close({force:true});
+        this.popup = new chooselocView();
+        this.popup.render({explore: true});
+    },
+
     backToContext: function(){
         this.app.router.navigate('#/c/'+this.app.getContext().id);
         return false;
@@ -332,8 +364,6 @@ define([
     },
 
     getLocationInput: function(clb) {
-        var that = this;
-
         this.popup && this.popup.close({force:true});
         this.popup = new chooselocView();
         this.popup.render();
@@ -342,42 +372,47 @@ define([
             clb && clb(circle);
         });
         
+        this.populateAllLocations();
+    },
+
+    populateAllLocations: function(){
+        var that = this;
         this.clearMap();
         this.app.getAllLocations(function(json){
-            for (var i in json.locations){
-                var loc = json.locations[i];
+        for (var i in json.locations){
+            var loc = json.locations[i];
 
-                var radius = parseFloat(loc.radius);
-                var lat = parseFloat(loc.lat);
-                var lng = parseFloat(loc.lon);
-                var center = new google.maps.LatLng(lat, lng);
-                model = new Backbone.Model({
-                    id: loc.id,
-                    center: center,
-                    radius: radius,
-                    title: loc.title,
-                    creator: loc.creator || '"unknown"',
-                });
+            var radius = parseFloat(loc.radius);
+            var lat = parseFloat(loc.lat);
+            var lng = parseFloat(loc.lon);
+            var center = new google.maps.LatLng(lat, lng);
+            model = new Backbone.Model({
+                id: loc.id,
+                center: center,
+                radius: radius,
+                title: loc.title,
+                creator: loc.creator || '"unknown"',
+            });
 
-                var infowindowView = new mapInfoLocationView({model:model});
-                infowindowView.render();
-                infowindowView.bind('uselocation', function(model){ 
-                    that.popup.useLocation(model);
-                });
+            var infowindowView = new mapInfoLocationView({model:model});
+            infowindowView.render();
+            infowindowView.bind('uselocation', function(model){ 
+                that.popup.useLocation(model);
+            });
 
-                options = {
-                    center: center,
-                    radius: radius,
-                    // icon: icon,
-                    // markerPos: markerPos,
-                    infowindowContent: infowindowView.el,
-                    // strokecolor: model.get('strokecolor'),
-                    // fillcolor: model.get('fillcolor'),
-                    calloutSide: true,
-                };
-                that.addPlainMapCircle(options);
-            }
-        });
+            options = {
+                center: center,
+                radius: radius,
+                // icon: icon,
+                // markerPos: markerPos,
+                infowindowContent: infowindowView.el,
+                // strokecolor: model.get('strokecolor'),
+                // fillcolor: model.get('fillcolor'),
+                calloutSide: true,
+            };
+            that.addPlainMapCircle(options);
+        }
+    });
     },
 
     keyClickClb: function(kmodel){

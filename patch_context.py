@@ -383,7 +383,9 @@ def show_alerts(u):
         # for a in r.smembers('alert:on:%s:users' % atype):
             # print atype, a
 
-show_alerts('ypodim')
+
+print get_kv_by_vid(1046)
+# show_alerts('ypodim')
 
 # patch_context(1007, '', 1005)
 # show_contexts()

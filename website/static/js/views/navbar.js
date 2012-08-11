@@ -16,11 +16,19 @@ define([
         // 'click a#feedback': 'feedback',
         'click a#contexts': 'contextMenu',
         'click a.context': 'contextTitle',
+        'click a#explore': 'explore',
     },
     template: _.template(navbarTemplate),
     
     app: appConfig.getState(),
     contextMenuClicked: false,
+
+
+    explore: function(){
+        console.log('ok')
+        this.trigger('explore');
+        return false;
+    },
 
     contextTitle: function(){
         this.trigger('context:title');

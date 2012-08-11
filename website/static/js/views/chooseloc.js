@@ -99,11 +99,45 @@ define([
         google.maps.event.addListener(this.tempCircle, 'mouseover', this.areaMouseOver);
         google.maps.event.addListener(this.tempCircle, 'mouseout', this.areaMouseOut);
 
-        // if (this.$('#'+this.locationInput).val())
-            // this.$('button#next').removeClass('disabled');
-
         return false;
     },
+
+    explore: function() {
+        var zoom = this.app.map.getZoom();
+        var header = 40;
+        var padding = parseInt(this.$('#crosshair').css('padding-top').replace(/[^-\d\.]/g, ''));
+        var top = this.$('#crosshair').offset().top;
+        var borderwidth = parseInt(this.$('#crosshair').css('border-width'));
+
+        var x = $(this.app.map.getDiv()).width()/2 - 120;
+        var y = top - header + padding + 2*borderwidth + 210;
+        var scale = Math.pow(2, 20.9-zoom);
+        var radius = 10*scale;
+        var center = this.latLngControl.xy2latlng(x,y);
+        
+        // var contextOptions = {
+        //     strokeColor: "pink",
+        //     strokeOpacity: 0.8,
+        //     strokeWeight: 2,
+        //     fillColor: "#FF0000",
+        //     fillOpacity: 0.1,
+        //     map: this.app.map,
+        //     center: center,
+        //     radius: 10*scale,
+        // };
+
+        // this.tempCircle && this.tempCircle.setMap(null);
+        // this.tempCircle = new google.maps.Circle(contextOptions);
+
+        this.app.getAllLocations(function(json){
+            console.log(json.locations.length);
+        }, {lat:center.lat(), lon:center.lng(), radius:radius});
+        
+        clearTimeout(this.timer);
+        this.timer = undefined;
+        return false;
+    },
+
     areaClick: function(event) {
         // console.log('area', this.cntx)
     },
@@ -115,13 +149,23 @@ define([
         this.setOptions({zIndex:0});
     },
 
-    render: function(){
+    render: function(options){
         var compiled_template = _.template( mapTemplate );
         this.$el.html( compiled_template() ).addClass('transparent').show();
-
         this.unbind();
-        
-        this.doAutocomplete();
+
+        var that = this;
+
+        if (options && options.explore) {
+            this.$el.children('.locationPicker').hide();
+            google.maps.event.addListener(this.app.map, 'drag', function(){
+                if (!that.timer) {
+                    that.timer = setTimeout(function(){that.explore()}, 200);
+                }
+            });
+        } else 
+            this.doAutocomplete();
+
         return this;
     },
 

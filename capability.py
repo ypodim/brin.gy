@@ -9,6 +9,7 @@ from copy import copy
 from math import sqrt
 
 from keys import *
+from math import sin,cos,atan2,sqrt,pi
 
 class location:
     agents = {}
@@ -105,14 +106,34 @@ class location:
     def inBounds(self, point, bounds):
         if not bounds:
             return True
-        lat = point['lat']
-        lon = point['lon']
-        # if bounds['ne']['lat']
-        print bounds['ne']
-        print bounds['sw']
-        print point
+        
+        distance = self.getDistanceByHaversine(point, bounds)
+        print distance
+        if distance <= bounds['radius']:
+            return True
 
-        return True
+        return False
+
+    def getDistanceByHaversine(self, loc1, loc2):
+        lat1 = float(loc1['lat'])
+        lon1 = float(loc1['lon'])
+        lat2 = float(loc2['lat'])
+        lon2 = float(loc2['lon'])
+
+        # convert to radians
+        lon1 = lon1 * pi / 180.0
+        lon2 = lon2 * pi / 180.0
+        lat1 = lat1 * pi / 180.0
+        lat2 = lat2 * pi / 180.0
+
+        # haversine formula
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = (sin(dlat/2))**2 + cos(lat1) * cos(lat2) * (sin(dlon/2.0))**2
+        c = 2.0 * atan2(sqrt(a), sqrt(1.0-a))
+        earthradius = 6371.0 * 1000
+        return earthradius * c
+
 
     def get(self, params, arguments):
         #print 'satellite location get'
@@ -123,17 +144,15 @@ class location:
         lat = lon = ''
 
         bounds = {}
-        nelat = arguments.get('nelat')
-        nelon = arguments.get('nelon')
-        swlat = arguments.get('swlat')
-        swlon = arguments.get('swlon')
+        centerlat = arguments.get('centerlat')
+        centerlon = arguments.get('centerlon')
+        radius = arguments.get('radius')
 
-        if nelat and nelon and swlat and swlon:
-            nelat = float(nelat[0])
-            nelon = float(nelon[0])
-            swlat = float(swlat[0])
-            swlon = float(swlon[0])
-            bounds = dict(ne={lat:nelat, lon:nelon}, sw={lat:swlat,lon:swlon})
+        if centerlat and centerlon and radius:
+            centerlat = float(centerlat[0])
+            centerlon = float(centerlon[0])
+            radius = float(radius[0])
+            bounds = dict(lat=centerlat, lon=centerlon, radius=radius)
 
         if len(params) >= 1:
             if params[0] == 'fetch':
