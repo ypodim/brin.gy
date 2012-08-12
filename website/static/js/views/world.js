@@ -90,8 +90,14 @@ define([
                     var revlocation = json.locations[i];
                     for (var j in revlocation.reversePointers) {
                         var match = revlocation.reversePointers[j];
-                        console.log(JSON.stringify(match))
-                        that.$('aside').append( emTemplate(match) );
+                        // console.log(JSON.stringify(match))
+
+                        var str = '';
+                        if (match.type == 'context') 
+                            str = 'application: <b>'+match.cdata.title+'</b>';
+                        else
+                            str = '<b>'+match.val+'</b> ('+match.key+')';
+                        that.$('aside').append( emTemplate({match:str}) );
                     }
                 }
             }, obj);
