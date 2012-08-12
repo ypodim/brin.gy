@@ -16,10 +16,16 @@ define([
   'views/modal',
   'views/chooseloc',
 
+  'text!templates/frame.html',
+  'text!templates/explorerMatch.html',
+
   'http://google-maps-utility-library-v3.googlecode.com/svn/tags/infobox/1.1.9/src/infobox.js'
-  ], function($, _, Backbone, appConfig, attrModel, attrCollection, keyView, mapInfoAttrView, mapInfoContextView, mapInfoLocationView, valueFrameView, modalView, chooselocView, test){
+  ], function($, _, Backbone, appConfig, attrModel, attrCollection, 
+    keyView, mapInfoAttrView, mapInfoContextView, mapInfoLocationView, valueFrameView, modalView, chooselocView, 
+    frameTemplate, explorerMatchTemplate, 
+    test){
   var welcomeView = Backbone.View.extend({
-    el: $('#container'),
+    el: $('body'),
     events: {
         'click button#addLocation': 'addLocationBtn',
         'click button#newKey': 'newKey',
@@ -34,8 +40,19 @@ define([
     popup: null,
 
     showExplorer: function(){
+        var that = this;
+
+        this.$('aside').empty();
+        this.app.navbarView.toggleContextTitle({flag:false});
+
+        this.$('button#addContext').hide();
+        this.$('button#addLocation').hide();
+        this.$('button#backToContext').hide();
+
+        this.$('aside').show().toggleClass('hideAside', false);
+
         this.populateAllLocations();
-        
+
         var heatMapData = [
             {location: new google.maps.LatLng(37.782, -122.447), weight: 0.5},
             new google.maps.LatLng(37.782, -122.445),
@@ -59,10 +76,26 @@ define([
         // });
         // heatmap.setMap(this.app.map);
 
+        var emTemplate = _.template( explorerMatchTemplate );
 
         this.popup && this.popup.close({force:true});
-        this.popup = new chooselocView();
+        this.popup = new chooselocView({el: this.$('#popup')});
         this.popup.render({explore: true});
+        this.popup.bind('explorer:match', function(obj){
+
+            that.$('aside').empty();
+
+            this.app.getAllLocations(function(json){
+                for (var i in json.locations) {
+                    var revlocation = json.locations[i];
+                    for (var j in revlocation.reversePointers) {
+                        var match = revlocation.reversePointers[j];
+                        console.log(JSON.stringify(match))
+                        that.$('aside').append( emTemplate(match) );
+                    }
+                }
+            }, obj);
+        });
     },
 
     backToContext: function(){
@@ -80,11 +113,13 @@ define([
     },
 
     showAllContexts: function(options){
+        this.renderFrame();
+
         if (!(options && options.notoggle))
             this.$('aside').show().toggleClass('hideAside', true);
 
         // this.app.modal.close();
-        this.popup && this.popup.close({force:true});
+        this.popup && this.popup.close({force:true, close:true});
 
         this.$('button#addContext').show();
         this.$('button#addLocation').hide();
@@ -365,7 +400,7 @@ define([
 
     getLocationInput: function(clb) {
         this.popup && this.popup.close({force:true});
-        this.popup = new chooselocView();
+        this.popup = new chooselocView({el: this.$('#popup')});
         this.popup.render();
         this.popup.unbind('newlocation');
         this.popup.bind('newlocation', function(circle){ 
@@ -451,7 +486,7 @@ define([
         if (kmodel.get('type') == 'string') {
             this.$('button#addLocation').hide();
             this.popup && this.popup.close({force:true});
-            this.popup = new valueFrameView({models:models, key:kmodel.get('key')});
+            this.popup = new valueFrameView({el: this.$('#popup'), models:models, key:kmodel.get('key')});
             this.popup.render();
         }
     },
@@ -523,7 +558,7 @@ define([
 
         var that = this;
         var background = 'url(/static/images/';
-        background += (options.calloutSide) ? 'callout_side' : 'callout-large';
+        background += (options.calloutSide) ? 'callout_side' : 'callout';
         background += '.png?14)';
         var offsetX = (options.calloutSide) ? 8 : -194;
         var offsetY = (options.calloutSide) ? -83 : -178;
@@ -593,7 +628,13 @@ define([
         return false;
     },
 
+    renderFrame: function(){
+        this.$('#container').html(_.template( frameTemplate ));
+    },
+
     render: function(){
+        this.renderFrame();
+
         this.app.navbarView.enableContextMenu();
         this.app.navbarView.toggleContextTitle({flag:true});
         this.$('aside').toggleClass('hideAside', false);

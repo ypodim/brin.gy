@@ -31,6 +31,7 @@ define([
         'stats': 'stats',
 
         'apps': 'apps',
+        'explore': 'explore',
 
         "*actions": "defaultRoute",
     },
@@ -41,8 +42,12 @@ define([
     },
 
     apps: function(){
-        console.log('world')
         this.worldView.showAllContexts();
+    },
+
+    explore: function(){
+        console.log('explore')
+        this.worldView.showExplorer();
     },
 
     presentation: function(sno){

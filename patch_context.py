@@ -406,8 +406,8 @@ def add_reverse_location_pointers():
             revdic = dict(type='context', cid=cid)
             reverse_pointers.append(revdic)
 
-        print reverse_pointers
         if reverse_pointers:
+            # print json.dumps(reverse_pointers)
             print r.sadd('location:lid:%s:reverse' % lid, json.dumps(reverse_pointers))
 
 

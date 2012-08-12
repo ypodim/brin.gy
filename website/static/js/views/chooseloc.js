@@ -7,7 +7,7 @@ define([
   'text!templates/chooseloc.html'
   ], function($, _, Backbone, appConfig, mapTemplate){
   var chooseLocationView = Backbone.View.extend({
-    el: $("#popup"),
+    // el: $("#popup"),
     events: {
         'click button#cancel': 'cancelBtn',
         'click button#useloc': 'useBtn',
@@ -115,17 +115,8 @@ define([
         var radius = 10*scale;
         var center = this.latLngControl.xy2latlng(x,y);
         
-        this.app.getAllLocations(function(json){
-            // console.log(json.locations.length);
-            for (var i in json.locations) {
-                var revlocation = json.locations[i];
-                // console.log(revlocation)
-                for (var j in revlocation.reversePointers) {
-                    var revpointer = revlocation.reversePointers[j];
-                    console.log( JSON.stringify(revpointer) )    
-                }
-            }
-        }, {lat:center.lat(), lon:center.lng(), radius:radius});
+        this.trigger('explorer:match', {lat:center.lat(), lon:center.lng(), radius:radius});
+        
         
         clearTimeout(this.timer);
         this.timer = undefined;
@@ -149,8 +140,8 @@ define([
         this.unbind();
 
         var that = this;
-
         if (options && options.explore) {
+            console.log('ok')
             this.$el.children('.locationPicker').hide();
             google.maps.event.addListener(this.app.map, 'drag', function(){
                 if (!that.timer) {

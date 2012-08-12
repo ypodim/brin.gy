@@ -10,7 +10,7 @@ define([
   ], function($, _, Backbone, appConfig, valuesFrameTemplate, valueView, attrModel){
   var ValueFrameView = Backbone.View.extend({
 
-    el: $('#popup'),
+    // el: $('#popup'),
     template: _.template(valuesFrameTemplate),
     app: appConfig.getState(),
 

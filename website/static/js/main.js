@@ -21,7 +21,9 @@ require.config({
     // popover: 'libs/bootstrap/bootstrap-popover',
     button: 'libs/bootstrap/bootstrap-button',
 
-    maps: 'libs/gmaps/gmaps',
+    // maps: 'http://maps.google.com/maps/api/js?sensor=false&libraries=places,geometry,visualization',
+
+
   },
   urlArgs: "bust=" +  (new Date()).getTime(),
 })
@@ -31,6 +33,7 @@ require([
     'bootstrap',
     'underscore',
     'app',
+
 
     'router',
     'backbone',
@@ -89,7 +92,6 @@ require([
         appp.navbarView.bind('signin', wldView.showLoginBox);
         appp.navbarView.bind('signup', wldView.showLoginBox);
         appp.navbarView.bind('contexts', wldView.showAllContexts);
-        appp.navbarView.bind('explore', function(){wldView.showExplorer()});
 
         appp.navbarView.bind('context:title', function(){
             wldView.selectedKeyModel = null;
@@ -127,9 +129,7 @@ require([
         appp.bind('deleted', appp.navbarView.render);
         appp.bind('addattr', wldView.addAttr);
         appp.bind('remattr', wldView.remAttr);
-
-        // appp.loginView.bind('context:new', appp.navbarView.render);
-        // appp.loginView.bind('context:new', appp.navbarView.render);
+        
 
         appp.loginView.bind('context:all', appp.navbarView.render);
         appp.loginView.bind('context:all', wldView.showAllContexts);

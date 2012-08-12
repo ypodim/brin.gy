@@ -31,11 +31,13 @@ define([
         var action = $(e.target).attr('id');
         this.trigger('about:'+action);
         this.close();
+        return false;
     },
     accountClick: function(e){
         var action = $(e.target).attr('id');
         this.trigger('account:'+action);
         this.close();
+        return false;
     },
     
 
