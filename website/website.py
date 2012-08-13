@@ -5,7 +5,9 @@ import tornado.httpserver
 import tornado.httpclient
 import tornado.ioloop
 import tornado.web
+import tornado.options
 
+import logging
 import os
 import os.path
 import time
@@ -114,7 +116,9 @@ application = tornado.web.Application([
 ], **settings)
 
 if __name__ == "__main__":
-    
+    logging.getLogger().setLevel(getattr(logging, 'INFO'))
+    tornado.options.enable_pretty_logging()
+
     config = Config()
     
     parser = OptionParser(add_help_option=False)

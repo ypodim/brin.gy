@@ -8,6 +8,7 @@ import tornado.escape
 import tornado.httpclient
 import tornado.options
 
+import logging
 import sys, os, time, urlparse
 from datetime import datetime
 from optparse import OptionParser
@@ -187,7 +188,8 @@ class serve_user(bringy_handler):
             rkey = 'user:%s:alerts' % self.username
             llen = db.r.llen(rkey)
             for i in xrange(llen):
-                alert = db.r.lpop(rkey)
+                alert = db.r.lpop(rkey) or '[]'
+                print alert
                 alert = tornado.escape.json_decode(alert)
                 dic['alerts'].append(alert)
                 alert = tornado.escape.json_encode(alert)
@@ -228,13 +230,17 @@ class serve_user(bringy_handler):
         
         if not passed:
             error = 'authentication failed for user:%s secret:%s' % (self.username, secret)
-        if not options and not context:
+        if not options and action != 'clearalerts' and not context:
             error = 'invalid context'
         if action == 'leave' and context == 'all':
             error = 'You can check in any time you like, but you can never leave'
         if action == 'options' and not options:
             error = 'No valid options'
 
+        print error, not error and action.lower() == 'clearalerts'
+        if not error and action.lower() == 'clearalerts':
+            rkey = 'user:%s:alerts' % self.username
+            db.r.delete(rkey)
         if not error and action == 'join':
             db.join_context(context, self.username)
         if not error and action == 'leave':
@@ -714,7 +720,7 @@ class debug(tornado.web.RequestHandler):
 settings = dict(
     cookie_secret="12oETzKXQAGaYdkL5gEmGeJJFuYhghdskj3hHG8s/Vo=",# choose a cookie seed
     login_url="/",# not sure if this is right or if it even matters
-    xsrf_cookies=True,
+    # xsrf_cookies=True,
     #setting keys is important!
     facebook_api_key= facebook_api_key,
     facebook_secret= facebook_secret,
@@ -743,7 +749,6 @@ application = tornado.web.Application([
     (r"/oauth", ProviderHandler),
     (r"/oauth/twitter", TwitterHandler),
     (r"/oauth/facebook", FacebookHandler),
-    (r"/example", ExamplePage),
 
     (r"/users", debug),    
     
@@ -758,6 +763,9 @@ application = tornado.web.Application([
     
     
 if __name__ == "__main__":
+    
+    logging.getLogger().setLevel(getattr(logging, 'INFO'))
+    tornado.options.enable_pretty_logging()
     
     parser = OptionParser(add_help_option=False)
     parser.add_option("-h", "--host", dest="host", default='')
@@ -778,7 +786,7 @@ if __name__ == "__main__":
     db = DB(dbno)
     
     print 'Ego agent running at %s:%s using %s' % (HOST,PORT,mode)
-    tornado.options.parse_command_line()
+
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(PORT, address=HOST)
     ioloop = tornado.ioloop.IOLoop.instance()

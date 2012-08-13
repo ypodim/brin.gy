@@ -158,7 +158,7 @@ define([
             var aview = new alertsView({el:this.$('.content')});
             aview.render();
 
-            this.$('.footer').html("<button class='account btn btn-success cancel'>Close</button>")
+            // this.$('.footer').html("<button class='account btn btn-success cancel'>Close</button>")
             return this;
         }
 

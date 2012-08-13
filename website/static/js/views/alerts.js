@@ -11,10 +11,13 @@ define([
     template: _.template(alertsViewTemplate),
     alertTemplate: _.template(alertViewTemplate),
     events: {
-
+        'click button#clear': 'clearAll',
     },
     app: appConfig.getState(),
 
+    clearAll: function(){
+        this.app.clearAlerts();
+    },
     render: function(){
         var that = this;
         this.app.agent.loadUserOptions(function(json){

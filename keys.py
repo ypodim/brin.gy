@@ -1,4 +1,5 @@
 import time
+import json
 
 def getK (context):            return 'profile:%s:keys'                 % (context)
 def getKA(context, key):       return 'profile:%s:key:%s:agents'        % (context, key)
@@ -103,7 +104,7 @@ def doalert(r, atype, c, k, v, u):
                 context=c, 
                 user=u,
                 tstamp=time.time())
-            r.rpush('user:%s:alerts' % umatch, alert)
+            r.rpush('user:%s:alerts' % umatch, json.dumps(alert))
             print umatch, alert
 
 

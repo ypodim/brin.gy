@@ -4,7 +4,7 @@ import tornado.auth
 import tornado.escape
 import tornado.httpserver
 import tornado.ioloop
-# import tornado.options
+import tornado.options
 import tornado.web
 from tornado.httputil import url_concat
 from tornado import httpclient
@@ -13,46 +13,38 @@ from tornado import httpclient
 #Make sure you have these options, and please create your own...
 #API Keys and Don't enter this into source control!! Set some environment variables
 #in a config file or something
-# from tornado.options import define, options
-# define("port", default=3000, help="run on the given port", type=int)
-# define("facebook_api_key", help="your Facebook application API key",
-#        default="275214402583214")
-# define("facebook_secret", help="your Facebook application secret",
-#        default="bc9ba3efd1e28deec5e7d2061dd6fdfa")
-# define("twitter_consumer_key", help="Twitter OAuth",
-#        default="cicnNgg3nrEFqb3DdODw")
-# define("twitter_consumer_secret", help="Twitter OAuth",
-#        default="yvK2ecNU3JyQCpXkPEoBW4rHm8NL6dtKVRRqDO7tys")
-    
-facebook_api_key = '275214402583214'
-facebook_secret = 'bc9ba3efd1e28deec5e7d2061dd6fdfa'
-twitter_consumer_key = 'cicnNgg3nrEFqb3DdODw'
-twitter_consumer_secret = 'yvK2ecNU3JyQCpXkPEoBW4rHm8NL6dtKVRRqDO7tys'
+from tornado.options import define, options
 
-# class Application(tornado.web.Application):
-#     def __init__(self):
+facebook_api_key="275214402583214"
+facebook_secret="bc9ba3efd1e28deec5e7d2061dd6fdfa"
+twitter_consumer_key="cicnNgg3nrEFqb3DdODw"
+twitter_consumer_secret='yvK2ecNU3JyQCpXkPEoBW4rHm8NL6dtKVRRqDO7tys'
+
+
+class Application(tornado.web.Application):
+    def __init__(self):
         
-#         # These are the only required urls be sure to swap out ExamplePage 
-#         handlers = [
-#             (r"/", ExamplePage),
-#             (r"/oauth", ProviderHandler),
-#             (r"/oauth/twitter", TwitterHandler),
-#             (r"/oauth/facebook", FacebookHandler),
-#         ]
+        # These are the only required urls be sure to swap out ExamplePage 
+        handlers = [
+            (r"/", ExamplePage),
+            (r"/oauth", ProviderHandler),
+            (r"/oauth/twitter", TwitterHandler),#
+            (r"/oauth/facebook", FacebookHandler),#
+        ]
 
-#         settings = dict(
-#             cookie_secret="12oETzKXQAGaYdkL5gEmGeJJFuYhghdskj3hHG8s/Vo=",# choose a cookie seed
-#             login_url="/",# not sure if this is right or if it even matters
-#             xsrf_cookies=True,
-#             #setting keys is important!
-#             facebook_api_key= facebook_api_key,
-#             facebook_secret= facebook_secret,
-#             twitter_consumer_key= twitter_consumer_key,
-#             twitter_consumer_secret= twitter_consumer_secret,
-#             debug=True,
-#             autoescape=None,
-#         )
-#         tornado.web.Application.__init__(self, handlers, **settings)
+        settings = dict(
+            cookie_secret="12oETzKXQAGaYdkL5gEmGeJJFuYhghdskj3hHG8s/Vo=",# choose a cookie seed
+            login_url="/",# not sure if this is right or if it even matters
+            xsrf_cookies=True,
+            #setting keys is important!
+            facebook_api_key=options.facebook_api_key,
+            facebook_secret=options.facebook_secret,
+            twitter_consumer_key=options.twitter_consumer_key,
+            twitter_consumer_secret=options.twitter_consumer_secret,
+            debug=True,
+            autoescape=None,
+        )
+        tornado.web.Application.__init__(self, handlers, **settings)
 
 class BaseAuthHandler(tornado.web.RequestHandler): # BaseAuthHandler provides access to cookies
     def get_current_user(self):# Current_user is not used at all, but it may prove useful for integrating into the Brin.gy Framework
@@ -85,13 +77,14 @@ class BaseAuthHandler(tornado.web.RequestHandler): # BaseAuthHandler provides ac
 
 class ExamplePage(BaseAuthHandler): # this is just a sample page for you to look at, showing method calls and what not. Delete it!!!
     def get(self):
-        scripts = ("<script type='text/javascript' src='/oauth?provider=facebook&action=query&request=/me/friends'></script>"+
-                   "<script type='text/javascript' src='/oauth?provider=twitter&request=/followers/ids&action=query'></script>")
+       # beforescripts = ('<div id="fb-root"></div><script>(function(d, s, id) {var js, fjs = d.getElementsByTagName(s)[0];if (d.getElementById(id)) return;js = d.createElement(s); js.id = id;js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId='+self.settings["facebook_api_key"]+'";fjs.parentNode.insertBefore(js, fjs);}(document, "script", "facebook-jssdk"));</script>')
+        afterscripts = ("<script type='text/javascript' src='/oauth?provider=facebook&action=query&request=/me/friends'></script>"+
+            "<script type='text/javascript' src='/oauth?provider=twitter&action=query&request=/followers/ids'></script>")
         link1 = ("<a href='/oauth?provider=facebook&action=logout' id='facebook'>You have this many friends on Facebook:   (click to log out)</a></br>"
                  if self.current_facebook_user else "<a href='/oauth?provider=facebook&action=login'>Facebook login: </a></br>")
-        link2 = ("<a href='/oauth?provider=twitter&action=logout' id ='twitter'>You have this many followers on Twitter:   (click to log out)</a>"
+        link2 = ("<a href='/oauth?provider=twitter&action=logout' id='twitter'>You have this many followers on Twitter:   (click to log out)</a>"
                  if self.current_twitter_user else "<a href='/oauth?provider=twitter&action=login'>Twitter login: </a>")
-        self.write(link1+link2+scripts)
+        self.write(link1+link2+afterscripts)
 
 
 class ProviderHandler(BaseAuthHandler):
@@ -134,15 +127,17 @@ class FacebookHandler(BaseAuthHandler, tornado.auth.FacebookGraphMixin):
             return
         self.authorize_redirect(redirect_uri=my_url,
                                 client_id=self.settings["facebook_api_key"],
-                                extra_params={"scope": "read_stream, offline_access"})# and then get confirmation?
+                                extra_params={"scope": "read_stream, offline_access, user_likes"})# and then get confirmation?
                 
     
+                    
+            
     def _on_facebook_auth(self, user):
         if not user:
             raise tornado.web.HTTPError(500, "Facebook auth failed")
         self.set_secure_cookie("facebookUser", tornado.escape.json_encode(user))#save the user to cookie
         self.redirect(self.get_argument("next", "/"))#take it home
-        self.finish()
+        #self.finish()
 
     def facebook_logout(self): # logout function
         self.clear_cookie("facebookUser") # erase user cookie
@@ -150,14 +145,16 @@ class FacebookHandler(BaseAuthHandler, tornado.auth.FacebookGraphMixin):
             
     @tornado.web.asynchronous
     def make_facebook_request(self):#makes a Graph API request
-        request = self.get_argument('request', '/me/friends') 
-        print
-        print self.current_facebook_user
-        self.facebook_request(request, callback=self.async_callback(self._on_info),
-                              access_token=self.current_facebook_user["access_token"])#send the request to facebook, process info in callback
-        return
+        if self.current_facebook_user:
+            request = self.get_argument('request', "/me/friends") #request defaults to users friends
+            self.facebook_request(request, callback=self.async_callback(self._on_info),
+                                  access_token=self.current_facebook_user["access_token"])#send the request to facebook, process info in callback
+            return
+        else:
+            self.write("")
+            self.finish()
     def _on_info(self, info):#TODO: change what happens to data!!!
-        self.set_header("Content-Type", "text/javascript") # set mimetypes
+        #self.set_header("Content-Type", "text/plain") # set mimetypes
         if info is None:
             self.write('0')
         else:
@@ -194,10 +191,14 @@ class TwitterHandler(BaseAuthHandler, tornado.auth.TwitterMixin): # See Facebook
     
     @tornado.web.asynchronous
     def make_twitter_request(self):
-        request = self.get_argument('request', "/followers/ids") #default request to followers/ids
-        self.twitter_request(request, callback=self.async_callback(self._on_data),
-                             access_token=self.current_twitter_user["access_token"])
-        return
+        if self.current_twitter_user:
+            request = self.get_argument('request', "/followers/ids") #default request to followers/ids
+            self.twitter_request(request, callback=self.async_callback(self._on_data),
+                                 access_token=self.current_twitter_user["access_token"])
+            return
+        else:
+            self.write("")
+            self.finish()
     
     def _on_data(self, data):
         self.set_header("Content-Type", "text/javascript")
@@ -209,7 +210,7 @@ class TwitterHandler(BaseAuthHandler, tornado.auth.TwitterMixin): # See Facebook
 
 
 def main(): # run the app
-    # tornado.options.parse_command_line()
+    tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()

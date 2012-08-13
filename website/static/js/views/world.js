@@ -563,12 +563,12 @@ define([
         // });
 
         var that = this;
-        var background = 'url(/static/images/';
-        background += (options.calloutSide) ? 'callout_side' : 'callout';
-        background += '.png?14)';
-        var offsetX = (options.calloutSide) ? 8 : -194;
-        var offsetY = (options.calloutSide) ? -83 : -178;
-        var padding = (options.calloutSide) ? '0 10px 22px 28px' : '10px';
+        // var background = 'url(/static/images/';
+        // background += (options.calloutSide) ? 'callout_side' : 'callout';
+        // background += '.png?14)';
+        var offsetX = (options.calloutSide) ? 20 : -194;
+        var offsetY = (options.calloutSide) ? -95 : -193;
+        // var padding = (options.calloutSide) ? '0 10px 22px 28px' : '10px';
         // var height = (options.calloutSide) ? '100px' : '150px';
 
         var myOptions = {
@@ -582,13 +582,13 @@ define([
                 'background-color': 'white',
                 'border': '1px solid gray',
                 'border-radius': '5px',
-                'background-repeat': 'no-repeat',
+                'background-color': 'white',
                 'background-size': '100%',
-                'padding': padding,
+                // 'padding': padding,
                 // height: height,
                 'z-index': 3000,
-                closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
-                closeBoxMargin: "10px 2px 2px 2px",
+                // closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
+                // closeBoxMargin: "10px 2px 2px 2px",
             },
             infoBoxClearance: new google.maps.Size(1, 1),
             isHidden: false,

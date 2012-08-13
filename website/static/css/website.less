@@ -636,11 +636,13 @@ div#map_canvas {
     z-index: 0;
     /*box-shadow: inset 0 0 5px 5px gray;*/
 }
+
+@infoboxHeight: 130px;
 div.infoBox {
     z-index: 2000;
 
     width: 350px;
-    height: 130px;
+    height: @infoboxHeight;
     margin: -1px;
 
     /*background: url(/static/images/callout.png?7) no-repeat;*/
@@ -654,16 +656,15 @@ div.infoBox > img {
     /*display: none;*/
 }
 div.infoboxAttribute {
-    /*height:100px;*/
-    /*background-color: yellow;*/
+    position: relative;
 }
 div.infoboxAttribute > div.title {
-    height: 22px;
+    height: 36px;
     padding: 0 0 5px 0;
     border-bottom: 1px solid rgba(0,0,0,0.1);
     font-weight: bold;
     font-size: 22px;
-    line-height: 22px;
+    line-height: 36px;
 }
 div.infoboxAttribute > div.title > div.titleKey {
     float: right;
@@ -688,16 +689,19 @@ div.infoboxAttribute > div.body > div.tools > button {
     margin: 1px 0 1px 5px;
     float: right;
 }
+div.infoboxAttribute > img.arrow {
+    position: absolute;
+    left: 174px;
+    top: @infoboxHeight + 8;
+    width: 20px;
+}
 
 div.infoboxContext {
-    /*width:350px;*/
-    
-    /*background-color: rgba(60,60,60,0.8);*/
-    /*background-color: yellow;*/
+    position: relative;
 }
 div.infoboxContext > div.title {
     height: 36px;
-    padding: 5px 0 5px 0;
+    padding: 0 0 5px 0;
     border-bottom: 1px solid rgba(0,0,0,0.1);
     font-weight: bold;
     font-size: 22px;
@@ -737,7 +741,18 @@ div.infoboxContext > div.body > div.tools > a.zoom {
 div.infoboxContext > div.body > div.creator {
     color: gray;
 }
-
+div.infoboxContext > img.arrow {
+    position: absolute;
+    left: 174px;
+    top: @infoboxHeight + 8;
+    width: 20px;
+}
+div.infoboxContext > img.arrow-left {
+    position: absolute;
+    left: -28px;
+    top: 50px;
+    width: 20px;
+}
 
 
 div#navbar {
@@ -789,7 +804,7 @@ div#navbar ul > li.authed {
     display: none;
 }
 div#navbar ul > li.authed > a {
-    /*background-color: rgba(80,80,80,0.8);*/
+    position: relative;
     border: 1px solid rgba(0,0,0,0.2);
     padding: 10px 20px 10px 20px;
 }
@@ -893,7 +908,7 @@ div#modal > div.box > div.header > a {
 div#modal > div.box > div.header > span#title {
     text-transform: uppercase;
 }
-div#modal > div.box > div.content {
+div#modal > div.box div.main {
     max-height: 500px;
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
@@ -927,18 +942,18 @@ div#modal > div.box > div.content div.buttons {
 div#modal > div.box > div.content div.buttons > button {
     width: 150px;
 }
-div#modal > div.box > div.content > div.alerts > div.well{
+div#modal > div.box > div.content > div.main > div.alerts > div.well{
     /*border-radius: 5px;*/
     font-weight: normal;
     
 }
 
-div#modal > div.box > div.footer {
+div#modal > div.box div.footer {
     text-align: right;
     padding: 10px 0 0 0;
     /*height: 30px;*/
 }
-div#modal > div.box > div.footer > button {
+div#modal > div.box div.footer > button {
     /*float: right;*/
     margin-left: 5px;
     min-width: 100px;
@@ -946,13 +961,28 @@ div#modal > div.box > div.footer > button {
 
 
 .badge-icon {
+    /*position: absolute;
+    right: 5px;
+    top: 5px;*/
+    display: inline-block;
+
     background-color: red;
     color: white;
     text-shadow: 0 -1px gray;
     font-weight: bold;
-    font-size: 10px;
+    font-size: 11px;
+    line-height: 11px;
+    padding: 3px;
     border: 1px solid white;
+    border-radius: 4px;
 }
 
-
+.white-outline {
+    color: red ! important;
+    text-shadow:
+    -1px -1px 0 #fff,
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff,
+    1px 1px 0 #fff;  
+}
 

@@ -61,19 +61,7 @@ define([
         this.$('a').removeClass('disabled');
         this.contextMenuClicked = false;
     },
-    explore: function(){
-        
-        console.log('explore', this.explorerRunning, this.previousPage);
-
-        if (this.explorerRunning) {
-            this.app.router.navigate("", {trigger:true});
-            this.explorerRunning = undefined;
-            this.render();
-            return false;
-        }
-        this.explorerRunning = 1;
-        this.render();
-    },
+    
     about: function(e){
         // this.trigger('about');
         // return false;
@@ -133,9 +121,9 @@ define([
         btn.addClass('highlighted')
 
         var action = btn.attr('id');
-        var left = this.$('span#username').offset().left;
-        var width = this.$('span#username').width();
-        this.trigger(action, {action:action, left:left, width:width});
+        var left = btn.offset().left + 22;
+        var width = btn.width();
+        this.trigger(action, {action:action, left:left, width:width, alerts:this.alerts});
         return false;
     },
 
@@ -144,9 +132,24 @@ define([
         this.$('a.context').toggle(flag);
     },
 
+    explore: function(){
+        if (this.explorerRunning) {
+            history.back();
+            this.explorerRunning = undefined;
+            this.render();
+            return false;
+        }
+        this.explorerRunning = 1;
+        this.render();
+    },
+
     render: function(options){
-        this.previousPage = Backbone.history.fragment;
-        
+        var that = this;
+        this.app.agent.loadUserOptions(function(json){
+            that.alerts = json.alerts.length;
+            that.$('.badge-icon').html(that.alerts).toggle((that.alerts>0));
+        });
+
         this.$('li:not(.explore)').toggle(!this.explorerRunning);
         this.$('li.explore > a').html('Explore');
         if (this.explorerRunning) {

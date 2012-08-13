@@ -7,6 +7,7 @@ import tornado.web
 import tornado.escape
 import tornado.options
 
+import logging
 import sys, os, time, random
 from optparse import OptionParser
 
@@ -322,7 +323,9 @@ application = tornado.web.Application([
 
 
 if __name__ == "__main__":
-    
+    logging.getLogger().setLevel(getattr(logging, 'INFO'))
+    tornado.options.enable_pretty_logging()
+
     statistics = Statistics()
     
     db = DB(0)
@@ -341,7 +344,6 @@ if __name__ == "__main__":
         mode = '(debug)'
     
     print 'Satellite running at %s:%s %s' % (HOST,PORT,mode)
-    tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(PORT, address=HOST)
     ioloop = tornado.ioloop.IOLoop.instance()

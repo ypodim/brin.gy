@@ -177,6 +177,19 @@ var state = {
         },
     },
 
+    clearAlerts: function(){
+        var that = this;
+        var url = this.agent.url();
+        var data = {
+            action: 'clearalerts',
+            username: this.agent.id(),
+            secret: this.agent.fullInfo().pwd,
+        };
+        $.post(url, data, function(json){
+            that.navbarView && this.navbarView.render();
+        }, 'json');
+    },
+
     getAllLocations: function(clb, circleBound){
         var url = this.satellite.url+'/location';
         var data = {};

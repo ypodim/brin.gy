@@ -134,6 +134,8 @@ define([
             this.$el.html( compiled_template() );
             var left = options.left - this.$el.width() + options.width;
             this.$el.css({left:left}).show();
+            
+            this.$('#alerts').toggleClass('white-outline', (options.alerts>0));
         }
         
         this.$('form').children(':first').focus();
