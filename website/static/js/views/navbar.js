@@ -13,7 +13,7 @@ define([
         'click a#signin': 'login',
         'click a#signup': 'login',
         'click a#account': 'account',
-        // 'click a#feedback': 'feedback',
+        'click a#explore': 'explore',
         'click a#contexts': 'contextMenu',
         'click a.context': 'contextTitle',
     },
@@ -61,10 +61,19 @@ define([
         this.$('a').removeClass('disabled');
         this.contextMenuClicked = false;
     },
-    // feedback: function(){
-    //     this.app.modal.render({title:'feedback'});
-    //     return false;
-    // },
+    explore: function(){
+        
+        console.log('explore', this.explorerRunning, this.previousPage);
+
+        if (this.explorerRunning) {
+            this.app.router.navigate("", {trigger:true});
+            this.explorerRunning = undefined;
+            this.render();
+            return false;
+        }
+        this.explorerRunning = 1;
+        this.render();
+    },
     about: function(e){
         // this.trigger('about');
         // return false;
@@ -111,12 +120,7 @@ define([
     },
 
     account: function(e){
-        // this.trigger('account', {action:'account'});
-        // return false;
-
-        var btn;
-        // btn = $(e.target);
-        btn = this.$('a#account');
+        var btn = this.$('a#account');
 
         e.stopPropagation();
 
@@ -132,7 +136,6 @@ define([
         var left = this.$('span#username').offset().left;
         var width = this.$('span#username').width();
         this.trigger(action, {action:action, left:left, width:width});
-        console.log('account trigger', action)
         return false;
     },
 
@@ -142,15 +145,16 @@ define([
     },
 
     render: function(options){
-        if (options && options.message) {
-            this.$('li.menu').hide();
-            this.$('li.message').show();
-            this.$('li.message').html(options.message);
-            return false;
+        this.previousPage = Backbone.history.fragment;
+        
+        this.$('li:not(.explore)').toggle(!this.explorerRunning);
+        this.$('li.explore > a').html('Explore');
+        if (this.explorerRunning) {
+            this.$('li.explore > a').html('Back');
+            return;
         }
 
         this.$('li.menu').show();
-        this.$('li.message').hide();
         this.$('a').removeClass('highlighted');
 
         var ctitle = this.app.getContext().title;

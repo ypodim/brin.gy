@@ -5,6 +5,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import tornado.escape
+import tornado.options
 
 import sys, os, time, random
 from optparse import OptionParser
@@ -340,7 +341,7 @@ if __name__ == "__main__":
         mode = '(debug)'
     
     print 'Satellite running at %s:%s %s' % (HOST,PORT,mode)
-    
+    tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(PORT, address=HOST)
     ioloop = tornado.ioloop.IOLoop.instance()

@@ -46,7 +46,6 @@ define([
     },
 
     explore: function(){
-        console.log('explore')
         this.worldView.showExplorer();
     },
 

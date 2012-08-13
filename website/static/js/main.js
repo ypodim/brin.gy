@@ -52,6 +52,12 @@ require([
         appp.setConfig(config);
         appp.initConfig();
 
+        var app_router = new Router({
+            worldView: wldView,
+        });
+        appp.router = app_router;
+        Backbone.history.start();
+
         // worldView
         var wldView = new worldView();
         // wldView.render();
@@ -134,11 +140,8 @@ require([
         appp.loginView.bind('context:all', appp.navbarView.render);
         appp.loginView.bind('context:all', wldView.showAllContexts);
 
-        var app_router = new Router({
-            worldView: wldView,
-        });
-        appp.router = app_router;
-        Backbone.history.start();
-        // app_router.navigate('apps');
+        
+        if (!Backbone.history.fragment || Backbone.history.fragment == 'explore')
+            app_router.navigate('apps', {trigger:true});
     });
 })

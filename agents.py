@@ -6,6 +6,7 @@ import tornado.ioloop
 import tornado.web
 import tornado.escape
 import tornado.httpclient
+import tornado.options
 
 import sys, os, time, urlparse
 from datetime import datetime
@@ -20,6 +21,7 @@ from db import DB
 from profile import profile
 from location import location
 from keys import *
+from oauth import *
 
 capability_names = ['profile','location']
 
@@ -709,10 +711,22 @@ class debug(tornado.web.RequestHandler):
 
 #########################################
 
-settings = {
-    "static_path": os.path.join(os.path.dirname(__file__), "static",),
-    "debug": os.environ.get("SERVER_SOFTWARE", "").startswith("Development/"),
-}
+settings = dict(
+    cookie_secret="12oETzKXQAGaYdkL5gEmGeJJFuYhghdskj3hHG8s/Vo=",# choose a cookie seed
+    login_url="/",# not sure if this is right or if it even matters
+    xsrf_cookies=True,
+    #setting keys is important!
+    facebook_api_key= facebook_api_key,
+    facebook_secret= facebook_secret,
+    twitter_consumer_key= twitter_consumer_key,
+    twitter_consumer_secret= twitter_consumer_secret,
+    autoescape=None,
+
+    static_path=os.path.join(os.path.dirname(__file__), "static",),
+    debug=os.environ.get("SERVER_SOFTWARE", "").startswith("Development/"),
+)
+
+
 application = tornado.web.Application([
     (r"/ustats", api_call),
     (r"/batch_profile", api_call),
@@ -726,6 +740,10 @@ application = tornado.web.Application([
     (r"/feedback", api_call),
     (r"/stats", stats),
 
+    (r"/oauth", ProviderHandler),
+    (r"/oauth/twitter", TwitterHandler),
+    (r"/oauth/facebook", FacebookHandler),
+    (r"/example", ExamplePage),
 
     (r"/users", debug),    
     
@@ -760,7 +778,7 @@ if __name__ == "__main__":
     db = DB(dbno)
     
     print 'Ego agent running at %s:%s using %s' % (HOST,PORT,mode)
-    
+    tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(PORT, address=HOST)
     ioloop = tornado.ioloop.IOLoop.instance()

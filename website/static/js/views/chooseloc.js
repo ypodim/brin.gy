@@ -141,7 +141,6 @@ define([
 
         var that = this;
         if (options && options.explore) {
-            console.log('ok')
             this.$el.children('.locationPicker').hide();
             google.maps.event.addListener(this.app.map, 'drag', function(){
                 if (!that.timer) {

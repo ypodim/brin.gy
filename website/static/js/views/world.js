@@ -578,7 +578,10 @@ define([
             pixelOffset: new google.maps.Size(offsetX, offsetY),
             zIndex: null,
             boxStyle: { 
-                background: background,
+                // background: background,
+                'background-color': 'white',
+                'border': '1px solid gray',
+                'border-radius': '5px',
                 'background-repeat': 'no-repeat',
                 'background-size': '100%',
                 'padding': padding,
