@@ -22,7 +22,7 @@ from db import DB
 from profile import profile
 from location import location
 from keys import *
-from oauth import *
+from integration2 import *
 
 capability_names = ['profile','location']
 

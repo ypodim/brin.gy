@@ -13,13 +13,21 @@ from tornado import httpclient
 #Make sure you have these options, and please create your own...
 #API Keys and Don't enter this into source control!! Set some environment variables
 #in a config file or something
-# from tornado.options import define, options
+from tornado.options import define, options
+define("port", default=3000, help="run on the given port", type=int)
+define("facebook_api_key", help="your Facebook application API key",
+       default="275214402583214")
+define("facebook_secret", help="your Facebook application secret",
+       default="bc9ba3efd1e28deec5e7d2061dd6fdfa")
+define("twitter_consumer_key", help="Twitter OAuth",
+       default="cicnNgg3nrEFqb3DdODw")
+define("twitter_consumer_secret", help="Twitter OAuth",
+       default="yvK2ecNU3JyQCpXkPEoBW4rHm8NL6dtKVRRqDO7tys")
 
 facebook_api_key="275214402583214"
 facebook_secret="bc9ba3efd1e28deec5e7d2061dd6fdfa"
 twitter_consumer_key="cicnNgg3nrEFqb3DdODw"
 twitter_consumer_secret='yvK2ecNU3JyQCpXkPEoBW4rHm8NL6dtKVRRqDO7tys'
-
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -158,7 +166,6 @@ class FacebookHandler(BaseAuthHandler, tornado.auth.FacebookGraphMixin):
         if info is None:
             self.write('0')
         else:
-            print 'info', info
             self.write("document.getElementById('facebook').innerHTML = 'You have this many friends on Facebook: "+ str(len(info['data']))+ " (click to log out)';")# write date
         self.finish()
 
@@ -210,3 +217,12 @@ class TwitterHandler(BaseAuthHandler, tornado.auth.TwitterMixin): # See Facebook
         self.finish()
 
 
+def main(): # run the app
+    tornado.options.parse_command_line()
+    http_server = tornado.httpserver.HTTPServer(Application())
+    http_server.listen(options.port)
+    tornado.ioloop.IOLoop.instance().start()
+
+
+if __name__ == "__main__":
+    main()
