@@ -186,7 +186,7 @@ var state = {
             secret: this.agent.fullInfo().pwd,
         };
         $.post(url, data, function(json){
-            that.navbarView && this.navbarView.render();
+            that.navbarView && that.navbarView.render();
         }, 'json');
     },
 
