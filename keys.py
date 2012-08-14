@@ -95,6 +95,9 @@ def doalert(r, atype, c, k, v, u):
 
     for umatch in matches:
         storedOption = get_user_option(r, umatch, atype)
+        if storedOption == None:
+            set_user_option(r, umatch, atype, True)
+            storedOption = get_user_option(r, umatch, atype)
         if storedOption == 'True':
             umatch
             alert = dict(
@@ -105,7 +108,7 @@ def doalert(r, atype, c, k, v, u):
                 user=u,
                 tstamp=time.time())
             r.rpush('user:%s:alerts' % umatch, json.dumps(alert))
-            print umatch, alert
+            # print umatch, alert
 
 
     # print 'alert', atype, k, v, u, c
