@@ -71,7 +71,11 @@ class profile():
                 doalert(self.db, 'onvaluecreated', context, key, val, self.usr)
 
     def del_reverse(self, context, key, val):
-        ctitle = context['title']
+        if type(context) == dict:
+            ctitle = context['title']
+        else:
+            ctitle = context
+
         cid = context['id']
         if self.db.srem(getKVA(ctitle, key, val), self.usr):  # remove agent from set for this key/val pair
             if self.db.zincrby(getKV(ctitle, key), val, -1) <= 0: # decrease key/val pair's score    
@@ -213,8 +217,14 @@ class profile():
             for val in self.get_vals(key):
                 print 'clearing val', val
                 for context in self.db.smembers('%s:contexts' % self.usr):
+                    if context == 'all':
+                        continue
                     print 'clearing context', context
-                    self.del_val(context, key, val)
+                    cid = self.db.get('context:title:%s:cid' % context)
+                    print 'cid', cid
+                    cdic = self.db.hgetall('context:cid:%s' % cid)
+                    print 'cdic', cdic
+                    self.del_val(cdic, key, val)
         
     def get(self, context):
         if self.path[-1] == 'visited':
