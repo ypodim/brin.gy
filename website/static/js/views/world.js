@@ -118,6 +118,13 @@ define([
         this.circles = [];
     },
 
+    updateAlertsIndication: function(alerts) {
+        var title = 'Brin.gy';
+        if (alerts > 0)
+            title = 'Brin.gy ('+alerts+')';
+        $('title').html(title);
+    },
+
     showAllContexts: function(options){
         this.renderFrame();
 

@@ -148,6 +148,7 @@ define([
         this.app.agent.loadUserOptions(function(json){
             that.alerts = json.alerts.length;
             that.$('.badge-icon').html(that.alerts).toggle((that.alerts>0));
+            that.app.trigger('alerts:update', json.alerts.length);
         });
 
         this.$('li:not(.explore)').toggle(!this.explorerRunning);

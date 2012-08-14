@@ -89,11 +89,12 @@ require([
             wldView.appendKey(m);
         });
         
+        appp.bind('alerts:update', wldView.updateAlertsIndication);
 
         appp.navbarView.bind('signin', wldView.showLoginBox);
         appp.navbarView.bind('signup', wldView.showLoginBox);
         appp.navbarView.bind('contexts', wldView.showAllContexts);
-
+        
         appp.navbarView.bind('context:title', function(){
             wldView.selectedKeyModel = null;
             wldView.render()
