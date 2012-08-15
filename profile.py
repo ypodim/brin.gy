@@ -56,7 +56,8 @@ class profile():
 
     
     'user:USER:alerts' # list
-
+    
+    'chat:cid:CID:key:KEY:val:VAL' # list of dics: username, tstamp, message 
 
     def add_reverse(self, context, key, val):
         if self.db.sadd(getKA(context, key), self.usr):   # add agent to set for this key

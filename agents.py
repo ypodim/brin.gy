@@ -189,7 +189,6 @@ class serve_user(bringy_handler):
             llen = db.r.llen(rkey)
             for i in xrange(llen):
                 alert = db.r.lpop(rkey) or '[]'
-                print alert
                 alert = tornado.escape.json_decode(alert)
                 dic['alerts'].append(alert)
                 alert = tornado.escape.json_encode(alert)

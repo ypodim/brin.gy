@@ -398,6 +398,28 @@ var state = {
         }, 'json');
     },
 
+    postChat: function(cid, key, val, message, clb) {
+        var url = this.satellite.url+'/chat';
+        var data = {
+            cid:cid, 
+            key:key, 
+            val:val, 
+            message:message, 
+            username: this.agent.id(),
+            secret:this.agent.fullInfo().pwd
+        };
+        $.post(url, data, function(json){
+            clb && clb(json.chat);
+        }, 'json');
+    },
+    getChats: function(cid, key, val, clb) {
+        var url = this.satellite.url+'/chat';
+        var data = {cid:cid, key:key, val:val};
+        $.getJSON(url, data, function(json){
+            clb && clb(json.chats);
+        });
+    },
+
     getKeyvals: function(clb){
         if (! this.context()) {
             console.log('ERROR: context not set, cannot get keyvals');

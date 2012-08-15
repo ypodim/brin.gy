@@ -82,6 +82,8 @@ def doalert(r, atype, c, k, v, u):
     if c == 'all':
         return
 
+    print 'doalert', atype, c, k, u
+
     matches = []
     if atype == 'onvalueadded':
         matches = r.smembers(getKVA(c, k, v)) - set([u])
@@ -90,6 +92,17 @@ def doalert(r, atype, c, k, v, u):
     if atype == 'onattribute':
         cid = r.get('context:title:%s:cid' % c)
         matches = r.smembers('context:cid:%s:users' % cid) - set([u])
+    if atype == 'onchat':
+        conversationUsers = set([])
+        cid = r.get('context:title:%s:cid' % c)
+        ckey = 'chat:cid:%s:key:%s:val:%s' % (cid, k, v)
+        clen = r.llen(ckey)
+        for mdicstr in r.lrange(ckey, 0, clen):
+            chat = json.loads(mdicstr)
+            conversationUsers.add(chat['username'])
+        matches = r.smembers(getKVA(c, k, v))
+        matches = matches.union(conversationUsers)
+        matches = matches - set([u])
     if atype == 'onapplication':
         # matches = r.smembers('context:cid:%s:users' % c)
         pass
@@ -100,7 +113,6 @@ def doalert(r, atype, c, k, v, u):
             set_user_option(r, umatch, atype, True)
             storedOption = get_user_option(r, umatch, atype)
         if storedOption == 'True':
-            umatch
             alert = dict(
                 atype=atype, 
                 key=k, 
@@ -110,7 +122,6 @@ def doalert(r, atype, c, k, v, u):
                 tstamp=time.time())
             r.rpush('user:%s:alerts' % umatch, json.dumps(alert))
             # print umatch, alert
-
 
     # print 'alert', atype, k, v, u, c
 

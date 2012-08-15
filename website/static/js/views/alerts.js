@@ -27,6 +27,7 @@ define([
                 var alert = json.alerts[i];
                 var alerthtml = that.alertTemplate(alert);
                 alerthtml = $(alerthtml).children('.'+alert.atype);
+                // console.log(JSON.stringify(alert))
 
                 that.$('div.alerts').append(alerthtml);
             }

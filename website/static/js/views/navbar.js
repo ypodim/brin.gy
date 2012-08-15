@@ -143,13 +143,24 @@ define([
         this.render();
     },
 
-    render: function(options){
+    alertPoller: function() {
+        if (!this.app.agent.loggedIn()) {
+            this.timer = undefined;
+            return;
+        }
         var that = this;
         this.app.agent.loadUserOptions(function(json){
             that.alerts = (json.alerts) ? json.alerts.length : 0;
             that.$('.badge-icon').html(that.alerts).toggle((that.alerts>0));
             that.app.trigger('alerts:update', that.alerts);
+            that.timer = setTimeout(function(){that.alertPoller()}, 1000);
+            console.log(that.alerts)
         });
+    },
+
+    render: function(options){
+        if (this.timer == undefined)
+            this.alertPoller();
 
         this.$('li:not(.explore)').toggle(!this.explorerRunning);
         this.$('li.explore > a').html('Explore');

@@ -13,15 +13,49 @@ define([
     app: appConfig.getState(),
 
     events: {
-        'submit form': 'newAttrSubmit',
+        'submit form.newAttr': 'newAttrSubmit',
         'click form.newAttr > button': 'newAttrSubmit',
         "click a.valpart"    : "toggleUsers",
-        'click button#addBtn' : 'addBtn',  
+        'click button#addBtn' : 'addBtn',
+
+        'submit form.message': 'sendChat'
     },
 
     initialize: function(options) {
         _.bindAll(this, 'render', 'addBtn', 'toggleUsers');
         this.model.bind('change', this.render);
+    },
+
+    addToHistory: function(messageObj){
+        var msgEl = $('<div></div>').addClass('message');
+        var msg = '<b>'+messageObj.username+':</b> '+messageObj.message;
+        msgEl.html(msg);
+        this.$('.history').append(msgEl);
+    },
+
+    sendChat: function(){
+        var cid = this.app.context().id;
+        var key = this.model.get('key');
+        var val = this.model.get('val');
+        var message = this.$('input.prompt').val();
+        var that = this;
+        this.app.postChat(cid, key, val, message, function(response){
+            that.$('input.prompt').val('');
+            that.addToHistory(response);
+        });
+        return false;
+    },
+
+    populateChatHistory: function() {
+        var cid = this.app.context().id;
+        var key = this.model.get('key');
+        var val = this.model.get('val');
+        var that = this;
+        this.app.getChats(cid, key, val, function(chats){
+            for (var i in chats) {
+                that.addToHistory(chats[i]);
+            }
+        });
     },
 
     newAttrSubmit: function() {
@@ -39,6 +73,7 @@ define([
 
     toggleMatches: function(flag) {
         this.$('#matches').toggle(flag);
+        this.$('.chat').toggle(flag);
         this.$el.toggleClass('expand', flag);
     },
 
@@ -82,6 +117,8 @@ define([
             this.$('div#matches').append(uhtml);
             this.$('a.userMatch:last-child > i').css({visibility: 'hidden'});
         }
+
+        this.populateChatHistory();
 
         return this;
     },

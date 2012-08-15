@@ -318,7 +318,69 @@ class contexts(tornado.web.RequestHandler):
 
         res = dict(error=error, username=username, cid=cid)
         self.write(res)
-            
+
+
+
+class chat(tornado.web.RequestHandler):
+    def options(self):
+        self.write({})
+    def prepare(self):
+        statistics.hit()
+        self.start_time = time.time()
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
+        self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
+        self.set_header('Content-Type','application/json; charset=UTF-8')
+
+    def get(self):
+        cid = self.get_argument('cid','')
+        key = self.get_argument('key','')
+        val = self.get_argument('val','')
+
+        ckey = 'chat:cid:%s:key:%s:val:%s' % (cid, key, val)
+        clen = db.r.llen(ckey)
+        res = []
+        for mdicstr in db.r.lrange(ckey, 0, clen):
+            mdic = tornado.escape.json_decode(mdicstr)
+            res.append(mdic)
+        
+        self.write(dict(chats=res))
+
+    def post(self):
+        error = ''
+        secret = self.get_argument('secret','')
+        username = self.get_argument('username','')
+        cid = self.get_argument('cid','')
+        key = self.get_argument('key','')
+        val = self.get_argument('val','')
+        message = self.get_argument('message','')
+
+        if cid and key and val and username and secret:
+            if db.authenticate_user(username, secret):
+                ctitle = db.r.hget('context:cid:%s' % cid, 'title')
+                print ctitle
+                if db.r.scard(getKVA(ctitle, key, val)):
+                    if message:
+                        ckey = 'chat:cid:%s:key:%s:val:%s' % (cid, key, val)
+                        print 'ckey', ckey
+                        mdic = dict(message=message, tstamp=time.time(), username=username)
+                        mdicstr = tornado.escape.json_encode(mdic)
+                        print mdic
+                        print db.r.rpush(ckey, mdicstr)
+
+                        atype = 'onchat'
+                        doalert(db.r, atype, ctitle, key, val, username)
+                else:
+                    error = 'context/key/val does not exist'
+            else:
+                error = 'authentication failure'
+        else:
+            error = 'missing parameters'
+
+        res = dict(error=error, chat=dict(cid=cid, key=key, val=val, message=message, username=username))
+        self.write(res)
+
+
 #########################################
 
 settings = {
@@ -332,6 +394,8 @@ application = tornado.web.Application([
     (r"/contexts", contexts),
     (r"/contexts/(.*)", contexts),
     
+    (r"/chat", chat),
+
     (r"/.+", serve_request),
 ], **settings)    
 

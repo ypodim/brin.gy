@@ -576,6 +576,44 @@ div.valcontainer > div.btn-group  {
 div.valcontainer > div#matches  {
     display: none;
 }
+
+
+div.valcontainer > div.chat  {
+    display: none;
+    margin: 5px 0 5px 0;
+    background-color: white;
+    position: relative;
+    height: 100px;
+}
+div.valcontainer > div.chat > div.history {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 75px;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+}
+div.valcontainer > div.chat > form.message {
+    position: absolute;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    height: 25px;
+
+    margin-top: 5px;
+
+    padding: 0;
+    margin: 0;
+}
+div.valcontainer > div.chat > form.message > input {
+    width: 378px;
+    outline: none;
+    border-radius: 0;
+}
+
+
+
 div.valcontainer > a {
     /*background-color: blue;*/
 }
