@@ -15,7 +15,7 @@ define([
         'click a#account': 'account',
         'click a#explore': 'explore',
         'click a#contexts': 'contextMenu',
-        // 'click a.context': 'contextTitle',
+        'click a.context': 'contextTitle',
     },
     template: _.template(navbarTemplate),
     
@@ -173,6 +173,8 @@ define([
 
         var ctitle = this.app.context().title;
         this.$('a.context').toggle((ctitle!=null)).html('#'+ctitle);
+        this.$('a.context').attr({href: '#/c/'+this.app.context().id});
+        console.log(ctitle, this.app.context().id)
         
         this.$('.authed').toggle(this.app.agent.loggedIn());
         this.$('.noauth').toggle(!this.app.agent.loggedIn());
