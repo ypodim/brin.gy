@@ -70,7 +70,7 @@ require([
             appp.cookies.del_cookie(username);
             appp.agent.unsetAgentId();
             appp.navbarView.render();
-            wldView.render();
+            // wldView.render();
         });
 
         appp.modal.bind('reminder', function(){
@@ -126,7 +126,7 @@ require([
         
 
         
-        appp.bind('loggedin', wldView.render);
+        // appp.bind('loggedin', wldView.render);
         appp.bind('loggedin', appp.navbarView.render);
         appp.bind('signedup', appp.navbarView.render);
         appp.bind('deleted', appp.navbarView.render);

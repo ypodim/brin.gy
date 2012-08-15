@@ -141,71 +141,71 @@ class stats(tornado.web.RequestHandler):
         return dic
 
 
-class multimatch(tornado.web.RequestHandler):
-    error = ''
-    def options(self):
-        self.write({})
-    def prepare(self):
-        statistics.hit()
+# class multimatch(tornado.web.RequestHandler):
+#     error = ''
+#     def options(self):
+#         self.write({})
+#     def prepare(self):
+#         statistics.hit()
         
-        self.start_time = time.time()
-        self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
-        self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
-        self.set_header('Content-Type','application/json; charset=UTF-8')
+#         self.start_time = time.time()
+#         self.set_header('Access-Control-Allow-Origin', '*')
+#         self.set_header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
+#         self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
+#         self.set_header('Content-Type','application/json; charset=UTF-8')
             
-        if self.request.body:
-            args = [x.split('=') for x in self.request.body.split('&')]
-            params = dict(args)
-        else:
-            params = {}
-            for k,v in self.request.arguments.items():
-                params[k] = v[-1]
-        self.params = params
+#         if self.request.body:
+#             args = [x.split('=') for x in self.request.body.split('&')]
+#             params = dict(args)
+#         else:
+#             params = {}
+#             for k,v in self.request.arguments.items():
+#                 params[k] = v[-1]
+#         self.params = params
     
-    def get(self):
-        self.post()
-    def post(self):
-        matches = []
+#     def get(self):
+#         self.post()
+#     def post(self):
+#         matches = []
         
-        arguments = self.get_argument('data', '')
-        context = self.get_argument('context', 'all')
-        #print
-        #print self.request
-        #print escaped_data
-        #arguments = tornado.escape.url_unescape(escaped_data)
-        #print arguments
+#         arguments = self.get_argument('data', '')
+#         context = self.get_argument('context', 'all')
+#         #print
+#         #print self.request
+#         #print escaped_data
+#         #arguments = tornado.escape.url_unescape(escaped_data)
+#         #print arguments
         
-        arguments = json.loads(arguments)
+#         arguments = json.loads(arguments)
         
-        #matchreqs = [x for x in arguments if x[2]]
-        #if matchreqs:
-            #print
-            #print matchreqs
-        #print
-        #print arguments
-        for capname, key, val in arguments:
-            innerstart = time.time()
-            try:
-                cap = eval('%s' % capname)(r)
-            except Exception, e:
-                self.error = '%s' % e
-                continue
-            if capname == 'profile':
-                dic = cap.get_count(context, key, val)
-            else:
-                dic = cap.get_count(key, val)
-            matches.append([capname, key, val, dic['count'], dic['matches']])
+#         #matchreqs = [x for x in arguments if x[2]]
+#         #if matchreqs:
+#             #print
+#             #print matchreqs
+#         #print
+#         #print arguments
+#         for capname, key, val in arguments:
+#             innerstart = time.time()
+#             try:
+#                 cap = eval('%s' % capname)(r)
+#             except Exception, e:
+#                 self.error = '%s' % e
+#                 continue
+#             if capname == 'profile':
+#                 dic = cap.get_count(context, key, val)
+#             else:
+#                 dic = cap.get_count(key, val)
+#             matches.append([capname, key, val, dic['count'], dic['matches']])
             
-            #if capname == 'location':
-                #print 'entry completed in ', time.time()-innerstart
-                #print '-%s- -%s- %s %s' % (key, val, dic['count'], len(dic['matches']))
+#             #if capname == 'location':
+#                 #print 'entry completed in ', time.time()-innerstart
+#                 #print '-%s- -%s- %s %s' % (key, val, dic['count'], len(dic['matches']))
             
-        dic = dict(matches=matches, error=self.error, count=0)
-        dic.__setitem__('response_time', time.time() - self.start_time)
-        dic.__setitem__('error', dic.get('error',self.error))
-        #print 'response_time', dic['response_time'], [type(x) for x in matches]
-        self.write(dic)
+#         dic = dict(matches=matches, error=self.error, count=0)
+#         dic.__setitem__('response_time', time.time() - self.start_time)
+#         dic.__setitem__('error', dic.get('error',self.error))
+#         #print 'response_time', dic['response_time'], [type(x) for x in matches]
+#         self.write(dic)
 
 
 class randomstat(tornado.web.RequestHandler):
@@ -388,7 +388,7 @@ settings = {
     "static_path": os.path.join(os.path.dirname(__file__), "static",),
 }
 application = tornado.web.Application([
-    (r"/multimatch", multimatch),
+    # (r"/multimatch", multimatch),
     (r"/stats", stats),
     (r"/randomstat", randomstat),
     (r"/contexts", contexts),

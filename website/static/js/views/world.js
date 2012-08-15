@@ -126,6 +126,7 @@ define([
     },
 
     showAllContexts: function(options){
+        console.log('showAllContexts');
         this.renderFrame();
 
         if (!(options && options.notoggle))
@@ -141,8 +142,7 @@ define([
 
         var ctitle = this.app.context().title;
         this.$('button#backToContext').html('Back to '+this.app.context().title+' >').toggle(ctitle != null);
-        console.log((ctitle != null));
-
+        
         this.clearMap();
 
         var that = this;
@@ -303,7 +303,7 @@ define([
             title: 'newContextOptions', 
             // location: circle.title,
         }).bind('modal:closed', function(){
-            console.log('newcontext - modal closed');
+            // console.log('newcontext - modal closed');
             that.showAllContexts({notoggle:true});
         }).bind('newcontext', function(appdic){
             
@@ -316,7 +316,7 @@ define([
                 that.$('button#addContext').show();
                 
                 if (circle && circle.center) {
-                    console.log('newcontext - modal closed with', appdic, circle);
+                    // console.log('newcontext - modal closed with', appdic, circle);
 
                     contextOptions = {
                         id: null,
@@ -334,7 +334,7 @@ define([
                     }
 
                     var clb = function(json){
-                        console.log('new context post got back:', json);
+                        // console.log('new context post got back:', json);
                         if (json.error) {
                             alert(json.error);
                             return false;
@@ -343,7 +343,7 @@ define([
                         that.app.router.navigate('#/c/'+json.cid);
                         that.app.modal.render({title: 'newkey'});
                         that.app.modal.bind('newkey', function(obj){
-                            console.log('new key result', obj)
+                            // console.log('new key result', obj)
                         })
                     };
                     that.app.postNewContext(contextOptions, clb);
@@ -642,7 +642,6 @@ define([
         this.collection.reset();
         this.$('aside > div.list').empty();
         this.app.getKeyvals(function(json){
-
             var bounds = new google.maps.LatLngBounds();
             var locTitles = {};
 

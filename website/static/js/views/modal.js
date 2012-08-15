@@ -122,6 +122,7 @@ define([
         this.$el.hide();
         if (!(options && options.silent))
             this.trigger('modal:closed');
+        console.log('modal close')
         return false;
     },
 
@@ -149,7 +150,7 @@ define([
             aview.bind('delete', function(){that.close()});
 
             aview.unbind('signout');
-            aview.bind('signout', function(){that.close()});
+            aview.bind('signout', function(){that.close({silent:true})});
             
             this.$('.content').html( aview.$el );
             return this;

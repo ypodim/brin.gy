@@ -15,7 +15,7 @@ define([
         'click a#account': 'account',
         'click a#explore': 'explore',
         'click a#contexts': 'contextMenu',
-        'click a.context': 'contextTitle',
+        // 'click a.context': 'contextTitle',
     },
     template: _.template(navbarTemplate),
     
@@ -154,7 +154,6 @@ define([
             that.$('.badge-icon').html(that.alerts).toggle((that.alerts>0));
             that.app.trigger('alerts:update', that.alerts);
             that.timer = setTimeout(function(){that.alertPoller()}, 1000);
-            console.log(that.alerts)
         });
     },
 

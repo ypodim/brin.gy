@@ -223,7 +223,6 @@ var state = {
                 that.agent.setUserInfo(info);
                 that.agent.setAgentId( username );
                 that.cookies.set_cookie(username, password, json.email);
-                // that.stats('signin', username);
                 that.trigger('loggedin');
             } else {
                 $('div.alert')
@@ -421,11 +420,18 @@ var state = {
     },
 
     getKeyvals: function(clb){
-        if (! this.context()) {
-            console.log('ERROR: context not set, cannot get keyvals');
-            return;
-        }
-        var url = this.satellite.url+"/profile/"+this.context().title+"/keyvals";
+        
+        var ctitle = this.context().title;
+        if (!ctitle)
+            ctitle = 'all';
+
+        console.log('ctitle', this.context(), ctitle)
+
+        // if (! this.context()) {
+        //     console.log('ERROR: context not set, cannot get keyvals');
+        //     return;
+        // }
+        var url = this.satellite.url+"/profile/"+ctitle+"/keyvals";
         $.getJSON(url, {user:this.agent.id()}, clb);
     },
 
