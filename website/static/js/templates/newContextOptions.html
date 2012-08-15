@@ -25,11 +25,15 @@
 	<div class='well'>
         <div class='header'>Permissions</div>
         <label class="radio">
-            <input type="radio" id='location' value="location" name='keytype' checked />
+            <input type="radio" value="any" name='permissions' checked />
             Anyone can participate.
         </label>
         <label class="radio">
-            <input disabled type="radio" id='users' value="users" name='keytype' disabled />
+            <input type="radio" value="url" name='permissions' />
+            Anyone with the URL.
+        </label>
+        <label class="radio">
+            <input type="radio" value="social" name='permissions' disabled />
             Only users with at least 10 friends/followers can participate (FB/Twitter required). (coming soon)
         </label>
     </div>

@@ -71,10 +71,11 @@ define([
             });    
         }, 200);
     },
-    newContextSubmit: function(){
+    newContextSubmit: function(form){
         var title = this.$('input#title').val();
         var description = this.$('textarea#description').val();
-        var dic = {title:title, description:description};
+        var permissions = this.$('input[name=permissions]:checked').val();
+        var dic = {title:title, description:description, permissions:permissions};
         this.close({silent:true});
         this.trigger('newcontext', dic);
         return false;

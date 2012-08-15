@@ -146,9 +146,9 @@ define([
     render: function(options){
         var that = this;
         this.app.agent.loadUserOptions(function(json){
-            that.alerts = json.alerts.length;
+            that.alerts = (json.alerts) ? json.alerts.length : 0;
             that.$('.badge-icon').html(that.alerts).toggle((that.alerts>0));
-            that.app.trigger('alerts:update', json.alerts.length);
+            that.app.trigger('alerts:update', that.alerts);
         });
 
         this.$('li:not(.explore)').toggle(!this.explorerRunning);
@@ -161,7 +161,7 @@ define([
         this.$('li.menu').show();
         this.$('a').removeClass('highlighted');
 
-        var ctitle = this.app.getContext().title;
+        var ctitle = this.app.context().title;
         this.$('a.context').toggle((ctitle!=null)).html('#'+ctitle);
         
         this.$('.authed').toggle(this.app.agent.loggedIn());

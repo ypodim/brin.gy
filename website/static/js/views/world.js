@@ -105,7 +105,7 @@ define([
     },
 
     backToContext: function(){
-        this.app.router.navigate('#/c/'+this.app.getContext().id);
+        this.app.router.navigate('#/c/'+this.app.context().id);
         return false;
     },
 
@@ -139,8 +139,8 @@ define([
 
         this.app.navbarView.toggleContextTitle({flag:false});
 
-        var ctitle = this.app.getContext().title;
-        this.$('button#backToContext').html('Back to '+this.app.getContext().title+' >').toggle(ctitle != null);
+        var ctitle = this.app.context().title;
+        this.$('button#backToContext').html('Back to '+this.app.context().title+' >').toggle(ctitle != null);
         console.log((ctitle != null));
 
         this.clearMap();
@@ -322,6 +322,7 @@ define([
                         id: null,
                         title: appdic.title,
                         description: appdic.description,
+                        permissions: appdic.permissions,
                         location: {
                             id: circle.id,
                             title: circle.title,
@@ -332,7 +333,6 @@ define([
                         },
                     }
 
-                    
                     var clb = function(json){
                         console.log('new context post got back:', json);
                         if (json.error) {
@@ -351,32 +351,6 @@ define([
                 } else
                     that.showAllContexts({notoggle:true});
             });
-
-            
-
-            
-            // that.app.postNewContext()
-            return false;
-
-            that.app.setContext({
-                id: null,
-                title: appdic.title,
-                description: appdic.description,
-                lid: circle.id,
-                location: circle,
-                expiration: null,
-            });
-
-            that.app.navbarView.render();
-            // that.backToContext();
-
-            that.render();
-            // that.newKey();
-            that.app.modal.render({title: 'newkey'});
-            that.app.modal.bind('newkey', function(obj){
-                console.log('tester', obj)
-            })
-            // that.showAllContexts({notoggle:true});
         });
     },
 
@@ -662,7 +636,7 @@ define([
             return false;
         }
 
-        // console.log('WORLD render', this.app.getContext().title)
+        // console.log('WORLD render', this.app.context().title)
 
         var that = this;
         this.collection.reset();

@@ -5,6 +5,7 @@
 require.config({
   paths: {
     // jquery: 'libs/jquery/jquery-min',
+    jquery: 'libs/require/require-jquery', 
     cookie: 'libs/jquery/jquery.cookie',
 
     backbone: 'libs/backbone/backbone-min',

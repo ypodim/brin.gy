@@ -1,5 +1,6 @@
 import time
 import json
+import random
 
 def getK (context):            return 'profile:%s:keys'                 % (context)
 def getKA(context, key):       return 'profile:%s:key:%s:agents'        % (context, key)
@@ -113,6 +114,12 @@ def doalert(r, atype, c, k, v, u):
 
     # print 'alert', atype, k, v, u, c
 
+def randomID(digits=24):
+    res = ''
+    for i in xrange(24):
+        n = random.randint(0,9)
+        res += '%s' % n
+    return res
 
 def add_context(r, context, username):
     print
@@ -138,13 +145,18 @@ def add_context(r, context, username):
                                 ldic['radius'], 
                                 ldic.get('creator',username))
             lid = lres['lid']
-            # r.set('context:%s:lid' % c, lid)
 
-        cid = r.incr('global:nextcid')
+        if context['permissions'] == 'url':
+            cid = randomID()
+        else:
+            cid = r.incr('global:nextcid')
+
         cdic = dict(id=cid,
                     title=context['title'], 
                     description=context['description'],
-                    lid=lid)
+                    lid=lid,
+                    permissions=context['permissions'],
+                    owner=username)
         
         r.set('context:%s:cid' % context['title'], cid)
         r.hmset('context:cid:%s' % cid, cdic)

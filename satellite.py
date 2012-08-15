@@ -246,33 +246,49 @@ class contexts(tornado.web.RequestHandler):
         self.set_header('Access-Control-Allow-Origin', '*')
         self.set_header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
         self.set_header('Access-Control-Allow-Headers', 'X-Requested-With')
-        self.set_header('Content-Type','application/json; charset=UTF-8')    
-    def get(self):
-        user = self.get_argument('user','')
+        self.set_header('Content-Type','application/json; charset=UTF-8')
+
+    def get_by_cid(self, cid):
+        username = self.get_argument('username','')
+        title = db.r.hget('context:cid:%s' % cid, 'title')
+        if not title:
+            return {}
+        count = db.r.scard('context:cid:%s:users' % cid)
+        userhasit = (username!='' and db.r.sismember('context:cid:%s:users' % cid, username))
+        description = db.r.hget('context:cid:%s' % cid, 'description')
+        lid = db.r.hget('context:cid:%s' % cid, 'lid')
+        loc = db.r.hgetall('location:lid:%s' % lid)
+        permissions = db.r.hget('context:cid:%s' % cid, 'permissions')
+        if permissions == 'url':
+            secret = self.get_argument('secret','')
+            passed = db.authenticate_user(username, secret)
+            if not passed:
+                return {}
+
+        context = dict(title=title, 
+                       count=count, 
+                       userhasit=userhasit, 
+                       description=description,
+                       id=cid,
+                       lid=lid,
+                       permissions=permissions,
+                       location=loc)
+
+        return context
+
+    def get(self, cid=None):
         dic = dict(contexts=[])
+        
+        if cid:
+            cids = [cid]
+        else:
+            topcid = int(db.r.get('global:nextcid'))
+            cids = xrange(1001, topcid+1)
 
-        topcid = int(db.r.get('global:nextcid'))
-        for cid in xrange(1001, topcid+1):
-            title = db.r.hget('context:cid:%s' % cid, 'title')
-            if not title:
-                continue
-                
-            count = db.r.scard('context:cid:%s:users' % cid)
-            description = db.r.hget('context:cid:%s' % cid, 'description')
-
-            lid = db.r.hget('context:cid:%s' % cid, 'lid')
-            loc = db.r.hgetall('location:lid:%s' % lid)
-            userhasit = (user!='' and db.r.sismember('context:cid:%s:users' % cid, user))
-
-            context = dict(title=title, 
-                           count=count, 
-                           userhasit=userhasit, 
-                           description=description,
-                           id=cid,
-                           lid=lid,
-                           location=loc)
-            
-            dic['contexts'].append(context) 
+        for cid in cids:
+            context = self.get_by_cid(cid)
+            if context:
+                dic['contexts'].append(context)
 
         tempc = sorted(dic['contexts'], key=lambda cntx: cntx['count'], reverse=True)
         for i in xrange(len(tempc)):
@@ -298,10 +314,7 @@ class contexts(tornado.web.RequestHandler):
 
         if not error:
             context = tornado.escape.json_decode(context)
-            print 'DEBUG', context
             cid = add_context(db.r, context, username)
-            print cid
-            print
 
         res = dict(error=error, username=username, cid=cid)
         self.write(res)
@@ -317,6 +330,7 @@ application = tornado.web.Application([
     (r"/stats", stats),
     (r"/randomstat", randomstat),
     (r"/contexts", contexts),
+    (r"/contexts/(.*)", contexts),
     
     (r"/.+", serve_request),
 ], **settings)    

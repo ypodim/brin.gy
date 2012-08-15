@@ -93,7 +93,7 @@ var state = {
         this._context.expiration = cdic.expiration;
     },
 
-    getContext: function(){
+    context: function(){
         return this._context;
     },
 
@@ -206,7 +206,7 @@ var state = {
     },
     getContexts: function(clb) {
         var url = this.satellite.url+'/contexts';
-        $.getJSON(url, {user:this.agent.id()}, function(json){
+        $.getJSON(url, {username: this.agent.id()}, function(json){
             clb && clb(json);
         });
     },
@@ -361,7 +361,7 @@ var state = {
             type: options.type,
             url: url,
             data: {data:data, 
-                    context: JSON.stringify(that.getContext()), 
+                    context: JSON.stringify(that.context()), 
                     // context_details: JSON.stringify(context_details),
                     secret:this.agent.fullInfo().pwd,
                     // contextDescription:that.context.descr
@@ -387,12 +387,23 @@ var state = {
         }, 'json');
     },
 
+    getContext: function(cid, clb){
+        var url = this.satellite.url+'/contexts/'+cid;
+        var data = {
+            username: this.agent.id(),
+            secret: this.agent.fullInfo().pwd,
+        };
+        $.getJSON(url, data, function(json){
+            clb && clb(json);
+        }, 'json');
+    },
+
     getKeyvals: function(clb){
-        if (! this.getContext()) {
+        if (! this.context()) {
             console.log('ERROR: context not set, cannot get keyvals');
             return;
         }
-        var url = this.satellite.url+"/profile/"+this.getContext().title+"/keyvals";
+        var url = this.satellite.url+"/profile/"+this.context().title+"/keyvals";
         $.getJSON(url, {user:this.agent.id()}, clb);
     },
 

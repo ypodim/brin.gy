@@ -135,27 +135,21 @@ define([
         });
     },
     showAbout: function() {
-        // this.controlsView.setUIstate({
-            // footer:false,
-        // });
         this.app.modal.render({title: 'about'});
     },
 
-    setContext: function( cid ) {
+    setContext: function(cid) {
         var that = this;
-        var url = this.app.satellite.url+'/contexts';
-        $.getJSON(url, function(json){
-            for (var i in json.contexts) {
-                var cntx = json.contexts[i];
-                if (cntx.id == cid) {
-                    that.app.setContext(cntx);
-                    that.app.cookies.set_context_in_cookie(cntx);
-                    that.worldView.render();
-                    that.app.navbarView.render();
-                    return;
-                }
-            }
-        })
+        this.app.getContext(cid, function(json){
+            if (json.contexts.length) {
+                var cntx = json.contexts[0];
+                that.app.setContext(cntx);
+                that.app.cookies.set_context_in_cookie(cntx);
+                that.worldView.render();
+                that.app.navbarView.render();
+            } else
+                that.navigate('/apps', {trigger:true});
+        });
     },
     
     attributes: function() {
