@@ -425,6 +425,7 @@ define([
             options = {
                 center: center,
                 radius: radius,
+                title: loc.title,
                 // icon: icon,
                 // markerPos: markerPos,
                 infowindowContent: infowindowView.el,
@@ -500,6 +501,7 @@ define([
             center: model.get('location').center,
             radius: model.get('location').radius,
             icon: icon,
+            title: model.get('val'),
             markerPos: markerPos,
             infowindowContent: infowindowView.el,
             strokecolor: model.get('strokecolor'),
@@ -530,7 +532,7 @@ define([
             // icon: options.icon,
             position: markerPos,
             map: this.app.map,
-            title: 'options.title',
+            title: options.title,
         });
         if (options.icon)
             marker.setIcon(options.icon);

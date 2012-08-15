@@ -87,12 +87,10 @@ define([
         return false;
     },
     newKeySubmit: function(e){
-        console.log('modal newky submit')
         var key = this.$('input#key').val();
         var keytype = this.$('[name=keytype]:checked').val();
         this.close();
         this.trigger('newkey', {key:key, type:keytype});
-        console.log('newkey triggered?')
         return false;
     },
     typeSelection: function(e){    
@@ -105,7 +103,6 @@ define([
             kclass = 'icon-user';
         this.$('a.dropdown-toggle > i').attr({class:kclass});
 
-        console.log('oooo')
         return false;
     },
 
@@ -122,7 +119,6 @@ define([
         this.$el.hide();
         if (!(options && options.silent))
             this.trigger('modal:closed');
-        console.log('modal close')
         return false;
     },
 
@@ -179,7 +175,7 @@ define([
             data = {
                 
             }
-            console.log('modal - newkey')
+            // console.log('modal - newkey')
         }
         if (options.title == 'feedback') {
             this.$('span#title').html('Feedback')
