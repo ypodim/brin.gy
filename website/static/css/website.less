@@ -275,6 +275,11 @@ aside > div.list > div > a.highlighted {
 aside > div.list > div.asideEntry > a.asideKey > div.title {
     position: absolute;
     left:5px;
+    
+    max-width: @asideWidth - 30;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 aside > div.list > div.asideEntry > a.asideKey > i {
     float: right;
