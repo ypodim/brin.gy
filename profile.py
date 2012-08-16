@@ -50,7 +50,7 @@ class profile():
     'global:nextcid' # holds next key id to be assigned to a context
     'contexts' # set of all contexts available
     'USER:contexts' # set of contexts in which USER participates
-    'context:cid:CID' # hash: id, title, description, expiration, lid
+    'context:cid:CID' # hash: id, title, description, expiration, lid, permissions
     'context:cid:CID:users' # set
     'context:title:CONTEXTTITLE:cid' # string
 

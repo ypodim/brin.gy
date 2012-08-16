@@ -3,9 +3,12 @@ define([
   'underscore', 
   'backbone',
   'app',
+
+  'tooltip',
+
   'text!templates/valueDetailed.html',
   'text!templates/userMatch.html',
-  ], function($, _, Backbone, appConfig, valuesTemplate, userMatchTemplate){
+  ], function($, _, Backbone, appConfig, tooltipjs, valuesTemplate, userMatchTemplate){
   var ValueView = Backbone.View.extend({
 
     className: 'valcontainer',
@@ -87,6 +90,9 @@ define([
 
     render: function(options) {
         this.$el.html(this.template(this.model.toJSON()));
+
+        if (this.model.get('val').length > 20)
+            this.$('span.value').tooltip({title: this.model.get('val')});
 
         if (options && options.newAttr) {
             this.$('div.btn-group').hide();
