@@ -546,37 +546,17 @@ define([
         // });
 
         var that = this;
-        // var background = 'url(/static/images/';
-        // background += (options.calloutSide) ? 'callout_side' : 'callout';
-        // background += '.png?14)';
         var offsetX = (options.calloutSide) ? 20 : -194;
         var offsetY = (options.calloutSide) ? -95 : -193;
-        // var padding = (options.calloutSide) ? '0 10px 22px 28px' : '10px';
-        // var height = (options.calloutSide) ? '100px' : '150px';
 
         var myOptions = {
             content: options.infowindowContent,
-            disableAutoPan: false,
             maxWidth: 0,
             pixelOffset: new google.maps.Size(offsetX, offsetY),
-            zIndex: null,
-            boxStyle: { 
-                // background: background,
-                'background-color': 'white',
-                'border': '1px solid gray',
-                'border-radius': '5px',
-                'background-color': 'white',
-                'background-size': '100%',
-                // 'padding': padding,
-                // height: height,
-                'z-index': 3000,
-                // closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
-                // closeBoxMargin: "10px 2px 2px 2px",
-            },
             infoBoxClearance: new google.maps.Size(1, 1),
-            isHidden: false,
-            pane: "floatPane",
-            enableEventPropagation: false,
+            // pane: "floatPane",
+            // boxClass: 'infoBox',
+            // enableEventPropagation: false,
         };
 
         var ib = new InfoBox(myOptions);
