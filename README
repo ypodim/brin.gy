@@ -15,3 +15,22 @@ Three components are involved in running Brin.gy:
     
     cd website
     python website.py [-d SATELLITE_ADDRESS][-a AGENTS_ADDRESS]
+
+
+Running Brin.gy locally:
+	
+1) First, make sure you have a running Redis server (http://redis.io/download). 
+2) Install tornado:
+
+	sudo easy_install tornado
+
+3) Install redis for python:
+	
+	sudo easy_install redis
+
+4) Then, run the following:
+
+	python agents.py
+	python satellite.py
+	cd website
+	python website.py -d localhost:22222 -a localhost:10007
