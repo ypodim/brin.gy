@@ -34,3 +34,5 @@ Running Brin.gy locally:
 	python satellite.py
 	cd website
 	python website.py -d localhost:22222 -a localhost:10007
+
+5) Point your browser to http://localhost:8889
