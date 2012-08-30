@@ -515,9 +515,9 @@ define([
         var contextOptions = {
             strokeColor: options.strokecolor,
             strokeOpacity: 0.8,
-            strokeWeight: 2,
+            strokeWeight: 1,
             fillColor: options.fillcolor,
-            fillOpacity: 0.1,
+            fillOpacity: 0.05,
             map: this.app.map,
             center: options.center,
             radius: options.radius,
