@@ -111,7 +111,10 @@ define([
     },
 
     clearMap: function(){
-        _.each(this.circles, function(circle){ circle.infowindow.close(); })
+        _.each(this.circles, function(circle){ 
+            circle.infowindow.close();
+            circle.infopreviewwindow.close();
+        })
         for (var i in this.circles) {
             this.circles[i].circle.setMap(null);
             this.circles[i].marker.setMap(null);
@@ -596,7 +599,7 @@ define([
             _.each(that.circles, function(circle){ circle.infowindow.close(); })
         });
 
-        this.circles.push({circle:mapCircle, marker:marker, infowindow:ib});
+        this.circles.push({circle:mapCircle, marker:marker, infowindow:ib, infopreviewwindow:ibpreview});
     },
 
     appendKey: function(attr){
