@@ -567,10 +567,10 @@ define([
         infowindowPreviewView.bind('preview:clicked', function(title){
             _.each(that.circles, function(circle){ 
                 circle.infowindow.close(); 
-                circle.circle.setOptions({strokeColor: options.strokecolor});
+                circle.circle.setOptions({strokeColor: options.strokecolor, strokeWeight: 1});
             })
             ib.open(that.app.map, marker);
-            mapCircle.setOptions({strokeColor: 'red'});
+            mapCircle.setOptions({strokeColor: 'red', strokeWeight: 3});
         });
 
         infowindowPreviewView.render();
@@ -587,10 +587,10 @@ define([
         google.maps.event.addListener(marker, 'click', function() {
             _.each(that.circles, function(circle){ 
                 circle.infowindow.close(); 
-                circle.circle.setOptions({strokeColor: options.strokecolor});
+                circle.circle.setOptions({strokeColor: options.strokecolor, strokeWeight: 1});
             })
             ib.open(that.app.map, marker);
-            mapCircle.setOptions({strokeColor: 'red'});
+            mapCircle.setOptions({strokeColor: 'red', strokeWeight: 3});
         });
         google.maps.event.addListener(mapCircle, 'click', function() {
             _.each(that.circles, function(circle){ circle.infowindow.close(); })
