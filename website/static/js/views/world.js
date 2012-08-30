@@ -11,6 +11,7 @@ define([
   'views/mapInfoAttribute',
   'views/mapInfoContext',
   'views/mapInfoLocation',
+  'views/mapInfoPreview',
   'views/valueFrame',
   
   'views/modal',
@@ -21,8 +22,8 @@ define([
 
   'http://google-maps-utility-library-v3.googlecode.com/svn/tags/infobox/1.1.9/src/infobox.js'
   ], function($, _, Backbone, appConfig, attrModel, attrCollection, 
-    keyView, mapInfoAttrView, mapInfoContextView, mapInfoLocationView, valueFrameView, modalView, chooselocView, 
-    frameTemplate, explorerMatchTemplate, 
+    keyView, mapInfoAttrView, mapInfoContextView, mapInfoLocationView, mapInfoPreviewView, valueFrameView, modalView, chooselocView, 
+    frameTemplate, explorerMatchTemplate,
     test){
   var welcomeView = Backbone.View.extend({
     el: $('body'),
@@ -490,7 +491,7 @@ define([
         var infowindowView;
         if (model.get('type') == 'location') {
             var infowindowView = new mapInfoAttrView({model:model});
-            infowindowView.render();    
+            infowindowView.render();
         }
         if (model.get('type') == 'context') {
             var infowindowView = new mapInfoContextView({model:model});
@@ -501,7 +502,7 @@ define([
             center: model.get('location').center,
             radius: model.get('location').radius,
             icon: icon,
-            title: model.get('val'),
+            title: model.get('val') || model.get('title'),
             markerPos: markerPos,
             infowindowContent: infowindowView.el,
             strokecolor: model.get('strokecolor'),
@@ -546,7 +547,7 @@ define([
         // });
 
         var that = this;
-        var offsetX = (options.calloutSide) ? 20 : -194;
+        var offsetX = (options.calloutSide) ? 20 : -195;
         var offsetY = (options.calloutSide) ? -95 : -193;
 
         var myOptions = {
@@ -561,6 +562,28 @@ define([
 
         var ib = new InfoBox(myOptions);
 
+        var pmodel = new Backbone.Model({title: options.title});
+        var infowindowPreviewView = new mapInfoPreviewView({model: pmodel});
+        infowindowPreviewView.bind('preview:clicked', function(title){
+            _.each(that.circles, function(circle){ 
+                circle.infowindow.close(); 
+                circle.circle.setOptions({strokeColor: options.strokecolor});
+            })
+            ib.open(that.app.map, marker);
+            mapCircle.setOptions({strokeColor: 'red'});
+        });
+
+        infowindowPreviewView.render();
+        var myOptions = {
+            content: infowindowPreviewView.el,
+            // maxWidth: 0,
+            pixelOffset: new google.maps.Size(-61, -68),
+            infoBoxClearance: new google.maps.Size(1, 1),
+            boxClass: 'infoBoxPreview',
+        };
+        var ibpreview = new InfoBox(myOptions);
+        ibpreview.open(that.app.map, marker);
+        
         google.maps.event.addListener(marker, 'click', function() {
             _.each(that.circles, function(circle){ 
                 circle.infowindow.close(); 

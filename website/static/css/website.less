@@ -700,10 +700,45 @@ div.infoBox {
     background-color: white ! important;
     border: 1px solid gray;
     border-radius: 5px;
-    background-color: white;
     background-size: 100%;
-
 }
+div.infoBoxPreview {
+    z-index: 2000;
+
+    width: 100px;
+    height: 15px;
+    margin: -1px;
+
+    background-size: 100%;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    background-color: rgba(250,250,250,0.9);
+}
+div.infoBoxPreview img { 
+    display: none;
+}
+div.infoBoxPreview a.title {
+    color: #333;
+    font-weight: bold;
+    text-shadow: 0 1px 1px white;
+    display: block;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    -webkit-text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+div.infoBoxPreview img.arrow {
+    display: block;
+    position: absolute;
+    left: 50px;
+    bottom: -15px;
+    width: 20px;
+}
+
+
 div.infoBox > img {
     z-index:1000;
 }
