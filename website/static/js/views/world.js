@@ -739,7 +739,7 @@ define([
             }
 
             that.app.map.fitBounds(bounds);
-            var newZoom = Math.max(that.app.map.getZoom()-3, 3);
+            var newZoom = Math.max(that.app.map.getZoom()-0, 3);
             that.app.map.setZoom(newZoom);
             that.app.map.panBy(130,0);
         });
