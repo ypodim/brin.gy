@@ -76,12 +76,10 @@ var state = {
         }
 
         // console.log('context in cookie', cookie.last_context);
-        if (!cookie.last_context) {
-            cookie.last_context = {title:'all'};
-            this.cookies.set_context_in_cookie(cookie.last_context);
-
-            // this.setContextTitle(cookie.last_context);
-        }
+        // if (!cookie.last_context) {
+            // cookie.last_context = {title:'all'};
+            // this.cookies.set_context_in_cookie(cookie.last_context);
+        // }
     },
 
     setContext: function(cdic) {
@@ -130,10 +128,13 @@ var state = {
             if (typeof(cookie_str) != "string") 
                 cookie_str = "{}";
             
-            cookie = JSON.parse(cookie_str);
+            // cookie = JSON.parse(cookie_str);
+            if (cookie == undefined)
+                cookie = {};
             if (cookie.pseudonyms == undefined)
                 cookie.pseudonyms = {};
-            cookie.pseudonyms[name] = {secret:secret, email:email};    
+            console.log(cookie)
+            cookie.pseudonyms[name] = {secret:secret, email:email};
             cookie_str = JSON.stringify(cookie);
         //     console.log("set_cookie other_names2", cookie_str, secret);
             $.cookie('bringy', cookie_str, {expires:7, path:"/"});
