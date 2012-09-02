@@ -134,7 +134,9 @@ var state = {
                 cookie = {};
             if (cookie.pseudonyms == undefined)
                 cookie.pseudonyms = {};
-            console.log(cookie)
+
+            console.log(cookie.pseudonyms, (cookie.pseudonyms == undefined))
+
             cookie.pseudonyms[name] = {secret:secret, email:email};
             cookie_str = JSON.stringify(cookie);
         //     console.log("set_cookie other_names2", cookie_str, secret);
