@@ -129,6 +129,7 @@ var state = {
                 cookie_str = "{}";
             
             cookie = JSON.parse(cookie_str);
+            console.log(cookie, cookie_str);
             if (cookie == undefined)
                 cookie = {};
             if (cookie.pseudonyms == undefined)
