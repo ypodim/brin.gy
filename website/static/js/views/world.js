@@ -185,6 +185,8 @@ define([
                     score: c.count,
                     // strokecolor: (c.userhasit) ? 'red' : 'green',
                     // fillcolor: (c.userhasit) ? 'red' : 'green',
+                    strokecolor: '#bbb',
+                    fillcolor: '#bbb',
                     location: {
                         title: c.location.title,
                         center: center,
