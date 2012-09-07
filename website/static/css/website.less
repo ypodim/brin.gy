@@ -35,13 +35,19 @@ body {
     pointer-events: none;
 }
 #container > div#mapOverlay {
-    padding-right: @asideWidth;
-    position: relative;
+    position: absolute;
+    top: 0;
+    right: @asideWidth + 10;
+    bottom: 0;
+    left: 0;
+
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
 }
 #container > div#mapOverlay > button {
     display: none;
     position: absolute;
-    left: 10px;
+    /*left: 10px;*/
     top: 10px;
     font-size: 24px;
     line-height: 24px;
@@ -51,7 +57,7 @@ body {
     box-shadow: 0 0 100px black;
 }
 #container > div#mapOverlay > button#backToContext {
-    left: inherit;
+    /*left: inherit;*/
     right: 10px;
     width: @asideWidth;
 
@@ -124,25 +130,46 @@ div#login > ul.menu > li > a:hover > i {
     color: white;
 }
 
-@popupWidth: 400px;
-div#popup {
-    /*position: absolute;*/
-    /*left: 50%;*/
-    width: @popupWidth;
-    margin: 10px auto;
-    background-color: rgba(60,60,60,0.8);
-    pointer-events: all;
+@popupWidth: 500px;
+div.popup {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    /*width: @popupWidth;*/
+    /*margin: 10px auto;*/
+    /*background-color: rgba(60,60,60,0.8);*/
+    /*pointer-events: all;*/
+
+    /*pointer-events: none ! important;*/
+    /*background-color: rgba(60,60,60,0) ! important;*/
     padding: 10px;
+    margin: auto;
     display: none;
 }
-.transparent {
-    background-color: rgba(60,60,60,0) ! important;
-    pointer-events: none ! important;
+
+.opaque {
+    background-color: rgba(60,60,60,0.8);
+    pointer-events: all;
 }
+
 .overlay {
 
 }
-div#popup > div.header {
+
+div#locationChooser {
+    width: @popupWidth;
+}
+div#valueFrame {
+    width: @popupWidth;
+    /*margin: auto;*/
+    background-color: rgba(60,60,60,0.8);
+    pointer-events: all;
+}
+div#valueFrame > div.header {
+    
     font-weight: bold;
     font-size: 28px;
     line-height: 28px;
@@ -150,33 +177,14 @@ div#popup > div.header {
     padding: 5px;
     text-shadow: 0 -1px black;
 }
-div#popup > div.header > button {
+div#valueFrame > div.header > button {
     float: right;
     margin-left: 5px;
 }
 
 
 
-aside {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    z-index: 100;
-    width: @asideWidth;
-    padding: 10px 5px 5px 5px;
-    box-shadow: -4px 0 4px rgba(0,0,0,0.3);
 
-    pointer-events: all;
-
-    -webkit-transition: all 0.5s ease-in-out;
-    -moz-transition: all 0.5s ease-in-out;
-    -o-transition: all 0.5s ease-in-out;
-    -ms-transition: all 0.5s ease-in-out;
-    transition: all 0.5s ease-in-out;
-
-    background-color: #ddd;
-}
 
 .well {
     padding: 10px;
@@ -212,6 +220,29 @@ form.newKey > div.buttons {
 }
 form.newKey > div.buttons > button {
     width: 100px;
+}
+
+
+
+aside {
+    position: absolute;
+    right: 0;
+    top: 40px;
+    bottom: 0;
+    z-index: 100;
+    width: @asideWidth;
+    padding: 10px 5px 5px 5px;
+    box-shadow: -4px 0 4px rgba(0,0,0,0.3);
+
+    pointer-events: all;
+
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+    -ms-transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
+
+    background-color: #ddd;
 }
 
 aside > div.buttons {
@@ -298,13 +329,13 @@ aside > div.list > div.asideEntry > a.asideKey > div.score {
     border-radius: 3px;
     color:white;
 }
-.hideAside {
+/*.hideAside {
     -webkit-transform: translateX(@asideWidth + 50);
     -moz-transform: translateX(@asideWidth + 50);
     -o-transform: translateX(@asideWidth + 50);
     -ms-transform: translateX(@asideWidth + 50);
     transform: translateX(@asideWidth + 50);
-}
+}*/
 
 
 
@@ -494,7 +525,8 @@ div.locationPicker > .wizardPage > input#locationinput {
     border-radius:5px;
     pointer-events: all;
 }
-div#popup div#crosshair {
+
+div#crosshair {
     background: 10px 10px url(/static/images/crosshair.png?1); 
     background-repeat: no-repeat;
     background-size: 100%;
@@ -540,7 +572,7 @@ div.expand {
 /*div.valcontainer:last-child { margin-bottom: 0; }*/
 div.valcontainer > a {
     display: block;
-    height: 36px;
+    height: @valueHeight;
 }
 div.valcontainer > a:hover { text-decoration: none; }
 
@@ -584,6 +616,8 @@ div.valcontainer > div.btn-group  {
 }
 div.valcontainer > div#matches  {
     display: none;
+    border-top: 1px solid rgba(200,200,200,0.3);
+    margin-top: 5px;
 }
 
 
@@ -592,14 +626,15 @@ div.valcontainer > div.chat  {
     margin: 5px 0 5px 0;
     background-color: white;
     position: relative;
-    height: 100px;
+    height: 120px;
 }
 div.valcontainer > div.chat > div.history {
     position: absolute;
     top: 0;
     right: 0;
     left: 0;
-    height: 75px;
+    bottom: 25px;
+
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
 }
@@ -616,7 +651,7 @@ div.valcontainer > div.chat > form.message {
     margin: 0;
 }
 div.valcontainer > div.chat > form.message > input {
-    width: 378px;
+    width: 478px;
     outline: none;
     border-radius: 0;
 }
@@ -640,9 +675,9 @@ div.valcontainer > a > form.newAttr > button {
     width: 99px;
 }
 
-div#matches {
+/*div#matches {
     border-top: 1px solid rgba(200,200,200,0.3);
-}
+}*/
 a.userMatch {
     display: inline-block;
     color: white;
@@ -678,8 +713,8 @@ div#map_canvas {
     top: 40px;
     bottom: 0;
     left: 0;
-    /*right: @asideWidth + 10;*/
-    right: 0;
+    right: @asideWidth + 10;
+    /*right: 0;*/
     z-index: 0;
     /*box-shadow: inset 0 0 5px 5px gray;*/
 }

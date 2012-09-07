@@ -10,6 +10,9 @@ define([
   ], function($, _, Backbone, appConfig, valuesFrameTemplate, valueView, attrModel){
   var ValueFrameView = Backbone.View.extend({
 
+    // className: 'container',
+    el: $('#valueFrame'),
+
     // el: $('#popup'),
     template: _.template(valuesFrameTemplate),
     app: appConfig.getState(),
@@ -49,6 +52,7 @@ define([
     },
 
     expandBtn: function(e){
+        console.log(e)
         var flag = this.model.get('expanded');
         this.model.set({expanded:!flag});
         this.$('i.expand').toggleClass('icon-chevron-down', flag);
@@ -61,7 +65,8 @@ define([
 
     render: function() {
         this.$el.html(this.template(this.model.toJSON()));
-        this.$el.removeClass('transparent').show();
+        // this.$el.removeClass('transparent').show();
+        this.$el.show();
 
         var that = this;
         _.each(this.models, function(model){

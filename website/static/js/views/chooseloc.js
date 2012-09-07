@@ -7,7 +7,7 @@ define([
   'text!templates/chooseloc.html'
   ], function($, _, Backbone, appConfig, mapTemplate){
   var chooseLocationView = Backbone.View.extend({
-    // el: $("#popup"),
+    el: $("#locationChooser"),
     events: {
         'click button#cancel': 'cancelBtn',
         'click button#useloc': 'useBtn',
@@ -72,7 +72,7 @@ define([
         var top = this.$('#crosshair').offset().top;
         var borderwidth = parseInt(this.$('#crosshair').css('border-width'));
 
-        var x = $(this.app.map.getDiv()).width()/2 - 120;
+        var x = $(this.app.map.getDiv()).width()/2 - 40;
         var y = top - header + padding + 2*borderwidth + 210;
         var scale = Math.pow(2, 20.9-zoom);
         var radius = 10*scale;
@@ -136,7 +136,8 @@ define([
 
     render: function(options){
         var compiled_template = _.template( mapTemplate );
-        this.$el.html( compiled_template() ).addClass('transparent').show();
+        // this.$el.html( compiled_template() ).parent().addClass('transparent').show();
+        this.$el.html( compiled_template() ).show();
         this.unbind();
 
         var that = this;

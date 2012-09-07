@@ -16,14 +16,16 @@ define([
   
   'views/modal',
   'views/chooseloc',
+  'views/asideAttributes',
+  'views/asideContexts',
 
-  'text!templates/frame.html',
   'text!templates/explorerMatch.html',
 
   'http://google-maps-utility-library-v3.googlecode.com/svn/tags/infobox/1.1.9/src/infobox.js'
   ], function($, _, Backbone, appConfig, attrModel, attrCollection, 
     keyView, mapInfoAttrView, mapInfoContextView, mapInfoLocationView, mapInfoPreviewView, valueFrameView, modalView, chooselocView, 
-    frameTemplate, explorerMatchTemplate,
+    asideAttributesView, asideContextsView,
+    explorerMatchTemplate,
     test){
   var welcomeView = Backbone.View.extend({
     el: $('body'),
@@ -37,7 +39,7 @@ define([
     
     circles: [],
     collection: new attrCollection(),
-    selectedKeyModel: null,
+    // selectedKeyModel: null,
     popup: null,
 
     showExplorer: function(){
@@ -50,7 +52,7 @@ define([
         this.$('button#addLocation').hide();
         this.$('button#backToContext').hide();
 
-        this.$('aside').show().toggleClass('hideAside', false);
+        // this.$('aside').show().toggleClass('hideAside', false);
 
         this.populateAllLocations();
 
@@ -79,8 +81,10 @@ define([
 
         var emTemplate = _.template( explorerMatchTemplate );
 
+        this.vFrame && this.vFrame.close();
+        this.$('#mapOverlay').removeClass('opaque');
         this.popup && this.popup.close({force:true});
-        this.popup = new chooselocView({el: this.$('#popup')});
+        this.popup = new chooselocView();
         this.popup.render({explore: true});
         this.popup.bind('explorer:match', function(obj){
 
@@ -106,6 +110,7 @@ define([
     },
 
     backToContext: function(){
+        this.$('button#backToContext').hide();
         this.app.router.navigate('#/c/'+this.app.context().id);
         return false;
     },
@@ -130,13 +135,26 @@ define([
     },
 
     showAllContexts: function(options){
-        console.log('showAllContexts');
-        this.renderFrame();
+        var that = this;
+        this.aside = new asideContextsView();
+        this.aside.render();
+        this.aside.bind('appclick', function(cmodel){
+            _.each(that.circles, function(circle){ 
+                if (circle.marker.title == cmodel.get('title')) {
+                    that.locationClick({strokecolor:''}, circle.infowindow, circle.marker, circle.circle);
 
-        if (!(options && options.notoggle))
-            this.$('aside').show().toggleClass('hideAside', true);
+                    // circle.marker.setZIndex(100);
+                    // circle.infowindow.setZIndex(100);
+                } else {
+                    // circle.marker.setZIndex(0);
+                    // circle.infowindow.setZIndex(0);
+                }
+            })
+        });
 
-        // this.app.modal.close();
+
+        this.$('#mapOverlay').removeClass('opaque');
+        this.vFrame && this.vFrame.close();
         this.popup && this.popup.close({force:true, close:true});
 
         this.$('button#addContext').show();
@@ -149,7 +167,6 @@ define([
         
         this.clearMap();
 
-        var that = this;
         this.app.getContexts(function(json){
             var bounds = new google.maps.LatLngBounds();
 
@@ -198,6 +215,8 @@ define([
                 });
 
                 that.addMapCircle(model);
+
+                that.aside.add(model);
             }
 
             if (!bounds.isEmpty()) {
@@ -371,11 +390,11 @@ define([
         this.getLocationInput( function(circle){
             that.$('button#addLocation').show();
 
-            if (that.selectedKeyModel)
-                that.keyClickClb( that.selectedKeyModel );
+            if (that.aside.selectedKeyModel)
+                that.keyClickClb( that.aside.selectedKeyModel );
 
             if (circle && circle.center) {
-                var key = that.selectedKeyModel.get('key');
+                var key = that.aside.selectedKeyModel.get('key');
                 that.app.modal.render({
                     title: 'getLocTitle',
                     location: circle.title,
@@ -392,8 +411,9 @@ define([
     },
 
     getLocationInput: function(clb) {
+        this.$('#mapOverlay').removeClass('opaque');
         this.popup && this.popup.close({force:true});
-        this.popup = new chooselocView({el: this.$('#popup')});
+        this.popup = new chooselocView();
         this.popup.render();
         this.popup.unbind('newlocation');
         this.popup.bind('newlocation', function(circle){ 
@@ -448,10 +468,13 @@ define([
         this.clearMap();
 
         var models = this.collection.where({key: kmodel.get('key')});
-        this.selectedKeyModel = kmodel;
+        this.aside.selectedKeyModel = kmodel;
 
         if (kmodel.get('type') == 'location') {
             this.$('button#addLocation').show();
+
+            this.$('#mapOverlay').removeClass('opaque');
+            this.vFrame && this.vFrame.close();
             this.popup && this.popup.close({force:true});
             var bounds = new google.maps.LatLngBounds();
             for (var i in models) {
@@ -474,14 +497,20 @@ define([
             if (models.length == 1)
                 this.app.map.setZoom(this.app.map.getZoom()-3);
 
-            this.app.map.panBy(130, 0);
+            // this.app.map.panBy(130, 0);
         }
 
         if (kmodel.get('type') == 'string') {
             this.$('button#addLocation').hide();
-            this.popup && this.popup.close({force:true});
-            this.popup = new valueFrameView({el: this.$('#popup'), models:models, key:kmodel.get('key')});
-            this.popup.render();
+            this.$('#mapOverlay').addClass('opaque');
+
+            this.vFrame && this.vFrame.close();
+            this.vFrame = new valueFrameView({
+                models: models, 
+                key: kmodel.get('key'),
+            });
+
+            this.vFrame.render();
         }
     },
 
@@ -570,12 +599,7 @@ define([
         var pmodel = new Backbone.Model({title: options.title});
         var infowindowPreviewView = new mapInfoPreviewView({model: pmodel});
         infowindowPreviewView.bind('preview:clicked', function(title){
-            _.each(that.circles, function(circle){ 
-                circle.infowindow.close(); 
-                circle.circle.setOptions({strokeColor: options.strokecolor, strokeWeight: 1});
-            })
-            ib.open(that.app.map, marker);
-            mapCircle.setOptions({strokeColor: 'red', strokeWeight: 3});
+            that.locationClick(options, ib, marker, mapCircle);
         });
 
         infowindowPreviewView.render();
@@ -585,17 +609,13 @@ define([
             pixelOffset: new google.maps.Size(-61, -68),
             infoBoxClearance: new google.maps.Size(1, 1),
             boxClass: 'infoBoxPreview',
+            disableAutoPan: true,
         };
         var ibpreview = new InfoBox(myOptions);
         ibpreview.open(that.app.map, marker);
         
         google.maps.event.addListener(marker, 'click', function() {
-            _.each(that.circles, function(circle){ 
-                circle.infowindow.close(); 
-                circle.circle.setOptions({strokeColor: options.strokecolor, strokeWeight: 1});
-            })
-            ib.open(that.app.map, marker);
-            mapCircle.setOptions({strokeColor: 'red', strokeWeight: 3});
+            that.locationClick(options, ib, marker, mapCircle);
         });
         google.maps.event.addListener(mapCircle, 'click', function() {
             _.each(that.circles, function(circle){ circle.infowindow.close(); })
@@ -604,45 +624,59 @@ define([
         this.circles.push({circle:mapCircle, marker:marker, infowindow:ib, infopreviewwindow:ibpreview});
     },
 
-    appendKey: function(attr){
-        var keymodel = new Backbone.Model(attr);
-        var kview = new keyView({model: keymodel});
-        var that = this;
-        kview.render();
-        kview.bind('keyclick', function(){
-            that.$('a.asideKey').removeClass('highlighted');
-            that.$('a.asideKey > i').removeClass('icon-white');
-        });
-        kview.bind('keyclick', this.keyClickClb);
 
-        if (attr.prepend) {
-            this.$('aside > div.list').prepend(kview.el);
-            kview.keyClick();
-            if (attr.type == 'location')
-                this.$('button#addLocation').click();
-            if (attr.type == 'string')
-                // this.vFrameView.newAttr();
-                this.popup.newAttr();
-        } else
-            this.$('aside > div.list').append(kview.el);
-        return false;
+    locationClick: function(options, ib, marker, mapCircle){
+        _.each(this.circles, function(circle){ 
+            circle.infowindow.close(); 
+            circle.circle.setOptions({strokeColor: options.strokecolor, strokeWeight: 1});
+        })
+        ib.open(this.app.map, marker);
+        mapCircle.setOptions({strokeColor: 'red', strokeWeight: 3});
     },
 
-    renderFrame: function(){
-        this.$('#container').html(_.template( frameTemplate ));
-    },
+    // appendKey: function(attr){
+    //     var keymodel = new Backbone.Model(attr);
+    //     var kview = new keyView({model: keymodel});
+    //     var that = this;
+    //     kview.render();
+    //     kview.bind('keyclick', function(){
+    //         that.$('a.asideKey').removeClass('highlighted');
+    //         that.$('a.asideKey > i').removeClass('icon-white');
+    //     });
+    //     kview.bind('keyclick', this.keyClickClb);
+
+    //     if (attr.prepend) {
+    //         this.$('aside > div.list').prepend(kview.el);
+    //         kview.keyClick();
+    //         if (attr.type == 'location')
+    //             this.$('button#addLocation').click();
+    //         if (attr.type == 'string')
+    //             // this.vFrameView.newAttr();
+    //             this.popup.newAttr();
+    //     } else
+    //         this.$('aside > div.list').append(kview.el);
+    //     return false;
+    // },
+
+    // renderFrame: function(){
+        // this.$('#container').html(_.template( frameTemplate ));
+    // },
 
     render: function(){
-        this.renderFrame();
+        this.aside = new asideAttributesView();
+        this.aside.render();
+        this.aside.bind('keyclick', this.keyClickClb);
+
+        // this.renderFrame();
 
         this.app.navbarView.enableContextMenu();
         this.app.navbarView.toggleContextTitle({flag:true});
-        this.$('aside').toggleClass('hideAside', false);
+        
         this.$('button#addContext').fadeOut();
         this.clearMap();
 
-        if (this.selectedKeyModel) {
-            this.keyClickClb( this.selectedKeyModel );
+        if (this.aside.selectedKeyModel) {
+            this.keyClickClb( this.aside.selectedKeyModel );
             return false;
         }
 
@@ -650,7 +684,7 @@ define([
 
         var that = this;
         this.collection.reset();
-        this.$('aside > div.list').empty();
+        // this.$('aside > div.list').empty();
         this.app.getKeyvals(function(json){
             var bounds = new google.maps.LatLngBounds();
             var locTitles = {};
@@ -660,7 +694,8 @@ define([
                 attr.key;
                 attr.score;
 
-                that.appendKey(attr);
+                // that.appendKey(attr);
+                that.aside.add(attr);
 
                 for (var v in attr.values) {
                     var val = attr.values[v];
@@ -703,36 +738,34 @@ define([
                                 type: attr.type,
                             });
 
-                            // if (attr.type == 'location') {
-                                var lat = parseFloat(xdata.lat);
-                                var lng = parseFloat(xdata.lon);
-                                var center = new google.maps.LatLng(lat, lng);
-                                var radius = parseInt(xdata.radius);
+                            var lat = parseFloat(xdata.lat);
+                            var lng = parseFloat(xdata.lon);
+                            var center = new google.maps.LatLng(lat, lng);
+                            var radius = parseInt(xdata.radius);
 
-                                var markerPos = center;
-                                var lid = xdata.id;
+                            var markerPos = center;
+                            var lid = xdata.id;
 
-                                if (locTitles[lid]) {
-                                    var randomRadius = Math.min( (0.3+Math.random()) * radius, radius*0.8 );
-                                    var randomAngle = Math.random()*360;
-                                    markerPos = google.maps.geometry.spherical.computeOffset(
-                                                    center, 
-                                                    randomRadius, 
-                                                    randomAngle
-                                                )
-                                } else {
-                                    locTitles[lid] = lid;
-                                }
+                            if (locTitles[lid]) {
+                                var randomRadius = Math.min( (0.3+Math.random()) * radius, radius*0.8 );
+                                var randomAngle = Math.random()*360;
+                                markerPos = google.maps.geometry.spherical.computeOffset(
+                                                center, 
+                                                randomRadius, 
+                                                randomAngle
+                                            )
+                            } else {
+                                locTitles[lid] = lid;
+                            }
 
-                                bounds.extend(markerPos);
+                            bounds.extend(markerPos);
 
-                                model.set({location: {
-                                    center:center, 
-                                    radius:radius,
-                                    markerPos: markerPos,
-                                }});
-                                that.addMapCircle(model);
-                            // }
+                            model.set({location: {
+                                center:center, 
+                                radius:radius,
+                                markerPos: markerPos,
+                            }});
+                            that.addMapCircle(model);
                             
                             that.collection.add(model);
                         }
@@ -743,7 +776,7 @@ define([
             that.app.map.fitBounds(bounds);
             var newZoom = Math.max(that.app.map.getZoom()-0, 3);
             that.app.map.setZoom(newZoom);
-            that.app.map.panBy(130,0);
+            // that.app.map.panBy(130,0);
         });
     },
 
