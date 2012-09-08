@@ -169,13 +169,16 @@ div#valueFrame {
     pointer-events: all;
 }
 div#valueFrame > div.header {
-    
     font-weight: bold;
     font-size: 28px;
     line-height: 28px;
     color: white;
     padding: 5px;
     text-shadow: 0 -1px black;
+}
+div#valueFrame > div.header > div.title{
+    display: inline-block;
+    max-width: @popupWidth - 100;
 }
 div#valueFrame > div.header > button {
     float: right;
@@ -367,13 +370,13 @@ form.feedback > div.buttons > button {
 
 /*############# SEND MESSAGE #############*/
 form.sendMessage {
-    text-align:center;
+    /*text-align:center;*/
 }
 form.sendMessage > textarea {
     display:block;
     margin: 10px auto;
-    height:400px;
-    width:90%;
+    height:200px;
+    width:370px;
     /*line-height:30px;*/
 }
 form.sendMessage > div {
@@ -389,9 +392,8 @@ form.sendMessage > label > input {
     -webkit-transform: scale(3,3);
     -moz-transform: scale(3,3);
 }
-
-form.sendMessage .selectedAttr {
-    font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+form.sendMessage > div.buttons {
+    margin-top: 50px;
 }
 
 div.sendMessage {
@@ -619,7 +621,10 @@ div.valcontainer > div#matches  {
     border-top: 1px solid rgba(200,200,200,0.3);
     margin-top: 5px;
 }
-
+div.valcontainer > div#matches > div {
+    display: inline-block;
+    margin-right: 5px;
+}
 
 div.valcontainer > div.chat  {
     display: none;

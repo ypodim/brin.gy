@@ -14,7 +14,6 @@ define([
   'views/mapInfoPreview',
   'views/valueFrame',
   
-  'views/modal',
   'views/chooseloc',
   'views/asideAttributes',
   'views/asideContexts',
@@ -23,7 +22,7 @@ define([
 
   'http://google-maps-utility-library-v3.googlecode.com/svn/tags/infobox/1.1.9/src/infobox.js'
   ], function($, _, Backbone, appConfig, attrModel, attrCollection, 
-    keyView, mapInfoAttrView, mapInfoContextView, mapInfoLocationView, mapInfoPreviewView, valueFrameView, modalView, chooselocView, 
+    keyView, mapInfoAttrView, mapInfoContextView, mapInfoLocationView, mapInfoPreviewView, valueFrameView, chooselocView, 
     asideAttributesView, asideContextsView,
     explorerMatchTemplate,
     test){
@@ -795,21 +794,21 @@ define([
             'mapTypeControlOptions': {position: google.maps.ControlPosition.TOP_CENTER},
         });
 
-
-        // var moonTypeOptions = {
-        //     getTileUrl: function(coord, zoom) {
-        //         return 'http://localhost:8889/static/images/tile256.png';
-        //     },
-        //     isPng: true,
-        //     tileSize: new google.maps.Size(256, 256),
-        //     maxZoom: 9,
-        //     minZoom: 0,
-        //     radius: 1738000,
-        //     name: 'Moon'
-        // };
-        // var moonMapType = new google.maps.ImageMapType(moonTypeOptions);
-        // this.app.map.mapTypes.set('moon', moonMapType);
-        // this.app.map.setMapTypeId('moon');
+        var moonTypeOptions = {
+            getTileUrl: function(coord, zoom) {
+                return "http://d2h9tsxwphc7ip.cloudfront.net/" + zoom + '/' + coord.x + ' ' + coord.y + ".png";
+            },
+            isPng: true,
+            tileSize: new google.maps.Size(256, 256),
+            maxZoom: 9,
+            minZoom: 0,
+            radius: 1738000,
+            name: 'web',
+            isPng: true,
+        };
+        var moonMapType = new google.maps.ImageMapType(moonTypeOptions);
+        this.app.map.mapTypes.set('web', moonMapType);
+        // this.app.map.setMapTypeId('web');
 
         google.maps.event.addListener(this.app.map, 'click', function(event) {
             _.each(that.circles, function(circle){ circle.infowindow.close(); })

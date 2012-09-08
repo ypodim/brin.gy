@@ -417,6 +417,25 @@ var state = {
             clb && clb(json.chat);
         }, 'json');
     },
+
+    sendMessage: function(dstusername, message, key, val, clb) {
+        var url = this.agent.baseUrl()+'/send_message';
+        // var that = this;
+        var data = {
+            dstusername: dstusername,
+            username: this.agent.id(),
+            secret: this.agent.fullInfo().pwd, 
+            message: message, 
+            key: key,
+            val: val,
+        };
+        $.post(url, data, function(json){
+            clb && clb();
+            return false;
+        }, 'json');
+    },
+
+
     getChats: function(cid, key, val, clb) {
         var url = this.satellite.url+'/chat';
         var data = {cid:cid, key:key, val:val};

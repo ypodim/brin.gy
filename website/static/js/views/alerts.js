@@ -43,3 +43,4 @@ define([
   });
   return alertsView;
 });
+

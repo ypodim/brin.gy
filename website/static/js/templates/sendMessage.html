@@ -1,8 +1,15 @@
 <div class='alert sendMessage'></div>
 <form class="well sendMessage">
     <div>
-        You are sending a message to <span id='' class="badge badge-warning"></span> people, based on their attributes:
-        <div id='selectedAttrs'></div> 
+    	To: <span class='dst'><%= username %></span>
+        <!-- <div id='selectedAttrs'></div>  -->
     </div>
-    <textarea placeholder='type your message...'></textarea>
+    <textarea placeholder='type your message...' autofocus ></textarea>
+
+
+	<div class='buttons'>
+		<button class='btn btn-danger cancel'>Cancel</button>
+		<button class='btn btn-success'>Send</button>
+	</div>
+
 </form>

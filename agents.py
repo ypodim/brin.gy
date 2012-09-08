@@ -583,6 +583,38 @@ class api_call(tornado.web.RequestHandler):
         sendEmail(email, 'info@brin.gy', subject, message)
         self.write(dict(error=error, result=result))
 
+    def api_send_message(self):
+        error = ''
+        result = []
+        message = self.get_argument('message','')
+        key = self.get_argument('key','')
+        val = self.get_argument('val','')
+        username = self.get_argument('username','')
+        secret = self.get_argument('secret','')
+        dstusername = self.get_argument('dstusername','')
+        passed = db.authenticate_user(username, secret)
+        print 'authentication', username, secret, passed
+        if not passed:
+            self.write(dict(error='authentication failed'))
+            return
+
+        
+        email = db.get_email(dstusername)
+
+        subject = 'Brin.gy message'
+        ip = self.request.headers.get('X-Real-Ip')
+        emailbody = 'Hey,\n\n'
+        emailbody+= 'You got a message from: %s\n' % username
+        emailbody+= 'about: %s/%s' % (key, val)
+        emailbody+= '\n\n'
+        emailbody+= '=====================\n'
+        emailbody+= message
+        emailbody+= '\n=====================\n'
+        emailbody+= 'IP address that was used: %s' % ip
+        
+        sendEmail(email, 'info@brin.gy', subject, emailbody)
+        self.write(dict(error=error, result=result))
+
 
 class stats(tornado.web.RequestHandler):
     def options(self):
@@ -744,7 +776,9 @@ application = tornado.web.Application([
     (r"/cleanup", api_call),
     (r"/clear_context", api_call),
     (r"/feedback", api_call),
+    (r"/send_message", api_call),
     (r"/stats", stats),
+    
 
     (r"/oauth", ProviderHandler),
     (r"/oauth/twitter", TwitterHandler),

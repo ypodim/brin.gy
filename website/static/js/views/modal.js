@@ -7,6 +7,7 @@ define([
 
   'views/account',
   'views/alerts',
+  'views/sendMessage',
 
   'text!templates/modal.html',
   'text!templates/reminder.html',
@@ -15,9 +16,9 @@ define([
   'text!templates/about.html',
   'text!templates/newContextOptions.html',
   'text!templates/newLocationAttr.html',
-  // 'text!templates/alerts.html',
+  'text!templates/sendMessage.html',
   
-  ], function($, _, Backbone, appConfig, tooltip, accountView, alertsView, modalTemplate, reminderTemplate, newkeyTemplate, feedbackTemplate, aboutTemplate, newContextOptionsTemplate, newLocationAttrTemplate){
+  ], function($, _, Backbone, appConfig, tooltip, accountView, alertsView, sendMessageView, modalTemplate, reminderTemplate, newkeyTemplate, feedbackTemplate, aboutTemplate, newContextOptionsTemplate, newLocationAttrTemplate, sendMessageTemplate){
   var modalView = Backbone.View.extend({
     el: $('#modal'),
     events: {
@@ -32,11 +33,16 @@ define([
         'submit form.newContextOptions': 'newContextSubmit',
         'keyup input#title': 'contextTitleChange',
         'submit form.newLocationAttr': 'newLocationAttr',
+        // 'submit form.sendMessage': 'sendMessage',
 
         'click a.help': 'showHelp',
     },
     app: appConfig.getState(),
 
+    sendMessage: function(){
+        console.log('message')
+        return false;
+    },
     showHelp: function(e){
         var helpContent = $(e.target).parent().children('.helpContent');
         var caption = 'hide';
@@ -159,6 +165,12 @@ define([
             // this.$('.footer').html("<button class='account btn btn-success cancel'>Close</button>")
             return this;
         }
+        if (options.title == 'send message') {
+            var mview = new sendMessageView({el:this.$('.content'), model: options.model});
+            mview.render();
+            mview.bind('sent:message', this.close);
+            return this;
+        }
 
 
 
@@ -206,8 +218,16 @@ define([
             };
             this.$('div.box').addClass('mid-narrow');
         }
+        // if (options.title == 'sendMessage') {
+        //     this.$('span#title').html('send message')
+        //     inner_template = _.template( sendMessageTemplate );
+        //     data = {
+        //         // location: options.location,
+        //     };
+        //     this.$('div.box');
+        // }
         
-
+        console.log('wtfs')
         this.$('.content').html( inner_template(data) );
         return this;
     },

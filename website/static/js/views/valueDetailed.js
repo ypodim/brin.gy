@@ -6,9 +6,10 @@ define([
 
   'tooltip',
 
+  'views/userMatch',
+
   'text!templates/valueDetailed.html',
-  'text!templates/userMatch.html',
-  ], function($, _, Backbone, appConfig, tooltipjs, valuesTemplate, userMatchTemplate){
+  ], function($, _, Backbone, appConfig, tooltipjs, userMatchView, valuesTemplate){
   var ValueView = Backbone.View.extend({
 
     className: 'valcontainer',
@@ -110,19 +111,25 @@ define([
         }
         this.$('button#addBtn').html(btnCaption).addClass(btnClass);
         this.$('button.dropdown-toggle').addClass(btnClass);
-            
-        var utemplate = _.template(userMatchTemplate);
+        
+        
         var matches = this.model.get('matches');
         for (var m in matches) {
             var username = matches[m];
-            var uhtml = utemplate({username:username});
-            this.$('div#matches').append(uhtml);
+            var umodel = new Backbone.Model({
+                username: username,
+                key: this.model.get('key'),
+                val: this.model.get('val'),
+            });
+            var umatch = new userMatchView({model: umodel});
+            umatch.render();
+            this.$('div#matches').append(umatch.$el);
         }
-        if (matches.length > 2000) {
-            var uhtml = utemplate({username:'more...'});
-            this.$('div#matches').append(uhtml);
-            this.$('a.userMatch:last-child > i').css({visibility: 'hidden'});
-        }
+        // if (matches.length > 2000) {
+        //     var uhtml = utemplate({username:'more...'});
+        //     this.$('div#matches').append(uhtml);
+        //     this.$('a.userMatch:last-child > i').css({visibility: 'hidden'});
+        // }
 
         this.populateChatHistory();
 
