@@ -30,7 +30,7 @@ define([
     el: $('body'),
     events: {
         'click button#addLocation': 'addLocationBtn',
-        'click button#newKey': 'newKey',
+        // 'click button#newKey': 'newKey',
         'click button#addContext': 'addContextBtn',
         'click button#backToContext': 'backToContext',
     },
@@ -223,13 +223,13 @@ define([
             }
         });
     },
-    newKey: function() {
-        if (! this.app.agent.loggedIn({alert:1})) {
-            this.app.navbarView.login();
-            return false;
-        }
-        this.app.modal.render({title: 'newkey'});
-    },
+    // newKey: function() {
+    //     if (! this.app.agent.loggedIn({alert:1})) {
+    //         this.app.navbarView.login();
+    //         return false;
+    //     }
+    //     this.app.modal.render({title: 'newkey'});
+    // },
 
     addAttr: function (model) {
         this.app.mutateKeyValue({
@@ -364,10 +364,13 @@ define([
                             return false;
                         }
 
-                        that.app.router.navigate('#/c/'+json.cid);
-                        that.app.modal.render({title: 'newkey'});
+                        that.app.router.navigate('#/c/'+json.cid, {trigger:true});
+                        that.render();
+                        // that.aside.newKey();
+
+                        // that.app.modal.render({title: 'newkey'});
                         // that.app.modal.bind('newkey', function(obj){
-                            // console.log('new key result', obj)
+                        //     console.log('new key result', obj)
                         // })
                     };
                     that.app.postNewContext(contextOptions, clb);
