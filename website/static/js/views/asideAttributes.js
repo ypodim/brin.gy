@@ -28,7 +28,13 @@ define([
             this.app.navbarView.login();
             return false;
         }
+        var that = this;
         this.app.modal.render({title: 'newkey'});
+        this.app.modal.bind('newkey', function(m){
+            m.prepend = 1;
+            m.score = 1;
+            that.add(m);
+        });
     },
 
     add: function(attr){
@@ -48,12 +54,10 @@ define([
         if (attr.prepend) {
             this.$('aside > div.list').prepend(kview.el);
             kview.keyClick();
-            if (attr.type == 'location')
-                this.$('button#addLocation').click();
-            if (attr.type == 'string')
-                this.popup.newAttr();
-        } else
-            this.$('div.list').append(kview.el);
+            this.trigger('new:attribute', attr.type)
+        }
+
+        this.$('div.list').append(kview.el);
         return false;
     },
 

@@ -84,11 +84,12 @@ require([
             appp.doDelete();
         });
 
-        appp.modal.bind('newkey', function(m){
-            m.prepend = 1;
-            m.score = 1;
-            wldView.appendKey(m);
-        });
+        // appp.modal.bind('newkey', function(m){
+        //     console.log('main newkey', wldView)
+        //     m.prepend = 1;
+        //     m.score = 1;
+        //     wldView.appendKey(m);
+        // });
         
         appp.bind('alerts:update', wldView.updateAlertsIndication);
 

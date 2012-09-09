@@ -227,7 +227,6 @@ define([
         //     this.$('div.box');
         // }
         
-        console.log('wtfs')
         this.$('.content').html( inner_template(data) );
         return this;
     },

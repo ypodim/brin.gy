@@ -366,9 +366,9 @@ define([
 
                         that.app.router.navigate('#/c/'+json.cid);
                         that.app.modal.render({title: 'newkey'});
-                        that.app.modal.bind('newkey', function(obj){
+                        // that.app.modal.bind('newkey', function(obj){
                             // console.log('new key result', obj)
-                        })
+                        // })
                     };
                     that.app.postNewContext(contextOptions, clb);
                     
@@ -662,9 +662,17 @@ define([
     // },
 
     render: function(){
+        var that = this;
+
         this.aside = new asideAttributesView();
         this.aside.render();
         this.aside.bind('keyclick', this.keyClickClb);
+        this.aside.bind('new:attribute', function(atype){
+            if (atype == 'location')
+                that.$('button#addLocation').click();
+            if (atype == 'string')
+                that.vFrame.newAttr();
+        });
 
         // this.renderFrame();
 
@@ -681,7 +689,7 @@ define([
 
         // console.log('WORLD render', this.app.context().title)
 
-        var that = this;
+        
         this.collection.reset();
         // this.$('aside > div.list').empty();
         this.app.getKeyvals(function(json){
