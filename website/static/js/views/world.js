@@ -134,10 +134,12 @@ define([
     },
 
     showAllContexts: function(options){
+        console.log('showAllContexts !!!!')
         var that = this;
-        this.aside = new asideContextsView();
-        this.aside.render();
-        this.aside.bind('appclick', function(cmodel){
+
+        var aside = new asideContextsView();
+        aside.render();
+        aside.bind('appclick', function(cmodel){
             _.each(that.circles, function(circle){ 
                 if (circle.marker.title == cmodel.get('title')) {
                     that.locationClick({strokecolor:''}, circle.infowindow, circle.marker, circle.circle);
@@ -215,7 +217,7 @@ define([
 
                 that.addMapCircle(model);
 
-                that.aside.add(model);
+                aside.add(model);
             }
 
             if (!bounds.isEmpty()) {
@@ -223,13 +225,6 @@ define([
             }
         });
     },
-    // newKey: function() {
-    //     if (! this.app.agent.loggedIn({alert:1})) {
-    //         this.app.navbarView.login();
-    //         return false;
-    //     }
-    //     this.app.modal.render({title: 'newkey'});
-    // },
 
     addAttr: function (model) {
         this.app.mutateKeyValue({
@@ -325,10 +320,10 @@ define([
 
         this.app.modal.render({
             title: 'newContextOptions', 
-            // location: circle.title,
-        }).bind('modal:closed', function(){
-            // console.log('newcontext - modal closed');
-            that.showAllContexts({notoggle:true});
+        }).unbind('modal:cancel').unbind('newcontext');
+
+        this.app.modal.bind('modal:cancel', function(){
+            that.showAllContexts();
         }).bind('newcontext', function(appdic){
             
             var message = 'Choosing location for new application: "'+appdic.title+'"';
@@ -340,8 +335,6 @@ define([
                 that.$('button#addContext').show();
                 
                 if (circle && circle.center) {
-                    // console.log('newcontext - modal closed with', appdic, circle);
-
                     contextOptions = {
                         id: null,
                         title: appdic.title,
@@ -364,8 +357,22 @@ define([
                             return false;
                         }
 
-                        that.app.router.navigate('#/c/'+json.cid, {trigger:true});
-                        that.render();
+                        that.app.router.navigate('#/c/'+json.cid);
+
+                        that.aside && that.aside.die();
+                        that.aside = new asideAttributesView();
+                        that.aside.render();
+                        that.aside.bind('keyclick', this.keyClickClb);
+                        that.aside.bind('new:attribute', function(atype){
+                            console.log('triggered new:attribute after new context')
+                            if (atype == 'location')
+                                that.$('button#addLocation').click();
+                            if (atype == 'string') {
+                                // that.vFrame.newAttr();
+                                console.log('ok out')
+                            }
+                        });
+
                         // that.aside.newKey();
 
                         // that.app.modal.render({title: 'newkey'});
@@ -375,8 +382,11 @@ define([
                     };
                     that.app.postNewContext(contextOptions, clb);
                     
-                } else
-                    that.showAllContexts({notoggle:true});
+                } else {
+                    console.log('new context, no location chosen')
+                    that.showAllContexts();
+                }
+                    
             });
         });
     },
@@ -667,10 +677,12 @@ define([
     render: function(){
         var that = this;
 
+        this.aside && this.aside.die();
         this.aside = new asideAttributesView();
         this.aside.render();
         this.aside.bind('keyclick', this.keyClickClb);
         this.aside.bind('new:attribute', function(atype){
+            // console.log('triggered new:attribute after rendering')
             if (atype == 'location')
                 that.$('button#addLocation').click();
             if (atype == 'string')

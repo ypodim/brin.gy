@@ -42,7 +42,7 @@ define([
     },
 
     apps: function(){
-        // console.log('router apps')
+        console.log('router apps')
         this.worldView.showAllContexts();
     },
 

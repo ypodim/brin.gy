@@ -56,7 +56,6 @@ require([
         
         // worldView
         var wldView = new worldView();
-        // wldView.render();
 
         // navbar
         appp.navbarView = new navbarView({});
@@ -70,7 +69,6 @@ require([
             appp.cookies.del_cookie(username);
             appp.agent.unsetAgentId();
             appp.navbarView.render();
-            // wldView.render();
         });
 
         appp.modal.bind('reminder', function(){

@@ -10,7 +10,7 @@ define([
   'text!templates/asideContexts.html',
   ], function($, _, Backbone, appConfig, attrModel, contextView, asideContextsTemplate){
   var asideContextsView = Backbone.View.extend({
-    el: $('aside'),
+    // el: $('aside'),
     events: {
         // 'click button#addLocation': 'addLocationBtn',
         // 'click button#newKey': 'newKey',
@@ -22,18 +22,18 @@ define([
 
     collection: new Backbone.Collection(),
 
-    newKey: function() {
-        if (! this.app.agent.loggedIn({alert:1})) {
-            this.app.navbarView.login();
-            return false;
-        }
-        this.app.modal.render({title: 'newkey'});
-    },
+    // newKey: function() {
+    //     if (! this.app.agent.loggedIn({alert:1})) {
+    //         this.app.navbarView.login();
+    //         return false;
+    //     }
+    //     this.app.modal.render({title: 'newkey'});
+    // },
 
     add: function(cmodel){
         var cview = new contextView({model: cmodel});
         var that = this;
-        this.collection.add(cmodel);
+        // this.collection.add(cmodel);
 
         cview.render();
         cview.bind('appclick', function(){
@@ -42,13 +42,20 @@ define([
             that.trigger('appclick', cmodel);
         });
 
-        this.$('div.list').append(cview.el);
+        this.$('div.list').append(cview.$el);
         return false;
     },
 
     render: function(){
-        this.collection.reset();
+        // this.collection.reset();
         this.$el.html(this.template());
+        $('aside').html(this.$el);
+    },
+
+    die: function(){
+        this.unbind();
+        this.undelegateEvents();
+        this.remove();
     },
 
     initialize: function(options){

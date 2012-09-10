@@ -22,12 +22,11 @@ define([
   var modalView = Backbone.View.extend({
     el: $('#modal'),
     events: {
-        'click a.close': 'close',
-        // 'click button#reminder': 'reminderBtn',
+        'click a.close': 'cancel',
         'submit form.reminder': 'submitReminder',
 
         'click li > a': 'typeSelection',
-        'click button.cancel': 'close',
+        'click button.cancel': 'cancel',
         'submit form.newKey': 'newKeySubmit',
         'submit form.feedback': 'feedbackSubmit',
         'submit form.newContextOptions': 'newContextSubmit',
@@ -57,7 +56,7 @@ define([
         var dic = {
             val: this.$('input#title').val(),
         };
-        this.close({silent:true});
+        this.close();
         this.trigger('newlocationattr', dic);
         return false;
     },
@@ -82,7 +81,7 @@ define([
         var description = this.$('textarea#description').val();
         var permissions = this.$('input[name=permissions]:checked').val();
         var dic = {title:title, description:description, permissions:permissions};
-        this.close({silent:true});
+        this.close();
         this.trigger('newcontext', dic);
         return false;
     },
@@ -119,12 +118,17 @@ define([
         return false;
     },
 
+    cancel: function() {
+        this.trigger('modal:cancel');
+        this.close();
+    },
+
     close: function(options){
         // this.undelegateEvents();
         this.$('[required]').removeAttr('required');
         this.$el.hide();
-        if (!(options && options.silent))
-            this.trigger('modal:closed');
+        // if (!(options && options.silent))
+            // this.trigger('modal:closed');
         return false;
     },
 
@@ -152,7 +156,7 @@ define([
             aview.bind('delete', function(){that.close()});
 
             aview.unbind('signout');
-            aview.bind('signout', function(){that.close({silent:true})});
+            aview.bind('signout', function(){that.close()});
             
             this.$('.content').html( aview.$el );
             return this;
@@ -236,7 +240,7 @@ define([
         var that = this;
         $('body').keydown(function(e){
             if (e.keyCode == 27)
-                that.close();
+                that.cancel();
         })
     },
   });

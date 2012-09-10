@@ -10,7 +10,7 @@ define([
   'text!templates/asideAttributes.html',
   ], function($, _, Backbone, appConfig, attrModel, keyView, asideAttributesTemplate){
   var asideAttributesView = Backbone.View.extend({
-    el: $('aside'),
+    // el: $('aside'),
     events: {
         // 'click button#addLocation': 'addLocationBtn',
         'click button#newKey': 'newKey',
@@ -34,6 +34,7 @@ define([
             m.prepend = 1;
             m.score = 1;
             that.add(m);
+            return false;
         });
     },
 
@@ -57,13 +58,20 @@ define([
             this.trigger('new:attribute', attr.type)
         }
 
-        this.$('div.list').append(kview.el);
+        this.$('div.list').append(kview.$el);
         return false;
+    },
+
+    die: function(){
+        this.unbind();
+        this.undelegateEvents();
+        this.remove();
     },
 
     render: function(){
         this.collection.reset();
         this.$el.html(this.template());
+        $('aside').html(this.$el);
     },
 
     initialize: function(options){

@@ -14,11 +14,11 @@ body {
 }
 
 @asideWidth: 260px;
-#full, #container {
+#container {
     position: absolute;
     /*z-index:0;*/
     left: 0;
-    right: 0;
+    right: @asideWidth + 10;
     top: 40px;
     bottom: 0;
     padding: 0;
@@ -27,17 +27,17 @@ body {
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
 }
-#full {
+/*#full {
     background-color: #eee;
     display: none;
-}
+}*/
 #container {
     pointer-events: none;
 }
 #container > div#mapOverlay {
     position: absolute;
     top: 0;
-    right: @asideWidth + 10;
+    right: 0;
     bottom: 0;
     left: 0;
 
@@ -250,7 +250,7 @@ aside {
     background-color: #ddd;
 }
 
-aside > div.buttons {
+aside > div > div.buttons {
     height: 30px;
     margin: 0;
     font-size: 22px;
@@ -261,11 +261,11 @@ aside > div.buttons {
     border-bottom: 1px solid rgba(0,0,0,0.1);
     box-shadow: 0 1px rgba(0,0,0,0.4);
 }
-aside > div.buttons > button {
+aside > div > div.buttons > button {
     float: right;
 }
 
-aside > div.list {
+aside > div > div.list {
     position: absolute;
     right: 0;
     top: 50px;
@@ -278,10 +278,10 @@ aside > div.list {
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
 }
-aside > div.list > div.asideEntry {
+aside > div > div.list > div.asideEntry {
     width: @asideWidth;
 }
-aside > div.list > div.asideEntry > a.asideKey {
+aside > div > div.list > div.asideEntry > a.asideKey {
     color: rgba(50,50,50,0.8);
     display: block;
     position: relative;
@@ -292,13 +292,13 @@ aside > div.list > div.asideEntry > a.asideKey {
     line-height: 22px;
     border-radius: 5px;
 }
-aside > div.list > div.asideEntry > a.asideKey:hover {
+aside > div > div.list > div.asideEntry > a.asideKey:hover {
     cursor: pointer;
     color: rgba(0,0,0,0.5);
     border: 1px solid rgba(0,0,0,0.15);
     margin: -1px;
 }
-aside > div.list > div > a.highlighted {
+aside > div > div.list > div > a.highlighted {
     /*background-color: rgba(0,0,0,0.2);*/
     /*background-color: rgba(255, 207, 121,0.8);*/
     /*background-color: rgba(153, 204, 255, 0.9);*/
@@ -308,7 +308,7 @@ aside > div.list > div > a.highlighted {
     text-shadow: 0 -1px rgba(150,150,150,0.5);
     box-shadow: 0 2px 2px white, 0 -1px 2px gray;
 }
-aside > div.list > div.asideEntry > a.asideKey > div.title {
+aside > div > div.list > div.asideEntry > a.asideKey > div.title {
     position: absolute;
     left:5px;
     
@@ -317,11 +317,11 @@ aside > div.list > div.asideEntry > a.asideKey > div.title {
     overflow: hidden;
     white-space: nowrap;
 }
-aside > div.list > div.asideEntry > a.asideKey > i {
+aside > div > div.list > div.asideEntry > a.asideKey > i {
     float: right;
     margin: 7px 5px 0 5px;
 }
-aside > div.list > div.asideEntry > a.asideKey > div.score {
+aside > div > div.list > div.asideEntry > a.asideKey > div.score {
     position: absolute;
     top: 2px;
     left: 221px;
