@@ -29,7 +29,7 @@ define([
             return false;
         }
         var that = this;
-        this.app.modal.render({title: 'newkey'});
+        this.app.modal.render({title: 'newkey'}).unbind('newkey');
         this.app.modal.bind('newkey', function(m){
             m.prepend = 1;
             m.score = 1;
