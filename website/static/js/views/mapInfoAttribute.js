@@ -9,8 +9,8 @@ define([
   'text!templates/mapInfoAttribute.html',
   'text!templates/userMatch.html'
   ], function($, _, Backbone, appConfig, tooltipjs, mapInfoAttrTemplate, userMatchTemplate){
-  var welcomeView = Backbone.View.extend({
-    // el: $('div'),
+  var mapInfoAttributeView = Backbone.View.extend({
+    
     className: 'infoboxAttribute',
     events: {
         'click a.zoom': 'zoomHere',
@@ -89,5 +89,5 @@ define([
         this.model.bind('change', this.render);
     },
   });
-  return welcomeView;
+  return mapInfoAttributeView;
 });

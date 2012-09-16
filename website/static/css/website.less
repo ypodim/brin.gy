@@ -726,7 +726,7 @@ div#map_canvas {
     /*box-shadow: inset 0 0 5px 5px gray;*/
 }
 
-@infoboxHeight: 130px;
+@infoboxHeight: 140px;
 div.infoBox {
     z-index: 2000;
 
@@ -747,6 +747,7 @@ div.infoBox {
 div.infoBoxPreview {
     width: 100px;
     height: 15px;
+    line-height: 15px;
     margin: -1px;
 
     background-size: 100%;
@@ -770,6 +771,18 @@ div.infoBoxPreview a.title {
     -webkit-text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+}
+div.infoBoxPreview a.title > span.mini-count {
+    display:inline-block;
+    color: white;
+    background-color:#ff2244;
+    box-shadow: 0px 3px 1px rgba(0,0,0,0.5);
+    padding: 2px 5px 2px 5px;
+    text-align:center;
+    text-shadow: 0px -1px 0px rgba(0,0,0,0.6);
+    border-radius: 2px;
+    
+    line-height: 12px;
 }
 div.infoBoxPreview img.arrow {
     display: block;

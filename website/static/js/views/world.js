@@ -294,6 +294,7 @@ define([
             showControls: true,
             location: {center:circle.center, radius:circle.radius},
             type: 'location',
+            title: 'skata',
         });
 
         this.collection.add(model);
@@ -544,11 +545,13 @@ define([
             infowindowView.render();
         }
 
+        console.log(model)
         options = {
             center: model.get('location').center,
             radius: model.get('location').radius,
             icon: icon,
             title: model.get('val') || model.get('title'),
+            score: model.get('score'),
             markerPos: markerPos,
             infowindowContent: infowindowView.el,
             strokecolor: model.get('strokecolor'),
@@ -608,7 +611,10 @@ define([
 
         var ib = new InfoBox(myOptions);
 
-        var pmodel = new Backbone.Model({title: options.title});
+        var pmodel = new Backbone.Model({
+            title: options.title,
+            score: options.score,
+        });
         var infowindowPreviewView = new mapInfoPreviewView({model: pmodel});
         infowindowPreviewView.bind('preview:clicked', function(title){
             that.locationClick(options, ib, marker, mapCircle);
@@ -783,9 +789,10 @@ define([
                             bounds.extend(markerPos);
 
                             model.set({location: {
-                                center:center, 
-                                radius:radius,
+                                center: center, 
+                                radius: radius,
                                 markerPos: markerPos,
+                                title: xdata.title,
                             }});
                             that.addMapCircle(model);
                             
