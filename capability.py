@@ -175,16 +175,21 @@ class location:
                 ldic['id'] = lid
                 if self.inBounds(ldic, bounds):
                     reversePointers = []
+                    score = 0
                     for rpointer in self.r.smembers('location:lid:%s:reverse' % lid):
                         reversePointers = json.loads(rpointer)
                         for rp in reversePointers:
                             if rp['type'] == 'context':
+                                score += self.r.scard('context:cid:%s:users' % rp['cid'])
                                 cdata = self.r.hgetall('context:cid:%s' % rp['cid'])
                                 rp['cdata'] = cdata
+                            else:
+                                # print rp
+                                score += 1
+                                # score += self.r.scard('context:cid:%s:users' % rp['cid'])
 
                     ldic['reversePointers'] = reversePointers
-                    
-                    
+                    ldic['score'] = score
                     
                     # arguments.get('radius')
                     locations.append(ldic)

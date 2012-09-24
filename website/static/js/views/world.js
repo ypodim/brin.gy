@@ -440,41 +440,42 @@ define([
         var that = this;
         this.clearMap();
         this.app.getAllLocations(function(json){
-        for (var i in json.locations){
-            var loc = json.locations[i];
+            for (var i in json.locations){
+                var loc = json.locations[i];
 
-            var radius = parseFloat(loc.radius);
-            var lat = parseFloat(loc.lat);
-            var lng = parseFloat(loc.lon);
-            var center = new google.maps.LatLng(lat, lng);
-            model = new Backbone.Model({
-                id: loc.id,
-                center: center,
-                radius: radius,
-                title: loc.title,
-                creator: loc.creator || '"unknown"',
-            });
+                var radius = parseFloat(loc.radius);
+                var lat = parseFloat(loc.lat);
+                var lng = parseFloat(loc.lon);
+                var center = new google.maps.LatLng(lat, lng);
+                model = new Backbone.Model({
+                    id: loc.id,
+                    center: center,
+                    radius: radius,
+                    title: loc.title,
+                    creator: loc.creator || '"unknown"',
+                });
 
-            var infowindowView = new mapInfoLocationView({model:model});
-            infowindowView.render();
-            infowindowView.bind('uselocation', function(model){ 
-                that.popup.useLocation(model);
-            });
+                var infowindowView = new mapInfoLocationView({model:model});
+                infowindowView.render();
+                infowindowView.bind('uselocation', function(model){ 
+                    that.popup.useLocation(model);
+                });
 
-            options = {
-                center: center,
-                radius: radius,
-                title: loc.title,
-                // icon: icon,
-                // markerPos: markerPos,
-                infowindowContent: infowindowView.el,
-                // strokecolor: model.get('strokecolor'),
-                // fillcolor: model.get('fillcolor'),
-                calloutSide: true,
-            };
-            that.addPlainMapCircle(options);
-        }
-    });
+                options = {
+                    center: center,
+                    radius: radius,
+                    title: loc.title,
+                    score: loc.score,
+                    // icon: icon,
+                    // markerPos: markerPos,
+                    infowindowContent: infowindowView.el,
+                    // strokecolor: model.get('strokecolor'),
+                    // fillcolor: model.get('fillcolor'),
+                    calloutSide: true,
+                };
+                that.addPlainMapCircle(options);
+            }
+        });
     },
 
     keyClickClb: function(kmodel){
@@ -545,7 +546,7 @@ define([
             infowindowView.render();
         }
 
-        console.log(model)
+        // console.log(model)
         options = {
             center: model.get('location').center,
             radius: model.get('location').radius,
