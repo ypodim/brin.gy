@@ -8,7 +8,7 @@ from keys import *
 
 class DB:
     def __init__(self, db=0):
-        self.r = redis.Redis(host='localhost', port=6379, db=db)
+        self.r = redis.Redis(host='ego.media.mit.edu', port=23532, db=db)
 
     def generate_secret(self, username):
         secret = ''
